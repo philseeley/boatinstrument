@@ -76,7 +76,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         body: Center(
           child: Column(
             children: <Widget>[
-              AutoPilotDisplay(autoPilot),
+              AutoPilotDisplay(settings!),
               AutoPilotControl(settings!)
               ,
             ],

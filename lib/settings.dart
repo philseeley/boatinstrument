@@ -32,7 +32,6 @@ class Settings {
     // TODO
     Directory directory = await path_provider.getApplicationDocumentsDirectory();
     _store = File('${directory.path}/settings.json');
-    // _store = File('settings.json');
 
     try {
       String? s = _store?.readAsStringSync();
