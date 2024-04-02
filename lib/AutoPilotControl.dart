@@ -33,7 +33,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
     }
 
     _lockTimer?.cancel();
-;
+
     _lockTimer =  Timer(Duration(seconds: widget.settings.lockSeconds), () {
       setState(() {
         _locked = true;
