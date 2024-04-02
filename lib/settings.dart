@@ -29,7 +29,6 @@ class Settings {
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
 
   static load() async {
-    // TODO
     Directory directory = await path_provider.getApplicationDocumentsDirectory();
     _store = File('${directory.path}/settings.json');
 

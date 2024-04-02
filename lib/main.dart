@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:nav/AutoPilotDisplay.dart';
-import 'package:nav/AutoPilotControl.dart';
+import 'package:nav/auto_pilot_display.dart';
+import 'package:nav/auto_pilot_control.dart';
 import 'package:nav/settings.dart';
 import 'package:nav/settings_page.dart';
-
-import 'autopilot.dart';
 
 void main() {
   runApp(const NavApp());
@@ -31,7 +29,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Settings? settings;
-  AutoPilot autoPilot = AutoPilot();
 
   _MainPageState() {
     loadSettings();

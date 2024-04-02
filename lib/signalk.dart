@@ -1,0 +1,187 @@
+import 'package:json_annotation/json_annotation.dart';
+import 'package:nav/autopilot.dart';
+
+part 'signalk.g.dart';
+
+@JsonSerializable()
+class StringValue {
+  String value;
+
+  StringValue({
+    this.value = ''
+  });
+
+  factory StringValue.fromJson(Map<String, dynamic> json) =>
+      _$StringValueFromJson(json);
+}
+
+@JsonSerializable()
+class DoubleValue {
+  double value;
+
+  DoubleValue({
+    this.value = 0.0
+  });
+
+  factory DoubleValue.fromJson(Map<String, dynamic> json) =>
+      _$DoubleValueFromJson(json);
+}
+
+@JsonSerializable()
+class Wind {
+  DoubleValue? speedApparent;
+  DoubleValue? angleApparent;
+
+  Wind({
+    this.speedApparent,
+    this.angleApparent
+  });
+
+  factory Wind.fromJson(Map<String, dynamic> json) =>
+      _$WindFromJson(json);
+}
+
+@JsonSerializable()
+class Environment {
+  Wind? wind;
+
+  Environment({
+    this.wind
+  });
+
+  factory Environment.fromJson(Map<String, dynamic> json) =>
+      _$EnvironmentFromJson(json);
+}
+
+@JsonSerializable()
+class Target {
+  DoubleValue? headingMagnetic;
+  DoubleValue? windAngleApparent;
+
+  Target({
+    this.headingMagnetic,
+    this.windAngleApparent
+  });
+
+  factory Target.fromJson(Map<String, dynamic> json) =>
+      _$TargetFromJson(json);
+}
+
+enum AutopilotState {
+  standby('Standby'),
+  auto('Auto'),
+  track('Track'),
+  vane('Vane');
+
+  final String name;
+
+  const AutopilotState(this.name);
+}
+
+@JsonSerializable()
+class AutopilotStateValue {
+  AutopilotState value;
+
+  AutopilotStateValue({
+    this.value = AutopilotState.standby
+  });
+
+  factory AutopilotStateValue.fromJson(Map<String, dynamic> json) =>
+      _$AutopilotStateValueFromJson(json);
+}
+
+
+@JsonSerializable()
+class Autopilot {
+  AutopilotStateValue? state;
+  Target? target;
+
+  Autopilot({
+    this.state,
+    this.target
+  });
+
+  factory Autopilot.fromJson(Map<String, dynamic> json) =>
+      _$AutopilotFromJson(json);
+}
+
+@JsonSerializable()
+class Steering {
+  Autopilot? autopilot;
+
+  Steering({
+    this.autopilot
+  });
+
+  factory Steering.fromJson(Map<String, dynamic> json) =>
+      _$SteeringFromJson(json);
+}
+
+@JsonSerializable()
+class Waypoint {
+  String? name;
+
+  Waypoint({
+    this.name
+  });
+
+  factory Waypoint.fromJson(Map<String, dynamic> json) =>
+      _$WaypointFromJson(json);
+}
+
+@JsonSerializable()
+class WaypointValue {
+  List<Waypoint> value;
+
+  WaypointValue({
+    this.value = const []
+  });
+
+  factory WaypointValue.fromJson(Map<String, dynamic> json) =>
+      _$WaypointValueFromJson(json);
+}
+
+@JsonSerializable()
+class Route {
+  WaypointValue? waypoints;
+
+  Route({
+    this.waypoints
+  });
+
+  factory Route.fromJson(Map<String, dynamic> json) =>
+      _$RouteFromJson(json);
+}
+
+@JsonSerializable()
+class Navigation {
+  DoubleValue? courseOverGroundTrue;
+  DoubleValue? magneticVariation;
+  Route? currentRoute;
+
+  Navigation({
+    this.courseOverGroundTrue,
+    this.magneticVariation,
+    this.currentRoute
+  });
+
+  factory Navigation.fromJson(Map<String, dynamic> json) =>
+      _$NavigationFromJson(json);
+}
+
+@JsonSerializable()
+class Vessel {
+  Environment? environment;
+  Steering? steering;
+  Navigation? navigation;
+
+  Vessel({
+    this.environment
+  });
+
+  factory Vessel.fromJson(Map<String, dynamic> json) =>
+      _$VesselFromJson(json);
+}
+
+int rad2Deg(double? rad) => ((rad??0) * 57.29578).round();
+
