@@ -1,6 +1,7 @@
-import 'dart:io';
-
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'settings.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -13,13 +14,15 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsState extends State<SettingsPage> {
+  Timer? _authRequestTimer;
+  String? _authRequestHREF;
 
   @override
   Widget build(BuildContext context) {
     Settings settings = widget.settings;
 
     List<Widget> list = [
-      SwitchListTile(title: const Text("Enable Control Lock"),
+      SwitchListTile(title: const Text("Enable Control Lock:"),
           value: settings.enableLock,
           onChanged: (bool value) {
             setState(() {
@@ -27,7 +30,7 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       ListTile(
-          leading: const Text("Lock Timeout(seconds)"),
+          leading: const Text("Lock Timeout:"),
         title: Slider(
             min: 2.0,
             max: 20.0,
@@ -41,11 +44,19 @@ class _SettingsState extends State<SettingsPage> {
             }),
       ),
       ListTile(
-          leading: const Text("Auth Token"),
-          title: TextFormField(
-              initialValue: settings.authToken,
-              onChanged: (value) => settings.authToken = value)
-      )
+              leading: const Text("Signalk Server:"),
+              title: TextFormField(
+                  initialValue: settings.signalkServer,
+                  onChanged: (value) => settings.signalkServer = value)
+      ),
+      ListTile(
+          leading: const Text("Request Auth Token:"),
+          title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
+      ),
+      ListTile(
+          leading: const Text("Auth token:"),
+          title: Text(settings.authToken)
+      ),
       ];
 
     return Scaffold(
@@ -56,5 +67,76 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
+  }
+
+  void _requestAuthToken() async {
+    Uri uri = Uri.http(
+        widget.settings.signalkServer, '/signalk/v1/access/requests');
+
+    http.Response response = await http.post(
+        uri,
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: '{"clientId": "${widget.settings.clientID}", "description": "Nav App"}'
+    );
+
+    dynamic data = json.decode(response.body);
+    print(data['state']);
+    _authRequestHREF = data['href'];
+
+    setState(() {
+      widget.settings.authToken = 'PENDING';
+    });
+
+    _checkAuhRequest();
+  }
+
+  void _checkAuhRequest () {
+    _authRequestTimer =  Timer(const Duration(seconds: 5), _checkAuthRequestResponse);
+  }
+
+  void _checkAuthRequestResponse() async {
+    String? result;
+
+    Uri uri = Uri.http(
+        widget.settings.signalkServer, _authRequestHREF!);
+
+    http.Response response = await http.get(
+      uri,
+      headers: {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+    );
+
+    dynamic data = json.decode(response.body);
+
+    print(data['state']);
+
+    if(data['state'] == 'COMPLETED') {
+      if(data['statusCode'] == 200) {
+        if(data['accessRequest']['permission'] == 'APPROVED') {
+          setState(() {
+            widget.settings.authToken = data['accessRequest']['token'];
+          });
+        } else {
+          result = 'Failed: permission ${data['accessRequest']['permission']}';
+        }
+      } else {
+        result = 'Failed: code ${data['statusCode']}';
+      }
+
+      if(result != null) {
+        if (mounted) {
+          setState(() {
+            widget.settings.authToken = result!;
+          });
+        }
+      }
+    } else {
+      _checkAuhRequest();
+    }
   }
 }

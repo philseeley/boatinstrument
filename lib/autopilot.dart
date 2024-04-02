@@ -13,7 +13,7 @@ class AutoPilot {
   AutoPilotState status = AutoPilotState.off;
   int heading = 0;
   int vaneAngle = 0;
-  String goto = "";
+  String waypoint = "";
 
   int cog = 0;
   int apparentWindAngle = 0;

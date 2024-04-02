@@ -31,7 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-#  path_provider:
+  path_provider:
+  http:
   json_annotation:
 
 dev_dependencies:
@@ -45,6 +46,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+  build_runner:
   json_serializable:
 
 # For information on the generic Dart part of this file, see the

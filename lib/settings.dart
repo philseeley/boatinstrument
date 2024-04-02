@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
-//TODO import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:json_annotation/json_annotation.dart';
 
 part 'settings.g.dart';
@@ -9,6 +9,8 @@ part 'settings.g.dart';
 class Settings {
   bool enableLock;
   int lockSeconds;
+  String signalkServer;
+  String clientID;
   String authToken;
 
   static File? _store;
@@ -16,6 +18,8 @@ class Settings {
   Settings({
     this.enableLock = true,
     this.lockSeconds = 5,
+    this.signalkServer = 'openplotter.local:3000',
+    this.clientID = 'nav-1234', //TODO gen a GUID
     this.authToken = "",
   });
 
@@ -26,9 +30,9 @@ class Settings {
 
   static load() async {
     // TODO
-    // Directory directory = await path_provider.getApplicationDocumentsDirectory();
-    // _store = File('${directory.path}/settings.json');
-    _store = File('settings.json');
+    Directory directory = await path_provider.getApplicationDocumentsDirectory();
+    _store = File('${directory.path}/settings.json');
+    // _store = File('settings.json');
 
     try {
       String? s = _store?.readAsStringSync();
