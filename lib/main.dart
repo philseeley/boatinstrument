@@ -91,6 +91,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       return SettingsPage(settings!);
     }));
 
+    settings?.save();
+
     setState(() {});
   }
 }
