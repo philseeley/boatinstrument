@@ -30,7 +30,7 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       ListTile(
-          leading: const Text("Lock Timeout:"),
+        leading: const Text("Lock Timeout:"),
         title: Slider(
             min: 2.0,
             max: 20.0,
@@ -40,6 +40,20 @@ class _SettingsState extends State<SettingsPage> {
             onChanged: (double value) {
               setState(() {
                 settings.lockSeconds = value.toInt();
+              });
+            }),
+      ),
+      ListTile(
+        leading: const Text("Value Smoothing:"),
+        title: Slider(
+            min: 1.0,
+            max: 10.0,
+            divisions: 10,
+            value: settings.valueSmoothing.toDouble(),
+            label: "${settings.valueSmoothing.toInt()}",
+            onChanged: (double value) {
+              setState(() {
+                settings.valueSmoothing = value.toInt();
               });
             }),
       ),
@@ -62,8 +76,6 @@ class _SettingsState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        actions: [
-        ],
       ),
       body: ListView(children: list)
     );
@@ -83,7 +95,6 @@ class _SettingsState extends State<SettingsPage> {
     );
 
     dynamic data = json.decode(response.body);
-    print(data['state']);
     _authRequestHREF = data['href'];
 
     setState(() {
@@ -112,8 +123,6 @@ class _SettingsState extends State<SettingsPage> {
     );
 
     dynamic data = json.decode(response.body);
-
-    print(data['state']);
 
     if(data['state'] == 'COMPLETED') {
       if(data['statusCode'] == 200) {

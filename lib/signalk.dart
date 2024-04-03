@@ -208,7 +208,7 @@ double averageAngle(double angle1, double angle2) {
 double smoothAngle(double current, double latest, int smooth) {
   double average = averageAngle(current, latest);
 
-  double min, mins, max, maxs;
+  double min, max;
 
   if(current < average) {
     min = current;

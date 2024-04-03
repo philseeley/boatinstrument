@@ -9,6 +9,7 @@ part 'settings.g.dart';
 class Settings {
   bool enableLock;
   int lockSeconds;
+  int valueSmoothing;
   String signalkServer;
   String clientID;
   String authToken;
@@ -18,6 +19,7 @@ class Settings {
   Settings({
     this.enableLock = true,
     this.lockSeconds = 5,
+    this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
     this.clientID = 'nav-1234', //TODO gen a GUID
     this.authToken = "",

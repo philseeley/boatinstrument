@@ -17,7 +17,9 @@ class AutoPilotDisplay extends StatefulWidget {
 
 class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   Timer? _dataTimer;
-  Vessel self = Vessel();
+  Vessel _self = Vessel();
+  double? _courseOverGround;
+  double? _windAngleApparent;
   String? _error;
 
   _AutoPilotDisplayState () {
@@ -31,7 +33,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   }
   @override
   Widget build(BuildContext context) {
-    AutopilotState? state = self.steering?.autopilot?.state?.value;
+    AutopilotState? state = _self.steering?.autopilot?.state?.value;
 
     List<Widget> pilot = [
       Text(style: Theme.of(context).textTheme.titleLarge, "Pilot"),
@@ -43,25 +45,31 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       case AutopilotState.standby:
         break;
       case AutopilotState.auto:
-        pilot.add(Text("Heading: ${rad2Deg(self.steering?.autopilot?.target?.headingMagnetic?.value)}"));
+        pilot.add(Text("Heading: ${rad2Deg(_self.steering?.autopilot?.target?.headingMagnetic?.value)}"));
         break;
       case AutopilotState.track:
-        pilot.add(Text("Waypoint: ${self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
+        pilot.add(Text("Waypoint: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
         break;
       case AutopilotState.vane:
-        int targetWindAngleApparent = rad2Deg(self.steering?.autopilot?.target?.windAngleApparent?.value);
+        int targetWindAngleApparent = rad2Deg(_self.steering?.autopilot?.target?.windAngleApparent?.value);
         pilot.add(Text("Wind Angle: ${targetWindAngleApparent.abs()} ${targetWindAngleApparent < 0 ? 'P' : 'S'}"));
         break;
     }
 
-    int windAngleApparent = rad2Deg(self.environment?.wind?.angleApparent?.value);
+    double cogLatest = _self.navigation?.courseOverGroundTrue?.value??0;
+    _courseOverGround = smoothAngle(_courseOverGround??cogLatest, cogLatest, widget.settings.valueSmoothing);
+
+    double windAngleApparentLatest = _self.environment?.wind?.angleApparent?.value??0;
+    _windAngleApparent = smoothAngle(_windAngleApparent??windAngleApparentLatest, windAngleApparentLatest, widget.settings.valueSmoothing);
+
+    int windAngleApparent = rad2Deg(_windAngleApparent);
 
     return Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Column(children: pilot),
           Column(children: [
             Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
-            Text("COG: ${rad2Deg(self.navigation?.courseOverGroundTrue?.value)}"),
+            Text("COG: ${rad2Deg(_courseOverGround)}"),
             Text("Apparent Wind Angle: ${windAngleApparent.abs()} ${windAngleApparent < 0 ? 'P' : 'S'}"),
           ],)
         ]),
@@ -70,7 +78,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   }
 
   void _startDataTimer () {
-    _dataTimer = Timer(const Duration(seconds: 3), _getAutoPilotState);
+    _dataTimer = Timer(const Duration(seconds: 1), _getAutoPilotState);
   }
 
   dynamic _getData (String path) async {
@@ -96,12 +104,12 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
       if (mounted) {
         setState(() {
-          self = Vessel.fromJson(data);
+          _self = Vessel.fromJson(data);
         });
       }
     } catch (e) {
       setState(() {
-        _error = 'Failed to get data $e';
+        _error = 'Failed to get data: $e';
       });
     }
 

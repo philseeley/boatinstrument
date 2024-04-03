@@ -9,6 +9,7 @@ part of 'settings.dart';
 Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       enableLock: json['enableLock'] as bool? ?? true,
       lockSeconds: json['lockSeconds'] as int? ?? 5,
+      valueSmoothing: json['valueSmoothing'] as int? ?? 1,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
       clientID: json['clientID'] as String? ?? 'nav-1234',
@@ -18,6 +19,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
 Map<String, dynamic> _$SettingsToJson(Settings instance) => <String, dynamic>{
       'enableLock': instance.enableLock,
       'lockSeconds': instance.lockSeconds,
+      'valueSmoothing': instance.valueSmoothing,
       'signalkServer': instance.signalkServer,
       'clientID': instance.clientID,
       'authToken': instance.authToken,
