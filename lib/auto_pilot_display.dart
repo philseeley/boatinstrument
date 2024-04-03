@@ -18,6 +18,7 @@ class AutoPilotDisplay extends StatefulWidget {
 class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   Timer? _dataTimer;
   Vessel self = Vessel();
+  String? _error;
 
   _AutoPilotDisplayState () {
     _startDataTimer();
@@ -30,12 +31,14 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   }
   @override
   Widget build(BuildContext context) {
+    AutopilotState? state = self.steering?.autopilot?.state?.value;
+
     List<Widget> pilot = [
       Text(style: Theme.of(context).textTheme.titleLarge, "Pilot"),
-      Text(self.steering?.autopilot?.state?.value.name ?? 'OFF'),
+      Text(state?.name ?? 'No State'),
     ];
 
-    switch(self.steering?.autopilot?.state?.value) {
+    switch(state) {
       case null:
       case AutopilotState.standby:
         break;
@@ -53,13 +56,16 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
     int windAngleApparent = rad2Deg(self.environment?.wind?.angleApparent?.value);
 
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Column(children: pilot),
-      Column(children: [
-        Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
-        Text("COG: ${rad2Deg(self.navigation?.courseOverGroundTrue?.value)}"),
-        Text("Apparent Wind Angle: ${windAngleApparent.abs()} ${windAngleApparent < 0 ? 'P' : 'S'}"),
-      ],)
+    return Column(children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Column(children: pilot),
+          Column(children: [
+            Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
+            Text("COG: ${rad2Deg(self.navigation?.courseOverGroundTrue?.value)}"),
+            Text("Apparent Wind Angle: ${windAngleApparent.abs()} ${windAngleApparent < 0 ? 'P' : 'S'}"),
+          ],)
+        ]),
+      Text(_error??'')
     ]);
   }
 
@@ -83,9 +89,8 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   }
 
   void _getAutoPilotState () async {
-    // dynamic navigation = await _getData('navigation');
-    // dynamic autopilot = await _getData('steering/autopilot');
-    // dynamic wind = await _getData('environment/wind');
+    _error = null;
+
     try {
       dynamic data = await _getData('');
 
@@ -95,7 +100,9 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         });
       }
     } catch (e) {
-      print('Failed to get data $e');
+      setState(() {
+        _error = 'Failed to get data $e';
+      });
     }
 
     _startDataTimer();
