@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'signalk.g.dart';
@@ -182,5 +184,54 @@ class Vessel {
       _$VesselFromJson(json);
 }
 
-int rad2Deg(double? rad) => ((rad??0) * 57.29578).round();
+int rad2Deg(double? rad) => ((rad??0) * 57.29578).round() % 360;
+double deg2Rad(int? deg) => (deg??0) / 57.29578;
 
+double averageAngle(double angle1, double angle2) {
+  double min, max;
+
+  if(angle1 < angle2) {
+    min = angle1;
+    max = angle2;
+  } else {
+    min = angle2;
+    max = angle1;
+  }
+
+  if(max - min < pi) {
+    return (max + min) / 2;
+  } else {
+    return ((max + (min+(2*pi))) / 2) % (2*pi);
+  }
+}
+
+double smoothAngle(double current, double latest, int smooth) {
+  double average = averageAngle(current, latest);
+
+  double min, mins, max, maxs;
+
+  if(current < average) {
+    min = current;
+    max = average;
+  } else {
+    min = average;
+    max = current;
+  }
+
+  if(max - min < pi) {
+    if(current < average) {
+      return current + ((max - min) / smooth);
+    } else {
+      return current - ((max - min) / smooth);
+    }
+  } else {
+    double diff = ((min+(2*pi)) - max) / smooth;
+
+    if(current < average) {
+      double r = current - diff;
+      return r<0 ? r+(2*pi) : r;
+    } else {
+      return (current + diff) % (2*pi);
+    }
+  }
+}
