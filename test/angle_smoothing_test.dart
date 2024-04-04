@@ -18,6 +18,7 @@ void main() {
 
   test('Angle smoothing', ()
   {
+    // 1 is no smoothing, so these should be the same as the average.
     expect(rad2Deg(smoothAngle(deg2Rad( 10), deg2Rad(350), 1)),   0);
     expect(rad2Deg(smoothAngle(deg2Rad(350), deg2Rad( 10), 1)),   0);
     expect(rad2Deg(smoothAngle(deg2Rad( 45), deg2Rad(135), 1)),  90);
@@ -29,15 +30,16 @@ void main() {
     expect(rad2Deg(smoothAngle(deg2Rad(315), deg2Rad( 45), 1)),   0);
     expect(rad2Deg(smoothAngle(deg2Rad( 45), deg2Rad(315), 1)),   0);
 
-    expect(rad2Deg(smoothAngle(deg2Rad( 10), deg2Rad(350), 2)),   5);
-    expect(rad2Deg(smoothAngle(deg2Rad(350), deg2Rad( 10), 2)), 355);
-    expect(rad2Deg(smoothAngle(deg2Rad( 45), deg2Rad(135), 2)),  68);
-    expect(rad2Deg(smoothAngle(deg2Rad(135), deg2Rad( 45), 2)), 113);
-    expect(rad2Deg(smoothAngle(deg2Rad(135), deg2Rad(225), 2)), 158);
-    expect(rad2Deg(smoothAngle(deg2Rad(225), deg2Rad(135), 2)), 203);
-    expect(rad2Deg(smoothAngle(deg2Rad(225), deg2Rad(315), 2)), 248);
-    expect(rad2Deg(smoothAngle(deg2Rad(315), deg2Rad(225), 2)), 293);
-    expect(rad2Deg(smoothAngle(deg2Rad(315), deg2Rad( 45), 2)), 338);
-    expect(rad2Deg(smoothAngle(deg2Rad( 45), deg2Rad(315), 2)),  22);
+    // These should be more towards the first value.
+    expect(rad2Deg(smoothAngle(deg2Rad( 10), deg2Rad(350), 2)),   5); //   0
+    expect(rad2Deg(smoothAngle(deg2Rad(350), deg2Rad( 10), 2)), 355); //   0
+    expect(rad2Deg(smoothAngle(deg2Rad( 45), deg2Rad(135), 2)),  68); //  90
+    expect(rad2Deg(smoothAngle(deg2Rad(135), deg2Rad( 45), 2)), 113); //  90
+    expect(rad2Deg(smoothAngle(deg2Rad(135), deg2Rad(225), 2)), 158); // 180
+    expect(rad2Deg(smoothAngle(deg2Rad(225), deg2Rad(135), 2)), 203); // 180
+    expect(rad2Deg(smoothAngle(deg2Rad(225), deg2Rad(315), 2)), 248); // 270
+    expect(rad2Deg(smoothAngle(deg2Rad(315), deg2Rad(225), 2)), 293); // 270
+    expect(rad2Deg(smoothAngle(deg2Rad(315), deg2Rad( 45), 2)), 338); //   0
+    expect(rad2Deg(smoothAngle(deg2Rad( 45), deg2Rad(315), 2)),  22); //   0
   });
 }
