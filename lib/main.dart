@@ -14,8 +14,12 @@ class NavApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MainPage(),
+    TextStyle? tsMedium = Theme.of(context).textTheme.titleMedium!.apply(fontWeightDelta: 4).apply(fontSizeDelta: 5);
+    TextStyle? tsLarge = Theme.of(context).textTheme.titleLarge!.apply(fontWeightDelta: 4).apply(fontSizeDelta: 8);
+
+    return MaterialApp(
+      home: const MainPage(),
+      theme: ThemeData(textTheme: TextTheme(titleLarge: tsLarge, titleMedium: tsMedium, bodyMedium: tsMedium))
     );
   }
 }

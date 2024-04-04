@@ -50,7 +50,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(iconSize: 48, onPressed: widget.settings.enableLock && _locked ? null : () {_control(-i);}, icon: const Icon(Icons.chevron_left)),
-          Text("$i"),
+          Text("$i", style: Theme.of(context).textTheme.titleLarge),
           IconButton(iconSize: 48, onPressed: widget.settings.enableLock && _locked ? null : () {_control(i);}, icon: const Icon(Icons.chevron_right)),
         ]
       ));
