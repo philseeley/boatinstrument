@@ -37,7 +37,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
     List<Widget> pilot = [
       Text(style: Theme.of(context).textTheme.titleLarge, "Pilot"),
-      Text(state?.name ?? 'No State'),
+      Text("State: ${state?.name ?? 'No State'}"),
     ];
 
     switch(state) {
@@ -45,32 +45,40 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       case AutopilotState.standby:
         break;
       case AutopilotState.auto:
-        pilot.add(Text("Heading: ${rad2Deg(_self.steering?.autopilot?.target?.headingMagnetic?.value)}"));
+        pilot.add(Text("HDG: ${rad2Deg(_self.steering?.autopilot?.target?.headingMagnetic?.value)}"));
         break;
       case AutopilotState.track:
-        pilot.add(Text("Waypoint: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
+        pilot.add(Text("WPT: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
         break;
       case AutopilotState.vane:
         int targetWindAngleApparent = rad2Deg(_self.steering?.autopilot?.target?.windAngleApparent?.value);
-        pilot.add(Text("Wind Angle: ${targetWindAngleApparent.abs()} ${targetWindAngleApparent < 0 ? 'P' : 'S'}"));
+        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${targetWindAngleApparent < 0 ? 'P' : 'S'}"));
         break;
     }
 
-    double cogLatest = _self.navigation?.courseOverGroundTrue?.value??0;
-    _courseOverGround = smoothAngle(_courseOverGround??cogLatest, cogLatest, widget.settings.valueSmoothing);
+    double? cogLatest = _self.navigation?.courseOverGroundTrue?.value;
+    if(cogLatest != null) {
+      _courseOverGround = smoothAngle(_courseOverGround ?? cogLatest, cogLatest,
+          widget.settings.valueSmoothing);
+    }
 
-    double windAngleApparentLatest = _self.environment?.wind?.angleApparent?.value??0;
-    _windAngleApparent = smoothAngle(_windAngleApparent??windAngleApparentLatest, windAngleApparentLatest, widget.settings.valueSmoothing);
+    int? windAngleApparent;
+    double? windAngleApparentLatest = _self.environment?.wind?.angleApparent?.value;
+    if(windAngleApparentLatest != null) {
+      _windAngleApparent = smoothAngle(
+          _windAngleApparent ?? windAngleApparentLatest,
+          windAngleApparentLatest, widget.settings.valueSmoothing);
 
-    int windAngleApparent = rad2Deg(_windAngleApparent);
+      windAngleApparent = rad2Deg(_windAngleApparent);
+    }
 
     return Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Column(children: pilot),
           Column(children: [
             Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
-            Text("COG: ${rad2Deg(_courseOverGround)}"),
-            Text("Apparent Wind Angle: ${windAngleApparent.abs()} ${windAngleApparent < 0 ? 'P' : 'S'}"),
+            Text("COG: ${_courseOverGround == null ? '' : rad2Deg(_courseOverGround)}"),
+            Text("AWA: ${windAngleApparent == null ? '' : windAngleApparent.abs()} ${(windAngleApparent??0) < 0 ? 'P' : 'S'}"),
           ],)
         ]),
       Text(_error??'')
