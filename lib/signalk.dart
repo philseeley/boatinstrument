@@ -184,7 +184,7 @@ class Vessel {
       _$VesselFromJson(json);
 }
 
-int rad2Deg(double? rad) => ((rad??0) * 57.29578).round() % 360;
+int rad2Deg(double? rad) => ((rad??0) * 57.29578).round();
 double deg2Rad(int? deg) => (deg??0) / 57.29578;
 
 double averageAngle(double angle1, double angle2) {
