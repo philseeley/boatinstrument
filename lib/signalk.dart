@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -155,10 +156,23 @@ class Route {
 }
 
 @JsonSerializable()
+class CourseGreatCircle {
+  DoubleValue? crossTrackError;
+
+  CourseGreatCircle({
+    this.crossTrackError,
+  });
+
+  factory CourseGreatCircle.fromJson(Map<String, dynamic> json) =>
+      _$CourseGreatCircleFromJson(json);
+}
+
+@JsonSerializable()
 class Navigation {
   DoubleValue? courseOverGroundTrue;
   DoubleValue? magneticVariation;
   Route? currentRoute;
+  CourseGreatCircle? courseGreatCircle;
 
   Navigation({
     this.courseOverGroundTrue,
@@ -186,6 +200,8 @@ class Vessel {
 
 int rad2Deg(double? rad) => ((rad??0) * 57.29578).round();
 double deg2Rad(int? deg) => (deg??0) / 57.29578;
+double meters2NM(double m) => double.parse((m*0.00054).toStringAsPrecision(2));
+String val2PS(num val) => val < 0 ? 'P' : 'S';
 
 double averageAngle(double angle1, double angle2) {
   double min, max;

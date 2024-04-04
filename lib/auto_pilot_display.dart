@@ -52,7 +52,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         break;
       case AutopilotState.vane:
         int targetWindAngleApparent = rad2Deg(_self.steering?.autopilot?.target?.windAngleApparent?.value);
-        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${targetWindAngleApparent < 0 ? 'P' : 'S'}"));
+        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}"));
         break;
     }
 
@@ -72,14 +72,23 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       windAngleApparent = rad2Deg(_windAngleApparent);
     }
 
+    List<Widget> actual = [
+      Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
+      Text("COG: ${_courseOverGround == null ? '' : rad2Deg(_courseOverGround)}"),
+      Text("AWA: ${windAngleApparent == null ? '' : windAngleApparent.abs()} ${val2PS(windAngleApparent??0)}"),
+    ];
+
+    if((state??AutopilotState.standby) == AutopilotState.track) {
+      double? xte = _self.navigation?.courseGreatCircle?.crossTrackError?.value;
+      if(xte != null) {
+        actual.add(Text("XTE: ${meters2NM(xte.abs())} ${val2PS(xte)}"));
+      }
+    }
+
     return Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Column(children: pilot),
-          Column(children: [
-            Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
-            Text("COG: ${_courseOverGround == null ? '' : rad2Deg(_courseOverGround)}"),
-            Text("AWA: ${windAngleApparent == null ? '' : windAngleApparent.abs()} ${(windAngleApparent??0) < 0 ? 'P' : 'S'}"),
-          ],)
+          Column(children: actual)
         ]),
       Text(_error??'')
     ]);

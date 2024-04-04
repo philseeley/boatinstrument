@@ -58,7 +58,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
     List<Widget> buttons = [Column(children: controlButtons)];
     if(widget.settings.enableLock && _locked) {
-      buttons.add(Center(child: IconButton(onPressed: _unlock, icon: const Icon(Icons.lock))));
+      buttons.add(Center(child: IconButton(iconSize: 48, onPressed: _unlock, icon: const Icon(Icons.lock))));
     }
     return Stack(alignment: Alignment.center, children:  buttons);
   }

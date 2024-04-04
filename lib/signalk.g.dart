@@ -139,6 +139,19 @@ Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
       'waypoints': instance.waypoints,
     };
 
+CourseGreatCircle _$CourseGreatCircleFromJson(Map<String, dynamic> json) =>
+    CourseGreatCircle(
+      crossTrackError: json['crossTrackError'] == null
+          ? null
+          : DoubleValue.fromJson(
+              json['crossTrackError'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$CourseGreatCircleToJson(CourseGreatCircle instance) =>
+    <String, dynamic>{
+      'crossTrackError': instance.crossTrackError,
+    };
+
 Navigation _$NavigationFromJson(Map<String, dynamic> json) => Navigation(
       courseOverGroundTrue: json['courseOverGroundTrue'] == null
           ? null
@@ -151,13 +164,17 @@ Navigation _$NavigationFromJson(Map<String, dynamic> json) => Navigation(
       currentRoute: json['currentRoute'] == null
           ? null
           : Route.fromJson(json['currentRoute'] as Map<String, dynamic>),
-    );
+    )..courseGreatCircle = json['courseGreatCircle'] == null
+        ? null
+        : CourseGreatCircle.fromJson(
+            json['courseGreatCircle'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$NavigationToJson(Navigation instance) =>
     <String, dynamic>{
       'courseOverGroundTrue': instance.courseOverGroundTrue,
       'magneticVariation': instance.magneticVariation,
       'currentRoute': instance.currentRoute,
+      'courseGreatCircle': instance.courseGreatCircle,
     };
 
 Vessel _$VesselFromJson(Map<String, dynamic> json) => Vessel(
