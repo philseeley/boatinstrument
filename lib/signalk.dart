@@ -92,7 +92,6 @@ class AutopilotStateValue {
       _$AutopilotStateValueFromJson(json);
 }
 
-
 @JsonSerializable()
 class Autopilot {
   AutopilotStateValue? state;

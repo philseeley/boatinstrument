@@ -45,7 +45,11 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       case AutopilotState.standby:
         break;
       case AutopilotState.auto:
-        pilot.add(Text("HDG: ${rad2Deg(_self.steering?.autopilot?.target?.headingMagnetic?.value)}"));
+        if(_self.steering?.autopilot?.target?.headingMagnetic?.value != null &&
+           _self.navigation?.magneticVariation?.value != null) {
+          double headingTrue =_self.steering!.autopilot!.target!.headingMagnetic!.value + _self.navigation!.magneticVariation!.value;
+          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}"));
+        }
         break;
       case AutopilotState.track:
         pilot.add(Text("WPT: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
