@@ -73,7 +73,7 @@ enum AutopilotState {
   standby('Standby'),
   auto('Auto'),
   track('Track'),
-  vane('Vane');
+  wind('Vane');
 
   final String name;
 

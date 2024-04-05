@@ -50,7 +50,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       case AutopilotState.track:
         pilot.add(Text("WPT: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
         break;
-      case AutopilotState.vane:
+      case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_self.steering?.autopilot?.target?.windAngleApparent?.value);
         pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}"));
         break;
