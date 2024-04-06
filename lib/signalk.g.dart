@@ -102,10 +102,14 @@ Steering _$SteeringFromJson(Map<String, dynamic> json) => Steering(
       autopilot: json['autopilot'] == null
           ? null
           : Autopilot.fromJson(json['autopilot'] as Map<String, dynamic>),
+      rudderAngle: json['rudderAngle'] == null
+          ? null
+          : DoubleValue.fromJson(json['rudderAngle'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SteeringToJson(Steering instance) => <String, dynamic>{
       'autopilot': instance.autopilot,
+      'rudderAngle': instance.rudderAngle,
     };
 
 Waypoint _$WaypointFromJson(Map<String, dynamic> json) => Waypoint(

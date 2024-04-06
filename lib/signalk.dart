@@ -109,9 +109,11 @@ class Autopilot {
 @JsonSerializable()
 class Steering {
   Autopilot? autopilot;
+  DoubleValue? rudderAngle;
 
   Steering({
-    this.autopilot
+    this.autopilot,
+    this.rudderAngle
   });
 
   factory Steering.fromJson(Map<String, dynamic> json) =>

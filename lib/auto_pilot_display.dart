@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -89,12 +90,21 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       }
     }
 
+    const rudderStr = '===================='; // 40 degrees
+    double rudderAngle = _self.steering?.rudderAngle?.value??0;
+    int rudderAngleLen = rad2Deg(rudderAngle.abs());
+    rudderAngleLen = ((rudderAngleLen.toDouble()/40.0)*rudderStr.length).toInt();
+
     return Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Column(children: pilot),
           Column(children: actual)
         ]),
-      Text(_error??'')
+      Row(children: [
+        Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.red), textAlign: TextAlign.right)),
+        Expanded(child: Text(rudderStr.substring(0, rudderAngle > 0 ? rudderAngleLen : 0), style: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.green))),
+      ]),
+      Text(_error??'', style: Theme.of(context).textTheme.titleSmall!.apply(color: Colors.red))
     ]);
   }
 
