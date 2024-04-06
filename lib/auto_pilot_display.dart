@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -34,11 +33,14 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   }
   @override
   Widget build(BuildContext context) {
+    TextStyle headTS = Theme.of(context).textTheme.titleLarge!;
+    TextStyle infoTS = Theme.of(context).textTheme.titleMedium!.apply(fontSizeDelta: 8);
+
     AutopilotState? state = _self.steering?.autopilot?.state?.value;
 
     List<Widget> pilot = [
-      Text(style: Theme.of(context).textTheme.titleLarge, "Pilot"),
-      Text("State: ${state?.name ?? 'No State'}"),
+      Text("Pilot", style: headTS),
+      Text("State: ${state?.name ?? 'No State'}", style: infoTS),
     ];
 
     switch(state) {
@@ -49,15 +51,15 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         if(_self.steering?.autopilot?.target?.headingMagnetic?.value != null &&
            _self.navigation?.magneticVariation?.value != null) {
           double headingTrue =_self.steering!.autopilot!.target!.headingMagnetic!.value + _self.navigation!.magneticVariation!.value;
-          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}"));
+          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: infoTS));
         }
         break;
       case AutopilotState.track:
-        pilot.add(Text("WPT: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}"));
+        pilot.add(Text("WPT: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}", style: infoTS));
         break;
       case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_self.steering?.autopilot?.target?.windAngleApparent?.value);
-        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}"));
+        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: infoTS));
         break;
     }
 
@@ -78,9 +80,9 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     }
 
     List<Widget> actual = [
-      Text(style: Theme.of(context).textTheme.titleLarge, "Actual"),
-      Text("COG: ${_courseOverGround == null ? '' : rad2Deg(_courseOverGround)}"),
-      Text("AWA: ${windAngleApparent == null ? '' : windAngleApparent.abs()} ${val2PS(windAngleApparent??0)}"),
+      Text("Actual", style: headTS),
+      Text("COG: ${_courseOverGround == null ? '' : rad2Deg(_courseOverGround)}", style: infoTS),
+      Text("AWA: ${windAngleApparent == null ? '' : windAngleApparent.abs()} ${val2PS(windAngleApparent??0)}", style: infoTS),
     ];
 
     if((state??AutopilotState.standby) == AutopilotState.track) {
