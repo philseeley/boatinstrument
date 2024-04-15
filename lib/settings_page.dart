@@ -46,9 +46,9 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
         leading: const Text("Value Smoothing:"),
         title: Slider(
-            min: 1.0,
-            max: 10.0,
-            divisions: 10,
+            min: 0.0,
+            max: 20.0,
+            divisions: 21,
             value: settings.valueSmoothing.toDouble(),
             label: "${settings.valueSmoothing.toInt()}",
             onChanged: (double value) {

@@ -65,16 +65,16 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
     double? cogLatest = _self.navigation?.courseOverGroundTrue?.value;
     if(cogLatest != null) {
-      _courseOverGround = smoothAngle(_courseOverGround ?? cogLatest, cogLatest,
-          widget.settings.valueSmoothing);
+      _courseOverGround = averageAngle(_courseOverGround ?? cogLatest, cogLatest,
+          smooth: widget.settings.valueSmoothing);
     }
 
     int? windAngleApparent;
     double? windAngleApparentLatest = _self.environment?.wind?.angleApparent?.value;
     if(windAngleApparentLatest != null) {
-      _windAngleApparent = smoothAngle(
+      _windAngleApparent = averageAngle(
           _windAngleApparent ?? windAngleApparentLatest,
-          windAngleApparentLatest, widget.settings.valueSmoothing);
+          windAngleApparentLatest, smooth: widget.settings.valueSmoothing, relative: true);
 
       windAngleApparent = rad2Deg(_windAngleApparent);
     }
