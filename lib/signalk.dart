@@ -1,7 +1,7 @@
-import 'dart:ffi';
-import 'dart:math';
+import 'dart:math' as m;
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:vector_math/vector_math.dart' as vm;
 
 part 'signalk.g.dart';
 
@@ -199,56 +199,18 @@ class Vessel {
       _$VesselFromJson(json);
 }
 
-int rad2Deg(double? rad) => ((rad??0) * 57.29578).round();
-double deg2Rad(int? deg) => (deg??0) / 57.29578;
+int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
+double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 double meters2NM(double m) => double.parse((m*0.00054).toStringAsPrecision(2));
 String val2PS(num val) => val < 0 ? 'P' : 'S';
 
-double averageAngle(double angle1, double angle2) {
-  double min, max;
+double averageAngle(double current, double next, { int smooth = 0, bool relative=false }) {
+  vm.Vector2 v1 = vm.Vector2(m.sin(current) * (50+smooth), m.cos(current) * (50+smooth));
+  vm.Vector2 v2 = vm.Vector2(m.sin(next) * 50, m.cos(next) * 50);
 
-  if(angle1 < angle2) {
-    min = angle1;
-    max = angle2;
-  } else {
-    min = angle2;
-    max = angle1;
-  }
+  vm.Vector2 avg = (v1 + v2) / 2;
 
-  if(max - min < pi) {
-    return (max + min) / 2;
-  } else {
-    return ((max + (min+(2*pi))) / 2) % (2*pi);
-  }
-}
+  double avga = m.atan2(avg.x, avg.y);
 
-double smoothAngle(double current, double latest, int smooth) {
-  double average = averageAngle(current, latest);
-
-  double min, max;
-
-  if(current < average) {
-    min = current;
-    max = average;
-  } else {
-    min = average;
-    max = current;
-  }
-
-  if(max - min < pi) {
-    if(current < average) {
-      return current + ((max - min) / smooth);
-    } else {
-      return current - ((max - min) / smooth);
-    }
-  } else {
-    double diff = ((min+(2*pi)) - max) / smooth;
-
-    if(current < average) {
-      double r = current - diff;
-      return r<0 ? r+(2*pi) : r;
-    } else {
-      return (current + diff) % (2*pi);
-    }
-  }
+  return ((avga >= 0) || relative) ? avga : ((2 * m.pi) + avga);
 }
