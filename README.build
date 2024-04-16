@@ -1,0 +1,10 @@
+flutter clean
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+
+# for local Android install
+flutter build apk --no-shrink
+
+# for release
+flutter build appbundle # Android
+flutter build ios
