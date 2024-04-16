@@ -19,7 +19,7 @@ class Settings {
   Settings({
     this.enableLock = true,
     this.lockSeconds = 5,
-    this.valueSmoothing = 1,
+    this.valueSmoothing = 0,
     this.signalkServer = 'openplotter.local:3000',
     this.clientID = 'sailingapp-1234', //TODO gen a GUID
     this.authToken = "",

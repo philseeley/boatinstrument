@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/signalk.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class AutoPilotDisplay extends StatefulWidget {
   final Settings settings;
@@ -16,84 +15,68 @@ class AutoPilotDisplay extends StatefulWidget {
 }
 
 class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
-  Timer? _dataTimer;
-  Vessel _self = Vessel();
-  double? _courseOverGround;
+  WebSocketChannel? _channel;
+  AutopilotState? _autopilotState;
+  double? _courseOverGroundTrue;
+  double? _targetWindAngleApparent;
   double? _windAngleApparent;
+  double? _targetHeadingMagnetic;
+  double? _magneticVariation;
+  String? _waypoint;
+  double? _crossTrackError;
+  double? _rudderAngle;
   String? _error;
 
-  _AutoPilotDisplayState () {
-    _startDataTimer();
+  @override
+  void initState() {
+    super.initState();
+    _connect();
   }
 
-  @override
-  void dispose() {
-    _dataTimer?.cancel();
-    super.dispose();
-  }
   @override
   Widget build(BuildContext context) {
     TextStyle headTS = Theme.of(context).textTheme.titleLarge!;
     TextStyle infoTS = Theme.of(context).textTheme.titleMedium!.apply(fontSizeDelta: 8);
 
-    AutopilotState? state = _self.steering?.autopilot?.state?.value;
-
     List<Widget> pilot = [
       Text("Pilot", style: headTS),
-      Text("State: ${state?.displayName ?? 'No State'}", style: infoTS),
+      Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: infoTS),
     ];
 
-    switch(state) {
+    switch(_autopilotState) {
       case null:
       case AutopilotState.standby:
         break;
       case AutopilotState.auto:
-        if(_self.steering?.autopilot?.target?.headingMagnetic?.value != null &&
-           _self.navigation?.magneticVariation?.value != null) {
-          double headingTrue =_self.steering!.autopilot!.target!.headingMagnetic!.value + _self.navigation!.magneticVariation!.value;
+        if(_targetHeadingMagnetic != null &&
+           _magneticVariation != null) {
+          double headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
           pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: infoTS));
         }
         break;
       case AutopilotState.track:
-        pilot.add(Text("WPT: ${_self.navigation?.currentRoute?.waypoints?.value.elementAtOrNull(1)?.name}", style: infoTS));
+        pilot.add(Text("WPT: $_waypoint", style: infoTS));
         break;
       case AutopilotState.wind:
-        int targetWindAngleApparent = rad2Deg(_self.steering?.autopilot?.target?.windAngleApparent?.value);
+        int targetWindAngleApparent = rad2Deg(_targetWindAngleApparent);
         pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: infoTS));
         break;
     }
 
-    double? cogLatest = _self.navigation?.courseOverGroundTrue?.value;
-    if(cogLatest != null) {
-      _courseOverGround = averageAngle(_courseOverGround ?? cogLatest, cogLatest,
-          smooth: widget.settings.valueSmoothing);
-    }
-
-    int? windAngleApparent;
-    double? windAngleApparentLatest = _self.environment?.wind?.angleApparent?.value;
-    if(windAngleApparentLatest != null) {
-      _windAngleApparent = averageAngle(
-          _windAngleApparent ?? windAngleApparentLatest,
-          windAngleApparentLatest, smooth: widget.settings.valueSmoothing, relative: true);
-
-      windAngleApparent = rad2Deg(_windAngleApparent);
-    }
-
     List<Widget> actual = [
       Text("Actual", style: headTS),
-      Text("COG: ${_courseOverGround == null ? '' : rad2Deg(_courseOverGround)}", style: infoTS),
-      Text("AWA: ${windAngleApparent == null ? '' : windAngleApparent.abs()} ${val2PS(windAngleApparent??0)}", style: infoTS),
+      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: infoTS),
+      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: infoTS),
     ];
 
-    if((state??AutopilotState.standby) == AutopilotState.track) {
-      double? xte = _self.navigation?.courseGreatCircle?.crossTrackError?.value;
-      if(xte != null) {
-        actual.add(Text("XTE: ${meters2NM(xte.abs())} ${val2PS(xte)}"));
+    if((_autopilotState??AutopilotState.standby) == AutopilotState.track) {
+      if(_crossTrackError != null) {
+        actual.add(Text("XTE: ${meters2NM(_crossTrackError!.abs())} ${val2PS(_crossTrackError!)}"));
       }
     }
 
     const rudderStr = '===================='; // 40 degrees
-    double rudderAngle = _self.steering?.rudderAngle?.value??0;
+    double rudderAngle = _rudderAngle??0;
     int rudderAngleLen = rad2Deg(rudderAngle.abs());
     rudderAngleLen = ((rudderAngleLen.toDouble()/40.0)*rudderStr.length).toInt();
 
@@ -110,42 +93,109 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     ]);
   }
 
-  void _startDataTimer () {
-    _dataTimer = Timer(const Duration(seconds: 1), _getAutoPilotState);
-  }
-
-  dynamic _getData (String path) async {
-    Uri uri = Uri.http(
-        widget.settings.signalkServer, '/signalk/v1/api/vessels/self/$path');
-
-    http.Response response = await http.get(
-      uri,
-      headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json"
-      },
+  void _connect() async {
+    _channel = WebSocketChannel.connect(
+      Uri.parse('ws://${widget.settings.signalkServer}/signalk/v1/stream?subscribe=none'),
     );
 
-    return json.decode(response.body);
+    await _channel?.ready;
+
+    _channel?.stream.listen(_processData);
+
+    _channel?.sink.add(
+      jsonEncode(
+        {
+          "context": "vessels.self",
+          "subscribe": [
+            {
+              "path": "steering.autopilot.state",
+            },
+            {
+              "path": "navigation.courseOverGroundTrue",
+            },
+            {
+              "path": "steering.autopilot.target.windAngleApparent",
+            },
+            {
+              "path": "environment.wind.angleApparent",
+            },
+            {
+              "path": "navigation.currentRoute.waypoints",
+            },
+            {
+              "path": "navigation.courseGreatCircle.crossTrackError",
+            },
+            {
+              "path": "steering.autopilot.target.headingMagnetic",
+            },
+            {
+              "path": "navigation.magneticVariation",
+            },
+            {
+              "path": "steering.rudderAngle",
+            },
+            {
+              "path": "notifications.autopilot.*",
+            },
+          ]
+        },
+      ),
+    );
   }
 
-  void _getAutoPilotState () async {
-    _error = null;
+  _processData(data) {
+    dynamic d = json.decode(data);
 
-    try {
-      dynamic data = await _getData('');
-
-      if (mounted) {
-        setState(() {
-          _self = Vessel.fromJson(data);
-        });
+    if(d['updates'] != null) {
+      for (dynamic u in d['updates']) {
+        for (dynamic v in u['values']) {
+          try {
+            switch (v['path']) {
+              case 'steering.autopilot.state':
+                _autopilotState = AutopilotState.values.byName(v['value']);
+                break;
+              case 'navigation.courseOverGroundTrue':
+                // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
+                double cogLatest = v['value'] * 1.0;
+                _courseOverGroundTrue = averageAngle(
+                    _courseOverGroundTrue ?? cogLatest, cogLatest,
+                    smooth: widget.settings.valueSmoothing);
+                break;
+              case 'steering.autopilot.target.windAngleApparent':
+                _targetWindAngleApparent = v['value'] * 1.0;
+                break;
+              case 'environment.wind.angleApparent':
+                double waa = v['value'] * 1.0;
+                _windAngleApparent = averageAngle(
+                    _windAngleApparent ?? waa, waa,
+                    smooth: widget.settings.valueSmoothing, relative: true);
+                break;
+              case 'navigation.currentRoute.waypoints':
+                break;
+              case 'navigation.courseGreatCircle.crossTrackError':
+                _crossTrackError = v['value'] * 1.0;
+                break;
+              case 'steering.autopilot.target.headingMagnetic':
+                _targetHeadingMagnetic = v['value'] * 1.0;
+                break;
+              case 'navigation.magneticVariation':
+                _magneticVariation = v['value'] * 1.0;
+                break;
+              case 'steering.rudderAngle':
+                _rudderAngle = v['value'] * 1.0;
+                break;
+              case 'notifications.autopilot.*':
+              //TODO
+                break;
+            }
+          } catch (e) {
+            print(v);
+            print(e);
+          }
+        }
       }
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to get data: $e';
-      });
     }
 
-    _startDataTimer();
+    setState(() {});
   }
 }
