@@ -40,7 +40,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
     List<Widget> pilot = [
       Text("Pilot", style: headTS),
-      Text("State: ${state?.name ?? 'No State'}", style: infoTS),
+      Text("State: ${state?.displayName ?? 'No State'}", style: infoTS),
     ];
 
     switch(state) {

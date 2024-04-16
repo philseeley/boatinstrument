@@ -89,9 +89,10 @@ class _SettingsState extends State<SettingsPage> {
         uri,
         headers: {
           "accept": "application/json",
-          "Content-Type": "application/json"
         },
-        body: '{"clientId": "${widget.settings.clientID}", "description": "Nav App"}'
+        body: {
+          "clientId": "${widget.settings.clientID}",
+          "description": "Sailing App"}
     );
 
     dynamic data = json.decode(response.body);

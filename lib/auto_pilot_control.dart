@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:sailingapp/signalk.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 import 'package:sailingapp/settings.dart';
 
 class AutoPilotControl extends StatefulWidget {
@@ -16,16 +19,42 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
   bool _locked = true;
   Timer? _lockTimer;
+  String? _error;
 
-  void _control(int direction) {
+  _sendCommand(String path, String params) async {
+    _error = null;
+
     if(widget.settings.enableLock) {
       _unlock();
     }
 
-    print("change direction by $direction");
+    Uri uri = Uri.http(
+        widget.settings.signalkServer, '/signalk/v1/api/vessels/self/$path');
+
+    http.Response response = await http.put(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "application/json",
+          "Authorization": "Bearer ${widget.settings.authToken}"
+        },
+        body: params
+    );
+
+    setState(() {
+      _error = response.reasonPhrase;
+    });
   }
 
-  void _unlock() {
+  _adjustHeading(int direction) async {
+    await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
+  }
+
+  _setState(String state) async {
+    await _sendCommand("steering/autopilot/state", '{"value": "$state"}');
+  }
+
+  _unlock() {
     if(_locked) {
       setState(() {
         _locked = false;
@@ -44,22 +73,41 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
   @override
   Widget build(BuildContext context) {
     List<Row> controlButtons = [];
+    bool disabled = widget.settings.enableLock && _locked;
 
-    for(int i in [1, 5, 10]) {
+    for(int i in [1, 10]) {
       controlButtons.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          IconButton(iconSize: 48, onPressed: widget.settings.enableLock && _locked ? null : () {_control(-i);}, icon: const Icon(Icons.chevron_left)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-i);}, icon: const Icon(Icons.chevron_left)),
           Text("$i", style: Theme.of(context).textTheme.titleLarge),
-          IconButton(iconSize: 48, onPressed: widget.settings.enableLock && _locked ? null : () {_control(i);}, icon: const Icon(Icons.chevron_right)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(i);}, icon: const Icon(Icons.chevron_right)),
         ]
       ));
     }
 
+    List<Widget> stateButtons = [];
+    for(AutopilotState state in AutopilotState.values) {
+      stateButtons.add(ElevatedButton(
+          onPressed: disabled ? null : () {_setState(state.name);},
+          child: Text(state.displayName),
+      ));
+    }
+    controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons));
+
     List<Widget> buttons = [Column(children: controlButtons)];
     if(widget.settings.enableLock && _locked) {
-      buttons.add(Center(child: IconButton(iconSize: 48, onPressed: _unlock, icon: const Icon(Icons.lock))));
+      buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(
+        text: "Unlock",
+        outerColor: Colors.black,
+        // animationDuration: const Duration(milliseconds: 0),
+        onSubmit: () { return _unlock();},
+      ))));
     }
-    return Stack(alignment: Alignment.center, children:  buttons);
+
+    return Column(children: [
+      Stack(alignment: Alignment.center, children:  buttons),
+      Text(_error??'', style: Theme.of(context).textTheme.titleSmall!.apply(color: Colors.red))
+    ]);
   }
 }

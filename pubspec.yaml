@@ -34,6 +34,7 @@ dependencies:
   path_provider:
   http:
   json_annotation:
+  slide_to_act:
   vector_math: ^2.1.4
 
 dev_dependencies:

@@ -75,9 +75,9 @@ enum AutopilotState {
   track('Track'),
   wind('Vane');
 
-  final String name;
+  final String displayName;
 
-  const AutopilotState(this.name);
+  const AutopilotState(this.displayName);
 }
 
 @JsonSerializable()
