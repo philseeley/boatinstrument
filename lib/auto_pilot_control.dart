@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:nav/settings.dart';
+import 'package:sailingapp/settings.dart';
 
 class AutoPilotControl extends StatefulWidget {
   final Settings settings;

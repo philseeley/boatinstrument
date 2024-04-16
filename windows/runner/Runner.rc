@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "name.seeley.phil" "\0"
-            VALUE "FileDescription", "nav" "\0"
+            VALUE "FileDescription", "sailingapp" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "nav" "\0"
+            VALUE "InternalName", "sailingapp" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 name.seeley.phil. All rights reserved." "\0"
-            VALUE "OriginalFilename", "nav.exe" "\0"
-            VALUE "ProductName", "nav" "\0"
+            VALUE "OriginalFilename", "sailingapp.exe" "\0"
+            VALUE "ProductName", "sailingapp" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -12,7 +12,7 @@ Settings _$SettingsFromJson(Map<String, dynamic> json) => Settings(
       valueSmoothing: json['valueSmoothing'] as int? ?? 1,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
-      clientID: json['clientID'] as String? ?? 'nav-1234',
+      clientID: json['clientID'] as String? ?? 'sailingapp-1234',
       authToken: json['authToken'] as String? ?? "",
     );
 

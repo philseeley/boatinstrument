@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:nav/auto_pilot_display.dart';
-import 'package:nav/auto_pilot_control.dart';
-import 'package:nav/settings.dart';
-import 'package:nav/settings_page.dart';
+import 'package:sailingapp/auto_pilot_display.dart';
+import 'package:sailingapp/auto_pilot_control.dart';
+import 'package:sailingapp/settings.dart';
+import 'package:sailingapp/settings_page.dart';
 
 void main() {
   runApp(const NavApp());

@@ -1,4 +1,4 @@
-# nav
+# sailingapp
 
 A new Flutter project.
 

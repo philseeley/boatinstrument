@@ -21,7 +21,7 @@ class Settings {
     this.lockSeconds = 5,
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
-    this.clientID = 'nav-1234', //TODO gen a GUID
+    this.clientID = 'sailingapp-1234', //TODO gen a GUID
     this.authToken = "",
   });
 

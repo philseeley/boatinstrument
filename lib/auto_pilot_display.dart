@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:nav/settings.dart';
-import 'package:nav/signalk.dart';
+import 'package:sailingapp/settings.dart';
+import 'package:sailingapp/signalk.dart';
 
 class AutoPilotDisplay extends StatefulWidget {
   final Settings settings;
