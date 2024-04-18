@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/signalk.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:sailingapp/signalk_data.dart';
 
 class AutoPilotDisplay extends StatefulWidget {
   final Settings settings;
@@ -15,7 +15,6 @@ class AutoPilotDisplay extends StatefulWidget {
 }
 
 class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
-  WebSocketChannel? _channel;
   AutopilotState? _autopilotState;
   double? _courseOverGroundTrue;
   double? _targetWindAngleApparent;
@@ -30,7 +29,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   @override
   void initState() {
     super.initState();
-    _connect();
+    SignalKData().connect(widget.settings.signalkServer, _processData);
   }
 
   @override
@@ -93,105 +92,51 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     ]);
   }
 
-  void _connect() async {
-    _channel = WebSocketChannel.connect(
-      Uri.parse('ws://${widget.settings.signalkServer}/signalk/v1/stream?subscribe=none'),
-    );
-
-    await _channel?.ready;
-
-    _channel?.stream.listen(_processData);
-
-    _channel?.sink.add(
-      jsonEncode(
-        {
-          "context": "vessels.self",
-          "subscribe": [
-            {
-              "path": "steering.autopilot.state",
-            },
-            {
-              "path": "navigation.courseOverGroundTrue",
-            },
-            {
-              "path": "steering.autopilot.target.windAngleApparent",
-            },
-            {
-              "path": "environment.wind.angleApparent",
-            },
-            {
-              "path": "navigation.currentRoute.waypoints",
-            },
-            {
-              "path": "navigation.courseGreatCircle.crossTrackError",
-            },
-            {
-              "path": "steering.autopilot.target.headingMagnetic",
-            },
-            {
-              "path": "navigation.magneticVariation",
-            },
-            {
-              "path": "steering.rudderAngle",
-            },
-            {
-              "path": "notifications.autopilot.*",
-            },
-          ]
-        },
-      ),
-    );
-  }
-
   _processData(data) {
-    dynamic d = json.decode(data);
-
-    if(d['updates'] != null) {
-      for (dynamic u in d['updates']) {
-        for (dynamic v in u['values']) {
-          try {
-            switch (v['path']) {
-              case 'steering.autopilot.state':
-                _autopilotState = AutopilotState.values.byName(v['value']);
-                break;
-              case 'navigation.courseOverGroundTrue':
-                // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
-                double cogLatest = v['value'] * 1.0;
-                _courseOverGroundTrue = averageAngle(
-                    _courseOverGroundTrue ?? cogLatest, cogLatest,
-                    smooth: widget.settings.valueSmoothing);
-                break;
-              case 'steering.autopilot.target.windAngleApparent':
-                _targetWindAngleApparent = v['value'] * 1.0;
-                break;
-              case 'environment.wind.angleApparent':
-                double waa = v['value'] * 1.0;
-                _windAngleApparent = averageAngle(
-                    _windAngleApparent ?? waa, waa,
-                    smooth: widget.settings.valueSmoothing, relative: true);
-                break;
-              case 'navigation.currentRoute.waypoints':
-                break;
-              case 'navigation.courseGreatCircle.crossTrackError':
-                _crossTrackError = v['value'] * 1.0;
-                break;
-              case 'steering.autopilot.target.headingMagnetic':
-                _targetHeadingMagnetic = v['value'] * 1.0;
-                break;
-              case 'navigation.magneticVariation':
-                _magneticVariation = v['value'] * 1.0;
-                break;
-              case 'steering.rudderAngle':
-                _rudderAngle = v['value'] * 1.0;
-                break;
-              case 'notifications.autopilot.*':
-              //TODO
-                break;
-            }
-          } catch (e) {
-            print(v);
-            print(e);
+    for (dynamic u in data) {
+      for (dynamic v in u['values']) {
+        try {
+          switch (v['path']) {
+            case 'steering.autopilot.state':
+              _autopilotState = AutopilotState.values.byName(v['value']);
+              break;
+            case 'navigation.courseOverGroundTrue':
+              // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
+              double cogLatest = v['value'] * 1.0;
+              _courseOverGroundTrue = averageAngle(
+                  _courseOverGroundTrue ?? cogLatest, cogLatest,
+                  smooth: widget.settings.valueSmoothing);
+              break;
+            case 'steering.autopilot.target.windAngleApparent':
+              _targetWindAngleApparent = v['value'] * 1.0;
+              break;
+            case 'environment.wind.angleApparent':
+              double waa = v['value'] * 1.0;
+              _windAngleApparent = averageAngle(
+                  _windAngleApparent ?? waa, waa,
+                  smooth: widget.settings.valueSmoothing, relative: true);
+              break;
+            case 'navigation.currentRoute.waypoints':
+              break;
+            case 'navigation.courseGreatCircle.crossTrackError':
+              _crossTrackError = v['value'] * 1.0;
+              break;
+            case 'steering.autopilot.target.headingMagnetic':
+              _targetHeadingMagnetic = v['value'] * 1.0;
+              break;
+            case 'navigation.magneticVariation':
+              _magneticVariation = v['value'] * 1.0;
+              break;
+            case 'steering.rudderAngle':
+              _rudderAngle = v['value'] * 1.0;
+              break;
+            case 'notifications.autopilot.*':
+            //TODO
+              break;
           }
+        } catch (e) {
+          print(v);
+          print(e);
         }
       }
     }
