@@ -1,21 +1,17 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:sailingapp/authorization.dart';
 import 'settings.dart';
 
 class SettingsPage extends StatefulWidget {
   final Settings settings;
 
-  const SettingsPage(this.settings, {Key? key}) : super(key: key);
+  const SettingsPage(this.settings, {super.key});
 
   @override
   createState() => _SettingsState();
 }
 
 class _SettingsState extends State<SettingsPage> {
-  Timer? _authRequestTimer;
-  String? _authRequestHREF;
 
   @override
   Widget build(BuildContext context) {
@@ -82,71 +78,22 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   void _requestAuthToken() async {
-    Uri uri = Uri.http(
-        widget.settings.signalkServer, '/signalk/v1/access/requests');
-
-    http.Response response = await http.post(
-        uri,
-        headers: {
-          "accept": "application/json",
-        },
-        body: {
-          "clientId": "${widget.settings.clientID}",
-          "description": "Sailing App"}
-    );
-
-    dynamic data = json.decode(response.body);
-    _authRequestHREF = data['href'];
+    SignalKAuthorization().request(widget.settings.signalkServer, widget.settings.clientID, "Sailing App",
+      (authToken) {
+        setState(() {
+          widget.settings.authToken = authToken;
+        });
+      },
+      (msg) {
+        if (mounted) {
+          setState(() {
+            widget.settings.authToken = msg;
+          });
+        }
+      });
 
     setState(() {
       widget.settings.authToken = 'PENDING';
     });
-
-    _checkAuhRequest();
-  }
-
-  void _checkAuhRequest () {
-    _authRequestTimer =  Timer(const Duration(seconds: 5), _checkAuthRequestResponse);
-  }
-
-  void _checkAuthRequestResponse() async {
-    String? result;
-
-    Uri uri = Uri.http(
-        widget.settings.signalkServer, _authRequestHREF!);
-
-    http.Response response = await http.get(
-      uri,
-      headers: {
-        "accept": "application/json",
-        "Content-Type": "application/json"
-      },
-    );
-
-    dynamic data = json.decode(response.body);
-
-    if(data['state'] == 'COMPLETED') {
-      if(data['statusCode'] == 200) {
-        if(data['accessRequest']['permission'] == 'APPROVED') {
-          setState(() {
-            widget.settings.authToken = data['accessRequest']['token'];
-          });
-        } else {
-          result = 'Failed: permission ${data['accessRequest']['permission']}';
-        }
-      } else {
-        result = 'Failed: code ${data['statusCode']}';
-      }
-
-      if(result != null) {
-        if (mounted) {
-          setState(() {
-            widget.settings.authToken = result!;
-          });
-        }
-      }
-    } else {
-      _checkAuhRequest();
-    }
   }
 }
