@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:sailingapp/sailingapp_controller.dart';
 import 'package:sailingapp/signalk.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:sailingapp/settings.dart';
 
 class AutoPilotControl extends StatefulWidget {
+  final SailingAppController controller;
   final Settings settings;
 
-  const AutoPilotControl(this.settings, {super.key});
+  const AutoPilotControl(this.controller, this.settings, {super.key});
 
   @override
   State<AutoPilotControl> createState() => _AutoPilotControlState();
@@ -20,6 +22,12 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
   bool _locked = true;
   Timer? _lockTimer;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.configure(widget, null, {});
+  }
 
   _sendCommand(String path, String params) async {
     _error = null;

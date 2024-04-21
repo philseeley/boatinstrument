@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sailingapp/auto_pilot_display.dart';
-import 'package:sailingapp/auto_pilot_control.dart';
+import 'package:sailingapp/sailingapp_controller.dart';
+import 'package:sailingapp/widgets/auto_pilot_display.dart';
+import 'package:sailingapp/widgets/auto_pilot_control.dart';
 import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/settings_page.dart';
 
@@ -32,7 +33,11 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
+  SailingAppController? sailingAppController;
   Settings? settings;
+  late AutoPilotDisplay d;
+  late AutoPilotControl c;
+
 
   _MainPageState() {
     loadSettings();
@@ -40,6 +45,15 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   loadSettings() async {
     settings = await Settings.load();
+
+    sailingAppController = SailingAppController(settings!);
+    await sailingAppController?.connect();
+
+    d = AutoPilotDisplay(sailingAppController!, settings!);
+    sailingAppController?.addWidget(d);
+
+    c = AutoPilotControl(sailingAppController!, settings!);
+    sailingAppController?.addWidget(c);
 
     setState(() {});
   }
@@ -62,9 +76,17 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if(settings == null) {
+    if(sailingAppController == null) {
       return const Center();
     }
+
+    // sailingAppController?.clear();
+
+    // AutoPilotDisplay d = AutoPilotDisplay(sailingAppController!, settings!);
+    // sailingAppController?.addWidget(d);
+    //
+    // AutoPilotControl c = AutoPilotControl(sailingAppController!, settings!);
+    // sailingAppController?.addWidget(c);
 
     return Scaffold(
         appBar: AppBar(
@@ -77,9 +99,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         body: Center(
           child: Column(
             children: <Widget>[
-              AutoPilotDisplay(settings!),
-              AutoPilotControl(settings!)
-              ,
+              d,
+              c
             ],
           ),
         )

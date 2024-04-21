@@ -1,14 +1,13 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:sailingapp/sailingapp_controller.dart';
 import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/signalk.dart';
-import 'package:sailingapp/signalk_data.dart';
 
 class AutoPilotDisplay extends StatefulWidget {
+  final SailingAppController controller;
   final Settings settings;
 
-  const AutoPilotDisplay(this.settings, {super.key});
+  const AutoPilotDisplay(this.controller, this.settings, {super.key});
 
   @override
   State<AutoPilotDisplay> createState() => _AutoPilotDisplayState();
@@ -29,7 +28,17 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   @override
   void initState() {
     super.initState();
-    SignalKData().connect(widget.settings.signalkServer, _processData);
+    widget.controller.configure(widget, _processData, {
+      "steering.autopilot.state",
+      "navigation.courseOverGroundTrue",
+      "steering.autopilot.target.windAngleApparent",
+      "environment.wind.angleApparent",
+      "navigation.currentRoute.waypoints",
+      "navigation.courseGreatCircle.crossTrackError",
+      "steering.autopilot.target.headingMagnetic",
+      "navigation.magneticVariation",
+      "steering.rudderAngle",
+    });
   }
 
   @override
