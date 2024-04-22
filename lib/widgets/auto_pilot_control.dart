@@ -115,7 +115,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
     return Column(children: [
       Stack(alignment: Alignment.center, children:  buttons),
-      Text(_error??'', style: Theme.of(context).textTheme.titleSmall!.apply(color: Colors.red))
+      Text(_error??'', style: widget.controller.headTS.apply(color: Colors.red))
     ]);
   }
 }

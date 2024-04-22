@@ -43,12 +43,11 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle headTS = Theme.of(context).textTheme.titleLarge!;
-    TextStyle infoTS = Theme.of(context).textTheme.titleMedium!.apply(fontSizeDelta: 8);
+    SailingAppController c = widget.controller;
 
     List<Widget> pilot = [
-      Text("Pilot", style: headTS),
-      Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: infoTS),
+      Text("Pilot", style: c.headTS),
+      Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: c.infoTS),
     ];
 
     switch(_autopilotState) {
@@ -59,22 +58,22 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         if(_targetHeadingMagnetic != null &&
            _magneticVariation != null) {
           double headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
-          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: infoTS));
+          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: c.infoTS));
         }
         break;
       case AutopilotState.track:
-        pilot.add(Text("WPT: $_waypoint", style: infoTS));
+        pilot.add(Text("WPT: $_waypoint", style: c.infoTS));
         break;
       case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_targetWindAngleApparent);
-        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: infoTS));
+        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: c.infoTS));
         break;
     }
 
     List<Widget> actual = [
-      Text("Actual", style: headTS),
-      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: infoTS),
-      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: infoTS),
+      Text("Actual", style: c.headTS),
+      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: c.infoTS),
+      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: c.infoTS),
     ];
 
     if((_autopilotState??AutopilotState.standby) == AutopilotState.track) {
@@ -94,10 +93,10 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
           Column(children: actual)
         ]),
       Row(children: [
-        Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.red), textAlign: TextAlign.right)),
-        Expanded(child: Text(rudderStr.substring(0, rudderAngle > 0 ? rudderAngleLen : 0), style: Theme.of(context).textTheme.titleMedium!.apply(color: Colors.green))),
+        Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: c.headTS.apply(color: Colors.red), textAlign: TextAlign.right)),
+        Expanded(child: Text(rudderStr.substring(0, rudderAngle > 0 ? rudderAngleLen : 0), style: c.headTS.apply(color: Colors.green))),
       ]),
-      Text(_error??'', style: Theme.of(context).textTheme.titleSmall!.apply(color: Colors.red))
+      Text(_error??'', style: c.headTS.apply(color: Colors.red))
     ]);
   }
 

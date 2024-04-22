@@ -30,8 +30,11 @@ class SailingAppController {
   final Settings settings;
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
+  final TextStyle headTS;
+  final TextStyle infoTS;
 
-  SailingAppController(this.settings);
+
+  SailingAppController(this.settings, this.headTS, this.infoTS);
 
   void addWidget(Widget widget) {
     _widgetData.add(_WidgetData(widget));
