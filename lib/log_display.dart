@@ -24,7 +24,7 @@ class _LogDisplayState extends State<LogDisplay> {
               onPressed: () {
                 setState(() {});();
               }),
-          IconButton(icon: const Icon(Icons.clear),
+          IconButton(icon: const Icon(Icons.delete_sweep),
               onPressed: () {
                 setState(() {
                   widget._controller.clearLog();

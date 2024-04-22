@@ -51,7 +51,7 @@ class SailingAppController {
   void clearLog() => _buffer.clear();
 
   SailingAppController(this.settings, this.headTS, this.infoTS) {
-    l = Logger(output: CircularLogger(_buffer), printer: SimplePrinter(printTime: true, colors: false));
+    l = Logger(filter: ProductionFilter(), output: CircularLogger(_buffer), printer: SimplePrinter(printTime: true, colors: false));
   }
 
   void addWidget(Widget widget) {

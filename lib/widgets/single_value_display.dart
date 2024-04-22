@@ -35,7 +35,8 @@ class _SingleValueDisplayState extends State<SingleValueDisplay> {
 
   _processData(List<Update> updates) {
     try {
-      _value = updates[0].value;
+      // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
+      _value = updates[0].value * 1.0;
     } catch (e) {
       widget._controller.l.e("Error converting $updates: $e");
     }
