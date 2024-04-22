@@ -38,9 +38,6 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   SailingAppController? sailingAppController;
   Settings? settings;
-  late AutoPilotDisplay d;
-  late AutoPilotControl c;
-
 
   _MainPageState() {
     loadSettings();
@@ -51,12 +48,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     sailingAppController = SailingAppController(settings!, widget._headTS, widget._infoTS);
     await sailingAppController?.connect();
-
-    d = AutoPilotDisplay(sailingAppController!, settings!);
-    sailingAppController?.addWidget(d);
-
-    c = AutoPilotControl(sailingAppController!, settings!);
-    sailingAppController?.addWidget(c);
 
     setState(() {});
   }
@@ -83,13 +74,14 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       return const Center();
     }
 
-    // sailingAppController?.clear();
+    sailingAppController?.clear();
 
-    // AutoPilotDisplay d = AutoPilotDisplay(sailingAppController!, settings!);
-    // sailingAppController?.addWidget(d);
-    //
-    // AutoPilotControl c = AutoPilotControl(sailingAppController!, settings!);
-    // sailingAppController?.addWidget(c);
+    AutoPilotDisplay d = AutoPilotDisplay(sailingAppController!, settings!, key: UniqueKey());
+    sailingAppController?.addWidget(d);
+
+    AutoPilotControl c = AutoPilotControl(sailingAppController!, settings!, key: UniqueKey());
+    sailingAppController?.addWidget(c);
+
 
     return Scaffold(
         appBar: AppBar(
