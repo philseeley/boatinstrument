@@ -37,6 +37,8 @@ dependencies:
   slide_to_act:
   web_socket_channel:
   vector_math: ^2.1.4
+  logger:
+  circular_buffer:
 
 dev_dependencies:
   flutter_test:

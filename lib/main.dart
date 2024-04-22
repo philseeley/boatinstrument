@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sailingapp/log_display.dart';
 import 'package:sailingapp/sailingapp_controller.dart';
 import 'package:sailingapp/widgets/auto_pilot_display.dart';
 import 'package:sailingapp/widgets/auto_pilot_control.dart';
@@ -90,10 +91,16 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Auto Pilot"),
-          actions: [IconButton(onPressed: () {
-            showSettingsPage();
-          }, icon: const Icon(Icons.settings))
-          ],
+          actions: [
+            IconButton(icon: const Icon(Icons.settings),
+                onPressed: () {
+                  showSettingsPage();
+                }),
+            IconButton(icon: const Icon(Icons.notes),
+                onPressed: () {
+                  showLog();
+                })
+          ]
         ),
         body: Center(
           child: Column(
@@ -114,6 +121,15 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     }));
 
     settings?.save();
+
+    setState(() {});
+  }
+
+  showLog () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return LogDisplay(sailingAppController!);
+    }));
 
     setState(() {});
   }

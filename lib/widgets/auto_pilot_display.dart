@@ -142,8 +142,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             break;
         }
       } catch (e) {
-        print(u);
-        print(e);
+        widget.controller.l.e("Error converting $u: $e");
       }
     }
 

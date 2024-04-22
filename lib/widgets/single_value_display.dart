@@ -37,8 +37,7 @@ class _SingleValueDisplayState extends State<SingleValueDisplay> {
     try {
       _value = updates[0].value;
     } catch (e) {
-      print(updates);
-      print(e);
+      widget._controller.l.e("Error converting $updates: $e");
     }
 
     setState(() {});

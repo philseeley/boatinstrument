@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:sailingapp/settings.dart';
-import 'package:sailingapp/signalk.dart';
-import 'package:sailingapp/widgets/auto_pilot_control.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class Update {
@@ -26,7 +26,20 @@ class _WidgetData {
   _WidgetData(this.widget);
 }
 
+class CircularLogger extends LogOutput {
+  final CircularBuffer<String> _buffer;
+
+  CircularLogger(this._buffer);
+
+  @override
+  void output(OutputEvent event) {
+    _buffer.addAll(event.lines);
+  }
+}
+
 class SailingAppController {
+  final CircularBuffer<String> _buffer = CircularBuffer(100);
+  late final Logger l;
   final Settings settings;
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
@@ -34,8 +47,12 @@ class SailingAppController {
   final TextStyle headTS;
   final TextStyle infoTS;
 
+  List<String> get logBuffer => _buffer.toList();
+  void clearLog() => _buffer.clear();
 
-  SailingAppController(this.settings, this.headTS, this.infoTS);
+  SailingAppController(this.settings, this.headTS, this.infoTS) {
+    l = Logger(output: CircularLogger(_buffer), printer: SimplePrinter(printTime: true, colors: false));
+  }
 
   void addWidget(Widget widget) {
     _widgetData.add(_WidgetData(widget));
@@ -64,6 +81,10 @@ class SailingAppController {
 
   connect() async {
     try {
+      l.i("Connecting to: ${settings.signalkServer}");
+
+      _channel?.sink.close();
+
       _channel = WebSocketChannel.connect(
         Uri.parse('ws://${settings.signalkServer}/signalk/v1/stream?subscribe=none'),
       );
@@ -71,22 +92,25 @@ class SailingAppController {
       await _channel?.ready;
 
       _channel?.stream.listen(
-        _processData,
-        onError: (e) {
-          print('stream error $e');
-        },
-        onDone: () {
-          print('ws closed');
-          _reconnect();
-        }
+          _processData,
+          onError: (e) {
+            l.e('WebSocket stream error: $e');
+            _reconnect();
+          },
+          onDone: () {
+            l.w('WebSocket closed');
+            _reconnect();
+          }
       );
+
+      _subscribe();
+      _networkTimeout();
+
+      l.i("Connected to: ${settings.signalkServer}");
     } catch (e) {
-      print('Error connecting ws: $e');
+      l.e('Error connecting WebSocket: $e');
       _reconnect();
     }
-
-    _subscribe();
-    _networkTimeout();
   }
 
   void clear() {
@@ -111,12 +135,12 @@ class SailingAppController {
     // Unsubscribe from all updates first.
     _channel?.sink.add(
       jsonEncode(
-        {
-          "context": "*",
-          "unsubscribe": [
-            {"path": "*"}
-          ]
-        }
+          {
+            "context": "*",
+            "unsubscribe": [
+              {"path": "*"}
+            ]
+          }
       ),
     );
 
@@ -131,13 +155,13 @@ class SailingAppController {
   }
 
   void _reconnect () {
-    print("Reconnect");
+    l.i("Reconnecting WebSocket in 5 seconds");
     Timer(const Duration(seconds: 5), connect);
   }
 
   void _networkTimeout () {
     _networkTimer?.cancel();
-    _networkTimer = Timer(const Duration(seconds: 20), _reconnect);
+    _networkTimer = Timer(const Duration(seconds: 20), connect);
   }
 
   _processData(data) {
@@ -164,8 +188,7 @@ class SailingAppController {
               }
             }
           } catch (e) {
-            print(v);
-            print(e);
+            l.e("Error converting $v: $e");
           }
         }
 
