@@ -100,52 +100,50 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     ]);
   }
 
-  _processData(data) {
-    for (dynamic u in data) {
-      for (dynamic v in u['values']) {
-        try {
-          switch (v['path']) {
-            case 'steering.autopilot.state':
-              _autopilotState = AutopilotState.values.byName(v['value']);
-              break;
-            case 'navigation.courseOverGroundTrue':
-              // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
-              double cogLatest = v['value'] * 1.0;
-              _courseOverGroundTrue = averageAngle(
-                  _courseOverGroundTrue ?? cogLatest, cogLatest,
-                  smooth: widget.settings.valueSmoothing);
-              break;
-            case 'steering.autopilot.target.windAngleApparent':
-              _targetWindAngleApparent = v['value'] * 1.0;
-              break;
-            case 'environment.wind.angleApparent':
-              double waa = v['value'] * 1.0;
-              _windAngleApparent = averageAngle(
-                  _windAngleApparent ?? waa, waa,
-                  smooth: widget.settings.valueSmoothing, relative: true);
-              break;
-            case 'navigation.currentRoute.waypoints':
-              break;
-            case 'navigation.courseGreatCircle.crossTrackError':
-              _crossTrackError = v['value'] * 1.0;
-              break;
-            case 'steering.autopilot.target.headingMagnetic':
-              _targetHeadingMagnetic = v['value'] * 1.0;
-              break;
-            case 'navigation.magneticVariation':
-              _magneticVariation = v['value'] * 1.0;
-              break;
-            case 'steering.rudderAngle':
-              _rudderAngle = v['value'] * 1.0;
-              break;
-            case 'notifications.autopilot.*':
-            //TODO
-              break;
-          }
-        } catch (e) {
-          print(v);
-          print(e);
+  _processData(List<Update> updates) {
+    for (Update u in updates) {
+      try {
+        switch (u.path) {
+          case 'steering.autopilot.state':
+            _autopilotState = AutopilotState.values.byName(u.value);
+            break;
+          case 'navigation.courseOverGroundTrue':
+            // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
+            double cogLatest = u.value * 1.0;
+            _courseOverGroundTrue = averageAngle(
+                _courseOverGroundTrue ?? cogLatest, cogLatest,
+                smooth: widget.settings.valueSmoothing);
+            break;
+          case 'steering.autopilot.target.windAngleApparent':
+            _targetWindAngleApparent = u.value * 1.0;
+            break;
+          case 'environment.wind.angleApparent':
+            double waa = u.value * 1.0;
+            _windAngleApparent = averageAngle(
+                _windAngleApparent ?? waa, waa,
+                smooth: widget.settings.valueSmoothing, relative: true);
+            break;
+          case 'navigation.currentRoute.waypoints':
+            break;
+          case 'navigation.courseGreatCircle.crossTrackError':
+            _crossTrackError = u.value * 1.0;
+            break;
+          case 'steering.autopilot.target.headingMagnetic':
+            _targetHeadingMagnetic = u.value * 1.0;
+            break;
+          case 'navigation.magneticVariation':
+            _magneticVariation = u.value * 1.0;
+            break;
+          case 'steering.rudderAngle':
+            _rudderAngle = u.value * 1.0;
+            break;
+          case 'notifications.autopilot.*':
+          //TODO
+            break;
         }
+      } catch (e) {
+        print(u);
+        print(e);
       }
     }
 

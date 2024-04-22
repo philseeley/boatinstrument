@@ -14,14 +14,14 @@ class Update {
   Update(this.path, this.value);
 }
 
-// typedef OnUpdate = Function(List<Update> updates);
-typedef OnUpdate = Function(List<dynamic> updates);
+typedef OnUpdate = Function(List<Update> updates);
 
 class _WidgetData {
   Widget widget;
   bool configured = false;
   OnUpdate? onUpdate;
   Set<String> paths = {};
+  List<Update> updates = [];
 
   _WidgetData(this.widget);
 }
@@ -134,8 +134,31 @@ class SailingAppController {
     // We can get a status message on initial connection, which we ignore.
     if(d['updates'] != null) {
       for(_WidgetData wd in _widgetData) {
-        if(wd.onUpdate != null) {
-          wd.onUpdate!(d['updates']);
+        wd.updates.clear();
+      }
+
+      for (dynamic u in d['updates']) {
+        for (dynamic v in u['values']) {
+          try {
+            String path = v['path'];
+
+            for(_WidgetData wd in _widgetData) {
+              for(String p in wd.paths) {
+                if(path == p) {
+                  wd.updates.add(Update(path, v['value']));
+                }
+              }
+            }
+          } catch (e) {
+            print(v);
+            print(e);
+          }
+        }
+
+        for(_WidgetData wd in _widgetData) {
+          if(wd.onUpdate != null && wd.updates.isNotEmpty) {
+            wd.onUpdate!(wd.updates);
+          }
         }
       }
     }
