@@ -30,6 +30,7 @@ class SailingAppController {
   final Settings settings;
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
+  Timer? _networkTimer;
   final TextStyle headTS;
   final TextStyle infoTS;
 
@@ -54,7 +55,7 @@ class SailingAppController {
     }
 
     if(configured) {
-      subscribe();
+      _subscribe();
     }
 
     dynamic settings = {}; //TODO
@@ -76,19 +77,23 @@ class SailingAppController {
         },
         onDone: () {
           print('ws closed');
+          _reconnect();
         }
       );
     } catch (e) {
       print('Error connecting ws: $e');
       _reconnect();
     }
+
+    _subscribe();
+    _networkTimeout();
   }
 
   void clear() {
     _widgetData.clear();
   }
 
-  void subscribe() {
+  void _subscribe() {
     List<Map<String, String>> subscribe = [];
     Set<String> paths = {};
 
@@ -103,6 +108,7 @@ class SailingAppController {
       subscribe.add({"path": path});
     }
 
+    // Unsubscribe from all updates first.
     _channel?.sink.add(
       jsonEncode(
         {
@@ -125,10 +131,18 @@ class SailingAppController {
   }
 
   void _reconnect () {
-    Timer(const Duration(seconds: 10), connect);
+    print("Reconnect");
+    Timer(const Duration(seconds: 5), connect);
+  }
+
+  void _networkTimeout () {
+    _networkTimer?.cancel();
+    _networkTimer = Timer(const Duration(seconds: 20), _reconnect);
   }
 
   _processData(data) {
+    _networkTimeout();
+
     dynamic d = json.decode(data);
 
     // We can get a status message on initial connection, which we ignore.
