@@ -4,12 +4,14 @@ import 'package:sailingapp/widgets/auto_pilot_display.dart';
 import 'package:sailingapp/widgets/auto_pilot_control.dart';
 import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/settings_page.dart';
+import 'package:sailingapp/widgets/single_value_display.dart';
 
 void main() {
   runApp(const NavApp());
 }
 
 class NavApp extends StatelessWidget {
+
   const NavApp({super.key});
 
   // This widget is the root of your application.
@@ -82,6 +84,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     AutoPilotControl c = AutoPilotControl(sailingAppController!, settings!, key: UniqueKey());
     sailingAppController?.addWidget(c);
 
+    SingleValueDisplay sv = SingleValueDisplay(sailingAppController!, settings!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey());
+    sailingAppController?.addWidget(sv);
 
     return Scaffold(
         appBar: AppBar(
@@ -95,7 +99,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           child: Column(
             children: <Widget>[
               d,
-              c
+              c,
+              sv
             ],
           ),
         )
