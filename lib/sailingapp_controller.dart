@@ -46,12 +46,24 @@ class SailingAppController {
   Timer? _networkTimer;
   final TextStyle headTS;
   final TextStyle infoTS;
+  final TextStyle lineTS;
 
   List<String> get logBuffer => _buffer.toList();
   void clearLog() => _buffer.clear();
 
-  SailingAppController(this.settings, this.headTS, this.infoTS) {
-    l = Logger(filter: ProductionFilter(), output: CircularLogger(_buffer), printer: SimplePrinter(printTime: true, colors: false));
+  SailingAppController(this.settings, this.headTS, this.infoTS, this.lineTS) {
+    l = Logger(
+        filter: ProductionFilter(),
+        output: CircularLogger(_buffer),
+        printer: PrettyPrinter(colors: false, errorMethodCount: 1, methodCount: 0, noBoxingByDefault: true, levelEmojis: {
+          Level.trace: "[T]",
+          Level.debug: "[D]",
+          Level.info: "[I]",
+          Level.warning: "[W]",
+          Level.error: "[E]",
+          Level.fatal: "[F]"
+        })
+    );
   }
 
   void addWidget(Widget widget) {
@@ -94,12 +106,14 @@ class SailingAppController {
       _channel?.stream.listen(
           _processData,
           onError: (e) {
-            l.e('WebSocket stream error: $e');
+            l.e('WebSocket stream error', error: e);
             _reconnect();
+            return;
           },
           onDone: () {
             l.w('WebSocket closed');
             _reconnect();
+            return;
           }
       );
 
@@ -108,7 +122,7 @@ class SailingAppController {
 
       l.i("Connected to: ${settings.signalkServer}");
     } catch (e) {
-      l.e('Error connecting WebSocket: $e');
+      l.e('Error connecting WebSocket', error: e);
       _reconnect();
     }
   }
@@ -188,7 +202,7 @@ class SailingAppController {
               }
             }
           } catch (e) {
-            l.e("Error converting $v: $e");
+            l.e("Error converting $v", error: e);
           }
         }
 

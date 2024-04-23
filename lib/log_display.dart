@@ -35,7 +35,7 @@ class _LogDisplayState extends State<LogDisplay> {
       body: ListView.builder(
         itemCount: entries.length,
         itemBuilder: (BuildContext context, int index) {
-          return Text(entries[index]);
+          return Text(entries[index], style: widget._controller.lineTS);
         }
       )
     );

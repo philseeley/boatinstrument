@@ -46,7 +46,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     SailingAppController c = widget.controller;
 
     List<Widget> pilot = [
-      Text("Pilot", style: c.headTS),
+      Text("Pilot", style: c.infoTS),
       Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: c.infoTS),
     ];
 
@@ -71,7 +71,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     }
 
     List<Widget> actual = [
-      Text("Actual", style: c.headTS),
+      Text("Actual", style: c.infoTS),
       Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: c.infoTS),
       Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: c.infoTS),
     ];
@@ -142,7 +142,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             break;
         }
       } catch (e) {
-        widget.controller.l.e("Error converting $u: $e");
+        widget.controller.l.e("Error converting $u", error: e);
       }
     }
 

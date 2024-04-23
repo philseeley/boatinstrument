@@ -15,15 +15,15 @@ class NavApp extends StatelessWidget {
 
   const NavApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     TextStyle headTS = Theme.of(context).textTheme.titleMedium!.apply(fontWeightDelta: 4);
     TextStyle infoTS = Theme.of(context).textTheme.titleLarge!.apply(fontWeightDelta: 4).apply(fontSizeDelta: 8);
+    TextStyle lineTS = Theme.of(context).textTheme.bodySmall!;
 
     return MaterialApp(
-      home: MainPage(headTS, infoTS),
-      theme: ThemeData(textTheme: TextTheme(titleLarge: infoTS, titleMedium: headTS, bodyMedium: headTS))
+      home: MainPage(headTS, infoTS, lineTS),
+      theme: ThemeData(textTheme: TextTheme(titleLarge: infoTS, titleMedium: headTS, bodyMedium: headTS, bodySmall: lineTS))
     );
   }
 }
@@ -31,8 +31,9 @@ class NavApp extends StatelessWidget {
 class MainPage extends StatefulWidget {
   final TextStyle _headTS;
   final TextStyle _infoTS;
+  final TextStyle _lineTS;
 
-  const MainPage(this._headTS, this._infoTS, {super.key});
+  const MainPage(this._headTS, this._infoTS, this._lineTS, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -49,7 +50,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   loadSettings() async {
     settings = await Settings.load();
 
-    sailingAppController = SailingAppController(settings!, widget._headTS, widget._infoTS);
+    sailingAppController = SailingAppController(settings!, widget._headTS, widget._infoTS, widget._lineTS);
     await sailingAppController?.connect();
 
     setState(() {});
