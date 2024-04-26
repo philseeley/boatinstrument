@@ -40,7 +40,7 @@ class CircularLogger extends LogOutput {
 class SailingAppController {
   final CircularBuffer<String> _buffer = CircularBuffer(100);
   late final Logger l;
-  final Settings settings;
+  Settings? _settings;
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
@@ -51,7 +51,11 @@ class SailingAppController {
   List<String> get logBuffer => _buffer.toList();
   void clearLog() => _buffer.clear();
 
-  SailingAppController(this.settings, this.headTS, this.infoTS, this.lineTS) {
+  bool get ready => _settings != null;
+
+  Settings get settings => _settings!;
+
+  SailingAppController(this.headTS, this.infoTS, this.lineTS) {
     l = Logger(
         filter: ProductionFilter(),
         output: CircularLogger(_buffer),
@@ -63,7 +67,11 @@ class SailingAppController {
           Level.error: "[E]",
           Level.fatal: "[F]"
         })
-    );
+      );
+  }
+
+  loadSettings() async {
+    _settings = await Settings.load();
   }
 
   void addWidget(Widget widget) {

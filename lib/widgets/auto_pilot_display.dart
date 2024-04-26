@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sailingapp/sailingapp_controller.dart';
-import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/signalk.dart';
 
 class AutoPilotDisplay extends StatefulWidget {
   final SailingAppController controller;
-  final Settings settings;
 
-  const AutoPilotDisplay(this.controller, this.settings, {super.key});
+  const AutoPilotDisplay(this.controller, {super.key});
 
   @override
   State<AutoPilotDisplay> createState() => _AutoPilotDisplayState();
@@ -112,7 +110,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             double cogLatest = u.value * 1.0;
             _courseOverGroundTrue = averageAngle(
                 _courseOverGroundTrue ?? cogLatest, cogLatest,
-                smooth: widget.settings.valueSmoothing);
+                smooth: widget.controller.settings.valueSmoothing);
             break;
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = u.value * 1.0;
@@ -121,7 +119,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             double waa = u.value * 1.0;
             _windAngleApparent = averageAngle(
                 _windAngleApparent ?? waa, waa,
-                smooth: widget.settings.valueSmoothing, relative: true);
+                smooth: widget.controller.settings.valueSmoothing, relative: true);
             break;
           case 'navigation.currentRoute.waypoints':
             break;

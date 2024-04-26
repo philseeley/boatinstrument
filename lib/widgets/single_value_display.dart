@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:sailingapp/sailingapp_controller.dart';
-import 'package:sailingapp/settings.dart';
 
-class SingleValueDisplay extends StatefulWidget {
+class DoubleValueDisplay extends StatefulWidget {
   final SailingAppController _controller;
-  final Settings _settings;
   final String _title;
   final String _path;
   final String _units;
   final int _precision;
 
-  const SingleValueDisplay(this._controller, this._settings, this._title, this._path, this._units, this._precision, {super.key});
+  const DoubleValueDisplay(this._controller, this._title, this._path, this._units, this._precision, {super.key});
 
   @override
-  State<SingleValueDisplay> createState() => _SingleValueDisplayState();
+  State<DoubleValueDisplay> createState() => _DoubleValueDisplayState();
 }
 
-class _SingleValueDisplayState extends State<SingleValueDisplay> {
+class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
   double? _value;
 
   @override

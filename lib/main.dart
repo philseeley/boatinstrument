@@ -3,7 +3,6 @@ import 'package:sailingapp/log_display.dart';
 import 'package:sailingapp/sailingapp_controller.dart';
 import 'package:sailingapp/widgets/auto_pilot_display.dart';
 import 'package:sailingapp/widgets/auto_pilot_control.dart';
-import 'package:sailingapp/settings.dart';
 import 'package:sailingapp/settings_page.dart';
 import 'package:sailingapp/widgets/single_value_display.dart';
 
@@ -41,16 +40,16 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   SailingAppController? sailingAppController;
-  Settings? settings;
 
-  _MainPageState() {
-    loadSettings();
+  @override
+  void initState() {
+    super.initState();
+    _configure();
   }
 
-  loadSettings() async {
-    settings = await Settings.load();
-
-    sailingAppController = SailingAppController(settings!, widget._headTS, widget._infoTS, widget._lineTS);
+  _configure () async {
+    sailingAppController = SailingAppController(widget._headTS, widget._infoTS, widget._lineTS);
+    await sailingAppController?.loadSettings();
     await sailingAppController?.connect();
 
     setState(() {});
@@ -64,7 +63,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        settings?.save();
+        sailingAppController?.settings.save();
 
         break;
       case AppLifecycleState.resumed:
@@ -74,19 +73,19 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if(sailingAppController == null) {
+    if(sailingAppController == null || !sailingAppController!.ready) {
       return const Center();
     }
 
     sailingAppController?.clear();
 
-    AutoPilotDisplay d = AutoPilotDisplay(sailingAppController!, settings!, key: UniqueKey());
+    AutoPilotDisplay d = AutoPilotDisplay(sailingAppController!, key: UniqueKey());
     sailingAppController?.addWidget(d);
 
-    AutoPilotControl c = AutoPilotControl(sailingAppController!, settings!, key: UniqueKey());
+    AutoPilotControl c = AutoPilotControl(sailingAppController!, key: UniqueKey());
     sailingAppController?.addWidget(c);
 
-    SingleValueDisplay sv = SingleValueDisplay(sailingAppController!, settings!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey());
+    DoubleValueDisplay sv = DoubleValueDisplay(sailingAppController!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey());
     sailingAppController?.addWidget(sv);
 
     return Scaffold(
@@ -118,10 +117,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   showSettingsPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return SettingsPage(settings!);
+      return SettingsPage(sailingAppController!.settings);
     }));
 
-    settings?.save();
+    sailingAppController?.settings.save();
 
     setState(() {});
   }

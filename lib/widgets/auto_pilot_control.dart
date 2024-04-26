@@ -5,13 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:sailingapp/sailingapp_controller.dart';
 import 'package:sailingapp/signalk.dart';
 import 'package:slide_to_act/slide_to_act.dart';
-import 'package:sailingapp/settings.dart';
 
 class AutoPilotControl extends StatefulWidget {
   final SailingAppController controller;
-  final Settings settings;
 
-  const AutoPilotControl(this.controller, this.settings, {super.key});
+  const AutoPilotControl(this.controller, {super.key});
 
   @override
   State<AutoPilotControl> createState() => _AutoPilotControlState();
@@ -32,19 +30,19 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
   _sendCommand(String path, String params) async {
     _error = null;
 
-    if(widget.settings.enableLock) {
+    if(widget.controller.settings.enableLock) {
       _unlock();
     }
 
     Uri uri = Uri.http(
-        widget.settings.signalkServer, '/signalk/v1/api/vessels/self/$path');
+        widget.controller.settings.signalkServer, '/signalk/v1/api/vessels/self/$path');
 
     http.Response response = await http.put(
         uri,
         headers: {
           "Content-Type": "application/json",
           "accept": "application/json",
-          "Authorization": "Bearer ${widget.settings.authToken}"
+          "Authorization": "Bearer ${widget.controller.settings.authToken}"
         },
         body: params
     );
@@ -71,7 +69,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
     _lockTimer?.cancel();
 
-    _lockTimer =  Timer(Duration(seconds: widget.settings.lockSeconds), () {
+    _lockTimer =  Timer(Duration(seconds: widget.controller.settings.lockSeconds), () {
       setState(() {
         _locked = true;
       });
@@ -81,7 +79,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
   @override
   Widget build(BuildContext context) {
     List<Row> controlButtons = [];
-    bool disabled = widget.settings.enableLock && _locked;
+    bool disabled = widget.controller.settings.enableLock && _locked;
 
     for(int i in [1, 10]) {
       controlButtons.add(Row(
@@ -104,7 +102,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons));
 
     List<Widget> buttons = [Column(children: controlButtons)];
-    if(widget.settings.enableLock && _locked) {
+    if(widget.controller.settings.enableLock && _locked) {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(
         text: "Unlock",
         outerColor: Colors.black,
