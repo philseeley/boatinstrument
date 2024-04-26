@@ -79,15 +79,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     sailingAppController?.clear();
 
-    AutoPilotDisplay d = AutoPilotDisplay(sailingAppController!, key: UniqueKey());
-    sailingAppController?.addWidget(d);
-
-    AutoPilotControl c = AutoPilotControl(sailingAppController!, key: UniqueKey());
-    sailingAppController?.addWidget(c);
-
-    DoubleValueDisplay sv = DoubleValueDisplay(sailingAppController!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey());
-    sailingAppController?.addWidget(sv);
-
     return Scaffold(
         appBar: AppBar(
           title: const Text("Auto Pilot"),
@@ -105,9 +96,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         body: Center(
           child: Column(
             children: <Widget>[
-              d,
-              c,
-              sv
+              sailingAppController!.addWidget(AutoPilotDisplay(sailingAppController!, key: UniqueKey())),
+              sailingAppController!.addWidget(AutoPilotControl(sailingAppController!, key: UniqueKey())),
+             sailingAppController!.addWidget(DoubleValueDisplay(sailingAppController!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey()))
             ],
           ),
         )

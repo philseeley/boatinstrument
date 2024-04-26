@@ -74,8 +74,9 @@ class SailingAppController {
     _settings = await Settings.load();
   }
 
-  void addWidget(Widget widget) {
+  Widget addWidget(Widget widget) {
     _widgetData.add(_WidgetData(widget));
+    return widget;
   }
 
   dynamic configure(Widget widget, OnUpdate? onUpdate, Set<String> paths) {
