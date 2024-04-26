@@ -7,22 +7,16 @@ part 'settings.g.dart';
 
 @JsonSerializable()
 class Settings {
-  bool enableLock;
-  int lockSeconds;
   int valueSmoothing;
   String signalkServer;
-  String clientID;
-  String authToken;
+  Map<String, dynamic> widgetSettings;
 
   static File? _store;
 
   Settings({
-    this.enableLock = true,
-    this.lockSeconds = 5,
     this.valueSmoothing = 0,
     this.signalkServer = 'openplotter.local:3000',
-    this.clientID = 'sailingapp-1234', //TODO gen a GUID
-    this.authToken = "",
+    this.widgetSettings = const {}
   });
 
   factory Settings.fromJson(Map<String, dynamic> json) =>

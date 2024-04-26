@@ -18,27 +18,6 @@ class _SettingsState extends State<SettingsPage> {
     Settings settings = widget.settings;
 
     List<Widget> list = [
-      SwitchListTile(title: const Text("Enable Control Lock:"),
-          value: settings.enableLock,
-          onChanged: (bool value) {
-            setState(() {
-              settings.enableLock = value;
-            });
-          }),
-      ListTile(
-        leading: const Text("Lock Timeout:"),
-        title: Slider(
-            min: 2.0,
-            max: 20.0,
-            divisions: 18,
-            value: settings.lockSeconds.toDouble(),
-            label: "${settings.lockSeconds.toInt()}s",
-            onChanged: (double value) {
-              setState(() {
-                settings.lockSeconds = value.toInt();
-              });
-            }),
-      ),
       ListTile(
         leading: const Text("Value Smoothing:"),
         title: Slider(
@@ -59,15 +38,7 @@ class _SettingsState extends State<SettingsPage> {
                   initialValue: settings.signalkServer,
                   onChanged: (value) => settings.signalkServer = value)
       ),
-      ListTile(
-          leading: const Text("Request Auth Token:"),
-          title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
-      ),
-      ListTile(
-          leading: const Text("Auth token:"),
-          title: Text(settings.authToken)
-      ),
-      ];
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -75,25 +46,5 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
-  }
-
-  void _requestAuthToken() async {
-    SignalKAuthorization().request(widget.settings.signalkServer, widget.settings.clientID, "Sailing App",
-      (authToken) {
-        setState(() {
-          widget.settings.authToken = authToken;
-        });
-      },
-      (msg) {
-        if (mounted) {
-          setState(() {
-            widget.settings.authToken = msg;
-          });
-        }
-      });
-
-    setState(() {
-      widget.settings.authToken = 'PENDING';
-    });
   }
 }

@@ -20,7 +20,7 @@ class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
   @override
   void initState() {
     super.initState();
-    widget._controller.configure(widget, _processData, { widget._path });
+    widget._controller.configure((DoubleValueDisplay).toString(), widget, _processData, { widget._path });
   }
 
   @override

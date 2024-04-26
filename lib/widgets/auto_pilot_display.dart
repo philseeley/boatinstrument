@@ -26,7 +26,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget, _processData, {
+    widget.controller.configure((AutoPilotDisplay).toString(), widget, _processData, {
       "steering.autopilot.state",
       "navigation.courseOverGroundTrue",
       "steering.autopilot.target.windAngleApparent",

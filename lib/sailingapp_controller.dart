@@ -79,7 +79,7 @@ class SailingAppController {
     return widget;
   }
 
-  dynamic configure(Widget widget, OnUpdate? onUpdate, Set<String> paths) {
+  Map<String, dynamic> configure(String widgetID, Widget widget, OnUpdate? onUpdate, Set<String> paths) {
     bool configured = true;
 
     for(_WidgetData wd in _widgetData) {
@@ -96,8 +96,12 @@ class SailingAppController {
       _subscribe();
     }
 
-    dynamic settings = {}; //TODO
-    return settings;
+    return _settings?.widgetSettings[widgetID]??{};
+  }
+
+  void saveWidgetSettings(String widgetID, Map<String, dynamic> widgetSettings) {
+    settings.widgetSettings[widgetID] = widgetSettings;
+    settings.save();
   }
 
   connect() async {
