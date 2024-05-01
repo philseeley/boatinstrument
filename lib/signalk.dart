@@ -72,7 +72,7 @@ class Target {
 enum AutopilotState {
   standby('Standby'),
   auto('Auto'),
-  track('Track'),
+  route('Track'),
   wind('Vane');
 
   final String displayName;

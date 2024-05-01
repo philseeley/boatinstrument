@@ -59,7 +59,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
           pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: c.infoTS));
         }
         break;
-      case AutopilotState.track:
+      case AutopilotState.route:
         pilot.add(Text("WPT: $_waypoint", style: c.infoTS));
         break;
       case AutopilotState.wind:
@@ -74,9 +74,9 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: c.infoTS),
     ];
 
-    if((_autopilotState??AutopilotState.standby) == AutopilotState.track) {
+    if((_autopilotState??AutopilotState.standby) == AutopilotState.route) {
       if(_crossTrackError != null) {
-        actual.add(Text("XTE: ${meters2NM(_crossTrackError!.abs())} ${val2PS(_crossTrackError!)}"));
+        actual.add(Text("XTE: ${meters2NM(_crossTrackError!.abs()).toStringAsFixed(2)} ${val2PS(_crossTrackError!)}"));
       }
     }
 
@@ -122,6 +122,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
                 smooth: widget.controller.settings.valueSmoothing, relative: true);
             break;
           case 'navigation.currentRoute.waypoints':
+            _waypoint = u.value[1]['name'];
             break;
           case 'navigation.courseGreatCircle.crossTrackError':
             _crossTrackError = u.value * 1.0;

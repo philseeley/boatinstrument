@@ -131,7 +131,6 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(
         text: "Unlock",
         outerColor: Colors.black,
-        // animationDuration: const Duration(milliseconds: 0),
         onSubmit: () { return _unlock();},
       ))));
     }

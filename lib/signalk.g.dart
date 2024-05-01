@@ -80,7 +80,7 @@ Map<String, dynamic> _$AutopilotStateValueToJson(
 const _$AutopilotStateEnumMap = {
   AutopilotState.standby: 'standby',
   AutopilotState.auto: 'auto',
-  AutopilotState.track: 'track',
+  AutopilotState.route: 'route',
   AutopilotState.wind: 'wind',
 };
 
