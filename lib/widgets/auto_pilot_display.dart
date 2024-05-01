@@ -60,7 +60,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         }
         break;
       case AutopilotState.route:
-        pilot.add(Text("WPT: $_waypoint", style: c.infoTS));
+        pilot.add(Text("WPT: $_waypoint", style: c.headTS));
         break;
       case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_targetWindAngleApparent);
