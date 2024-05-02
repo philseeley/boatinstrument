@@ -39,6 +39,7 @@ dependencies:
   vector_math: ^2.1.4
   logger:
   circular_buffer:
+  resizable_widget: ^1.0.5
 
 dev_dependencies:
   flutter_test:

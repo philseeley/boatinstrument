@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:sailingapp/authorization.dart';
-import 'settings.dart';
+part of 'sailingapp_controller.dart';
 
 class SettingsPage extends StatefulWidget {
-  final Settings settings;
+  final SailingAppController _controller;
 
-  const SettingsPage(this.settings, {super.key});
+  const SettingsPage(this._controller, {super.key});
 
   @override
   createState() => _SettingsState();
@@ -15,7 +13,7 @@ class _SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    Settings settings = widget.settings;
+    _Settings settings = widget._controller._settings!;
 
     List<Widget> list = [
       ListTile(

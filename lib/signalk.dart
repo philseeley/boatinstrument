@@ -199,11 +199,13 @@ class Vessel {
       _$VesselFromJson(json);
 }
 
+//TODO move these to controller
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 double meters2NM(double m) => double.parse((m*0.00054).toStringAsPrecision(2));
 String val2PS(num val) => val < 0 ? 'P' : 'S';
 
+//TODO smoothing doesn't seem to be working.
 double averageAngle(double current, double next, { int smooth = 0, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * (50+smooth), m.cos(current) * (50+smooth));
   vm.Vector2 v2 = vm.Vector2(m.sin(next) * 50, m.cos(next) * 50);

@@ -110,7 +110,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             double cogLatest = u.value * 1.0;
             _courseOverGroundTrue = averageAngle(
                 _courseOverGroundTrue ?? cogLatest, cogLatest,
-                smooth: widget.controller.settings.valueSmoothing);
+                smooth: widget.controller.valueSmoothing);
             break;
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = u.value * 1.0;
@@ -119,7 +119,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             double waa = u.value * 1.0;
             _windAngleApparent = averageAngle(
                 _windAngleApparent ?? waa, waa,
-                smooth: widget.controller.settings.valueSmoothing, relative: true);
+                smooth: widget.controller.valueSmoothing, relative: true);
             break;
           case 'navigation.currentRoute.waypoints':
             _waypoint = u.value[1]['name'];

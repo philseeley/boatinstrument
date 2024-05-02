@@ -1,11 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
-import 'package:sailingapp/settings.dart';
+import 'package:resizable_widget/resizable_widget.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+part 'sailingapp_controller.g.dart';
+part 'settings_page.dart';
+part 'edit_page.dart';
 
 class Update {
   final String path;
@@ -26,6 +33,84 @@ class _WidgetData {
   _WidgetData(this.widget);
 }
 
+@JsonSerializable()
+class _PageWidget {
+  String id;
+  double percent;
+
+  _PageWidget(this.id, this.percent);
+
+  factory _PageWidget.fromJson(Map<String, dynamic> json) =>
+      _$PageWidgetFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PageWidgetToJson(this);
+}
+
+// @JsonSerializable()
+// class _PageRow {
+//   List<_PageWidget> widgets;
+//
+//   _PageRow(this.widgets);
+//
+//   factory _PageRow.fromJson(Map<String, dynamic> json) =>
+//       _$PageRowFromJson(json);
+// }
+
+@JsonSerializable()
+class _Page {
+  String name;
+  List<List<_PageWidget>> rows;
+
+  _Page(this.name, this.rows);
+
+  factory _Page.fromJson(Map<String, dynamic> json) =>
+      _$PageFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PageToJson(this);
+}
+
+@JsonSerializable()
+class _Settings {
+  int valueSmoothing;
+  String signalkServer;
+  List<_Page> pages;
+  Map<String, dynamic> widgetSettings;
+
+  static File? _store;
+
+  _Settings({
+    this.valueSmoothing = 0,
+    this.signalkServer = 'openplotter.local:3000',
+    this.pages = const [],
+    this.widgetSettings = const {}
+  });
+
+  factory _Settings.fromJson(Map<String, dynamic> json) =>
+      _$SettingsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SettingsToJson(this);
+
+  static load() async {
+    Directory directory = await path_provider.getApplicationDocumentsDirectory();
+    _store = File('${directory.path}/settings.json');
+
+    try {
+      String? s = _store?.readAsStringSync();
+      dynamic data = json.decode(s ?? "");
+
+      return _Settings.fromJson(data);
+    } on Exception {
+      return _Settings();
+    } on Error {
+      return _Settings();
+    }
+  }
+
+  _save (){
+    _store?.writeAsStringSync(json.encode(toJson()));
+  }
+}
+
 class CircularLogger extends LogOutput {
   final CircularBuffer<String> _buffer;
 
@@ -33,14 +118,18 @@ class CircularLogger extends LogOutput {
 
   @override
   void output(OutputEvent event) {
-    _buffer.addAll(event.lines);
+    // We can't use _buffer.addAll() as this is often called in async calls and
+    // can result in a "Concurrent modification during iteration" exception.
+    for(String s in event.lines) {
+      _buffer.add(s);
+    }
   }
 }
 
 class SailingAppController {
   final CircularBuffer<String> _buffer = CircularBuffer(100);
   late final Logger l;
-  Settings? _settings;
+  _Settings? _settings;
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
@@ -53,7 +142,8 @@ class SailingAppController {
 
   bool get ready => _settings != null;
 
-  Settings get settings => _settings!;
+  String get signalkServer => _settings!.signalkServer;
+  int get valueSmoothing => _settings!.valueSmoothing;
 
   SailingAppController(this.headTS, this.infoTS, this.lineTS) {
     l = Logger(
@@ -71,7 +161,7 @@ class SailingAppController {
   }
 
   loadSettings() async {
-    _settings = await Settings.load();
+    _settings = await _Settings.load();
   }
 
   Widget addWidget(Widget widget) {
@@ -100,18 +190,22 @@ class SailingAppController {
   }
 
   void saveWidgetSettings(String widgetID, Map<String, dynamic> widgetSettings) {
-    settings.widgetSettings[widgetID] = widgetSettings;
-    settings.save();
+    _settings?.widgetSettings[widgetID] = widgetSettings;
+    save();
+  }
+
+  void save() {
+    _settings?._save();
   }
 
   connect() async {
     try {
-      l.i("Connecting to: ${settings.signalkServer}");
+      l.i("Connecting to: $signalkServer");
 
       _channel?.sink.close();
 
       _channel = WebSocketChannel.connect(
-        Uri.parse('ws://${settings.signalkServer}/signalk/v1/stream?subscribe=none'),
+        Uri.parse('ws://$signalkServer/signalk/v1/stream?subscribe=none'),
       );
 
       await _channel?.ready;
@@ -133,7 +227,7 @@ class SailingAppController {
       _subscribe();
       _networkTimeout();
 
-      l.i("Connected to: ${settings.signalkServer}");
+      l.i("Connected to: $signalkServer");
     } catch (e) {
       l.e('Error connecting WebSocket', error: e);
       _reconnect();

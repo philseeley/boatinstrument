@@ -34,6 +34,7 @@ class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
   _processData(List<Update> updates) {
     try {
       // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
+      // TODO value smoothing.
       _value = updates[0].value * 1.0;
     } catch (e) {
       widget._controller.l.e("Error converting $updates", error: e);

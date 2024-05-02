@@ -54,22 +54,27 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
       _unlock();
     }
 
-    Uri uri = Uri.http(
-        widget.controller.settings.signalkServer, '/signalk/v1/api/vessels/self/$path');
+    try {
+      Uri uri = Uri.http(
+          widget.controller.signalkServer,
+          '/signalk/v1/api/vessels/self/$path');
 
-    http.Response response = await http.put(
-        uri,
-        headers: {
-          "Content-Type": "application/json",
-          "accept": "application/json",
-          "Authorization": "Bearer ${_settings.authToken}"
-        },
-        body: params
-    );
+      http.Response response = await http.put(
+          uri,
+          headers: {
+            "Content-Type": "application/json",
+            "accept": "application/json",
+            "Authorization": "Bearer ${_settings.authToken}"
+          },
+          body: params
+      );
 
-    setState(() {
-      _error = response.reasonPhrase;
-    });
+      setState(() {
+        _error = response.reasonPhrase;
+      });
+    } catch (e) {
+      widget.controller.l.e('Error Sending to WebSocket', error: e);
+    }
   }
 
   _adjustHeading(int direction) async {
@@ -157,7 +162,7 @@ class _SettingsPage extends StatefulWidget {
   final SailingAppController _controller;
   final _Settings _settings;
 
-  const _SettingsPage(this._controller, this._settings, {super.key});
+  const _SettingsPage(this._controller, this._settings);
 
   @override
   createState() => _SettingsState();
@@ -210,7 +215,7 @@ class _SettingsState extends State<_SettingsPage> {
   }
 
   void _requestAuthToken() async {
-    SignalKAuthorization().request(widget._controller.settings.signalkServer, widget._settings.clientID, "Sailing App - Autopilot Control",
+    SignalKAuthorization().request(widget._controller.signalkServer, widget._settings.clientID, "Sailing App - Autopilot Control",
             (authToken) {
           setState(() {
             widget._settings.authToken = authToken;

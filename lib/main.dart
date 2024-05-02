@@ -3,7 +3,6 @@ import 'package:sailingapp/log_display.dart';
 import 'package:sailingapp/sailingapp_controller.dart';
 import 'package:sailingapp/widgets/auto_pilot_display.dart';
 import 'package:sailingapp/widgets/auto_pilot_control.dart';
-import 'package:sailingapp/settings_page.dart';
 import 'package:sailingapp/widgets/single_value_display.dart';
 
 void main() {
@@ -63,7 +62,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        sailingAppController?.settings.save();
+        sailingAppController?.save();
 
         break;
       case AppLifecycleState.resumed:
@@ -74,15 +73,18 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     if(sailingAppController == null || !sailingAppController!.ready) {
-      return const Center();
+      return const Center(child: Text('Initialising'));
     }
 
     sailingAppController?.clear();
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Auto Pilot"),
           actions: [
+            IconButton(icon: const Icon(Icons.edit),
+                onPressed: () {
+                  _editPage();
+                }),
             IconButton(icon: const Icon(Icons.settings),
                 onPressed: () {
                   showSettingsPage();
@@ -108,10 +110,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   showSettingsPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return SettingsPage(sailingAppController!.settings);
+      return SettingsPage(sailingAppController!);
     }));
 
-    sailingAppController?.settings.save();
+    sailingAppController?.save();
 
     setState(() {});
   }
@@ -121,6 +123,17 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         context, MaterialPageRoute(builder: (context) {
       return LogDisplay(sailingAppController!);
     }));
+
+    setState(() {});
+  }
+
+  _editPage () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return EditPage(sailingAppController!, 0); //TODO which page
+    }));
+
+    sailingAppController?.save();
 
     setState(() {});
   }
