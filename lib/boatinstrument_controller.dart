@@ -8,12 +8,35 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
+import 'package:sailingapp/widgets/single_value_display.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'boatinstrument_controller.g.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
 
+class WidgetDetails {
+  final String id;
+  final String description;
+  final Widget Function(BoatInstrumentController) build;
+
+  WidgetDetails(this.id, this.description, this.build);
+}
+
+List<WidgetDetails> widgetDetails = [
+  WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1);}),
+  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 0);})
+];
+
+WidgetDetails getWidgetDetails(String id) {
+  for(WidgetDetails wd in widgetDetails) {
+    if(wd.id == id) {
+      return wd;
+    }
+  }
+
+  throw Exception('Unknown widget with ID $id');
+}
 class Update {
   final String path;
   final dynamic value;
@@ -63,17 +86,17 @@ class _Page {
 class _Settings {
   int valueSmoothing;
   String signalkServer;
-  List<_Page> pages;
-  Map<String, dynamic> widgetSettings;
+  late List<_Page> pages;
+  late Map<String, dynamic> widgetSettings;
 
   static File? _store;
 
   _Settings({
     this.valueSmoothing = 0,
     this.signalkServer = 'openplotter.local:3000',
-    this.pages = const [],
-    this.widgetSettings = const {}
-  });
+    pages,
+    widgetSettings
+  }) : pages = pages??_Page('Page Name', [[_PageWidget(widgetDetails[0].id, 1)]]), widgetSettings = widgetSettings??{};
 
   factory _Settings.fromJson(Map<String, dynamic> json) =>
       _$SettingsFromJson(json);
