@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sailingapp/sailingapp_controller.dart';
+import 'package:sailingapp/boatinstrument_controller.dart';
 
 class DoubleValueDisplay extends StatefulWidget {
-  final SailingAppController _controller;
+  final BoatInstrumentController _controller;
   final String _title;
   final String _path;
   final String _units;

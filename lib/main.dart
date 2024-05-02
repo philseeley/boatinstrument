@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sailingapp/log_display.dart';
-import 'package:sailingapp/sailingapp_controller.dart';
+import 'package:sailingapp/boatinstrument_controller.dart';
 import 'package:sailingapp/widgets/auto_pilot_display.dart';
 import 'package:sailingapp/widgets/auto_pilot_control.dart';
 import 'package:sailingapp/widgets/single_value_display.dart';
@@ -38,7 +38,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
-  SailingAppController? sailingAppController;
+  BoatInstrumentController? sailingAppController;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   _configure () async {
-    sailingAppController = SailingAppController(widget._headTS, widget._infoTS, widget._lineTS);
+    sailingAppController = BoatInstrumentController(widget._headTS, widget._infoTS, widget._lineTS);
     await sailingAppController?.loadSettings();
     await sailingAppController?.connect();
 

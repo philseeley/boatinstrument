@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sailingapp/sailingapp_controller.dart';
+import 'package:sailingapp/boatinstrument_controller.dart';
 import 'package:sailingapp/signalk.dart';
 
 class AutoPilotDisplay extends StatefulWidget {
-  final SailingAppController controller;
+  final BoatInstrumentController controller;
 
   const AutoPilotDisplay(this.controller, {super.key});
 
@@ -41,7 +41,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    SailingAppController c = widget.controller;
+    BoatInstrumentController c = widget.controller;
 
     List<Widget> pilot = [
       Text("Pilot", style: c.infoTS),

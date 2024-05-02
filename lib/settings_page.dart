@@ -1,7 +1,7 @@
-part of 'sailingapp_controller.dart';
+part of 'boatinstrument_controller.dart';
 
 class SettingsPage extends StatefulWidget {
-  final SailingAppController _controller;
+  final BoatInstrumentController _controller;
 
   const SettingsPage(this._controller, {super.key});
 

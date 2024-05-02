@@ -10,7 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-part 'sailingapp_controller.g.dart';
+part 'boatinstrument_controller.g.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
 
@@ -45,16 +45,6 @@ class _PageWidget {
 
   Map<String, dynamic> toJson() => _$PageWidgetToJson(this);
 }
-
-// @JsonSerializable()
-// class _PageRow {
-//   List<_PageWidget> widgets;
-//
-//   _PageRow(this.widgets);
-//
-//   factory _PageRow.fromJson(Map<String, dynamic> json) =>
-//       _$PageRowFromJson(json);
-// }
 
 @JsonSerializable()
 class _Page {
@@ -126,7 +116,7 @@ class CircularLogger extends LogOutput {
   }
 }
 
-class SailingAppController {
+class BoatInstrumentController {
   final CircularBuffer<String> _buffer = CircularBuffer(100);
   late final Logger l;
   _Settings? _settings;
@@ -145,7 +135,7 @@ class SailingAppController {
   String get signalkServer => _settings!.signalkServer;
   int get valueSmoothing => _settings!.valueSmoothing;
 
-  SailingAppController(this.headTS, this.infoTS, this.lineTS) {
+  BoatInstrumentController(this.headTS, this.infoTS, this.lineTS) {
     l = Logger(
         filter: ProductionFilter(),
         output: CircularLogger(_buffer),

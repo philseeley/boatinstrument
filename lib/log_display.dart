@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sailingapp/sailingapp_controller.dart';
+import 'package:sailingapp/boatinstrument_controller.dart';
 
 class LogDisplay extends StatefulWidget {
-  final SailingAppController _controller;
+  final BoatInstrumentController _controller;
 
   const LogDisplay(this._controller, {super.key});
 

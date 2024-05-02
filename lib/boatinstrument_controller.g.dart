@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'sailingapp_controller.dart';
+part of 'boatinstrument_controller.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

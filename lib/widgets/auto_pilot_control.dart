@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sailingapp/sailingapp_controller.dart';
+import 'package:sailingapp/boatinstrument_controller.dart';
 import 'package:sailingapp/signalk.dart';
 
 import '../authorization.dart';
@@ -27,7 +27,7 @@ class _Settings {
 }
 
 class AutoPilotControl extends StatefulWidget {
-  final SailingAppController controller;
+  final BoatInstrumentController controller;
 
   const AutoPilotControl(this.controller, {super.key});
 
@@ -159,7 +159,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 }
 
 class _SettingsPage extends StatefulWidget {
-  final SailingAppController _controller;
+  final BoatInstrumentController _controller;
   final _Settings _settings;
 
   const _SettingsPage(this._controller, this._settings);
