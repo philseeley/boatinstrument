@@ -38,7 +38,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
-  BoatInstrumentController? sailingAppController;
+  BoatInstrumentController? boatInstrumentController;
+  int _pageNum = 0;
 
   @override
   void initState() {
@@ -47,9 +48,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   _configure () async {
-    sailingAppController = BoatInstrumentController(widget._headTS, widget._infoTS, widget._lineTS);
-    await sailingAppController?.loadSettings();
-    await sailingAppController?.connect();
+    boatInstrumentController = BoatInstrumentController(widget._headTS, widget._infoTS, widget._lineTS);
+    await boatInstrumentController?.loadSettings();
+    await boatInstrumentController?.connect();
 
     setState(() {});
   }
@@ -62,7 +63,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        sailingAppController?.save();
+        boatInstrumentController?.save();
 
         break;
       case AppLifecycleState.resumed:
@@ -72,11 +73,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if(sailingAppController == null || !sailingAppController!.ready) {
-      return const Center(child: Text('Initialising'));
+    if(boatInstrumentController == null || !boatInstrumentController!.ready) {
+      return const Center(child: Text('Initialising')); //TODO splash screen
     }
 
-    sailingAppController?.clear();
+    boatInstrumentController?.clear();
+
 
     return Scaffold(
         appBar: AppBar(
@@ -95,25 +97,26 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 })
           ]
         ),
-        body: Center(
-          child: Column(
-            children: <Widget>[
-              sailingAppController!.addWidget(AutoPilotDisplay(sailingAppController!, key: UniqueKey())),
-              sailingAppController!.addWidget(AutoPilotControl(sailingAppController!, key: UniqueKey())),
-             sailingAppController!.addWidget(DoubleValueDisplay(sailingAppController!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey()))
-            ],
-          ),
-        )
+        body: boatInstrumentController?.buildPage(_pageNum),
+        // body: Center(
+        //   child: Column(
+        //     children: <Widget>[
+        //       sailingAppController!.addWidget(AutoPilotDisplay(sailingAppController!, key: UniqueKey())),
+        //       sailingAppController!.addWidget(AutoPilotControl(sailingAppController!, key: UniqueKey())),
+        //      sailingAppController!.addWidget(DoubleValueDisplay(sailingAppController!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey()))
+        //     ],
+        //   ),
+        // )
     );
   }
 
   showSettingsPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return SettingsPage(sailingAppController!);
+      return SettingsPage(boatInstrumentController!);
     }));
 
-    sailingAppController?.save();
+    boatInstrumentController?.save();
 
     setState(() {});
   }
@@ -121,7 +124,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   showLog () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return LogDisplay(sailingAppController!);
+      return LogDisplay(boatInstrumentController!);
     }));
 
     setState(() {});
@@ -130,10 +133,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   _editPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return EditPage(sailingAppController!, 0); //TODO which page
+      return EditPage(boatInstrumentController!, _pageNum);
     }));
 
-    sailingAppController?.save();
+    boatInstrumentController?.save();
 
     setState(() {});
   }

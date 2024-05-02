@@ -8,6 +8,8 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
+import 'package:sailingapp/widgets/auto_pilot_control.dart';
+import 'package:sailingapp/widgets/auto_pilot_display.dart';
 import 'package:sailingapp/widgets/single_value_display.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -24,8 +26,10 @@ class WidgetDetails {
 }
 
 List<WidgetDetails> widgetDetails = [
-  WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1);}),
-  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 0);})
+  WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
+  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 0, key: UniqueKey());}),
+  WidgetDetails('autopilot-display', 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
+  WidgetDetails('autopilot-control', 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];
 
 WidgetDetails getWidgetDetails(String id) {
@@ -96,7 +100,7 @@ class _Settings {
     this.signalkServer = 'openplotter.local:3000',
     pages,
     widgetSettings
-  }) : pages = pages??_Page('Page Name', [[_PageWidget(widgetDetails[0].id, 1)]]), widgetSettings = widgetSettings??{};
+  }) : pages = pages??[_Page('Page Name', [[_PageWidget(widgetDetails[0].id, 1)]])], widgetSettings = widgetSettings??{};
 
   factory _Settings.fromJson(Map<String, dynamic> json) =>
       _$SettingsFromJson(json);
@@ -209,6 +213,22 @@ class BoatInstrumentController {
 
   void save() {
     _settings?._save();
+  }
+
+  Widget buildPage(int pageNum) {
+    _Page page = _settings!.pages[pageNum];
+
+    List<Row> rows = [];
+    for(List<_PageWidget> r in page.rows) {
+      List<Widget> rowWidgets = [];
+      for(_PageWidget w in r) {
+        WidgetDetails wd = getWidgetDetails(w.id);
+        rowWidgets.add(addWidget(wd.build(this)));
+      }
+      rows.add(Row(children: rowWidgets));
+    }
+
+    return Column(children: rows);
   }
 
   connect() async {

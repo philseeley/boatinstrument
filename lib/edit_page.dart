@@ -26,7 +26,7 @@ class _EditPageState extends State<EditPage> {
 
     List<DropdownMenuEntry<WidgetDetails>> dropdownMenuEntries = [];
     for(WidgetDetails wd in widgetDetails) {
-      dropdownMenuEntries.add(DropdownMenuEntry(value: wd, label: wd.description));
+      dropdownMenuEntries.add(DropdownMenuEntry(value: wd, label: wd.description, style: TextButton.styleFrom(textStyle: widget._controller.lineTS)));
     }
 
     List<Widget> rwl = [];
@@ -44,7 +44,7 @@ class _EditPageState extends State<EditPage> {
           IconButton(onPressed: () {_split(ri, wi, 'W');}, icon: const Icon(Icons.splitscreen)),
           Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             IconButton(onPressed: () {_split(ri, wi, 'N');}, icon: const Icon(Icons.splitscreen)),
-            DropdownMenu(initialSelection: getWidgetDetails(w.id), onSelected: (wd) {w.id = wd?.id??'id';}, dropdownMenuEntries: dropdownMenuEntries),
+            DropdownMenu(initialSelection: getWidgetDetails(w.id), onSelected: (wd) {w.id = wd?.id??'id';}, dropdownMenuEntries: dropdownMenuEntries, textStyle: widget._controller.lineTS),
             IconButton(onPressed: () {_split(ri, wi, 'S');}, icon: const Icon(Icons.splitscreen)),
           ]),
           IconButton(onPressed: () {_split(ri, wi, 'E');}, icon: const Icon(Icons.splitscreen)),
