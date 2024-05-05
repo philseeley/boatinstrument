@@ -106,17 +106,16 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             _autopilotState = AutopilotState.values.byName(u.value);
             break;
           case 'navigation.courseOverGroundTrue':
-            // The '* 1.0' forces the result to be a double as sometimes the value is 0 and therefore an int.
-            double cogLatest = u.value * 1.0;
+            double cogLatest = (u.value as num).toDouble();
             _courseOverGroundTrue = averageAngle(
                 _courseOverGroundTrue ?? cogLatest, cogLatest,
                 smooth: widget.controller.valueSmoothing);
             break;
           case 'steering.autopilot.target.windAngleApparent':
-            _targetWindAngleApparent = u.value * 1.0;
+            _targetWindAngleApparent = (u.value as num).toDouble();
             break;
           case 'environment.wind.angleApparent':
-            double waa = u.value * 1.0;
+            double waa = (u.value as num).toDouble();
             _windAngleApparent = averageAngle(
                 _windAngleApparent ?? waa, waa,
                 smooth: widget.controller.valueSmoothing, relative: true);
@@ -125,16 +124,16 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
             _waypoint = u.value[1]['name'];
             break;
           case 'navigation.courseGreatCircle.crossTrackError':
-            _crossTrackError = u.value * 1.0;
+            _crossTrackError = (u.value as num).toDouble();
             break;
           case 'steering.autopilot.target.headingMagnetic':
-            _targetHeadingMagnetic = u.value * 1.0;
+            _targetHeadingMagnetic = (u.value as num).toDouble();
             break;
           case 'navigation.magneticVariation':
-            _magneticVariation = u.value * 1.0;
+            _magneticVariation = (u.value as num).toDouble();
             break;
           case 'steering.rudderAngle':
-            _rudderAngle = u.value * 1.0;
+            _rudderAngle = (u.value as num).toDouble();
             break;
           case 'notifications.autopilot.*':
           //TODO

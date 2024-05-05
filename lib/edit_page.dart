@@ -30,6 +30,7 @@ class _EditPageState extends State<EditPage> {
       dropdownMenuEntries.add(DropdownMenuEntry(value: wd, label: wd.description, style: TextButton.styleFrom(textStyle: widget._controller.lineTS)));
     }
 
+    //TODO need delete button.
     List<Widget> columns = [];
     List<double> columnsPercent = [];
 
