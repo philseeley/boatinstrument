@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sailingapp/log_display.dart';
 import 'package:sailingapp/boatinstrument_controller.dart';
-import 'package:sailingapp/widgets/auto_pilot_display.dart';
-import 'package:sailingapp/widgets/auto_pilot_control.dart';
-import 'package:sailingapp/widgets/single_value_display.dart';
 
 void main() {
   runApp(const NavApp());

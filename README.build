@@ -8,3 +8,6 @@ flutter build apk --no-shrink
 # for release
 flutter build appbundle # Android
 flutter build ios
+
+
+python3 -m json.tool /Users/admin//Library/Containers/name.seeley.phil.sailingapp/Data/Documents/settings.json

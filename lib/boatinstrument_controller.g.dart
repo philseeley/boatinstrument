@@ -6,29 +6,50 @@ part of 'boatinstrument_controller.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_PageWidget _$PageWidgetFromJson(Map<String, dynamic> json) => _PageWidget(
+_Box _$BoxFromJson(Map<String, dynamic> json) => _Box(
       json['id'] as String,
-      (json['percent'] as num).toDouble(),
+      (json['percentage'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$PageWidgetToJson(_PageWidget instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$BoxToJson(_Box instance) => <String, dynamic>{
+      'percentage': instance.percentage,
       'id': instance.id,
-      'percent': instance.percent,
+    };
+
+_Row _$RowFromJson(Map<String, dynamic> json) => _Row(
+      (json['boxes'] as List<dynamic>)
+          .map((e) => _Box.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['percentage'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$RowToJson(_Row instance) => <String, dynamic>{
+      'percentage': instance.percentage,
+      'boxes': instance.boxes,
+    };
+
+_Column _$ColumnFromJson(Map<String, dynamic> json) => _Column(
+      (json['rows'] as List<dynamic>)
+          .map((e) => _Row.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['percentage'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$ColumnToJson(_Column instance) => <String, dynamic>{
+      'percentage': instance.percentage,
+      'rows': instance.rows,
     };
 
 _Page _$PageFromJson(Map<String, dynamic> json) => _Page(
       json['name'] as String,
-      (json['rows'] as List<dynamic>)
-          .map((e) => (e as List<dynamic>)
-              .map((e) => _PageWidget.fromJson(e as Map<String, dynamic>))
-              .toList())
+      (json['columns'] as List<dynamic>)
+          .map((e) => _Column.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
       'name': instance.name,
-      'rows': instance.rows,
+      'columns': instance.columns,
     };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
@@ -39,8 +60,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
               ?.map((e) => _Page.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      widgetSettings:
-          json['widgetSettings'] as Map<String, dynamic>? ?? const {},
+      widgetSettings: json['widgetSettings'],
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{

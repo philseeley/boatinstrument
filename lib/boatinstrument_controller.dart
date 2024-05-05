@@ -60,25 +60,54 @@ class _WidgetData {
   _WidgetData(this.widget);
 }
 
+class _Resizable {
+  double percentage;
+
+  _Resizable(this.percentage);
+}
+
 @JsonSerializable()
-class _PageWidget {
+class _Box extends _Resizable{
   String id;
-  double percent;
 
-  _PageWidget(this.id, this.percent);
+  _Box(this.id, super.percentage);
 
-  factory _PageWidget.fromJson(Map<String, dynamic> json) =>
-      _$PageWidgetFromJson(json);
+  factory _Box.fromJson(Map<String, dynamic> json) =>
+      _$BoxFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PageWidgetToJson(this);
+  Map<String, dynamic> toJson() => _$BoxToJson(this);
+}
+
+@JsonSerializable()
+class _Row extends _Resizable{
+  List<_Box> boxes;
+
+  _Row(this.boxes, super.percentage);
+
+  factory _Row.fromJson(Map<String, dynamic> json) =>
+      _$RowFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RowToJson(this);
+}
+
+@JsonSerializable()
+class _Column extends _Resizable{
+  List<_Row> rows;
+
+  _Column(this.rows, super.percentage);
+
+  factory _Column.fromJson(Map<String, dynamic> json) =>
+      _$ColumnFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ColumnToJson(this);
 }
 
 @JsonSerializable()
 class _Page {
   String name;
-  List<List<_PageWidget>> rows;
+  List<_Column> columns;
 
-  _Page(this.name, this.rows);
+  _Page(this.name, this.columns);
 
   factory _Page.fromJson(Map<String, dynamic> json) =>
       _$PageFromJson(json);
@@ -98,9 +127,14 @@ class _Settings {
   _Settings({
     this.valueSmoothing = 0,
     this.signalkServer = 'openplotter.local:3000',
-    pages,
+    this.pages = const [],
     widgetSettings
-  }) : pages = pages??[_Page('Page Name', [[_PageWidget(widgetDetails[0].id, 1)]])], widgetSettings = widgetSettings??{};
+  }) : widgetSettings = widgetSettings??{} {
+    if(pages.isEmpty) {
+      pages = [_Page('Page Name', [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)])];
+
+    }
+  }
 
   factory _Settings.fromJson(Map<String, dynamic> json) =>
       _$SettingsFromJson(json);
@@ -116,9 +150,11 @@ class _Settings {
       dynamic data = json.decode(s ?? "");
 
       return _Settings.fromJson(data);
-    } on Exception {
+    } on Exception catch (e) {
+      print(e); //TODO Need to log, but log is in the controller.
       return _Settings();
-    } on Error {
+    } on Error catch(e) {
+      print(e);
       return _Settings();
     }
   }
@@ -219,14 +255,14 @@ class BoatInstrumentController {
     _Page page = _settings!.pages[pageNum];
 
     List<Row> rows = [];
-    for(List<_PageWidget> r in page.rows) {
-      List<Widget> rowWidgets = [];
-      for(_PageWidget w in r) {
-        WidgetDetails wd = getWidgetDetails(w.id);
-        rowWidgets.add(addWidget(wd.build(this)));
-      }
-      rows.add(Row(children: rowWidgets));
-    }
+    // for(List<_Box> r in page.rows) {
+    //   List<Widget> rowWidgets = [];
+    //   for(_Box w in r) {
+    //     WidgetDetails wd = getWidgetDetails(w.id);
+    //     rowWidgets.add(addWidget(wd.build(this)));
+    //   }
+    //   rows.add(Row(children: rowWidgets));
+    // }
 
     return Column(children: rows);
   }
