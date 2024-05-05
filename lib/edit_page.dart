@@ -81,6 +81,7 @@ class _EditPageState extends State<EditPage> {
           buttons.add(Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Row(children: nButtons),
             DropdownMenu(initialSelection: getWidgetDetails(box.id), onSelected: (b) {box.id = b?.id??'id';}, dropdownMenuEntries: dropdownMenuEntries, textStyle: widget._controller.lineTS),
+            IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete)),
             Row(children: sButtons)
           ]));
 
@@ -148,6 +149,30 @@ class _EditPageState extends State<EditPage> {
       p.columns[ci].percentage = pc;
       c.percentage = pc;
       p.columns.insert(after ? ci+1 : ci, c);
+    });
+  }
+
+  void _deleteBox(int ci, int ri, int bi) {
+    setState(() {
+      _Box b = _page!.columns[ci].rows[ri].boxes[bi];
+      _page!.columns[ci].rows[ri].boxes.removeAt(bi);
+      if(_page!.columns[ci].rows[ri].boxes.isNotEmpty) {
+        _page!.columns[ci].rows[ri].boxes[bi].percentage += b.percentage;
+      } else {
+        _Row r = _page!.columns[ci].rows[ri];
+        _page!.columns[ci].rows.removeAt(ri);
+        if(_page!.columns[ci].rows.isNotEmpty) {
+          _page!.columns[ci].rows[ri].percentage += r.percentage;
+        } else {
+          _Column c = _page!.columns[ci];
+          _page!.columns.removeAt(ci);
+          if(_page!.columns.isNotEmpty) {
+            _page!.columns[ci].percentage += c.percentage;
+          } else {
+            //TODO delete page
+          }
+        }
+      }
     });
   }
 
