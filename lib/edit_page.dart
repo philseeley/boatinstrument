@@ -157,19 +157,29 @@ class _EditPageState extends State<EditPage> {
       _Box b = _page!.columns[ci].rows[ri].boxes[bi];
       _page!.columns[ci].rows[ri].boxes.removeAt(bi);
       if(_page!.columns[ci].rows[ri].boxes.isNotEmpty) {
+        if(bi >= _page!.columns[ci].rows[ri].boxes.length) {
+          --bi;
+        }
         _page!.columns[ci].rows[ri].boxes[bi].percentage += b.percentage;
       } else {
         _Row r = _page!.columns[ci].rows[ri];
         _page!.columns[ci].rows.removeAt(ri);
         if(_page!.columns[ci].rows.isNotEmpty) {
+          if(ri >= _page!.columns[ci].rows.length) {
+            --ri;
+          }
           _page!.columns[ci].rows[ri].percentage += r.percentage;
         } else {
           _Column c = _page!.columns[ci];
           _page!.columns.removeAt(ci);
           if(_page!.columns.isNotEmpty) {
+            if(ci >= _page!.columns.length) {
+              --ci;
+            }
             _page!.columns[ci].percentage += c.percentage;
           } else {
             //TODO delete page
+            _page!.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)];
           }
         }
       }
