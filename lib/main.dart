@@ -76,7 +76,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     boatInstrumentController?.clear();
 
-
     return Scaffold(
         appBar: AppBar(
           actions: [

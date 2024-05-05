@@ -27,7 +27,7 @@ class WidgetDetails {
 
 List<WidgetDetails> widgetDetails = [
   WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
-  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 0, key: UniqueKey());}),
+  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
   WidgetDetails('autopilot-display', 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
   WidgetDetails('autopilot-control', 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];
@@ -251,20 +251,46 @@ class BoatInstrumentController {
     _settings?._save();
   }
 
+  Widget _buildRow(_Row row) {
+    return LayoutBuilder(builder: (context, constraints) {
+      List<Widget> widgets = [];
+      for (var box in row.boxes) {
+        widgets.add(SizedBox(
+            width: constraints.maxWidth * box.percentage,
+            height: double.infinity,
+            child: addWidget(getWidgetDetails(box.id).build(this))));
+      }
+      return Row(children: widgets);
+    });
+  }
+
+  Widget _buildColumn(_Column column) {
+    return LayoutBuilder(builder: (context, constraints) {
+      List<Widget> widgets = [];
+      for (var row in column.rows) {
+        widgets.add(SizedBox(
+            width: double.infinity,
+            height: constraints.maxHeight * row.percentage,
+            child: _buildRow(row)));
+      }
+      return Column(children: widgets);
+    });
+  }
+
   Widget buildPage(int pageNum) {
     _Page page = _settings!.pages[pageNum];
 
-    List<Row> rows = [];
-    // for(List<_Box> r in page.rows) {
-    //   List<Widget> rowWidgets = [];
-    //   for(_Box w in r) {
-    //     WidgetDetails wd = getWidgetDetails(w.id);
-    //     rowWidgets.add(addWidget(wd.build(this)));
-    //   }
-    //   rows.add(Row(children: rowWidgets));
-    // }
+    return LayoutBuilder(builder: (context, constraints) {
+      List<Widget> widgets = [];
+      for(var column in page.columns) {
+        widgets.add(SizedBox(
+          width: constraints.maxWidth * column.percentage,
+          height: double.infinity,
+          child: _buildColumn(column)));
+      }
 
-    return Column(children: rows);
+      return Row(children: widgets);
+    });
   }
 
   connect() async {
