@@ -28,6 +28,7 @@ class WidgetDetails {
 List<WidgetDetails> widgetDetails = [
   WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
   WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
+  WidgetDetails('apparent-wind-speed', 'Apparent Wind Speed', (controller) {return DoubleValueDisplay(controller, 'Apparent Wind Speed', 'environment.wind.speedApparent', 'kts', 1, key: UniqueKey());}),
   WidgetDetails('autopilot-display', 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
   WidgetDetails('autopilot-control', 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];
