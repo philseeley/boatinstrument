@@ -52,6 +52,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     setState(() {});
   }
 
+  //TODO is this needed as we save when we close the settings dialog?
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch(state)
@@ -78,6 +79,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     return Scaffold(
         appBar: AppBar(
+          title: Text(boatInstrumentController!.pageName(_pageNum)),
           actions: [
             IconButton(icon: const Icon(Icons.edit),
                 onPressed: () {
@@ -94,15 +96,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
           ]
         ),
         body: boatInstrumentController?.buildPage(_pageNum),
-        // body: Center(
-        //   child: Column(
-        //     children: <Widget>[
-        //       sailingAppController!.addWidget(AutoPilotDisplay(sailingAppController!, key: UniqueKey())),
-        //       sailingAppController!.addWidget(AutoPilotControl(sailingAppController!, key: UniqueKey())),
-        //      sailingAppController!.addWidget(DoubleValueDisplay(sailingAppController!, "Depth", "environment.depth.belowSurface", "m", 1, key: UniqueKey()))
-        //     ],
-        //   ),
-        // )
     );
   }
 
@@ -127,13 +120,17 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   _editPage () async {
-    await Navigator.push(
+    bool deleted = await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return EditPage(boatInstrumentController!, _pageNum);
     }));
 
     boatInstrumentController?.save();
 
-    setState(() {});
+    setState(() {
+      if(deleted) {
+        _pageNum = boatInstrumentController!.nextPageNum(_pageNum);
+      }
+    });
   }
 }

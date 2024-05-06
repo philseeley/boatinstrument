@@ -114,6 +114,8 @@ class _Page {
       _$PageFromJson(json);
 
   Map<String, dynamic> toJson() => _$PageToJson(this);
+
+  static _Page _newPage() => _Page('Page Name', [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)]);
 }
 
 @JsonSerializable()
@@ -132,8 +134,7 @@ class _Settings {
     widgetSettings
   }) : widgetSettings = widgetSettings??{} {
     if(pages.isEmpty) {
-      pages = [_Page('Page Name', [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)])];
-
+      pages = [_Page._newPage()];
     }
   }
 
@@ -292,6 +293,24 @@ class BoatInstrumentController {
 
       return Row(children: widgets);
     });
+  }
+
+  int nextPageNum(int currentPage) {
+    if(_settings!.pages.isEmpty) {
+      _settings?.pages = [_Page._newPage()];
+      return 0;
+    }
+    ++currentPage;
+    return currentPage %= _settings!.pages.length;
+  }
+
+  int prevPageNum(int currentPage) {
+    --currentPage;
+    return currentPage %= _settings!.pages.length;
+  }
+
+  String pageName(int pageNum) {
+    return _settings!.pages[pageNum].name;
   }
 
   connect() async {

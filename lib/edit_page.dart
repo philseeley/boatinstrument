@@ -153,6 +153,8 @@ class _EditPageState extends State<EditPage> {
   }
 
   void _deleteBox(int ci, int ri, int bi) {
+    bool deletePage = false;
+
     setState(() {
       _Box b = _page!.columns[ci].rows[ri].boxes[bi];
       _page!.columns[ci].rows[ri].boxes.removeAt(bi);
@@ -178,15 +180,22 @@ class _EditPageState extends State<EditPage> {
             }
             _page!.columns[ci].percentage += c.percentage;
           } else {
-            //TODO delete page
+            // Need to have one Box for the current screen, but this will be deleted.
             _page!.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)];
+            deletePage = true;
           }
         }
       }
     });
+
+    if(deletePage) {
+      //TODO add confirmation dialog.
+      widget._controller._settings!.pages.removeAt(widget._page);
+      Navigator.pop(context, true); // Return true if we deleted the page.
+    }
   }
 
   void _save() {
-    Navigator.pop(context);
+    Navigator.pop(context, false); // Return false if the page was not deleted.
   }
 }
