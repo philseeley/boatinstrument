@@ -37,7 +37,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
-  BoatInstrumentController? boatInstrumentController;
+  BoatInstrumentController? controller;
   int _pageNum = 0;
 
   @override
@@ -47,9 +47,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   _configure () async {
-    boatInstrumentController = BoatInstrumentController(widget._headTS, widget._infoTS, widget._lineTS);
-    await boatInstrumentController?.loadSettings();
-    await boatInstrumentController?.connect();
+    controller = BoatInstrumentController(widget._headTS, widget._infoTS, widget._lineTS);
+    await controller?.loadSettings();
+    await controller?.connect();
 
     setState(() {});
   }
@@ -63,7 +63,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        boatInstrumentController?.save();
+        controller?.save();
 
         break;
       case AppLifecycleState.resumed:
@@ -73,17 +73,17 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if(boatInstrumentController == null || !boatInstrumentController!.ready) {
+    if(controller == null || !controller!.ready) {
       return const Center(child: Text('Initialising')); //TODO splash screen
     }
 
-    boatInstrumentController?.clear();
+    controller?.clear();
 
     //TODO Fullscreen.
     return Scaffold(
         //TODO have a AppBar/Drawer from the top/bottom that shows ontop when swiped down/up.
         appBar: AppBar(
-          title: Text(boatInstrumentController!.pageName(_pageNum), style: boatInstrumentController?.headTS) ,
+          title: Text(controller!.pageName(_pageNum), style: controller?.headTS) ,
           actions: [
             IconButton(icon: const Icon(Icons.edit),
                 onPressed: () {
@@ -106,10 +106,10 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   showSettingsPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return SettingsPage(boatInstrumentController!);
+      return SettingsPage(controller!);
     }));
 
-    boatInstrumentController?.save();
+    controller?.save();
 
     setState(() {});
   }
@@ -117,7 +117,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   showLog () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return LogDisplay(boatInstrumentController!);
+      return LogDisplay(controller!);
     }));
 
     setState(() {});
@@ -126,14 +126,14 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   _editPage () async {
     bool deleted = await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return EditPage(boatInstrumentController!, _pageNum);
+      return EditPage(controller!, _pageNum);
     }));
 
-    boatInstrumentController?.save();
+    controller?.save();
 
     setState(() {
       if(deleted) {
-        _pageNum = boatInstrumentController!.nextPageNum(_pageNum);
+        _pageNum = controller!.nextPageNum(_pageNum);
       }
     });
   }
