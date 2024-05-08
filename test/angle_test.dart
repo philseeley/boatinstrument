@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:boatinstrument/signalk.dart';
+import 'package:boatinstrument/boatinstrument_controller.dart';
 
 void main() {
   test('Angle averaging', ()

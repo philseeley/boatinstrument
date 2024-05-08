@@ -1,21 +1,39 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as m;
 
+import 'package:vector_math/vector_math.dart' as vm;
 import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
-import 'package:boatinstrument/widgets/auto_pilot_control.dart';
-import 'package:boatinstrument/widgets/auto_pilot_display.dart';
+import 'package:boatinstrument/widgets/autopilot.dart';
 import 'package:boatinstrument/widgets/double_value_display.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'boatinstrument_controller.g.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
+
+int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
+double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
+double meters2NM(double m) => double.parse((m*0.00054).toStringAsPrecision(2));
+String val2PS(num val) => val < 0 ? 'P' : 'S';
+
+//TODO smoothing doesn't seem to be working.
+double averageAngle(double current, double next, { int smooth = 0, bool relative=false }) {
+  vm.Vector2 v1 = vm.Vector2(m.sin(current) * (50+smooth), m.cos(current) * (50+smooth));
+  vm.Vector2 v2 = vm.Vector2(m.sin(next) * 50, m.cos(next) * 50);
+
+  vm.Vector2 avg = (v1 + v2) / 2;
+
+  double avga = m.atan2(avg.x, avg.y);
+
+  return ((avga >= 0) || relative) ? avga : ((2 * m.pi) + avga);
+}
 
 abstract class BoxSettings {}
 
