@@ -317,6 +317,8 @@ class BoatInstrumentController {
   }
 
   connect() async {
+    _networkTimeout();
+
     try {
       l.i("Connecting to: $signalkServer");
 
@@ -332,23 +334,17 @@ class BoatInstrumentController {
           _processData,
           onError: (e) {
             l.e('WebSocket stream error', error: e);
-            _reconnect();
-            return;
           },
           onDone: () {
             l.w('WebSocket closed');
-            _reconnect();
-            return;
           }
       );
 
       _subscribe();
-      _networkTimeout();
 
       l.i("Connected to: $signalkServer");
     } catch (e) {
       l.e('Error connecting WebSocket', error: e);
-      _reconnect();
     }
   }
 
@@ -391,11 +387,6 @@ class BoatInstrumentController {
         },
       ),
     );
-  }
-
-  void _reconnect () {
-    l.i("Reconnecting WebSocket in 5 seconds");
-    Timer(const Duration(seconds: 5), connect);
   }
 
   void _networkTimeout () {
