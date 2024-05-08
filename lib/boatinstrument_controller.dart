@@ -17,20 +17,39 @@ part 'boatinstrument_controller.g.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
 
+abstract class BoxSettings {}
+
+abstract class BoxWidget extends StatefulWidget {
+  const BoxWidget({super.key});
+
+  String get id;
+
+  bool get hasSettings => false;
+
+  Widget? getSettingsWidget(Map<String, dynamic> json) {
+    return null;
+  }
+
+  Map<String, dynamic> getSettingsJson() {
+    return {};
+  }
+}
+
 class WidgetDetails {
   final String id;
   final String description;
-  final Widget Function(BoatInstrumentController) build;
+  final BoxWidget Function(BoatInstrumentController) build;
 
   WidgetDetails(this.id, this.description, this.build);
 }
 
+//TODO need to have proper IDs for the other DoubleValueDisplay entries.
 List<WidgetDetails> widgetDetails = [
   WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
   WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
   WidgetDetails('apparent-wind-speed', 'Apparent Wind Speed', (controller) {return DoubleValueDisplay(controller, 'Apparent Wind Speed', 'environment.wind.speedApparent', 'kts', 1, key: UniqueKey());}),
   WidgetDetails('autopilot-display', 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
-  WidgetDetails('autopilot-control', 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
+  WidgetDetails(AutoPilotControl.ID, 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];
 
 WidgetDetails getWidgetDetails(String id) {
@@ -227,6 +246,10 @@ class BoatInstrumentController {
     return widget;
   }
 
+  Map<String, dynamic> getWidgetSettings(String widgetID) {
+    return _settings?.widgetSettings[widgetID]??{};
+  }
+
   Map<String, dynamic> configure(String widgetID, Widget widget, OnUpdate? onUpdate, Set<String> paths) {
     bool configured = true;
 
@@ -244,7 +267,7 @@ class BoatInstrumentController {
       _subscribe();
     }
 
-    return _settings?.widgetSettings[widgetID]??{};
+    return getWidgetSettings(widgetID);
   }
 
   void saveWidgetSettings(String widgetID, Map<String, dynamic> widgetSettings) {

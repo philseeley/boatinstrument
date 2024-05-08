@@ -12,7 +12,7 @@ import '../authorization.dart';
 part 'auto_pilot_control.g.dart';
 
 @JsonSerializable()
-class _Settings {
+class _Settings extends BoxSettings {
   bool enableLock;
   int lockSeconds;
   String clientID;
@@ -26,17 +26,37 @@ class _Settings {
   });
 }
 
-class AutoPilotControl extends StatefulWidget {
-  final BoatInstrumentController controller;
+class AutoPilotControl extends BoxWidget {
+  static const String ID = 'autopilot-control';
 
-  const AutoPilotControl(this.controller, {super.key});
+  final BoatInstrumentController controller;
+  _Settings _editSettings = _Settings();
+
+  AutoPilotControl(this.controller, {super.key});
 
   @override
   State<AutoPilotControl> createState() => _AutoPilotControlState();
+
+  @override
+  String get id => ID;
+
+  @override
+  bool get hasSettings => true;
+
+  @override
+  Widget getSettingsWidget(Map<String, dynamic> json) {
+    _editSettings = _$SettingsFromJson(json);
+    return _SettingsWidget(controller, _editSettings);
+  }
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_editSettings);
+  }
 }
 
 class _AutoPilotControlState extends State<AutoPilotControl> {
-  _Settings _settings = _Settings();
+  _Settings _settings =_Settings();
   bool _locked = true;
   Timer? _lockTimer;
   String? _error;
@@ -44,7 +64,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget.controller.configure((AutoPilotControl).toString(), widget, null, {}));
+    _settings = _$SettingsFromJson(widget.controller.configure(widget.id, widget, null, {}));
   }
 
   _sendCommand(String path, String params) async {
@@ -103,6 +123,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
   @override
   Widget build(BuildContext context) {
+
     List<Row> controlButtons = [];
     bool disabled = _settings.enableLock && _locked;
 
@@ -126,11 +147,6 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
     }
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons));
 
-    //TODO
-    controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      IconButton(onPressed: _showSettingsPage, icon: const Icon(Icons.settings))
-    ]));
-
     List<Widget> buttons = [Column(children: controlButtons)];
     if(_settings.enableLock && _locked) {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(
@@ -145,30 +161,19 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
       Text(_error??'', style: widget.controller.headTS.apply(color: Colors.red))
     ]);
   }
-
-  _showSettingsPage () async {
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) {
-      return _SettingsPage(widget.controller, _settings);
-    }));
-
-    widget.controller.saveWidgetSettings((AutoPilotControl).toString(), _$SettingsToJson(_settings));
-
-    setState(() {});
-  }
 }
 
-class _SettingsPage extends StatefulWidget {
+class _SettingsWidget extends StatefulWidget {
   final BoatInstrumentController _controller;
   final _Settings _settings;
 
-  const _SettingsPage(this._controller, this._settings);
+  const _SettingsWidget(this._controller, this._settings);
 
   @override
   createState() => _SettingsState();
 }
 
-class _SettingsState extends State<_SettingsPage> {
+class _SettingsState extends State<_SettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
@@ -206,12 +211,7 @@ class _SettingsState extends State<_SettingsPage> {
       ),
     ];
 
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Settings"),
-        ),
-        body: ListView(children: list)
-    );
+    return ListView(children: list);
   }
 
   void _requestAuthToken() async {

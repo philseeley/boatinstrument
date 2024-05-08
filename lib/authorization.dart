@@ -16,6 +16,7 @@ class SignalKAuthorization {
     _onAuth = onAuth;
     _onError = onError;
 
+    //TODO need try/catch error handling.
     Uri uri = Uri.http(_signalKServer, '/signalk/v1/access/requests');
 
     http.Response response = await http.post(

@@ -25,12 +25,12 @@ class _EditPageState extends State<EditPage> {
       return Container();
     }
 
-    List<DropdownMenuEntry<WidgetDetails>> dropdownMenuEntries = [];
+    List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [];
     for(WidgetDetails wd in widgetDetails) {
-      dropdownMenuEntries.add(DropdownMenuEntry(value: wd, label: wd.description, style: TextButton.styleFrom(textStyle: widget._controller.lineTS)));
+      popupMenuEntries.add(PopupMenuItem<WidgetDetails>(value: wd, textStyle: widget._controller.lineTS, child: Text(wd.description)));
     }
 
-    //TODO need delete button.
+    //TODO move delete button into main setting dialog.
     List<Widget> columns = [];
     List<double> columnsPercent = [];
 
@@ -76,15 +76,41 @@ class _EditPageState extends State<EditPage> {
             sButtons.add(IconButton(onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.keyboard_arrow_down, color: Colors.orange)));
           }
 
-          boxes.add(Stack(alignment: Alignment.center, children: [
-            getWidgetDetails(box.id).build(widget._controller),
-            Positioned(bottom: 0, right: 0, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings, color: Colors.blue))),
+          BoxWidget boxWidget = getWidgetDetails(box.id).build(widget._controller);
+
+          PopupMenuButton boxWidgetMenu = PopupMenuButton(
+            icon: const Icon(Icons.list, color: Colors.blue),
+            itemBuilder: (BuildContext context) {
+              return popupMenuEntries;
+            },
+            onSelected: (value) {
+              setState(() {
+                box.id = (value as WidgetDetails).id;
+              });
+            },
+          );
+
+          Widget settingsButton;
+          if(boxWidget.hasSettings) {
+            settingsButton = Positioned(bottom: 0, right: 0, child: IconButton(onPressed: () {_showSettingsPage(boxWidget);}, icon: const Icon(Icons.settings, color: Colors.blue)));
+          }
+          List<Widget> stack = [
+            boxWidget,
+            boxWidgetMenu
+          ];
+
+          if(boxWidget.hasSettings) {
+            stack.add(Positioned(top: 0, right: 0, child: IconButton(onPressed: () {_showSettingsPage(boxWidget);}, icon: const Icon(Icons.settings, color: Colors.blue))));
+          }
+
+          stack.addAll([
             Positioned(bottom: 0, left: 0, child: IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
             Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
             Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),
             Positioned(right: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons)),
             Positioned(left: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: wButtons)),
-          ]));
+          ]);
+          boxes.add(Stack(alignment: Alignment.center, children: stack));
 
           boxesPercent.add(box.percentage);
         }
@@ -178,6 +204,7 @@ class _EditPageState extends State<EditPage> {
             _page!.columns[ci].percentage += c.percentage;
           } else {
             // Need to have one Box for the current screen, but this will be deleted.
+            //TODO move page delete to the main settings page and list all pages for rearrangement and editing.
             _page!.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)];
             deletePage = true;
           }
@@ -186,7 +213,7 @@ class _EditPageState extends State<EditPage> {
     });
 
     if(deletePage) {
-      //TODO add confirmation dialog.
+      //TODO add confirmation dialog. Will be moved.
       widget._controller._settings!.pages.removeAt(widget._page);
       Navigator.pop(context, true); // Return true if we deleted the page.
     }
@@ -194,5 +221,42 @@ class _EditPageState extends State<EditPage> {
 
   void _save() {
     Navigator.pop(context, false); // Return false if the page was not deleted.
+  }
+
+  _showSettingsPage (BoxWidget boxWidget) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _BoxSettingsPage(widget._controller, boxWidget);
+    }));
+
+    widget._controller.saveWidgetSettings(boxWidget.id, boxWidget.getSettingsJson());
+
+    setState(() {});
+  }
+}
+
+class _BoxSettingsPage extends StatefulWidget {
+  final BoatInstrumentController _controller;
+  final BoxWidget _boxWidget;
+  late BoxSettings _settings;
+
+  _BoxSettingsPage(this._controller, this._boxWidget) {
+    // _settings = _controller.getWidgetSettings(_boxWidget.id);
+  }
+
+  @override
+  createState() => _BoxSettingsState();
+}
+
+class _BoxSettingsState extends State<_BoxSettingsPage> {
+
+  @override
+  Widget build(BuildContext context) {
+    Widget settingsWidget = widget._boxWidget.getSettingsWidget(widget._controller.getWidgetSettings(widget._boxWidget.id))!;
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Settings')),
+      body: settingsWidget
+    );
   }
 }

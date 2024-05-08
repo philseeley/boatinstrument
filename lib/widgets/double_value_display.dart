@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sailingapp/boatinstrument_controller.dart';
 
-class DoubleValueDisplay extends StatefulWidget {
+class DoubleValueDisplay extends BoxWidget {
   final BoatInstrumentController _controller;
   final String _title;
   final String _path;
@@ -12,6 +12,9 @@ class DoubleValueDisplay extends StatefulWidget {
 
   @override
   State<DoubleValueDisplay> createState() => _DoubleValueDisplayState();
+
+  @override //TODO
+  String get id => 'TODO';
 }
 
 class _DoubleValueDisplayState extends State<DoubleValueDisplay> {

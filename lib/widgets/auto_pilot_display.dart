@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:sailingapp/boatinstrument_controller.dart';
 import 'package:sailingapp/signalk.dart';
 
-class AutoPilotDisplay extends StatefulWidget {
+class AutoPilotDisplay extends BoxWidget {
+  static const String ID = 'autopilot-display';
+
   final BoatInstrumentController controller;
 
   const AutoPilotDisplay(this.controller, {super.key});
 
   @override
   State<AutoPilotDisplay> createState() => _AutoPilotDisplayState();
+
+  @override
+  String get id => ID;
 }
 
 class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
