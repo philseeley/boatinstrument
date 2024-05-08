@@ -53,6 +53,7 @@ Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
     };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
+      version: json['version'] as int? ?? 0,
       valueSmoothing: json['valueSmoothing'] as int? ?? 0,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
@@ -64,6 +65,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
+      'version': instance.version,
       'valueSmoothing': instance.valueSmoothing,
       'signalkServer': instance.signalkServer,
       'pages': instance.pages,

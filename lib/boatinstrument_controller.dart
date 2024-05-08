@@ -42,6 +42,7 @@ WidgetDetails getWidgetDetails(String id) {
 
   throw Exception('Unknown widget with ID $id');
 }
+
 class Update {
   final String path;
   final dynamic value;
@@ -120,6 +121,7 @@ class _Page {
 
 @JsonSerializable()
 class _Settings {
+  int version;
   int valueSmoothing;
   String signalkServer;
   late List<_Page> pages;
@@ -128,6 +130,7 @@ class _Settings {
   static File? _store;
 
   _Settings({
+    this.version = 0,
     this.valueSmoothing = 0,
     this.signalkServer = 'openplotter.local:3000',
     this.pages = const [],
