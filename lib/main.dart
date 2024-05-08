@@ -12,12 +12,14 @@ class NavApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //TODO find better fonts. LCD?
     TextStyle headTS = Theme.of(context).textTheme.titleMedium!.apply(fontFamily: 'Red Hat Mono', color: Colors.white, fontWeightDelta: 4);
     TextStyle infoTS = Theme.of(context).textTheme.titleLarge!.apply(fontFamily: 'Red Hat Mono', color: Colors.white, fontSizeDelta: 20);
     TextStyle lineTS = Theme.of(context).textTheme.bodySmall!.apply(fontFamily: 'Red Hat Mono', color: Colors.white);
 
     return MaterialApp(
       home: MainPage(headTS, infoTS, lineTS),
+      //TODO light/dark/night mode.
       theme: ThemeData(textTheme: TextTheme(titleLarge: infoTS, titleMedium: headTS, bodyMedium: headTS, bodySmall: lineTS))
     );
   }
@@ -77,7 +79,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     boatInstrumentController?.clear();
 
+    //TODO Fullscreen.
     return Scaffold(
+        //TODO have a AppBar/Drawer from the top/bottom that shows ontop when swiped down/up.
         appBar: AppBar(
           title: Text(boatInstrumentController!.pageName(_pageNum), style: boatInstrumentController?.headTS) ,
           actions: [
