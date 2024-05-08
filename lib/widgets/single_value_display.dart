@@ -25,10 +25,10 @@ class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Column(children: [
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text(widget._title, style: widget._controller.headTS),
       Text("${(_value??0).toStringAsFixed(widget._precision)} ${widget._units}", style: widget._controller.infoTS)
-    ]));
+    ]);
   }
 
   _processData(List<Update> updates) {
