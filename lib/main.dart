@@ -12,9 +12,9 @@ class NavApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle headTS = Theme.of(context).textTheme.titleMedium!.apply(fontWeightDelta: 4);
-    TextStyle infoTS = Theme.of(context).textTheme.titleLarge!.apply(fontWeightDelta: 4).apply(fontSizeDelta: 8);
-    TextStyle lineTS = Theme.of(context).textTheme.bodySmall!;
+    TextStyle headTS = Theme.of(context).textTheme.titleMedium!.apply(fontFamily: 'Red Hat Mono', color: Colors.white, fontWeightDelta: 4);
+    TextStyle infoTS = Theme.of(context).textTheme.titleLarge!.apply(fontFamily: 'Red Hat Mono', color: Colors.white, fontSizeDelta: 20);
+    TextStyle lineTS = Theme.of(context).textTheme.bodySmall!.apply(fontFamily: 'Red Hat Mono', color: Colors.white);
 
     return MaterialApp(
       home: MainPage(headTS, infoTS, lineTS),
@@ -79,7 +79,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(boatInstrumentController!.pageName(_pageNum)),
+          title: Text(boatInstrumentController!.pageName(_pageNum), style: boatInstrumentController?.headTS) ,
           actions: [
             IconButton(icon: const Icon(Icons.edit),
                 onPressed: () {

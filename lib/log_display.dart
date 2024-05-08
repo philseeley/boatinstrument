@@ -18,7 +18,7 @@ class _LogDisplayState extends State<LogDisplay> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Log"),
+        title: Text("Log", style: widget._controller.headTS),
         actions: [
           IconButton(icon: const Icon(Icons.refresh),
               onPressed: () {
