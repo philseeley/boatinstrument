@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sailingapp/boatinstrument_controller.dart';
-import 'package:sailingapp/signalk.dart';
+import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:boatinstrument/signalk.dart';
 
 import '../authorization.dart';
 
@@ -21,7 +21,7 @@ class _Settings extends BoxSettings {
   _Settings({
     this.enableLock = true,
     this.lockSeconds = 3,
-    this.clientID = 'sailingapp-autopilot-1234',
+    this.clientID = 'boatinstrument-autopilot-1234',
     this.authToken = ''
   });
 }

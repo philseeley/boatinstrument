@@ -1,6 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:sailingapp/log_display.dart';
-import 'package:sailingapp/boatinstrument_controller.dart';
+import 'package:boatinstrument/log_display.dart';
+import 'package:boatinstrument/boatinstrument_controller.dart';
 
 void main() {
   runApp(const NavApp());

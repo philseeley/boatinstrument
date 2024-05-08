@@ -1,6 +1,6 @@
 {
-    "name": "sailingapp",
-    "short_name": "sailingapp",
+    "name": "boatinstrument",
+    "short_name": "boatinstrument",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

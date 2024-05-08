@@ -90,10 +90,6 @@ class _EditPageState extends State<EditPage> {
             },
           );
 
-          Widget settingsButton;
-          if(boxWidget.hasSettings) {
-            settingsButton = Positioned(bottom: 0, right: 0, child: IconButton(onPressed: () {_showSettingsPage(boxWidget);}, icon: const Icon(Icons.settings, color: Colors.blue)));
-          }
           List<Widget> stack = [
             boxWidget,
             boxWidgetMenu
@@ -238,11 +234,8 @@ class _EditPageState extends State<EditPage> {
 class _BoxSettingsPage extends StatefulWidget {
   final BoatInstrumentController _controller;
   final BoxWidget _boxWidget;
-  late BoxSettings _settings;
 
-  _BoxSettingsPage(this._controller, this._boxWidget) {
-    // _settings = _controller.getWidgetSettings(_boxWidget.id);
-  }
+  const _BoxSettingsPage(this._controller, this._boxWidget);
 
   @override
   createState() => _BoxSettingsState();
@@ -255,7 +248,7 @@ class _BoxSettingsState extends State<_BoxSettingsPage> {
     Widget settingsWidget = widget._boxWidget.getSettingsWidget(widget._controller.getWidgetSettings(widget._boxWidget.id))!;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      appBar: AppBar(title: const Text('Settings')),
       body: settingsWidget
     );
   }

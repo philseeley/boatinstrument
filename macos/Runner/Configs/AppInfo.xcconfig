@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = sailingapp
+PRODUCT_NAME = boatinstrument
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = name.seeley.phil.sailingapp
+PRODUCT_BUNDLE_IDENTIFIER = name.seeley.phil.boatinstrument
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2024 name.seeley.phil. All rights reserved.

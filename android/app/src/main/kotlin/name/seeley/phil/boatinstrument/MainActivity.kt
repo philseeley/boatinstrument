@@ -1,4 +1,4 @@
-package name.seeley.phil.sailingapp
+package name.seeley.phil.boatinstrument
 
 import io.flutter.embedding.android.FlutterActivity
 

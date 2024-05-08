@@ -8,9 +8,9 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
-import 'package:sailingapp/widgets/auto_pilot_control.dart';
-import 'package:sailingapp/widgets/auto_pilot_display.dart';
-import 'package:sailingapp/widgets/double_value_display.dart';
+import 'package:boatinstrument/widgets/auto_pilot_control.dart';
+import 'package:boatinstrument/widgets/auto_pilot_display.dart';
+import 'package:boatinstrument/widgets/double_value_display.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'boatinstrument_controller.g.dart';

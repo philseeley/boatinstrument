@@ -1,4 +1,4 @@
-# sailingapp
+# boatinstrument
 
 A new Flutter project.
 

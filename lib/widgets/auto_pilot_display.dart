@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sailingapp/boatinstrument_controller.dart';
-import 'package:sailingapp/signalk.dart';
+import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:boatinstrument/signalk.dart';
 
 class AutoPilotDisplay extends BoxWidget {
   static const String ID = 'autopilot-display';
@@ -92,8 +92,8 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
     return Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Column(children: pilot),
-          Column(children: actual)
+          DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: Column(children: pilot)),
+          DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: Column(children: actual))
         ]),
       Row(children: [
         Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: c.headTS.apply(color: Colors.red), textAlign: TextAlign.right)),
