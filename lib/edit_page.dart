@@ -49,45 +49,42 @@ class _EditPageState extends State<EditPage> {
         for (int bi = 0; bi < row.boxes.length; ++bi) {
           _Box box = row.boxes[bi];
 
-          List<Widget> buttons = [];
           List<Widget> nButtons = [];
           List<Widget> sButtons = [];
           List<Widget> eButtons = [];
           List<Widget> wButtons = [];
 
-          wButtons.add(TextButton(onPressed: () {_addBox(row, bi);}, child: Text('<+', style: widget._controller.headTS.apply(color: Colors.blue))));
+          wButtons.add(IconButton(onPressed: () {_addBox(row, bi);}, icon: const Icon(Icons.keyboard_arrow_left, color: Colors.blue)));
+
           if(bi == 0 && ri == 0) {
-            wButtons.add(TextButton(onPressed: () {_addColumn(_page!, ci);}, child: Text('<+', style: widget._controller.headTS.apply(color: Colors.red))));
+            wButtons.add(IconButton(onPressed: () {_addColumn(_page!, ci);}, icon: const Icon(Icons.keyboard_double_arrow_left, color: Colors.red)));
           }
 
           if(bi == 0) {
-            nButtons.add(TextButton(onPressed: () {_addRow(column, ri);}, child: Text('^\n+', style: widget._controller.headTS.apply(color: Colors.orange))));
+            nButtons.add(IconButton(onPressed: () {_addRow(column, ri);}, icon: const Icon(Icons.keyboard_arrow_up, color: Colors.orange)));
           }
 
           if(bi == row.boxes.length-1) {
-            eButtons.add(TextButton(onPressed: () {_addBox(row, bi, after: true);}, child: Text('+>', style: widget._controller.headTS.apply(color: Colors.blue))));
+            eButtons.add(IconButton(onPressed: () {_addBox(row, bi, after: true);}, icon: const Icon(Icons.keyboard_arrow_right, color: Colors.blue)));
           }
 
           if(ci == _page!.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
-            eButtons.add(TextButton(onPressed: () {_addColumn(_page!, ci, after: true);}, child: Text('+>', style: widget._controller.headTS.apply(color: Colors.red))));
+            eButtons.add(IconButton(onPressed: () {_addColumn(_page!, ci, after: true);}, icon: const Icon(Icons.keyboard_double_arrow_right, color: Colors.red)));
           }
 
           if(ri == column.rows.length-1 && bi == 0) {
-            sButtons.add(TextButton(onPressed: () {_addRow(column, ri, after: true);}, child: Text('+\nv', style: widget._controller.headTS.apply(color: Colors.orange))));
+            sButtons.add(IconButton(onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.keyboard_arrow_down, color: Colors.orange)));
           }
 
-          buttons.add(Column(mainAxisAlignment: MainAxisAlignment.center, children: wButtons));
-
-          buttons.add(Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Row(children: nButtons),
-            DropdownMenu(initialSelection: getWidgetDetails(box.id), onSelected: (b) {box.id = b?.id??'id';}, dropdownMenuEntries: dropdownMenuEntries, textStyle: widget._controller.lineTS),
-            IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete)),
-            Row(children: sButtons)
+          boxes.add(Stack(alignment: Alignment.center, children: [
+            getWidgetDetails(box.id).build(widget._controller),
+            Positioned(bottom: 0, right: 0, child: IconButton(onPressed: () {}, icon: const Icon(Icons.settings, color: Colors.blue))),
+            Positioned(bottom: 0, left: 0, child: IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
+            Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
+            Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),
+            Positioned(right: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons)),
+            Positioned(left: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: wButtons)),
           ]));
-
-          buttons.add(Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons));
-
-          boxes.add(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: buttons));
 
           boxesPercent.add(box.percentage);
         }
