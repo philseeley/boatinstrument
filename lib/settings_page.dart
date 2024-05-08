@@ -31,10 +31,10 @@ class _SettingsState extends State<SettingsPage> {
             }),
       ),
       ListTile(
-              leading: const Text("Signalk Server:"),
-              title: TextFormField(
-                  initialValue: settings.signalkServer,
-                  onChanged: (value) => settings.signalkServer = value)
+        leading: const Text("Signalk Server:"),
+        title: TextFormField(
+            initialValue: settings.signalkServer,
+            onChanged: (value) => settings.signalkServer = value)
       ),
     ];
 

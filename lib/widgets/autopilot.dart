@@ -31,7 +31,7 @@ class _Settings extends BoxSettings {
   _Settings({
     this.enableLock = true,
     this.lockSeconds = 3,
-    this.clientID = 'boatinstrument-autopilot-1234',
+    this.clientID = 'boatinstrument-autopilot-1234',//TODO GUID
     this.authToken = ''
   });
 }
@@ -212,6 +212,12 @@ class _SettingsState extends State<_SettingsWidget> {
             }),
       ),
       ListTile(
+          leading: const Text("Client ID:"),
+          title: TextFormField(
+              initialValue: s.clientID,
+              onChanged: (value) => s.clientID = value)
+      ),
+      ListTile(
           leading: const Text("Request Auth Token:"),
           title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
       ),
@@ -225,7 +231,7 @@ class _SettingsState extends State<_SettingsWidget> {
   }
 
   void _requestAuthToken() async {
-    SignalKAuthorization().request(widget._controller.signalkServer, widget._settings.clientID, "Sailing App - Autopilot Control",
+    SignalKAuthorization(widget._controller).request(widget._settings.clientID, "Boat Instrument - Autopilot Control",
             (authToken) {
           setState(() {
             widget._settings.authToken = authToken;
