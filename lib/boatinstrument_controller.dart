@@ -10,7 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
 import 'package:sailingapp/widgets/auto_pilot_control.dart';
 import 'package:sailingapp/widgets/auto_pilot_display.dart';
-import 'package:sailingapp/widgets/single_value_display.dart';
+import 'package:sailingapp/widgets/double_value_display.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'boatinstrument_controller.g.dart';
