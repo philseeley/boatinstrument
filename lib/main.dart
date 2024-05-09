@@ -38,7 +38,7 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
+class _MainPageState extends State<MainPage> {
   BoatInstrumentController? controller;
   int _pageNum = 0;
 
@@ -54,23 +54,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     await controller?.connect();
 
     setState(() {});
-  }
-
-  //TODO is this needed as we save when we close the settings dialog?
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch(state)
-    {
-      case AppLifecycleState.paused:
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-        controller?.save();
-
-        break;
-      case AppLifecycleState.resumed:
-        break;
-    }
   }
 
   @override
