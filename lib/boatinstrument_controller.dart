@@ -188,18 +188,10 @@ class _Settings {
     Directory directory = await path_provider.getApplicationDocumentsDirectory();
     _store = File('${directory.path}/settings.json');
 
-    try {
-      String? s = _store?.readAsStringSync();
-      dynamic data = json.decode(s ?? "");
+    String? s = _store?.readAsStringSync();
+    dynamic data = json.decode(s ?? "");
 
-      return _Settings.fromJson(data);
-    } on Exception catch (e) {
-      print(e); //TODO Need to log, but log is in the controller.
-      return _Settings();
-    } on Error catch(e) {
-      print(e);
-      return _Settings();
-    }
+    return _Settings.fromJson(data);
   }
 
   _save (){
@@ -256,7 +248,15 @@ class BoatInstrumentController {
   }
 
   loadSettings() async {
-    _settings = await _Settings.load();
+    try {
+      _settings = await _Settings.load();
+    } on Exception catch (e) {
+      l.e('Exception loading Settings', error: e);
+      _settings = _Settings();
+    } on Error catch(e) {
+      l.e('Error loading Settings', error: e);
+      _settings = _Settings();
+    }
   }
 
   Widget addWidget(Widget widget) {

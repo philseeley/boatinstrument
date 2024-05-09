@@ -23,7 +23,7 @@ class NavApp extends StatelessWidget {
     return MaterialApp(
       home: MainPage(headTS, infoTS),
       //TODO light/dark/night mode.
-      theme: themeData,
+      theme: themeData
     );
   }
 }
