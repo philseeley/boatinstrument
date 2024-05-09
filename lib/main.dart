@@ -87,7 +87,7 @@ class _MainPageState extends State<MainPage> {
   void _movePage (DragEndDetails details) {
     if(details.primaryVelocity != 0.0) {
       setState(() {
-        if (details.primaryVelocity! < 0.0) {
+        if (details.primaryVelocity! > 0.0) {
           _pageNum = controller!.prevPageNum(_pageNum);
         } else {
           _pageNum = controller!.nextPageNum(_pageNum);
