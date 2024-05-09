@@ -77,7 +77,7 @@ class _EditPageState extends State<_EditPage> {
             sButtons.add(IconButton(onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.keyboard_arrow_down, color: Colors.orange)));
           }
 
-          BoxWidget boxWidget = getWidgetDetails(box.id).build(widget._controller);
+          BoxWidget boxWidget = getWidgetDetails(widget._controller, box.id).build(widget._controller);
 
           PopupMenuButton boxWidgetMenu = PopupMenuButton(
             icon: const Icon(Icons.list, color: Colors.blue),

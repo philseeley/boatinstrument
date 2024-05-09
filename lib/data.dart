@@ -57,14 +57,15 @@ List<WidgetDetails> widgetDetails = [
   WidgetDetails(AutoPilotControl.sid, 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];
 
-WidgetDetails getWidgetDetails(String id) {
+WidgetDetails getWidgetDetails(BoatInstrumentController controller, String id) {
   for(WidgetDetails wd in widgetDetails) {
     if(wd.id == id) {
       return wd;
     }
   }
 
-  throw Exception('Unknown widget with ID $id');
+  controller.l.e('Unknown widget with ID $id', error: Exception('Unknown widget with ID $id'));
+  return widgetDetails[0];
 }
 
 class Update {
