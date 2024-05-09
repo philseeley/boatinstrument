@@ -37,7 +37,7 @@ class _Settings extends BoxSettings {
 }
 
 class AutoPilotControl extends BoxWidget {
-  static const String ID = 'autopilot-control';
+  static const String sid = 'autopilot-control';
 
   final BoatInstrumentController _controller;
   _Settings _editSettings = _Settings();
@@ -48,7 +48,7 @@ class AutoPilotControl extends BoxWidget {
   State<AutoPilotControl> createState() => _AutoPilotControlState();
 
   @override
-  String get id => ID;
+  String get id => sid;
 
   @override
   bool get hasSettings => true;
@@ -252,7 +252,7 @@ class _SettingsState extends State<_SettingsWidget> {
 }
 
 class AutoPilotDisplay extends BoxWidget {
-  static const String ID = 'autopilot-display';
+  static const String sid = 'autopilot-display';
 
   final BoatInstrumentController controller;
 
@@ -262,7 +262,7 @@ class AutoPilotDisplay extends BoxWidget {
   State<AutoPilotDisplay> createState() => _AutoPilotDisplayState();
 
   @override
-  String get id => ID;
+  String get id => sid;
 }
 
 class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
