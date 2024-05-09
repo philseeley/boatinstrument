@@ -3,8 +3,21 @@ part of 'boatinstrument_controller.dart';
 class _EditPage extends StatefulWidget {
   final BoatInstrumentController _controller;
   final _Page _page;
+  final _Page _editPage =  _Page('_TMP_', []);
 
-  const _EditPage(this._controller, this._page, {super.key});
+  _EditPage(this._controller, this._page, {super.key}) {
+    for(_Column c in _page.columns) {
+      _Column ec = _Column([], c.percentage);
+      _editPage.columns.add(ec);
+      for(_Row r in c.rows) {
+        _Row er = _Row([], r.percentage);
+        ec.rows.add(er);
+        for(_Box b in r.boxes) {
+          er.boxes.add(_Box(b.id, b.percentage));
+        }
+      }
+    }
+  }
 
   @override
   State<_EditPage> createState() => _EditPageState();
@@ -19,12 +32,11 @@ class _EditPageState extends State<_EditPage> {
       popupMenuEntries.add(PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description)));
     }
 
-    //TODO move delete button into main setting dialog.
     List<Widget> columns = [];
     List<double> columnsPercent = [];
 
-    for(int ci = 0; ci < widget._page.columns.length; ++ci) {
-      _Column column = widget._page.columns[ci];
+    for(int ci = 0; ci < widget._editPage.columns.length; ++ci) {
+      _Column column = widget._editPage.columns[ci];
 
       List<Widget> rows = [];
       List<double> rowsPercent = [];
@@ -46,7 +58,7 @@ class _EditPageState extends State<_EditPage> {
           wButtons.add(IconButton(onPressed: () {_addBox(row, bi);}, icon: const Icon(Icons.keyboard_arrow_left, color: Colors.blue)));
 
           if(bi == 0 && ri == 0) {
-            wButtons.add(IconButton(onPressed: () {_addColumn(widget._page, ci);}, icon: const Icon(Icons.keyboard_double_arrow_left, color: Colors.red)));
+            wButtons.add(IconButton(onPressed: () {_addColumn(widget._editPage, ci);}, icon: const Icon(Icons.keyboard_double_arrow_left, color: Colors.red)));
           }
 
           if(bi == 0) {
@@ -57,8 +69,8 @@ class _EditPageState extends State<_EditPage> {
             eButtons.add(IconButton(onPressed: () {_addBox(row, bi, after: true);}, icon: const Icon(Icons.keyboard_arrow_right, color: Colors.blue)));
           }
 
-          if(ci == widget._page.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
-            eButtons.add(IconButton(onPressed: () {_addColumn(widget._page, ci, after: true);}, icon: const Icon(Icons.keyboard_double_arrow_right, color: Colors.red)));
+          if(ci == widget._editPage.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
+            eButtons.add(IconButton(onPressed: () {_addColumn(widget._editPage, ci, after: true);}, icon: const Icon(Icons.keyboard_double_arrow_right, color: Colors.red)));
           }
 
           if(ri == column.rows.length-1 && bi == 0) {
@@ -109,10 +121,10 @@ class _EditPageState extends State<_EditPage> {
     }
 
     return Scaffold(
-      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._page.columns);}, isHorizontalSeparator: false, separatorColor: Colors.red, percentages: columnsPercent, children: columns),
+      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.columns);}, isHorizontalSeparator: false, separatorColor: Colors.red, percentages: columnsPercent, children: columns),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: const Icon(Icons.save), onPressed: _save),
-        IconButton(icon: const Icon(Icons.close), onPressed: _save) //TODO need to revert
+        IconButton(icon: const Icon(Icons.close), onPressed: _close)
       ])
     );
   }
@@ -173,7 +185,7 @@ class _EditPageState extends State<_EditPage> {
   }
 
   void _deleteBox(int ci, int ri, int bi) {
-    _Page page = widget._page;
+    _Page page = widget._editPage;
 
     setState(() {
       _Box b = page.columns[ci].rows[ri].boxes[bi];
@@ -201,7 +213,7 @@ class _EditPageState extends State<_EditPage> {
             page.columns[ci].percentage += c.percentage;
           } else {
             // Need to have one Box for the current screen.
-            page.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)];
+            page.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1.0)], 1.0)];
           }
         }
       }
@@ -209,6 +221,11 @@ class _EditPageState extends State<_EditPage> {
   }
 
   void _save() {
+    widget._page.columns = widget._editPage.columns;
+    _close();
+  }
+
+  void _close() {
     Navigator.pop(context);
   }
 
