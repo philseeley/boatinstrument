@@ -74,14 +74,14 @@ class _MainPageState extends State<MainPage> {
   }
 
   showSettingsPage () async {
-     Navigator.push(
+    await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return SettingsPage(controller!);
     }));
 
-    // controller?.save();
-    //
-    // setState(() {});
+    controller?.save();
+
+    setState(() {});
   }
 
   void _movePage (DragEndDetails details) {
