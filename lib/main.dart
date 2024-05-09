@@ -40,7 +40,6 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   BoatInstrumentController? controller;
   int _pageNum = 0;
-  SnackBar? _snackBar;
 
   @override
   void initState() {
@@ -63,12 +62,6 @@ class _MainPageState extends State<MainPage> {
     }
 
     controller?.clear();
-
-    //TODO Would prefer a top bar.
-    _snackBar = _snackBar??SnackBar(
-      content: Text(controller!.pageName(_pageNum)),
-      action: SnackBarAction(label: 'Setting', onPressed: showSettingsPage),
-    );
 
     //TODO Fullscreen.
     return Scaffold(
@@ -106,7 +99,13 @@ class _MainPageState extends State<MainPage> {
   void _showSnackBar (DragEndDetails details) {
     if(details.primaryVelocity != 0.0 && details.primaryVelocity! < 0.0) {
       setState(() {
-        ScaffoldMessenger.of(context).showSnackBar(_snackBar!);
+        //TODO Would prefer a top bar.
+        SnackBar snackBar = SnackBar(
+          content: Text(controller!.pageName(_pageNum)),
+          action: SnackBarAction(label: 'Settings >', onPressed: showSettingsPage),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar!);
       });
     }
   }

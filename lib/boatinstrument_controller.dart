@@ -356,7 +356,7 @@ class BoatInstrumentController {
   }
 
   String pageName(int pageNum) {
-    return _settings!.pages[pageNum].name;
+    return '${pageNum+1}/${_settings!.pages.length} ${_settings!.pages[pageNum].name}';
   }
 
   connect() async {
