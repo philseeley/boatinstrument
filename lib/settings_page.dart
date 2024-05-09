@@ -37,6 +37,22 @@ class _SettingsState extends State<SettingsPage> {
               onChanged: (value) => settings.signalkServer = value)
       ),
       ListTile(
+          leading: const Text("Distance:  "),
+          title: _distanceRadioList()
+      ),
+      ListTile(
+          leading: const Text("Speed:     "),
+          title: _speedRadioList()
+      ),
+      ListTile(
+          leading: const Text("Wind Speed:"),
+          title: _windSpeedRadioList()
+      ),
+      ListTile(
+          leading: const Text("Depth:     "),
+          title: _depthRadioList()
+      ),
+      ListTile(
           leading: const Text('Pages:'),
           title: IconButton(icon: const Icon(Icons.add), onPressed: _addPage,)
       ),
@@ -63,6 +79,54 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
+  }
+
+  Row _distanceRadioList() {
+    List<Widget> l = [];
+    for(var v in DistanceUnits.values) {
+      l.add(Radio(
+          value: v,
+          groupValue: widget._controller._settings?.distanceUnits,
+          onChanged: (value) { setState(() { widget._controller._settings?.distanceUnits = value!;});}));
+      l.add(Text(v.displayName));
+    }
+    return Row(children: l);
+  }
+
+  Row _speedRadioList() {
+    List<Widget> l = [];
+    for(var v in SpeedUnits.values) {
+      l.add(Radio(
+          value: v,
+          groupValue: widget._controller._settings?.speedUnits,
+          onChanged: (value) { setState(() { widget._controller._settings?.speedUnits = value!;});}));
+      l.add(Text(v.displayName));
+    }
+    return Row(children: l);
+  }
+
+  Row _windSpeedRadioList() {
+    List<Widget> l = [];
+    for(var v in SpeedUnits.values) {
+      l.add(Radio(
+          value: v,
+          groupValue: widget._controller._settings?.windSpeedUnits,
+          onChanged: (value) { setState(() { widget._controller._settings?.windSpeedUnits = value!;});}));
+      l.add(Text(v.displayName));
+    }
+    return Row(children: l);
+  }
+
+  Row _depthRadioList() {
+    List<Widget> l = [];
+    for(var v in DepthUnits.values) {
+      l.add(Radio(
+          value: v,
+          groupValue: widget._controller._settings?.depthUnits,
+          onChanged: (value) { setState(() { widget._controller._settings?.depthUnits = value!;});}));
+      l.add(Text(v.displayName));
+    }
+    return Row(children: l);
   }
 
   void _showLog () async {

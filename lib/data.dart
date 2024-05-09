@@ -142,11 +142,51 @@ class _Page {
   static _Page _newPage() => _Page('Page Name', [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)]);
 }
 
+enum DistanceUnits {
+  meters('Meters', 'm'),
+  km('Kilometers', 'km'),
+  miles('Miles', 'mile'),
+  nm('Nautical Miles', 'nm');
+
+  final String displayName;
+  final String unit;
+
+  const DistanceUnits(this.displayName, this.unit);
+}
+
+enum SpeedUnits {
+  mps('MPH', 'mph'),
+  kph('KPH', 'km/h'),
+  mph('MPH', 'mph'),
+  kts('Knots', 'kts');
+
+  final String displayName;
+  final String unit;
+
+  const SpeedUnits(this.displayName, this.unit);
+}
+
+enum DepthUnits {
+  m('Meters', 'm'),
+  ft('Feet', 'ft'),
+  fa('Fathom', 'Fa');
+
+  final String displayName;
+  final String unit;
+
+  const DepthUnits(this.displayName, this.unit);
+
+}
+
 @JsonSerializable()
 class _Settings {
   int version;
   int valueSmoothing;
   String signalkServer;
+  DistanceUnits distanceUnits;
+  SpeedUnits speedUnits;
+  SpeedUnits windSpeedUnits;
+  DepthUnits depthUnits;
   late List<_Page> pages;
   late Map<String, dynamic> widgetSettings;
 
@@ -156,6 +196,10 @@ class _Settings {
     this.version = 0,
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
+    this.distanceUnits = DistanceUnits.nm,
+    this.speedUnits = SpeedUnits.kts,
+    this.windSpeedUnits = SpeedUnits.kts,
+    this.depthUnits = DepthUnits.m,
     this.pages = const [],
     widgetSettings
   }) : widgetSettings = widgetSettings??{} {

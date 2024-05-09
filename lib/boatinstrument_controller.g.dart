@@ -57,6 +57,18 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       valueSmoothing: json['valueSmoothing'] as int? ?? 1,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
+      distanceUnits:
+          $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
+              DistanceUnits.nm,
+      speedUnits:
+          $enumDecodeNullable(_$SpeedUnitsEnumMap, json['speedUnits']) ??
+              SpeedUnits.kts,
+      windSpeedUnits:
+          $enumDecodeNullable(_$SpeedUnitsEnumMap, json['windSpeedUnits']) ??
+              SpeedUnits.kts,
+      depthUnits:
+          $enumDecodeNullable(_$DepthUnitsEnumMap, json['depthUnits']) ??
+              DepthUnits.m,
       pages: (json['pages'] as List<dynamic>?)
               ?.map((e) => _Page.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -68,6 +80,30 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
       'valueSmoothing': instance.valueSmoothing,
       'signalkServer': instance.signalkServer,
+      'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
+      'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,
+      'windSpeedUnits': _$SpeedUnitsEnumMap[instance.windSpeedUnits]!,
+      'depthUnits': _$DepthUnitsEnumMap[instance.depthUnits]!,
       'pages': instance.pages,
       'widgetSettings': instance.widgetSettings,
     };
+
+const _$DistanceUnitsEnumMap = {
+  DistanceUnits.meters: 'meters',
+  DistanceUnits.km: 'km',
+  DistanceUnits.miles: 'miles',
+  DistanceUnits.nm: 'nm',
+};
+
+const _$SpeedUnitsEnumMap = {
+  SpeedUnits.mps: 'mps',
+  SpeedUnits.kph: 'kph',
+  SpeedUnits.mph: 'mph',
+  SpeedUnits.kts: 'kts',
+};
+
+const _$DepthUnitsEnumMap = {
+  DepthUnits.m: 'm',
+  DepthUnits.ft: 'ft',
+  DepthUnits.fa: 'fa',
+};
