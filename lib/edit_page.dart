@@ -1,30 +1,19 @@
 part of 'boatinstrument_controller.dart';
 
-class EditPage extends StatefulWidget {
+class _EditPage extends StatefulWidget {
   final BoatInstrumentController _controller;
-  final int _page;
+  final _Page _page;
 
-  const EditPage(this._controller, this._page, {super.key});
+  const _EditPage(this._controller, this._page, {super.key});
 
   @override
-  State<EditPage> createState() => _EditPageState();
+  State<_EditPage> createState() => _EditPageState();
 }
 
-class _EditPageState extends State<EditPage> {
-  _Page? _page;
-
-  @override
-  initState() {
-    super.initState();
-    _page = widget._controller._settings!.pages[widget._page];
-  }
+class _EditPageState extends State<_EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    if(_page == null) {
-      return Container();
-    }
-
     List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [];
     for(WidgetDetails wd in widgetDetails) {
       popupMenuEntries.add(PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description)));
@@ -34,8 +23,8 @@ class _EditPageState extends State<EditPage> {
     List<Widget> columns = [];
     List<double> columnsPercent = [];
 
-    for(int ci = 0; ci < _page!.columns.length; ++ci) {
-      _Column column = _page!.columns[ci];
+    for(int ci = 0; ci < widget._page.columns.length; ++ci) {
+      _Column column = widget._page.columns[ci];
 
       List<Widget> rows = [];
       List<double> rowsPercent = [];
@@ -57,7 +46,7 @@ class _EditPageState extends State<EditPage> {
           wButtons.add(IconButton(onPressed: () {_addBox(row, bi);}, icon: const Icon(Icons.keyboard_arrow_left, color: Colors.blue)));
 
           if(bi == 0 && ri == 0) {
-            wButtons.add(IconButton(onPressed: () {_addColumn(_page!, ci);}, icon: const Icon(Icons.keyboard_double_arrow_left, color: Colors.red)));
+            wButtons.add(IconButton(onPressed: () {_addColumn(widget._page, ci);}, icon: const Icon(Icons.keyboard_double_arrow_left, color: Colors.red)));
           }
 
           if(bi == 0) {
@@ -68,8 +57,8 @@ class _EditPageState extends State<EditPage> {
             eButtons.add(IconButton(onPressed: () {_addBox(row, bi, after: true);}, icon: const Icon(Icons.keyboard_arrow_right, color: Colors.blue)));
           }
 
-          if(ci == _page!.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
-            eButtons.add(IconButton(onPressed: () {_addColumn(_page!, ci, after: true);}, icon: const Icon(Icons.keyboard_double_arrow_right, color: Colors.red)));
+          if(ci == widget._page.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
+            eButtons.add(IconButton(onPressed: () {_addColumn(widget._page, ci, after: true);}, icon: const Icon(Icons.keyboard_double_arrow_right, color: Colors.red)));
           }
 
           if(ri == column.rows.length-1 && bi == 0) {
@@ -120,7 +109,7 @@ class _EditPageState extends State<EditPage> {
     }
 
     return Scaffold(
-      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, _page!.columns);}, isHorizontalSeparator: false, separatorColor: Colors.red, percentages: columnsPercent, children: columns),
+      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._page.columns);}, isHorizontalSeparator: false, separatorColor: Colors.red, percentages: columnsPercent, children: columns),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: const Icon(Icons.save), onPressed: _save),
         IconButton(icon: const Icon(Icons.close), onPressed: _save) //TODO need to revert
@@ -184,51 +173,43 @@ class _EditPageState extends State<EditPage> {
   }
 
   void _deleteBox(int ci, int ri, int bi) {
-    bool deletePage = false;
+    _Page page = widget._page;
 
     setState(() {
-      _Box b = _page!.columns[ci].rows[ri].boxes[bi];
-      _page!.columns[ci].rows[ri].boxes.removeAt(bi);
-      if(_page!.columns[ci].rows[ri].boxes.isNotEmpty) {
-        if(bi >= _page!.columns[ci].rows[ri].boxes.length) {
+      _Box b = page.columns[ci].rows[ri].boxes[bi];
+      page.columns[ci].rows[ri].boxes.removeAt(bi);
+      if(page.columns[ci].rows[ri].boxes.isNotEmpty) {
+        if(bi >= page.columns[ci].rows[ri].boxes.length) {
           --bi;
         }
-        _page!.columns[ci].rows[ri].boxes[bi].percentage += b.percentage;
+        page.columns[ci].rows[ri].boxes[bi].percentage += b.percentage;
       } else {
-        _Row r = _page!.columns[ci].rows[ri];
-        _page!.columns[ci].rows.removeAt(ri);
-        if(_page!.columns[ci].rows.isNotEmpty) {
-          if(ri >= _page!.columns[ci].rows.length) {
+        _Row r = page.columns[ci].rows[ri];
+        page.columns[ci].rows.removeAt(ri);
+        if(page.columns[ci].rows.isNotEmpty) {
+          if(ri >= page.columns[ci].rows.length) {
             --ri;
           }
-          _page!.columns[ci].rows[ri].percentage += r.percentage;
+          page.columns[ci].rows[ri].percentage += r.percentage;
         } else {
-          _Column c = _page!.columns[ci];
-          _page!.columns.removeAt(ci);
-          if(_page!.columns.isNotEmpty) {
-            if(ci >= _page!.columns.length) {
+          _Column c = page.columns[ci];
+          page.columns.removeAt(ci);
+          if(page.columns.isNotEmpty) {
+            if(ci >= page.columns.length) {
               --ci;
             }
-            _page!.columns[ci].percentage += c.percentage;
+            page.columns[ci].percentage += c.percentage;
           } else {
-            // Need to have one Box for the current screen, but this will be deleted.
-            //TODO move page delete to the main settings page and list all pages for rearrangement and editing.
-            _page!.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)];
-            deletePage = true;
+            // Need to have one Box for the current screen.
+            page.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)];
           }
         }
       }
     });
-
-    if(deletePage) {
-      //TODO add confirmation dialog. Will be moved.
-      widget._controller._settings!.pages.removeAt(widget._page);
-      Navigator.pop(context, true); // Return true if we deleted the page.
-    }
   }
 
   void _save() {
-    Navigator.pop(context, false); // Return false if the page was not deleted.
+    Navigator.pop(context);
   }
 
   _showSettingsPage (BoxWidget boxWidget) async {

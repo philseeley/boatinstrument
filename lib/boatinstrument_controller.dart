@@ -14,6 +14,8 @@ import 'package:boatinstrument/widgets/autopilot.dart';
 import 'package:boatinstrument/widgets/double_value_display.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'log_display.dart';
+
 part 'boatinstrument_controller.g.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
@@ -64,9 +66,9 @@ class WidgetDetails {
 //TODO need to have proper IDs for the other DoubleValueDisplay entries.
 //TODO widget for web page.
 List<WidgetDetails> widgetDetails = [
-  WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
-  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
-  WidgetDetails('apparent-wind-speed', 'Apparent Wind Speed', (controller) {return DoubleValueDisplay(controller, 'Apparent Wind Speed', 'environment.wind.speedApparent', 'kts', 1, key: UniqueKey());}),
+  WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'DPT', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
+  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'TWS', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
+  WidgetDetails('apparent-wind-speed', 'Apparent Wind Speed', (controller) {return DoubleValueDisplay(controller, 'AWS', 'environment.wind.speedApparent', 'kts', 1, key: UniqueKey());}),
   WidgetDetails('autopilot-display', 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotControl.ID, 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];

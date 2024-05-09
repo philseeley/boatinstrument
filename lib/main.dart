@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:boatinstrument/log_display.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
 void main() {
@@ -41,6 +40,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   BoatInstrumentController? controller;
   int _pageNum = 0;
+  SnackBar? _snackBar;
 
   @override
   void initState() {
@@ -64,62 +64,50 @@ class _MainPageState extends State<MainPage> {
 
     controller?.clear();
 
+    //TODO Would prefer a top bar.
+    _snackBar = _snackBar??SnackBar(
+      content: Text(controller!.pageName(_pageNum)),
+      action: SnackBarAction(label: 'Setting', onPressed: showSettingsPage),
+    );
+
     //TODO Fullscreen.
     return Scaffold(
-        //TODO have a AppBar/Drawer from the top/bottom that shows ontop when swiped down/up.
-        appBar: AppBar(
-          title: Text(controller!.pageName(_pageNum), style: controller?.headTS) ,
-          actions: [
-            IconButton(icon: const Icon(Icons.edit),
-                onPressed: () {
-                  _editPage();
-                }),
-            IconButton(icon: const Icon(Icons.settings),
-                onPressed: () {
-                  showSettingsPage();
-                }),
-            IconButton(icon: const Icon(Icons.notes),
-                onPressed: () {
-                  showLog();
-                })
-          ]
-        ),
-        body: boatInstrumentController?.buildPage(_pageNum),
-    );
+      body: GestureDetector(
+        onHorizontalDragEnd: _movePage,
+        onVerticalDragEnd: _showSnackBar,
+        child: controller?.buildPage(_pageNum),
+      ),
+    ); //DragGestureRecognizer
   }
 
   showSettingsPage () async {
-    await Navigator.push(
+     Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return SettingsPage(controller!);
     }));
 
-    controller?.save();
-
-    setState(() {});
+    // controller?.save();
+    //
+    // setState(() {});
   }
 
-  showLog () async {
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) {
-      return LogDisplay(controller!);
-    }));
-
-    setState(() {});
+  void _movePage (DragEndDetails details) {
+    if(details.primaryVelocity != 0.0) {
+      setState(() {
+        if (details.primaryVelocity! < 0.0) {
+          _pageNum = controller!.prevPageNum(_pageNum);
+        } else {
+          _pageNum = controller!.nextPageNum(_pageNum);
+        }
+      });
+    }
   }
 
-  _editPage () async {
-    bool deleted = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) {
-      return EditPage(controller!, _pageNum);
-    }));
-
-    controller?.save();
-
-    setState(() {
-      if(deleted) {
-        _pageNum = controller!.nextPageNum(_pageNum);
-      }
-    });
+  void _showSnackBar (DragEndDetails details) {
+    if(details.primaryVelocity != 0.0 && details.primaryVelocity! < 0.0) {
+      setState(() {
+        ScaffoldMessenger.of(context).showSnackBar(_snackBar!);
+      });
+    }
   }
 }
