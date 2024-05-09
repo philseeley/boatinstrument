@@ -46,12 +46,13 @@ class WidgetDetails {
   WidgetDetails(this.id, this.description, this.build);
 }
 
-//TODO need to have proper IDs for the other DoubleValueDisplay entries.
 //TODO widget for web page.
 List<WidgetDetails> widgetDetails = [
-  WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'DPT', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
-  WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'TWS', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
-  WidgetDetails('apparent-wind-speed', 'Apparent Wind Speed', (controller) {return DoubleValueDisplay(controller, 'AWS', 'environment.wind.speedApparent', 'kts', 1, key: UniqueKey());}),
+  WidgetDetails(DepthDisplay.sid, 'Depth', (controller) {return DepthDisplay(controller, key: UniqueKey());}),
+  WidgetDetails(SpeedDisplay.sid, 'Speed', (controller) {return SpeedDisplay(controller, key: UniqueKey());}),
+  WidgetDetails(SOGDisplay.sid, 'Speed Over Ground', (controller) {return SOGDisplay(controller, key: UniqueKey());}),
+  WidgetDetails(WindSpeedApparentDisplay.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentDisplay(controller, key: UniqueKey());}),
+  WidgetDetails(WindSpeedTrueDisplay.sid, 'Wind Speed True', (controller) {return WindSpeedTrueDisplay(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotDisplay.sid, 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotControl.sid, 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
 ];
@@ -155,7 +156,7 @@ enum DistanceUnits {
 }
 
 enum SpeedUnits {
-  mps('MPH', 'mph'),
+  mps('M/S', 'm/s'),
   kph('KPH', 'km/h'),
   mph('MPH', 'mph'),
   kts('Knots', 'kts');

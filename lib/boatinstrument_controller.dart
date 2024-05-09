@@ -53,6 +53,10 @@ class BoatInstrumentController {
 
   String get signalkServer => _settings!.signalkServer;
   int get valueSmoothing => _settings!.valueSmoothing;
+  DistanceUnits get distanceUnits => _settings!.distanceUnits;
+  SpeedUnits get speedUnits => _settings!.speedUnits;
+  SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;
+  DepthUnits get depthUnits => _settings!.depthUnits;
 
   BoatInstrumentController(this.headTS, this.infoTS) {
     l = Logger(
