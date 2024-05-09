@@ -141,6 +141,15 @@ class _EditPageState extends State<EditPage> {
     r[i].percentage = 1.0 - total;
   }
 
+  // We need this to adjust for rounding errors.
+  static double _diff(List<_Resizable> list) {
+    double tot = 0;
+    for(_Resizable r in list) {
+      tot += r.percentage;
+    }
+    return 1.0 - tot;
+  }
+
   void _addBox(_Row r, int bi, {bool after = false}) {
     setState(() {
       _Box b = _Box(widgetDetails[0].id, 1);
@@ -148,6 +157,7 @@ class _EditPageState extends State<EditPage> {
       r.boxes[bi].percentage = pc;
       b.percentage = pc;
       r.boxes.insert(after ? bi+1 : bi, b);
+      b.percentage += _diff(r.boxes);
     });
   }
 
@@ -158,6 +168,7 @@ class _EditPageState extends State<EditPage> {
       c.rows[ri].percentage = pc;
       r.percentage = pc;
       c.rows.insert(after ? ri+1 : ri, r);
+      r.percentage += _diff(c.rows);
     });
   }
 
@@ -168,6 +179,7 @@ class _EditPageState extends State<EditPage> {
       p.columns[ci].percentage = pc;
       c.percentage = pc;
       p.columns.insert(after ? ci+1 : ci, c);
+      c.percentage += _diff(p.columns);
     });
   }
 
