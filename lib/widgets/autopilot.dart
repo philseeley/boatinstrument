@@ -166,7 +166,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
       ))));
     }
 
-    return Column(children: [
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Stack(alignment: Alignment.center, children:  buttons),
       Text(_error??'', style: widget._controller.headTS.apply(color: Colors.red))
     ]);
@@ -296,10 +296,11 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   @override
   Widget build(BuildContext context) {
     BoatInstrumentController c = widget.controller;
+    TextStyle s = widget.controller.headTS; //TODO we should be able to set the font size for the whole widget using a Theme.
 
     List<Widget> pilot = [
-      const Text("Pilot"),
-      Text("State: ${_autopilotState?.displayName ?? 'No State'}"),
+      Text("Pilot", style: s),
+      Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: s),
     ];
 
     switch(_autopilotState) {
@@ -310,27 +311,27 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         if(_targetHeadingMagnetic != null &&
             _magneticVariation != null) {
           double headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
-          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}"));
+          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: s));
         }
         break;
       case AutopilotState.route:
-        pilot.add(Text("WPT: $_waypoint"));
+        pilot.add(Text("WPT: $_waypoint", style: s));
         break;
       case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_targetWindAngleApparent);
-        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}"));
+        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: s));
         break;
     }
 
     List<Widget> actual = [
-      const Text("Actual"),
-      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}"),
-      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}"),
+      Text("Actual", style: s),
+      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: s),
+      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: s),
     ];
 
     if((_autopilotState??AutopilotState.standby) == AutopilotState.route) {
       if(_crossTrackError != null) {
-        actual.add(Text("XTE: ${meters2NM(_crossTrackError!.abs()).toStringAsFixed(2)} ${val2PS(_crossTrackError!)}"));
+        actual.add(Text("XTE: ${meters2NM(_crossTrackError!.abs()).toStringAsFixed(2)} ${val2PS(_crossTrackError!)}", style: s));
       }
     }
 
@@ -339,7 +340,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     int rudderAngleLen = rad2Deg(rudderAngle.abs());
     rudderAngleLen = ((rudderAngleLen.toDouble()/40.0)*rudderStr.length).toInt();
 
-    return Column(children: [
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Column(children: pilot),
         Column(children: actual)

@@ -59,7 +59,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     if(controller == null || !controller!.ready) {
-      return const Center(child: Text('Initialising')); //TODO splash screen
+      return const Center(child: Text('Initialising')); //TODO splash screen and App Icon
     }
 
     controller?.clear();
