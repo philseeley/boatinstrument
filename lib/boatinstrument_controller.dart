@@ -62,6 +62,7 @@ class WidgetDetails {
 }
 
 //TODO need to have proper IDs for the other DoubleValueDisplay entries.
+//TODO widget for web page.
 List<WidgetDetails> widgetDetails = [
   WidgetDetails('depth', 'Depth', (controller) {return DoubleValueDisplay(controller, 'Depth', 'environment.depth.belowSurface', 'm', 1, key: UniqueKey());}),
   WidgetDetails('true-wind-speed', 'True Wind Speed', (controller) {return DoubleValueDisplay(controller, 'True Wind Speed', 'environment.wind.speedTrue', 'kts', 1, key: UniqueKey());}),
@@ -230,7 +231,6 @@ class BoatInstrumentController {
   Timer? _networkTimer;
   final TextStyle headTS;
   final TextStyle infoTS;
-  final TextStyle lineTS;
 
   List<String> get logBuffer => _buffer.toList();
   void clearLog() => _buffer.clear();
@@ -240,7 +240,7 @@ class BoatInstrumentController {
   String get signalkServer => _settings!.signalkServer;
   int get valueSmoothing => _settings!.valueSmoothing;
 
-  BoatInstrumentController(this.headTS, this.infoTS, this.lineTS) {
+  BoatInstrumentController(this.headTS, this.infoTS) {
     l = Logger(
         filter: ProductionFilter(),
         output: CircularLogger(_buffer),

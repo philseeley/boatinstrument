@@ -14,14 +14,16 @@ class NavApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //TODO find better fonts. LCD?
-    TextStyle headTS = Theme.of(context).textTheme.titleMedium!.apply(fontFamily: 'Red Hat Mono', color: Colors.white, fontWeightDelta: 4);
-    TextStyle infoTS = Theme.of(context).textTheme.titleLarge!.apply(fontFamily: 'Red Hat Mono', color: Colors.white, fontSizeDelta: 20);
-    TextStyle lineTS = Theme.of(context).textTheme.bodySmall!.apply(fontFamily: 'Red Hat Mono', color: Colors.white);
+
+    ThemeData themeData = ThemeData(colorScheme: const ColorScheme.highContrastDark(), fontFamily: 'Red Hat Mono');
+
+    TextStyle headTS = themeData.textTheme.titleMedium!.copyWith(fontSize: 20);
+    TextStyle infoTS = themeData.textTheme.bodyLarge!.copyWith(fontSize: 40);
 
     return MaterialApp(
-      home: MainPage(headTS, infoTS, lineTS),
+      home: MainPage(headTS, infoTS),
       //TODO light/dark/night mode.
-      theme: ThemeData(textTheme: TextTheme(titleLarge: infoTS, titleMedium: headTS, bodyMedium: headTS, bodySmall: lineTS))
+      theme: themeData,
     );
   }
 }
@@ -29,9 +31,8 @@ class NavApp extends StatelessWidget {
 class MainPage extends StatefulWidget {
   final TextStyle _headTS;
   final TextStyle _infoTS;
-  final TextStyle _lineTS;
 
-  const MainPage(this._headTS, this._infoTS, this._lineTS, {super.key});
+  const MainPage(this._headTS, this._infoTS, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -48,7 +49,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   }
 
   _configure () async {
-    controller = BoatInstrumentController(widget._headTS, widget._infoTS, widget._lineTS);
+    controller = BoatInstrumentController(widget._headTS, widget._infoTS);
     await controller?.loadSettings();
     await controller?.connect();
 

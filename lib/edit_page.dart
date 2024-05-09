@@ -27,7 +27,7 @@ class _EditPageState extends State<EditPage> {
 
     List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [];
     for(WidgetDetails wd in widgetDetails) {
-      popupMenuEntries.add(PopupMenuItem<WidgetDetails>(value: wd, textStyle: widget._controller.lineTS, child: Text(wd.description)));
+      popupMenuEntries.add(PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description)));
     }
 
     //TODO move delete button into main setting dialog.

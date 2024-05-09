@@ -298,8 +298,8 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     BoatInstrumentController c = widget.controller;
 
     List<Widget> pilot = [
-      Text("Pilot", style: c.infoTS),
-      Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: c.infoTS),
+      Text("Pilot"),
+      Text("State: ${_autopilotState?.displayName ?? 'No State'}"),
     ];
 
     switch(_autopilotState) {
@@ -310,22 +310,22 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
         if(_targetHeadingMagnetic != null &&
             _magneticVariation != null) {
           double headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
-          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: c.infoTS));
+          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}"));
         }
         break;
       case AutopilotState.route:
-        pilot.add(Text("WPT: $_waypoint", style: c.headTS));
+        pilot.add(Text("WPT: $_waypoint"));
         break;
       case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_targetWindAngleApparent);
-        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: c.infoTS));
+        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}"));
         break;
     }
 
     List<Widget> actual = [
-      Text("Actual", style: c.infoTS),
-      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: c.infoTS),
-      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: c.infoTS),
+      Text("Actual"),
+      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}"),
+      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}"),
     ];
 
     if((_autopilotState??AutopilotState.standby) == AutopilotState.route) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
+//TODO need to deal with unit etc.
 class DoubleValueDisplay extends BoxWidget {
   final BoatInstrumentController _controller;
   final String _title;
@@ -28,9 +29,10 @@ class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    //TODO value and umits want to be different sizes.
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Text(widget._title, style: widget._controller.headTS),
-      Text("${(_value??0).toStringAsFixed(widget._precision)} ${widget._units}", style: widget._controller.infoTS)
+      Text('${widget._title} - ${widget._units}', style: widget._controller.headTS),
+      Text((_value??0).toStringAsFixed(widget._precision), style: widget._controller.infoTS)
     ]);
   }
 

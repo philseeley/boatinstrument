@@ -18,7 +18,7 @@ class _LogDisplayState extends State<LogDisplay> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Log", style: widget._controller.headTS),
+        title: Text("Log"),
         actions: [
           IconButton(icon: const Icon(Icons.refresh),
               onPressed: () {
@@ -35,7 +35,7 @@ class _LogDisplayState extends State<LogDisplay> {
       body: ListView.builder(
         itemCount: entries.length,
         itemBuilder: (BuildContext context, int index) {
-          return Text(entries[index], style: widget._controller.lineTS);
+          return Text(entries[index]);
         }
       )
     );
