@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
@@ -13,6 +13,7 @@ class NavApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //TODO find better fonts. LCD?
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     ThemeData themeData = ThemeData(colorScheme: const ColorScheme.highContrastDark(), fontFamily: 'Red Hat Mono');
 
@@ -105,7 +106,7 @@ class _MainPageState extends State<MainPage> {
           action: SnackBarAction(label: 'Settings >', onPressed: showSettingsPage),
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar!);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     }
   }
