@@ -26,15 +26,19 @@ double meters2NM(double m) => double.parse((m*0.00054).toStringAsPrecision(2));
 String val2PS(num val) => val < 0 ? 'P' : 'S';
 
 //TODO smoothing doesn't seem to be working.
-double averageAngle(double current, double next, { int smooth = 0, bool relative=false }) {
-  vm.Vector2 v1 = vm.Vector2(m.sin(current) * (50+smooth), m.cos(current) * (50+smooth));
-  vm.Vector2 v2 = vm.Vector2(m.sin(next) * 50, m.cos(next) * 50);
+double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
+  vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);
+  vm.Vector2 v2 = vm.Vector2(m.sin(next), m.cos(next));
 
   vm.Vector2 avg = (v1 + v2) / 2;
 
   double avga = m.atan2(avg.x, avg.y);
 
   return ((avga >= 0) || relative) ? avga : ((2 * m.pi) + avga);
+}
+
+double averageDouble(double current, double next, { int smooth = 1 }) {
+  return ((current * smooth) + next) / (1 + smooth);
 }
 
 abstract class BoxSettings {}
@@ -171,7 +175,7 @@ class _Settings {
 
   _Settings({
     this.version = 0,
-    this.valueSmoothing = 0,
+    this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
     this.pages = const [],
     widgetSettings

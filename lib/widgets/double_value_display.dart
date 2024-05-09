@@ -38,8 +38,8 @@ class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
 
   _processData(List<Update> updates) {
     try {
-      // TODO value smoothing.
-      _value = (updates[0].value as num).toDouble();
+      double next = (updates[0].value as num).toDouble();
+      _value = averageDouble(_value??next, next);
     } catch (e) {
       widget._controller.l.e("Error converting $updates", error: e);
     }
