@@ -64,7 +64,6 @@ class _MainPageState extends State<MainPage> {
 
     controller?.clear();
 
-    //TODO Fullscreen.
     return Scaffold(
       body: GestureDetector(
         onHorizontalDragEnd: _movePage,

@@ -85,8 +85,6 @@ class _SettingsState extends State<SettingsPage> {
         context, MaterialPageRoute(builder: (context) {
       return _EditPage(widget._controller, page);
     }));
-
-    widget._controller.save(); //TODO need to save on close of setting page
   }
 
   void _deletePage(int papeNum) {
