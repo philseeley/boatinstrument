@@ -44,6 +44,8 @@ class _DoubleValueDisplayState extends State<DoubleValueDisplay> {
       widget._controller.l.e("Error converting $updates", error: e);
     }
 
-    setState(() {});
+    if(mounted) {
+      setState(() {});
+    }
   }
 }

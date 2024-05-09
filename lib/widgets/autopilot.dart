@@ -398,6 +398,8 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
       }
     }
 
-    setState(() {});
+    if(mounted) {
+      setState(() {});
+    }
   }
 }
