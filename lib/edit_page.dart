@@ -5,7 +5,7 @@ class _EditPage extends StatefulWidget {
   final _Page _page;
   final _Page _editPage =  _Page('_TMP_', []);
 
-  _EditPage(this._controller, this._page, {super.key}) {
+  _EditPage(this._controller, this._page) {
     for(_Column c in _page.columns) {
       _Column ec = _Column([], c.percentage);
       _editPage.columns.add(ec);

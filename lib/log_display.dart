@@ -18,7 +18,7 @@ class _LogDisplayState extends State<LogDisplay> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Log"),
+        title: const Text("Log"),
         actions: [
           IconButton(icon: const Icon(Icons.refresh),
               onPressed: () {

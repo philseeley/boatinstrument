@@ -38,7 +38,7 @@ class _SettingsState extends State<SettingsPage> {
       ),
       ListTile(
           leading: const Text('Pages:'),
-          title: IconButton(icon: Icon(Icons.add), onPressed: _addPage,)
+          title: IconButton(icon: const Icon(Icons.add), onPressed: _addPage,)
       ),
     ];
 

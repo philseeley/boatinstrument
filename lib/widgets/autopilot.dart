@@ -39,10 +39,10 @@ class _Settings extends BoxSettings {
 class AutoPilotControl extends BoxWidget {
   static const String ID = 'autopilot-control';
 
-  final BoatInstrumentController controller;
+  final BoatInstrumentController _controller;
   _Settings _editSettings = _Settings();
 
-  AutoPilotControl(this.controller, {super.key});
+  AutoPilotControl(this._controller, {super.key});
 
   @override
   State<AutoPilotControl> createState() => _AutoPilotControlState();
@@ -56,7 +56,7 @@ class AutoPilotControl extends BoxWidget {
   @override
   Widget getSettingsWidget(Map<String, dynamic> json) {
     _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(controller, _editSettings);
+    return _SettingsWidget(_controller, _editSettings);
   }
 
   @override
@@ -74,7 +74,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget.controller.configure(widget.id, widget, null, {}));
+    _settings = _$SettingsFromJson(widget._controller.configure(widget.id, widget, null, {}));
   }
 
   _sendCommand(String path, String params) async {
@@ -86,7 +86,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
     try {
       Uri uri = Uri.http(
-          widget.controller.signalkServer,
+          widget._controller.signalkServer,
           '/signalk/v1/api/vessels/self/$path');
 
       http.Response response = await http.put(
@@ -103,7 +103,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
         _error = response.reasonPhrase;
       });
     } catch (e) {
-      widget.controller.l.e('Error Sending to WebSocket', error: e);
+      widget._controller.l.e('Error Sending to WebSocket', error: e);
     }
   }
 
@@ -168,7 +168,7 @@ class _AutoPilotControlState extends State<AutoPilotControl> {
 
     return Column(children: [
       Stack(alignment: Alignment.center, children:  buttons),
-      Text(_error??'', style: widget.controller.headTS.apply(color: Colors.red))
+      Text(_error??'', style: widget._controller.headTS.apply(color: Colors.red))
     ]);
   }
 }
@@ -298,7 +298,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     BoatInstrumentController c = widget.controller;
 
     List<Widget> pilot = [
-      Text("Pilot"),
+      const Text("Pilot"),
       Text("State: ${_autopilotState?.displayName ?? 'No State'}"),
     ];
 
@@ -323,7 +323,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
     }
 
     List<Widget> actual = [
-      Text("Actual"),
+      const Text("Actual"),
       Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}"),
       Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}"),
     ];
@@ -341,8 +341,8 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
 
     return Column(children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: Column(children: pilot)),
-        DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: Column(children: actual))
+        Column(children: pilot),
+        Column(children: actual)
       ]),
       Row(children: [
         Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: c.headTS.apply(color: Colors.red), textAlign: TextAlign.right)),
