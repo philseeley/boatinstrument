@@ -38,6 +38,33 @@ abstract class BoxWidget extends StatefulWidget {
   }
 }
 
+class BlankBox extends BoxWidget {
+  final BoatInstrumentController _controller;
+
+  const BlankBox(this._controller, {super.key});
+
+  static const String sid = '_BLANK_';
+  @override
+  String get id => sid;
+
+  @override
+  State<BlankBox> createState() => _BlankBoxState();
+}
+
+class _BlankBoxState extends State<BlankBox> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget._controller.configure(widget.id, widget, null, { });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
 class WidgetDetails {
   final String id;
   final String description;
@@ -46,8 +73,10 @@ class WidgetDetails {
   WidgetDetails(this.id, this.description, this.build);
 }
 
+//TODO widget for blank box.
 //TODO widget for web page.
 List<WidgetDetails> widgetDetails = [
+  WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}),
   WidgetDetails(DepthDisplay.sid, 'Depth', (controller) {return DepthDisplay(controller, key: UniqueKey());}),
   WidgetDetails(SpeedDisplay.sid, 'Speed', (controller) {return SpeedDisplay(controller, key: UniqueKey());}),
   WidgetDetails(SOGDisplay.sid, 'Speed Over Ground', (controller) {return SOGDisplay(controller, key: UniqueKey());}),
