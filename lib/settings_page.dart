@@ -45,19 +45,19 @@ class _SettingsState extends State<SettingsPage> {
           }),
       ListTile(
           leading: const Text("Distance:  "),
-          title: _distanceRadioList()
+          title: _distanceMenu()
       ),
       ListTile(
           leading: const Text("Speed:     "),
-          title: _speedRadioList()
+          title: _speedMenu()
       ),
       ListTile(
           leading: const Text("Wind Speed:"),
-          title: _windSpeedRadioList()
+          title: _windSpeedMenu()
       ),
       ListTile(
           leading: const Text("Depth:     "),
-          title: _depthRadioList()
+          title: _depthMenu()
       ),
       ListTile(
           leading: const Text('Pages:'),
@@ -88,52 +88,80 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
-  Row _distanceRadioList() {
-    List<Widget> l = [];
+  DropdownMenu _distanceMenu() {
+    List<DropdownMenuEntry<DistanceUnits>> l = [];
     for(var v in DistanceUnits.values) {
-      l.add(Radio(
+      l.add(DropdownMenuEntry<DistanceUnits>(
           value: v,
-          groupValue: widget._controller._settings?.distanceUnits,
-          onChanged: (value) { setState(() { widget._controller._settings?.distanceUnits = value!;});}));
-      l.add(Text(v.displayName));
+          label: v.displayName));
     }
-    return Row(children: l);
+
+    DropdownMenu menu = DropdownMenu<DistanceUnits>(
+      initialSelection: widget._controller._settings?.distanceUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.distanceUnits = value!;
+      },
+    );
+
+    return menu;
   }
 
-  Row _speedRadioList() {
-    List<Widget> l = [];
+  DropdownMenu _speedMenu() {
+    List<DropdownMenuEntry<SpeedUnits>> l = [];
     for(var v in SpeedUnits.values) {
-      l.add(Radio(
+      l.add(DropdownMenuEntry<SpeedUnits>(
           value: v,
-          groupValue: widget._controller._settings?.speedUnits,
-          onChanged: (value) { setState(() { widget._controller._settings?.speedUnits = value!;});}));
-      l.add(Text(v.displayName));
+          label: v.displayName));
     }
-    return Row(children: l);
+
+    DropdownMenu menu = DropdownMenu<SpeedUnits>(
+      initialSelection: widget._controller._settings?.speedUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.speedUnits = value!;
+      },
+    );
+
+    return menu;
   }
 
-  Row _windSpeedRadioList() {
-    List<Widget> l = [];
+  DropdownMenu _windSpeedMenu() {
+    List<DropdownMenuEntry<SpeedUnits>> l = [];
     for(var v in SpeedUnits.values) {
-      l.add(Radio(
+      l.add(DropdownMenuEntry<SpeedUnits>(
           value: v,
-          groupValue: widget._controller._settings?.windSpeedUnits,
-          onChanged: (value) { setState(() { widget._controller._settings?.windSpeedUnits = value!;});}));
-      l.add(Text(v.displayName));
+          label: v.displayName));
     }
-    return Row(children: l);
+
+    DropdownMenu menu = DropdownMenu<SpeedUnits>(
+      initialSelection: widget._controller._settings?.windSpeedUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.windSpeedUnits = value!;
+      },
+    );
+
+    return menu;
   }
 
-  Row _depthRadioList() {
-    List<Widget> l = [];
+  DropdownMenu _depthMenu() {
+    List<DropdownMenuEntry<DepthUnits>> l = [];
     for(var v in DepthUnits.values) {
-      l.add(Radio(
+      l.add(DropdownMenuEntry<DepthUnits>(
           value: v,
-          groupValue: widget._controller._settings?.depthUnits,
-          onChanged: (value) { setState(() { widget._controller._settings?.depthUnits = value!;});}));
-      l.add(Text(v.displayName));
+          label: v.displayName));
     }
-    return Row(children: l);
+
+    DropdownMenu menu = DropdownMenu<DepthUnits>(
+      initialSelection: widget._controller._settings?.depthUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.depthUnits = value!;
+      },
+    );
+
+    return menu;
   }
 
   void _showLog () async {
