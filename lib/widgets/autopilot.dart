@@ -74,7 +74,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget._controller.configure(widget.id, widget, null, {}));
+    _settings = _$SettingsFromJson(widget._controller.configure(widget));
   }
 
   _sendCommand(String path, String params) async {
@@ -280,7 +280,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure((AutoPilotStatusBox).toString(), widget, _processData, {
+    widget.controller.configure(widget, onUpdate: _processData, paths: {
       "steering.autopilot.state",
       "navigation.courseOverGroundTrue",
       "steering.autopilot.target.windAngleApparent",

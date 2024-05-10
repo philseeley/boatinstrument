@@ -56,7 +56,7 @@ class _BlankBoxState extends State<BlankBox> {
   @override
   void initState() {
     super.initState();
-    widget._controller.configure(widget.id, widget, null, { });
+    widget._controller.configure(widget);
   }
 
   @override

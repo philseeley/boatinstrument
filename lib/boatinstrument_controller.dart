@@ -95,7 +95,7 @@ class BoatInstrumentController {
     return _settings?.widgetSettings[widgetID]??{};
   }
 
-  Map<String, dynamic> configure(String widgetID, Widget widget, OnUpdate? onUpdate, Set<String> paths) {
+  Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, Set<String> paths = const {}}) {
     bool configured = true;
 
     for(_WidgetData wd in _widgetData) {
@@ -112,7 +112,7 @@ class BoatInstrumentController {
       _subscribe();
     }
 
-    return getWidgetSettings(widgetID);
+    return getWidgetSettings(widget.id);
   }
 
   void saveWidgetSettings(String widgetID, Map<String, dynamic> widgetSettings) {

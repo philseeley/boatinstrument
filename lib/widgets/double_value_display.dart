@@ -132,12 +132,11 @@ class _DoubleValueDisplayState extends State<_DoubleValueDisplay> {
   @override
   void initState() {
     super.initState();
-    widget._controller.configure((_DoubleValueDisplay).toString(), widget, _processData, { widget._path });
+    widget._controller.configure(widget, onUpdate: _processData, paths: { widget._path });
   }
 
   @override
   Widget build(BuildContext context) {
-    //TODO value and umits want to be different sizes.
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text('${widget._title} - ${widget._units()}', style: widget._controller.headTS),
       Text(_displayValue.toStringAsFixed(widget._precision), style: widget._controller.infoTS)
