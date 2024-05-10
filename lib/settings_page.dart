@@ -36,6 +36,13 @@ class _SettingsState extends State<SettingsPage> {
               initialValue: settings.signalkServer,
               onChanged: (value) => settings.signalkServer = value)
       ),
+      SwitchListTile(title: const Text("Wraparound page change:"),
+          value: settings.wrapPages,
+          onChanged: (bool value) {
+            setState(() {
+              settings.wrapPages = value;
+            });
+          }),
       ListTile(
           leading: const Text("Distance:  "),
           title: _distanceRadioList()
