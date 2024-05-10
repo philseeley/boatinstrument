@@ -81,7 +81,11 @@ class _MainPageState extends State<MainPage> {
 
     controller?.save();
 
-    setState(() {});
+    setState(() {
+      if(_pageNum >= controller!.numOfPages) {
+        _pageNum = controller!.numOfPages-1;
+      }
+    });
   }
 
   void _movePage (DragEndDetails details) {
