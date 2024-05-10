@@ -223,6 +223,7 @@ class _Settings {
 
   static File? _store;
 
+  //TODO Add "always on display".
   _Settings({
     this.version = 0,
     this.valueSmoothing = 1,

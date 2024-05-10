@@ -69,7 +69,6 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   _Settings _settings =_Settings();
   bool _locked = true;
   Timer? _lockTimer;
-  String? _error;
 
   @override
   void initState() {
@@ -78,7 +77,6 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   }
 
   _sendCommand(String path, String params) async {
-    _error = null;
 
     if(_settings.enableLock) {
       _unlock();
@@ -99,9 +97,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
           body: params
       );
 
-      setState(() {
-        _error = response.reasonPhrase;
-      });
+      widget._controller.showMessage(context, response.reasonPhrase??'');
     } catch (e) {
       widget._controller.l.e('Error Sending to WebSocket', error: e);
     }
@@ -166,10 +162,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
       ))));
     }
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Stack(alignment: Alignment.center, children:  buttons),
-      Text(_error??'', style: widget._controller.headTS.apply(color: Colors.red))
-    ]);
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(alignment: Alignment.center, children:  buttons)]);
   }
 }
 
@@ -246,7 +239,7 @@ class _SettingsState extends State<_SettingsWidget> {
         });
 
     setState(() {
-      widget._settings.authToken = 'PENDING';
+      widget._settings.authToken = 'PENDING - keep this page open until request approved';
     });
   }
 }

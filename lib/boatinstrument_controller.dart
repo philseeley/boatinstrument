@@ -124,6 +124,10 @@ class BoatInstrumentController {
     _settings?._save();
   }
 
+  void showMessage(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
   Widget _buildRow(_Row row) {
     return LayoutBuilder(builder: (context, constraints) {
       List<Widget> widgets = [];
