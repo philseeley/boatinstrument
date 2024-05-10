@@ -36,15 +36,15 @@ class _Settings extends BoxSettings {
   });
 }
 
-class AutoPilotControl extends BoxWidget {
+class AutoPilotControlBox extends BoxWidget {
 
   final BoatInstrumentController _controller;
   _Settings _editSettings = _Settings();
 
-  AutoPilotControl(this._controller, {super.key});
+  AutoPilotControlBox(this._controller, {super.key});
 
   @override
-  State<AutoPilotControl> createState() => _AutoPilotControlState();
+  State<AutoPilotControlBox> createState() => _AutoPilotControlState();
 
   static const String sid = 'autopilot-control';
   @override
@@ -65,7 +65,7 @@ class AutoPilotControl extends BoxWidget {
   }
 }
 
-class _AutoPilotControlState extends State<AutoPilotControl> {
+class _AutoPilotControlState extends State<AutoPilotControlBox> {
   _Settings _settings =_Settings();
   bool _locked = true;
   Timer? _lockTimer;
@@ -251,21 +251,21 @@ class _SettingsState extends State<_SettingsWidget> {
   }
 }
 
-class AutoPilotDisplay extends BoxWidget {
+class AutoPilotStatusBox extends BoxWidget {
   static const String sid = 'autopilot-display';
 
   final BoatInstrumentController controller;
 
-  const AutoPilotDisplay(this.controller, {super.key});
+  const AutoPilotStatusBox(this.controller, {super.key});
 
   @override
-  State<AutoPilotDisplay> createState() => _AutoPilotDisplayState();
+  State<AutoPilotStatusBox> createState() => _AutoPilotDisplayState();
 
   @override
   String get id => sid;
 }
 
-class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
+class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
   AutopilotState? _autopilotState;
   double? _courseOverGroundTrue;
   double? _targetWindAngleApparent;
@@ -280,7 +280,7 @@ class _AutoPilotDisplayState extends State<AutoPilotDisplay> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure((AutoPilotDisplay).toString(), widget, _processData, {
+    widget.controller.configure((AutoPilotStatusBox).toString(), widget, _processData, {
       "steering.autopilot.state",
       "navigation.courseOverGroundTrue",
       "steering.autopilot.target.windAngleApparent",

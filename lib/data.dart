@@ -73,17 +73,16 @@ class WidgetDetails {
   WidgetDetails(this.id, this.description, this.build);
 }
 
-//TODO widget for blank box.
 //TODO widget for web page.
 List<WidgetDetails> widgetDetails = [
-  WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}),
-  WidgetDetails(DepthDisplay.sid, 'Depth', (controller) {return DepthDisplay(controller, key: UniqueKey());}),
-  WidgetDetails(SpeedDisplay.sid, 'Speed', (controller) {return SpeedDisplay(controller, key: UniqueKey());}),
-  WidgetDetails(SOGDisplay.sid, 'Speed Over Ground', (controller) {return SOGDisplay(controller, key: UniqueKey());}),
-  WidgetDetails(WindSpeedApparentDisplay.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentDisplay(controller, key: UniqueKey());}),
-  WidgetDetails(WindSpeedTrueDisplay.sid, 'Wind Speed True', (controller) {return WindSpeedTrueDisplay(controller, key: UniqueKey());}),
-  WidgetDetails(AutoPilotDisplay.sid, 'Autopilot Display', (controller) {return AutoPilotDisplay(controller, key: UniqueKey());}),
-  WidgetDetails(AutoPilotControl.sid, 'Autopilot Control', (controller) {return AutoPilotControl(controller, key: UniqueKey());}),
+  WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}), // This is the default Box.
+  WidgetDetails(DepthBox.sid, 'Depth', (controller) {return DepthBox(controller, key: UniqueKey());}),
+  WidgetDetails(SpeedBox.sid, 'Speed', (controller) {return SpeedBox(controller, key: UniqueKey());}),
+  WidgetDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller) {return SpeedOverGroundBox(controller, key: UniqueKey());}),
+  WidgetDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentBox(controller, key: UniqueKey());}),
+  WidgetDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller) {return WindSpeedTrueBox(controller, key: UniqueKey());}),
+  WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller) {return AutoPilotStatusBox(controller, key: UniqueKey());}),
+  WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller) {return AutoPilotControlBox(controller, key: UniqueKey());}),
 ];
 
 WidgetDetails getWidgetDetails(BoatInstrumentController controller, String id) {

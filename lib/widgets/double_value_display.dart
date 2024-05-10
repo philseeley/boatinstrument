@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
-class DepthDisplay extends _DoubleValueDisplay {
+class DepthBox extends _DoubleValueDisplay {
   static const String sid = 'depth';
   @override
   String get id => sid;
 
-  DepthDisplay(controller, {super.key}) : super(controller, 'Depth', 'environment.depth.belowSurface', 1) {
+  DepthBox(controller, {super.key}) : super(controller, 'Depth', 'environment.depth.belowSurface', 1) {
     _setup(_convertDepth, _depthUnits);
   }
 
@@ -26,20 +26,20 @@ class DepthDisplay extends _DoubleValueDisplay {
   }
 }
 
-class SOGDisplay extends _SpeedDisplay {
+class SpeedOverGroundBox extends _SpeedDisplay {
   static const String sid = 'speed-over-ground';
   @override
   String get id => sid;
 
-  SOGDisplay(controller, {super.key}) : super(controller, 'SOG', 'navigation.speedOverGround');
+  SpeedOverGroundBox(controller, {super.key}) : super(controller, 'SOG', 'navigation.speedOverGround');
 }
 
-class SpeedDisplay extends _SpeedDisplay {
+class SpeedBox extends _SpeedDisplay {
   static const String sid = 'speed-through-water';
   @override
   String get id => sid;
 
-  SpeedDisplay(controller, {super.key}) : super(controller, 'Speed', 'navigation.speedThroughWater');
+  SpeedBox(controller, {super.key}) : super(controller, 'Speed', 'navigation.speedThroughWater');
 }
 
 abstract class _SpeedDisplay extends _DoubleValueDisplay {
@@ -66,20 +66,20 @@ abstract class _SpeedDisplay extends _DoubleValueDisplay {
   }
 }
 
-class WindSpeedApparentDisplay extends _WindSpeedDisplay {
+class WindSpeedApparentBox extends _WindSpeedDisplay {
   static const String sid = 'wind-speed-apparent';
   @override
   String get id => sid;
 
-  WindSpeedApparentDisplay(controller, {super.key}) : super(controller, 'AWS', 'environment.wind.speedApparent');
+  WindSpeedApparentBox(controller, {super.key}) : super(controller, 'AWS', 'environment.wind.speedApparent');
 }
 
-class WindSpeedTrueDisplay extends _WindSpeedDisplay {
+class WindSpeedTrueBox extends _WindSpeedDisplay {
   static const String sid = 'wind-speed-true';
   @override
   String get id => sid;
 
-  WindSpeedTrueDisplay(controller, {super.key}) : super(controller, 'TWS', 'environment.wind.speedTrue');
+  WindSpeedTrueBox(controller, {super.key}) : super(controller, 'TWS', 'environment.wind.speedTrue');
 }
 
 abstract class _WindSpeedDisplay extends _DoubleValueDisplay {
