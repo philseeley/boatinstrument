@@ -57,6 +57,7 @@ class BoatInstrumentController {
   SpeedUnits get speedUnits => _settings!.speedUnits;
   SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;
   DepthUnits get depthUnits => _settings!.depthUnits;
+  int get numOfPages => _settings!.pages.length;
 
   BoatInstrumentController(this.headTS, this.infoTS) {
     l = Logger(
@@ -171,12 +172,18 @@ class BoatInstrumentController {
       return 0;
     }
     ++currentPage;
-    return currentPage %= _settings!.pages.length;
+    if(_settings!.wrapPages) {
+      return currentPage %= _settings!.pages.length;
+    }
+    return (currentPage >= _settings!.pages.length) ? _settings!.pages.length-1 : currentPage;
   }
 
   int prevPageNum(int currentPage) {
     --currentPage;
-    return currentPage %= _settings!.pages.length;
+    if(_settings!.wrapPages) {
+      return currentPage %= _settings!.pages.length;
+    }
+    return (currentPage < 0) ? 0 : currentPage;
   }
 
   String pageName(int pageNum) {

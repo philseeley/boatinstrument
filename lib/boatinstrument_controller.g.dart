@@ -57,6 +57,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       valueSmoothing: json['valueSmoothing'] as int? ?? 1,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
+      wrapPages: json['wrapPages'] as bool? ?? true,
       distanceUnits:
           $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
               DistanceUnits.nm,
@@ -80,6 +81,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
       'valueSmoothing': instance.valueSmoothing,
       'signalkServer': instance.signalkServer,
+      'wrapPages': instance.wrapPages,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,
       'windSpeedUnits': _$SpeedUnitsEnumMap[instance.windSpeedUnits]!,
