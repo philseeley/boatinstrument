@@ -137,6 +137,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
       controlButtons.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          //TODO button beep
           IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-i);}, icon: const Icon(Icons.chevron_left)),
           Text("$i", style: Theme.of(context).textTheme.titleLarge),
           IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(i);}, icon: const Icon(Icons.chevron_right)),

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -12,9 +14,8 @@ class NavApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO find better fonts. LCD?
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-
+    //TODO find better fonts. LCD?
     ThemeData themeData = ThemeData(colorScheme: const ColorScheme.highContrastDark(), fontFamily: 'Red Hat Mono');
 
     TextStyle headTS = themeData.textTheme.titleMedium!.copyWith(fontSize: 20);

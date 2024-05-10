@@ -74,6 +74,8 @@ class WidgetDetails {
 }
 
 //TODO widget for web page.
+//TODO wind rose box
+//TODO rudder angle
 List<WidgetDetails> widgetDetails = [
   WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}), // This is the default Box.
   WidgetDetails(DepthBox.sid, 'Depth', (controller) {return DepthBox(controller, key: UniqueKey());}),
@@ -81,6 +83,7 @@ List<WidgetDetails> widgetDetails = [
   WidgetDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller) {return SpeedOverGroundBox(controller, key: UniqueKey());}),
   WidgetDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentBox(controller, key: UniqueKey());}),
   WidgetDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller) {return WindSpeedTrueBox(controller, key: UniqueKey());}),
+  WidgetDetails(WindRoseBox.sid, 'Wind Rose', (controller) {return WindRoseBox(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller) {return AutoPilotStatusBox(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller) {return AutoPilotControlBox(controller, key: UniqueKey());}),
 ];
