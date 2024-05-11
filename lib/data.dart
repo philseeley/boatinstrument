@@ -84,6 +84,7 @@ List<WidgetDetails> widgetDetails = [
   WidgetDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentBox(controller, key: UniqueKey());}),
   WidgetDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller) {return WindSpeedTrueBox(controller, key: UniqueKey());}),
   WidgetDetails(WindRoseBox.sid, 'Wind Rose', (controller) {return WindRoseBox(controller, key: UniqueKey());}),
+  WidgetDetails(WindRoseCHBox.sid, 'Wind Rose CH', (controller) {return WindRoseCHBox(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller) {return AutoPilotStatusBox(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller) {return AutoPilotControlBox(controller, key: UniqueKey());}),
 ];
