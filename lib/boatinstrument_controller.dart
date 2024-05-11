@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:boatinstrument/widgets/position_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 import 'package:circular_buffer/circular_buffer.dart';
