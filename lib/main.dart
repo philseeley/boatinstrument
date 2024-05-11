@@ -38,6 +38,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  static const Image _icon = Image(image: AssetImage('assets/icon.png'));
+
   BoatInstrumentController? controller;
   int _pageNum = 0;
 
@@ -58,7 +60,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     if(controller == null || !controller!.ready) {
-      return const Center(child: Text('Initialising')); //TODO splash screen and App Icon
+      return const Center(child: _icon); //TODO splash screen and App Icon
     }
 
     controller?.clear();
