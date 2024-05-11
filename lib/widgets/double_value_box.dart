@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
 class DepthBox extends _DoubleValueBox {
@@ -6,7 +7,7 @@ class DepthBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  DepthBox(controller, {super.key}) : super(controller, 'Depth', 'environment.depth.belowSurface', 1) {
+  DepthBox(controller, {super.key}) : super(controller, 'Depth', 'environment.depth.belowSurface') {
     _setup(_convertDepth, _depthUnits);
   }
 
@@ -44,7 +45,7 @@ class SpeedBox extends _SpeedBox {
 
 abstract class _SpeedBox extends _DoubleValueBox {
 
-  _SpeedBox(controller, title, path, {super.key}) : super(controller, title, path, 1) {
+  _SpeedBox(super.controller, super.title, super.path, {super.key}) {
     _setup(_convertSpeed, _speedUnits);
   }
 
@@ -84,7 +85,7 @@ class WindSpeedTrueBox extends _WindSpeedBox {
 
 abstract class _WindSpeedBox extends _DoubleValueBox {
 
-  _WindSpeedBox(controller, title, path, {super.key}) : super(controller, title, path, 1) {
+  _WindSpeedBox(super.controller, super.title, super.path, {super.key}) {
     _setup(_convertSpeed, _speedUnits);
   }
 
@@ -111,10 +112,11 @@ abstract class _DoubleValueBox extends BoxWidget {
   final String _title;
   final String _path;
   final int _precision;
+  final int _minLen;
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueBox(this._controller, this._title, this._path, this._precision, {super.key});
+  _DoubleValueBox(this._controller, this._title, this._path, {precision = 1, minLen =  2, super.key}): _precision = precision, _minLen = minLen;
 
   _setup(convert, units) {
     _convert = convert;
@@ -139,7 +141,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text('${widget._title} - ${widget._units()}', style: widget._controller.headTS),
-      Text(_displayValue.toStringAsFixed(widget._precision), style: widget._controller.infoTS)
+      Text(fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue), style: widget._controller.infoTS)
     ]);
   }
 

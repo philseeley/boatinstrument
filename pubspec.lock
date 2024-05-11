@@ -228,7 +228,7 @@ packages:
     source: sdk
     version: "0.0.0"
   format:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: format
       sha256: e2023adb214cd9550ad3d1e86cedf53bc406144cb76926d9d550fc29f0c271b5
