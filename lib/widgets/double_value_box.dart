@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
-class DepthBox extends _DoubleValueDisplay {
+class DepthBox extends _DoubleValueBox {
   static const String sid = 'depth';
   @override
   String get id => sid;
@@ -26,7 +26,7 @@ class DepthBox extends _DoubleValueDisplay {
   }
 }
 
-class SpeedOverGroundBox extends _SpeedDisplay {
+class SpeedOverGroundBox extends _SpeedBox {
   static const String sid = 'speed-over-ground';
   @override
   String get id => sid;
@@ -34,7 +34,7 @@ class SpeedOverGroundBox extends _SpeedDisplay {
   SpeedOverGroundBox(controller, {super.key}) : super(controller, 'SOG', 'navigation.speedOverGround');
 }
 
-class SpeedBox extends _SpeedDisplay {
+class SpeedBox extends _SpeedBox {
   static const String sid = 'speed-through-water';
   @override
   String get id => sid;
@@ -42,9 +42,9 @@ class SpeedBox extends _SpeedDisplay {
   SpeedBox(controller, {super.key}) : super(controller, 'Speed', 'navigation.speedThroughWater');
 }
 
-abstract class _SpeedDisplay extends _DoubleValueDisplay {
+abstract class _SpeedBox extends _DoubleValueBox {
 
-  _SpeedDisplay(controller, title, path, {super.key}) : super(controller, title, path, 1) {
+  _SpeedBox(controller, title, path, {super.key}) : super(controller, title, path, 1) {
     _setup(_convertSpeed, _speedUnits);
   }
 
@@ -66,7 +66,7 @@ abstract class _SpeedDisplay extends _DoubleValueDisplay {
   }
 }
 
-class WindSpeedApparentBox extends _WindSpeedDisplay {
+class WindSpeedApparentBox extends _WindSpeedBox {
   static const String sid = 'wind-speed-apparent';
   @override
   String get id => sid;
@@ -74,7 +74,7 @@ class WindSpeedApparentBox extends _WindSpeedDisplay {
   WindSpeedApparentBox(controller, {super.key}) : super(controller, 'AWS', 'environment.wind.speedApparent');
 }
 
-class WindSpeedTrueBox extends _WindSpeedDisplay {
+class WindSpeedTrueBox extends _WindSpeedBox {
   static const String sid = 'wind-speed-true';
   @override
   String get id => sid;
@@ -82,9 +82,9 @@ class WindSpeedTrueBox extends _WindSpeedDisplay {
   WindSpeedTrueBox(controller, {super.key}) : super(controller, 'TWS', 'environment.wind.speedTrue');
 }
 
-abstract class _WindSpeedDisplay extends _DoubleValueDisplay {
+abstract class _WindSpeedBox extends _DoubleValueBox {
 
-  _WindSpeedDisplay(controller, title, path, {super.key}) : super(controller, title, path, 1) {
+  _WindSpeedBox(controller, title, path, {super.key}) : super(controller, title, path, 1) {
     _setup(_convertSpeed, _speedUnits);
   }
 
@@ -106,7 +106,7 @@ abstract class _WindSpeedDisplay extends _DoubleValueDisplay {
   }
 }
 
-abstract class _DoubleValueDisplay extends BoxWidget {
+abstract class _DoubleValueBox extends BoxWidget {
   final BoatInstrumentController _controller;
   final String _title;
   final String _path;
@@ -114,7 +114,7 @@ abstract class _DoubleValueDisplay extends BoxWidget {
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueDisplay(this._controller, this._title, this._path, this._precision, {super.key});
+  _DoubleValueBox(this._controller, this._title, this._path, this._precision, {super.key});
 
   _setup(convert, units) {
     _convert = convert;
@@ -122,10 +122,10 @@ abstract class _DoubleValueDisplay extends BoxWidget {
   }
 
   @override
-  State<_DoubleValueDisplay> createState() => _DoubleValueDisplayState();
+  State<_DoubleValueBox> createState() => _DoubleValueBoxState();
 }
 
-class _DoubleValueDisplayState extends State<_DoubleValueDisplay> {
+class _DoubleValueBoxState extends State<_DoubleValueBox> {
   double? _value;
   double _displayValue = 0;
 
