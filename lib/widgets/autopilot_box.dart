@@ -8,7 +8,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 
 import '../authorization.dart';
 
-part 'autopilot.g.dart';
+part 'autopilot_box.g.dart';
 
 enum AutopilotState {
   standby('Standby'),

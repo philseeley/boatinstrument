@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'autopilot.dart';
+part of 'autopilot_box.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

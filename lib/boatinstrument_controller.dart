@@ -12,7 +12,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
-import 'package:boatinstrument/widgets/autopilot.dart';
+import 'package:boatinstrument/widgets/autopilot_box.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
