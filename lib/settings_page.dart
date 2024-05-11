@@ -167,7 +167,7 @@ class _SettingsState extends State<SettingsPage> {
   void _showLog () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return LogDisplay(widget._controller);
+      return const LogDisplay();
     }));
 
     setState(() {});

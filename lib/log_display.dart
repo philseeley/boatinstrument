@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
 class LogDisplay extends StatefulWidget {
-  final BoatInstrumentController _controller;
 
-  const LogDisplay(this._controller, {super.key});
+  const LogDisplay({super.key});
 
   @override
   State<LogDisplay> createState() => _LogDisplayState();
@@ -14,7 +13,7 @@ class _LogDisplayState extends State<LogDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> entries = List<String>.from(widget._controller.logBuffer);
+    List<String> entries = List<String>.from(CircularLogOutput.logBuffer);
 
     return Scaffold(
       appBar: AppBar(
@@ -27,7 +26,7 @@ class _LogDisplayState extends State<LogDisplay> {
           IconButton(icon: const Icon(Icons.delete_sweep),
               onPressed: () {
                 setState(() {
-                  widget._controller.clearLog();
+                  CircularLogOutput.clearLog();
                 });();
               }),
         ],

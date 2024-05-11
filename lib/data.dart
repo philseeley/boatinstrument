@@ -74,7 +74,6 @@ class WidgetDetails {
 }
 
 //TODO widget for web page.
-//TODO wind rose box
 //TODO rudder angle
 List<WidgetDetails> widgetDetails = [
   WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}), // This is the default Box.
@@ -90,14 +89,14 @@ List<WidgetDetails> widgetDetails = [
   WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller) {return AutoPilotControlBox(controller, key: UniqueKey());}),
 ];
 
-WidgetDetails getWidgetDetails(BoatInstrumentController controller, String id) {
+WidgetDetails getWidgetDetails(String id) {
   for(WidgetDetails wd in widgetDetails) {
     if(wd.id == id) {
       return wd;
     }
   }
 
-  controller.l.e('Unknown widget with ID $id', error: Exception('Unknown widget with ID $id'));
+  CircularLogger().e('Unknown widget with ID $id', error: Exception('Unknown widget with ID $id'));
   return widgetDetails[0];
 }
 

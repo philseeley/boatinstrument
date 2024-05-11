@@ -23,10 +23,11 @@ part 'data.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
 
-class CircularLogger extends LogOutput {
-  final CircularBuffer<String> _buffer;
+class CircularLogOutput extends LogOutput {
+  static final CircularBuffer<String> _buffer = CircularBuffer(100);
 
-  CircularLogger(this._buffer);
+  static List<String> get logBuffer => _buffer.toList();
+  static void clearLog() => _buffer.clear();
 
   @override
   void output(OutputEvent event) {
@@ -38,18 +39,33 @@ class CircularLogger extends LogOutput {
   }
 }
 
+class CircularLogger extends Logger {
+
+  CircularLogger() : super(
+        filter: ProductionFilter(),
+        output: CircularLogOutput(),
+        printer: PrettyPrinter(colors: false,
+            errorMethodCount: 1,
+            methodCount: 0,
+            noBoxingByDefault: true,
+            levelEmojis: {
+              Level.trace: "[T]",
+              Level.debug: "[D]",
+              Level.info: "[I]",
+              Level.warning: "[W]",
+              Level.error: "[E]",
+              Level.fatal: "[F]"
+            }));
+}
+
 class BoatInstrumentController {
-  final CircularBuffer<String> _buffer = CircularBuffer(100);
-  late final Logger l;
+  final CircularLogger l = CircularLogger();
   _Settings? _settings;
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
   final TextStyle headTS;
   final TextStyle infoTS;
-
-  List<String> get logBuffer => _buffer.toList();
-  void clearLog() => _buffer.clear();
 
   bool get ready => _settings != null;
 
@@ -61,20 +77,7 @@ class BoatInstrumentController {
   DepthUnits get depthUnits => _settings!.depthUnits;
   int get numOfPages => _settings!.pages.length;
 
-  BoatInstrumentController(this.headTS, this.infoTS) {
-    l = Logger(
-        filter: ProductionFilter(),
-        output: CircularLogger(_buffer),
-        printer: PrettyPrinter(colors: false, errorMethodCount: 1, methodCount: 0, noBoxingByDefault: true, levelEmojis: {
-          Level.trace: "[T]",
-          Level.debug: "[D]",
-          Level.info: "[I]",
-          Level.warning: "[W]",
-          Level.error: "[E]",
-          Level.fatal: "[F]"
-        })
-      );
-  }
+  BoatInstrumentController(this.headTS, this.infoTS);
 
   loadSettings() async {
     try {
@@ -137,7 +140,7 @@ class BoatInstrumentController {
         widgets.add(SizedBox(
             width: constraints.maxWidth * box.percentage,
             height: double.infinity,
-            child: DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: addWidget(getWidgetDetails(this, box.id).build(this)))));
+            child: DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: addWidget(getWidgetDetails(box.id).build(this)))));
       }
       return Row(children: widgets);
     });
