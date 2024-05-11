@@ -80,7 +80,7 @@ class _SettingsState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        actions: [
+        actions: [//TODO share as file or string.
           IconButton(icon: const Icon(Icons.notes),onPressed:  _showLog)
         ],
       ),

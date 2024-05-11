@@ -100,6 +100,29 @@ WidgetDetails getWidgetDetails(String id) {
   return widgetDetails[0];
 }
 
+PopupMenuItem<WidgetDetails> _widgetMenuEntry(String id) {
+  WidgetDetails wd = getWidgetDetails(id);
+  return PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description));
+}
+//TODO this needs work for the sub-menus.
+getWidgetMenus() {
+  List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [
+    _widgetMenuEntry(BlankBox.sid),
+    _widgetMenuEntry(DepthBox.sid),
+    _widgetMenuEntry(SpeedBox.sid),
+    _widgetMenuEntry(SpeedOverGroundBox.sid),
+    _widgetMenuEntry(WindSpeedApparentBox.sid),
+    _widgetMenuEntry(WindSpeedTrueBox.sid),
+    _widgetMenuEntry(WindRoseBox.sid),
+    _widgetMenuEntry(WindRoseCHBox.sid),
+    _widgetMenuEntry(PositionBox.sid),
+    _widgetMenuEntry(AutoPilotStatusBox.sid),
+    _widgetMenuEntry(AutoPilotControlBox.sid),
+  ];
+
+  return popupMenuEntries;
+}
+
 class Update {
   final String path;
   final dynamic value;

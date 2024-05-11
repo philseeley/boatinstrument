@@ -27,11 +27,6 @@ class _EditPageState extends State<_EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [];
-    for(WidgetDetails wd in widgetDetails) {
-      popupMenuEntries.add(PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description)));
-    }
-
     List<Widget> columns = [];
     List<double> columnsPercent = [];
 
@@ -82,7 +77,7 @@ class _EditPageState extends State<_EditPage> {
           PopupMenuButton boxWidgetMenu = PopupMenuButton(
             icon: const Icon(Icons.list, color: Colors.blue),
             itemBuilder: (BuildContext context) {
-              return popupMenuEntries;
+              return getWidgetMenus();
             },
             onSelected: (value) {
               setState(() {
