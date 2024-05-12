@@ -93,27 +93,29 @@ class _MainPageState extends State<MainPage> {
 
   void _movePage (DragEndDetails details) {
     if(details.primaryVelocity != 0.0) {
-      setState(() {
-        if (details.primaryVelocity! > 0.0) {
-          _pageNum = controller!.prevPageNum(_pageNum);
-        } else {
-          _pageNum = controller!.nextPageNum(_pageNum);
-        }
-      });
+      int newPage = 0;
+      if (details.primaryVelocity! > 0.0) {
+        newPage = controller!.prevPageNum(_pageNum);
+      } else {
+        newPage = controller!.nextPageNum(_pageNum);
+      }
+      if(newPage != _pageNum) {
+        setState(() {
+          _pageNum = newPage;
+        });
+      }
     }
   }
 
   void _showSnackBar (DragEndDetails details) {
     if(details.primaryVelocity != 0.0 && details.primaryVelocity! < 0.0) {
-      setState(() {
-        //TODO Would prefer a top bar.
-        SnackBar snackBar = SnackBar(
-          content: Text(controller!.pageName(_pageNum)),
-          action: SnackBarAction(label: 'Settings >', onPressed: showSettingsPage),
-        );
+      //TODO Would prefer a top bar.
+      SnackBar snackBar = SnackBar(
+        content: Text(controller!.pageName(_pageNum)),
+        action: SnackBarAction(label: 'Settings >', onPressed: showSettingsPage),
+      );
 
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      });
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 }
