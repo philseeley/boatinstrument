@@ -129,8 +129,8 @@ class BoatInstrumentController {
     _settings?._save();
   }
 
-  void showMessage(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  void showMessage(BuildContext context, String msg, {bool error = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: (error) ? Colors.orange : null, content: Text(msg)));
   }
 
   Widget _buildRow(_Row row) {

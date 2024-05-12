@@ -98,7 +98,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
       );
 
       if(response.statusCode != 200) {//TODO should be a constant for this
-        widget._controller.showMessage(context, response.reasonPhrase ?? '');
+        widget._controller.showMessage(context, response.reasonPhrase ?? '', error: true);
       }
     } catch (e) {
       widget._controller.l.e('Error Sending to WebSocket', error: e);
