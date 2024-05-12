@@ -4,6 +4,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 
 //TODO improve splash screen and App Icon
 //TODO check build for pi/ARM on Linux as cross compilation is not supported yet.
+//TODO do we want different pages for landscape and portrait?
 void main() {
   runApp(const NavApp());
 }
