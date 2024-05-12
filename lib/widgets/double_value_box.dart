@@ -140,6 +140,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      //TODO can we reduce the line spacing?
       Text('${widget._title} - ${widget._units()}', style: widget._controller.headTS),
       Text(fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue), style: widget._controller.infoTS)
     ]);

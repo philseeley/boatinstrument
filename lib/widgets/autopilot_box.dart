@@ -155,7 +155,8 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
       ));
     }
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons));
-
+    //TODO would a separate Lock slider for state and numbered/adjusting buttons be better?
+    //TODO Or separate these into two Boxes, but then how would the settings work??
     List<Widget> buttons = [Column(children: controlButtons)];
     if(_settings.enableLock && _locked) {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(

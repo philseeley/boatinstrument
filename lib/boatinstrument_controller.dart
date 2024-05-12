@@ -245,7 +245,7 @@ class BoatInstrumentController {
         paths.add(path);
       }
     }
-
+    //TODO is there an option to not get stale data?
     for(String path in paths) {
       subscribe.add({"path": path});
     }
@@ -276,7 +276,7 @@ class BoatInstrumentController {
     _networkTimer?.cancel();
     _networkTimer = Timer(const Duration(seconds: 20), connect);
   }
-
+  //TODO add callback when no data so boxes can clear their displays. Or do we want to showMessage or other overall visual clue?
   _processData(data) {
     _networkTimeout();
 

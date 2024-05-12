@@ -2,6 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
+//TODO improve splash screen and App Icon
+//TODO check build for pi/ARM on Linux as cross compilation is not supported yet.
 void main() {
   runApp(const NavApp());
 }
@@ -60,7 +62,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     if(controller == null || !controller!.ready) {
-      return const Center(child: _icon); //TODO splash screen and App Icon
+      return const Center(child: _icon);
     }
 
     controller?.clear();

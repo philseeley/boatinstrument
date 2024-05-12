@@ -67,7 +67,7 @@ class _SettingsState extends State<SettingsPage> {
 
     for(int p = 0; p < settings.pages.length; ++p) {
       _Page page = settings.pages[p];
-
+      //TODO allow re-ordering of pages through dragging.
       list.add(ListTile(
         leading: IconButton(icon: const Icon(Icons.edit), onPressed: () {_editPage(page);}),
         title: TextFormField(
