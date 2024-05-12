@@ -32,11 +32,11 @@ class WindRoseBox extends BoxWidget {
 class _WindRoseBoxState extends State<WindRoseBox> {
   double? _windAngleApparent;
   double? _windAngleTrue;
-  //TODO get/make proper images.
-  final Image _rose = const Image(image: AssetImage('assets/wind-rose.png'));
-  final Image _roseCH = const Image(image: AssetImage('assets/wind-rose-ch.png'));
-  final Image _apparentNeedle = const Image(color: Colors.red, image: AssetImage('assets/wind-needle.png'));
-  final Image _trueNeedle = const Image(color: Colors.yellow, image: AssetImage('assets/wind-needle.png'));
+  //TODO get/make proper images. Can these be vector images?
+  static const Image _rose = Image(image: AssetImage('assets/wind-rose.png'));
+  static const Image _roseCH = Image(image: AssetImage('assets/wind-rose-ch.png'));
+  static const Image _apparentNeedle = Image(color: Colors.red, image: AssetImage('assets/wind-needle.png'));
+  static const Image _trueNeedle = Image(color: Colors.yellow, image: AssetImage('assets/wind-needle.png'));
 
   @override
   void initState() {
