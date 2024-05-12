@@ -71,6 +71,9 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       depthUnits:
           $enumDecodeNullable(_$DepthUnitsEnumMap, json['depthUnits']) ??
               DepthUnits.m,
+      temperatureUnits: $enumDecodeNullable(
+              _$TemperatureUnitsEnumMap, json['temperatureUnits']) ??
+          TemperatureUnits.c,
       pages: (json['pages'] as List<dynamic>?)
               ?.map((e) => _Page.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -88,6 +91,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,
       'windSpeedUnits': _$SpeedUnitsEnumMap[instance.windSpeedUnits]!,
       'depthUnits': _$DepthUnitsEnumMap[instance.depthUnits]!,
+      'temperatureUnits': _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
       'pages': instance.pages,
       'widgetSettings': instance.widgetSettings,
     };
@@ -110,4 +114,9 @@ const _$DepthUnitsEnumMap = {
   DepthUnits.m: 'm',
   DepthUnits.ft: 'ft',
   DepthUnits.fa: 'fa',
+};
+
+const _$TemperatureUnitsEnumMap = {
+  TemperatureUnits.c: 'c',
+  TemperatureUnits.f: 'f',
 };

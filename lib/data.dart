@@ -232,7 +232,16 @@ enum DepthUnits {
   final String unit;
 
   const DepthUnits(this.displayName, this.unit);
+}
 
+enum TemperatureUnits {
+  c('Centigrade', 'C'),
+  f('Fahrenheit', 'F');
+
+  final String displayName;
+  final String unit;
+
+  const TemperatureUnits(this.displayName, this.unit);
 }
 
 @JsonSerializable()
@@ -246,6 +255,7 @@ class _Settings {
   SpeedUnits speedUnits;
   SpeedUnits windSpeedUnits;
   DepthUnits depthUnits;
+  TemperatureUnits temperatureUnits;
   late List<_Page> pages;
   late Map<String, dynamic> widgetSettings;
 
@@ -262,6 +272,7 @@ class _Settings {
     this.speedUnits = SpeedUnits.kts,
     this.windSpeedUnits = SpeedUnits.kts,
     this.depthUnits = DepthUnits.m,
+    this.temperatureUnits = TemperatureUnits.c,
     this.pages = const [],
     widgetSettings
   }) : widgetSettings = widgetSettings??{} {

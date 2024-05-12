@@ -51,20 +51,24 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       ListTile(
-          leading: const Text("Distance:  "),
+          leading: const Text("Distance:   "),
           title: _distanceMenu()
       ),
       ListTile(
-          leading: const Text("Speed:     "),
+          leading: const Text("Speed:      "),
           title: _speedMenu()
       ),
       ListTile(
-          leading: const Text("Wind Speed:"),
+          leading: const Text("Wind Speed: "),
           title: _windSpeedMenu()
       ),
       ListTile(
-          leading: const Text("Depth:     "),
+          leading: const Text("Depth:      "),
           title: _depthMenu()
+      ),
+      ListTile(
+          leading: const Text("Temperature:"),
+          title: _temperatureMenu()
       ),
       ListTile(
           leading: const Text('Pages:'),
@@ -165,6 +169,25 @@ class _SettingsState extends State<SettingsPage> {
       dropdownMenuEntries: l,
       onSelected: (value) {
         widget._controller._settings?.depthUnits = value!;
+      },
+    );
+
+    return menu;
+  }
+
+  DropdownMenu _temperatureMenu() {
+    List<DropdownMenuEntry<TemperatureUnits>> l = [];
+    for(var v in TemperatureUnits.values) {
+      l.add(DropdownMenuEntry<TemperatureUnits>(
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<TemperatureUnits>(
+      initialSelection: widget._controller._settings?.temperatureUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.temperatureUnits = value!;
       },
     );
 
