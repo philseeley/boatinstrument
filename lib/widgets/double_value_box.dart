@@ -2,6 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
+class SeaTemperatureBox extends _DoubleValueBox {
+  static const String sid = 'sea-temperature';
+  @override
+  String get id => sid;
+
+  SeaTemperatureBox(controller, {super.key}) : super(controller, 'Sea Temp', 'environment.water.temperature') {
+    _setup(_convertTemp, _tempUnits);
+  }
+
+  double _convertTemp(double temp) {
+    switch (_controller.temperatureUnits) {
+      case TemperatureUnits.c:
+        return temp - 273.15;
+      case TemperatureUnits.f:
+        return temp - 459.67;//TODO this isn't correct
+    }
+  }
+
+  String _tempUnits() {
+    return _controller.temperatureUnits.unit;
+  }
+}
+
+class CourseOverGroundBox extends _DoubleValueBox {
+  static const String sid = 'course-over-ground';
+  @override
+  String get id => sid;
+
+  CourseOverGroundBox(controller, {super.key}) : super(controller, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0) {
+    _setup(_convertCOG, _cogUnits);
+  }
+
+  double _convertCOG(double cog) {
+    return rad2Deg(cog) * 1.0;
+  }
+
+  String _cogUnits() {
+    return 'deg';
+  }
+}
+
 class DepthBox extends _DoubleValueBox {
   static const String sid = 'depth';
   @override

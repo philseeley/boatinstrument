@@ -85,6 +85,8 @@ List<WidgetDetails> widgetDetails = [
   WidgetDetails(WindRoseBox.sid, 'Wind Rose', (controller) {return WindRoseBox(controller, key: UniqueKey());}),
   WidgetDetails(WindRoseCHBox.sid, 'Wind Rose CH', (controller) {return WindRoseCHBox(controller, key: UniqueKey());}),
   WidgetDetails(PositionBox.sid, 'Position', (controller) {return PositionBox(controller, key: UniqueKey());}),
+  WidgetDetails(CourseOverGroundBox.sid, 'Course Over Ground', (controller) {return CourseOverGroundBox(controller, key: UniqueKey());}),
+  WidgetDetails(SeaTemperatureBox.sid, 'Sea Temperature', (controller) {return SeaTemperatureBox(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller) {return AutoPilotStatusBox(controller, key: UniqueKey());}),
   WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller) {return AutoPilotControlBox(controller, key: UniqueKey());}),
 ];
@@ -116,6 +118,8 @@ getWidgetMenus() {
     _widgetMenuEntry(WindRoseBox.sid),
     _widgetMenuEntry(WindRoseCHBox.sid),
     _widgetMenuEntry(PositionBox.sid),
+    _widgetMenuEntry(CourseOverGroundBox.sid),
+    _widgetMenuEntry(SeaTemperatureBox.sid),
     _widgetMenuEntry(AutoPilotStatusBox.sid),
     _widgetMenuEntry(AutoPilotControlBox.sid),
   ];

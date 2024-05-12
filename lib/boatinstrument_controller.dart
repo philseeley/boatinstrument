@@ -75,6 +75,7 @@ class BoatInstrumentController {
   SpeedUnits get speedUnits => _settings!.speedUnits;
   SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;
   DepthUnits get depthUnits => _settings!.depthUnits;
+  TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
   int get numOfPages => _settings!.pages.length;
 
   BoatInstrumentController(this.headTS, this.infoTS);
