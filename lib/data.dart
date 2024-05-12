@@ -241,6 +241,7 @@ class _Settings {
   int valueSmoothing;
   String signalkServer;
   bool wrapPages;
+  bool autoConfirmActions;
   DistanceUnits distanceUnits;
   SpeedUnits speedUnits;
   SpeedUnits windSpeedUnits;
@@ -256,6 +257,7 @@ class _Settings {
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
     this.wrapPages = true,
+    this.autoConfirmActions = false,
     this.distanceUnits = DistanceUnits.nm,
     this.speedUnits = SpeedUnits.kts,
     this.windSpeedUnits = SpeedUnits.kts,

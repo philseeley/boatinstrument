@@ -43,6 +43,13 @@ class _SettingsState extends State<SettingsPage> {
               settings.wrapPages = value;
             });
           }),
+      SwitchListTile(title: const Text("Auto confirm actions:"),
+          value: settings.autoConfirmActions,
+          onChanged: (bool value) {
+            setState(() {
+              settings.autoConfirmActions = value;
+            });
+          }),
       ListTile(
           leading: const Text("Distance:  "),
           title: _distanceMenu()

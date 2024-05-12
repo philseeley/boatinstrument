@@ -109,8 +109,11 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
     await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
   }
 
-  _setState(String state) async {
-    await _sendCommand("steering/autopilot/state", '{"value": "$state"}');
+  _setState(AutopilotState state) async {
+    if(await widget._controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
+      print('DONE');
+      await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
+    }
   }
 
   _unlock() {
@@ -150,7 +153,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
     List<Widget> stateButtons = [];
     for(AutopilotState state in AutopilotState.values) {
       stateButtons.add(ElevatedButton(
-          onPressed: disabled ? null : () {_setState(state.name);},
+          onPressed: disabled ? null : () {_setState(state);},
           child: Text(state.displayName),
       ));
     }
