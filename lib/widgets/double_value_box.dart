@@ -48,7 +48,7 @@ class DepthBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  DepthBox(controller, {super.key}) : super(controller, 'Depth', 'environment.depth.belowSurface') {
+  DepthBox(controller, {super.key}) : super(controller, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
     _setup(_convertDepth, _depthUnits);
   }
 
@@ -154,10 +154,12 @@ abstract class _DoubleValueBox extends BoxWidget {
   final String _path;
   final int _precision;
   final int _minLen;
+  final double? minValue;
+  final double? maxValue;
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueBox(this._controller, this._title, this._path, {precision = 1, minLen =  2, super.key}): _precision = precision, _minLen = minLen;
+  _DoubleValueBox(this._controller, this._title, this._path, {precision = 1, minLen =  2, this.minValue, this.maxValue, super.key}): _precision = precision, _minLen = minLen;
 
   _setup(convert, units) {
     _convert = convert;
@@ -170,7 +172,7 @@ abstract class _DoubleValueBox extends BoxWidget {
 
 class _DoubleValueBoxState extends State<_DoubleValueBox> {
   double? _value;
-  double _displayValue = 0;
+  double? _displayValue;
 
   @override
   void initState() {
@@ -180,18 +182,29 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
 
   @override
   Widget build(BuildContext context) {
+    String valueText = '-';
+    if(_displayValue != null) {
+      valueText = fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue!);
+    }
+
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       //TODO can we reduce the line spacing?
       Text('${widget._title} - ${widget._units()}', style: widget._controller.headTS),
-      Text(fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue), style: widget._controller.infoTS)
+      Text(valueText, style: widget._controller.infoTS)
     ]);
   }
 
   _processData(List<Update> updates) {
     try {
       double next = (updates[0].value as num).toDouble();
-      _value = averageDouble(_value??next, next);
-      _displayValue = widget._convert(_value!);
+
+      if((widget.minValue != null && next < widget.minValue!) ||
+         (widget.maxValue != null && next > widget.maxValue!)) {
+        _displayValue = null;
+      } else {
+        _value = averageDouble(_value ?? next, next);
+        _displayValue = widget._convert(_value!);
+      }
     } catch (e) {
       widget._controller.l.e("Error converting $updates", error: e);
     }

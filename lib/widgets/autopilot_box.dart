@@ -111,7 +111,6 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
 
   _setState(AutopilotState state) async {
     if(await widget._controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
-      print('DONE');
       await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
     }
   }
