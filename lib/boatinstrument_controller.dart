@@ -163,7 +163,10 @@ class BoatInstrumentController {
         widgets.add(SizedBox(
             width: constraints.maxWidth * box.percentage,
             height: double.infinity,
-            child: DecoratedBox(decoration: BoxDecoration(border: Border.all(color: Colors.white, width: 2)), child: addWidget(getWidgetDetails(box.id).build(this)))));
+            child: DecoratedBox(
+                position: DecorationPosition.foreground,
+                decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 2)),
+                child: addWidget(getWidgetDetails(box.id).build(this)))));
       }
       return Row(children: widgets);
     });
