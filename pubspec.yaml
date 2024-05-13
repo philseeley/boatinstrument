@@ -68,10 +68,7 @@ flutter:
   fonts:
     - family: Red Hat Mono
       fonts:
-#        - asset: fonts/RedHatMono-VariableFont_wght.ttf
         - asset: fonts/RedHatMono-Regular.ttf
-        - asset: fonts/RedHatMono-Bold.ttf
-          weight: 100
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
