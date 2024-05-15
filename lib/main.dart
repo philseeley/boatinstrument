@@ -21,8 +21,8 @@ class NavApp extends StatelessWidget {
     //TODO find better fonts. LCD?
     ThemeData themeData = ThemeData(colorScheme: const ColorScheme.highContrastDark(), fontFamily: 'Red Hat Mono');
 
-    TextStyle headTS = themeData.textTheme.titleMedium!.copyWith(fontSize: 20);
-    TextStyle infoTS = themeData.textTheme.bodyLarge!.copyWith(fontSize: 40);
+    TextStyle headTS = themeData.textTheme.titleMedium!.copyWith(height: 1.0, fontSize: 20);
+    TextStyle infoTS = themeData.textTheme.bodyLarge!.copyWith(height: 1.0, fontSize: 40);
 
     return MaterialApp(
       home: MainPage(headTS, infoTS),

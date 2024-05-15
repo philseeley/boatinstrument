@@ -188,7 +188,6 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      //TODO can we reduce the line spacing?
       Text('${widget._title} - ${widget._units()}', style: widget._controller.headTS),
       Text(valueText, style: widget._controller.infoTS)
     ]);
