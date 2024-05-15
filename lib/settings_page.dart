@@ -77,28 +77,13 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Temperature:"),
           title: _temperatureMenu()
       ),
-      ListTile(
-          leading: const Text('Pages:'),
-          title: IconButton(icon: const Icon(Icons.add), onPressed: _addPage,)
-      ),
     ];
 
-    for(int p = 0; p < settings.pages.length; ++p) {
-      _Page page = settings.pages[p];
-      //TODO allow re-ordering of pages through dragging.
-      list.add(ListTile(key: UniqueKey(),
-          leading: IconButton(icon: const Icon(Icons.edit), onPressed: () {_editPage(page);}),
-        title: TextFormField(
-            initialValue: page.name,
-            onChanged: (value) => page.name = value),
-        trailing: (p == 0) ? null : IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);})
-        ),
-      );
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
         actions: [//TODO share as file or string.
+          IconButton(icon: const Icon(Icons.web), onPressed: _editPages),
           IconButton(icon: const Icon(Icons.notes),onPressed:  _showLog)
         ],
       ),
@@ -206,8 +191,61 @@ class _SettingsState extends State<SettingsPage> {
         context, MaterialPageRoute(builder: (context) {
       return const LogDisplay();
     }));
+  }
 
-    setState(() {});
+  void _editPages () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return EditPagesPage(widget._controller);
+    }));
+  }
+}
+
+class EditPagesPage extends StatefulWidget {
+  final BoatInstrumentController _controller;
+
+  const EditPagesPage(this._controller, {super.key});
+
+  @override
+  createState() => _EditPagesState();
+}
+
+class _EditPagesState extends State<EditPagesPage> {
+
+  @override
+  Widget build(BuildContext context) {
+    _Settings settings = widget._controller._settings!;
+
+    List<Widget> pageList = [];
+    for(int p = 0; p < settings.pages.length; ++p) {
+      _Page page = settings.pages[p];
+
+      pageList.add(ListTile(key: UniqueKey(),
+          leading: IconButton(icon: const Icon(Icons.edit), onPressed: () {_editPage(page);}),
+          title: TextFormField(
+              initialValue: page.name,
+              onChanged: (value) => page.name = value),
+          trailing: (p == 0) ? null : IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);})
+      ));
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Pages"),
+          actions: [
+            IconButton(icon: const Icon(Icons.add),onPressed:  _addPage)
+          ],
+        ),
+        body: ReorderableListView(children: pageList, onReorder: (oldIndex, newIndex) {
+          setState(() {
+            if (oldIndex < newIndex) {
+              newIndex -= 1;
+            }
+            _Page p = settings.pages.removeAt(oldIndex);
+            settings.pages.insert(newIndex, p);
+          });
+        })
+    );
   }
 
   void _addPage() {
