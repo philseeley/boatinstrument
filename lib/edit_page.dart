@@ -25,6 +25,53 @@ class _EditPage extends StatefulWidget {
 
 class _EditPageState extends State<_EditPage> {
 
+  PopupMenuItem<WidgetDetails> _widgetMenuEntry(String id) {
+    WidgetDetails wd = getWidgetDetails(id);
+    return PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description));
+  }
+
+  PopupMenuItem<WidgetDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<WidgetDetails>> subMenuEntries) {
+    return PopupMenuItem(child: PopupMenuButton<WidgetDetails>(
+      tooltip: '',
+      shape: Border.all(color: Colors.grey),
+      itemBuilder: (context) {
+        return subMenuEntries;
+      },
+      onSelected: (value) {
+        setState(() {
+          box.id = value.id;
+        });
+      },
+      child: ListTile(title: Text(text), trailing: const Icon(Icons.arrow_right)),
+    ));
+  }
+
+  _getWidgetMenus(_Box box) {
+    List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [
+      _widgetMenuEntry(BlankBox.sid),
+      _widgetSubMenuEntry(box, 'Environment', [
+        _widgetMenuEntry(DepthBox.sid),
+        _widgetMenuEntry(SeaTemperatureBox.sid)]),
+      _widgetSubMenuEntry(box, 'Navigation', [
+        _widgetMenuEntry(CourseOverGroundBox.sid),
+        _widgetMenuEntry(SpeedOverGroundBox.sid),
+        _widgetMenuEntry(PositionBox.sid)]),
+      _widgetSubMenuEntry(box, 'Boat', [
+        _widgetMenuEntry(SpeedBox.sid)]),
+      _widgetSubMenuEntry(box, 'Wind', [
+        _widgetMenuEntry(WindSpeedApparentBox.sid),
+        _widgetMenuEntry(WindSpeedTrueBox.sid),
+        _widgetMenuEntry(WindRoseBox.sid),
+        _widgetMenuEntry(WindRoseCHBox.sid)]),
+      _widgetSubMenuEntry(box, 'Autopilot', [
+        _widgetMenuEntry(AutoPilotStatusBox.sid),
+        _widgetMenuEntry(AutoPilotControlBox.sid),
+        ]),
+    ];
+
+    return popupMenuEntries;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> columns = [];
@@ -76,8 +123,10 @@ class _EditPageState extends State<_EditPage> {
 
           PopupMenuButton boxWidgetMenu = PopupMenuButton(
             icon: const Icon(Icons.list, color: Colors.blue),
+            tooltip: 'Box Type',
+            shape: Border.all(color: Colors.grey),
             itemBuilder: (BuildContext context) {
-              return getWidgetMenus();
+              return _getWidgetMenus(box);
             },
             onSelected: (value) {
               setState(() {

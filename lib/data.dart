@@ -73,12 +73,12 @@ class WidgetDetails {
   WidgetDetails(this.id, this.description, this.build);
 }
 
-//TODO widget for web page.
+//TODO widget for web page. Can't find a WebView widget that works on macos so difficult to test.
 //TODO rudder angle
 List<WidgetDetails> widgetDetails = [
   WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}), // This is the default Box.
   WidgetDetails(DepthBox.sid, 'Depth', (controller) {return DepthBox(controller, key: UniqueKey());}),
-  WidgetDetails(SpeedBox.sid, 'Speed', (controller) {return SpeedBox(controller, key: UniqueKey());}),
+  WidgetDetails(SpeedBox.sid, 'Speed Through Water', (controller) {return SpeedBox(controller, key: UniqueKey());}),
   WidgetDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller) {return SpeedOverGroundBox(controller, key: UniqueKey());}),
   WidgetDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentBox(controller, key: UniqueKey());}),
   WidgetDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller) {return WindSpeedTrueBox(controller, key: UniqueKey());}),
@@ -100,31 +100,6 @@ WidgetDetails getWidgetDetails(String id) {
 
   CircularLogger().e('Unknown widget with ID $id', error: Exception('Unknown widget with ID $id'));
   return widgetDetails[0];
-}
-
-PopupMenuItem<WidgetDetails> _widgetMenuEntry(String id) {
-  WidgetDetails wd = getWidgetDetails(id);
-  return PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description));
-}
-//TODO this needs work for the sub-menus.
-getWidgetMenus() {
-  List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [
-    _widgetMenuEntry(BlankBox.sid),
-    _widgetMenuEntry(DepthBox.sid),
-    _widgetMenuEntry(SpeedBox.sid),
-    _widgetMenuEntry(SpeedOverGroundBox.sid),
-    _widgetMenuEntry(WindSpeedApparentBox.sid),
-    _widgetMenuEntry(WindSpeedTrueBox.sid),
-    _widgetMenuEntry(WindRoseBox.sid),
-    _widgetMenuEntry(WindRoseCHBox.sid),
-    _widgetMenuEntry(PositionBox.sid),
-    _widgetMenuEntry(CourseOverGroundBox.sid),
-    _widgetMenuEntry(SeaTemperatureBox.sid),
-    _widgetMenuEntry(AutoPilotStatusBox.sid),
-    _widgetMenuEntry(AutoPilotControlBox.sid),
-  ];
-
-  return popupMenuEntries;
 }
 
 class Update {

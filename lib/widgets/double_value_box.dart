@@ -187,6 +187,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
       valueText = fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue!);
     }
 
+    //TODO scale font with box.
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Text('${widget._title} - ${widget._units()}', style: widget._controller.headTS),
       Text(valueText, style: widget._controller.infoTS)

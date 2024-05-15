@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-//TODO improve splash screen and App Icon
 //TODO check build for pi/ARM on Linux as cross compilation is not supported yet.
 //TODO do we want different pages for landscape and portrait?
 //TODO does HDMI carry sound?
