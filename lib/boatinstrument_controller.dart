@@ -71,6 +71,7 @@ class BoatInstrumentController {
 
   String get signalkServer => _settings!.signalkServer;
   int get valueSmoothing => _settings!.valueSmoothing;
+  bool get keepAwake => _settings!.keepAwake;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   SpeedUnits get speedUnits => _settings!.speedUnits;
   SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;

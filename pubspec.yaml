@@ -42,6 +42,7 @@ dependencies:
   circular_buffer:
   resizable_widget: ^1.0.5
   latlong_formatter:
+  wakelock_plus:
 
 dev_dependencies:
   flutter_test:

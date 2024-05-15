@@ -43,6 +43,13 @@ class _SettingsState extends State<SettingsPage> {
               settings.wrapPages = value;
             });
           }),
+      SwitchListTile(title: const Text("Keep Screen Awake:"),
+          value: settings.keepAwake,
+          onChanged: (bool value) {
+            setState(() {
+              settings.keepAwake = value;
+            });
+          }),
       SwitchListTile(title: const Text("Auto confirm actions:"),
           value: settings.autoConfirmActions,
           onChanged: (bool value) {

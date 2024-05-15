@@ -254,6 +254,7 @@ class _Settings {
   int valueSmoothing;
   String signalkServer;
   bool wrapPages;
+  bool keepAwake;
   bool autoConfirmActions;
   DistanceUnits distanceUnits;
   SpeedUnits speedUnits;
@@ -265,12 +266,12 @@ class _Settings {
 
   static File? _store;
 
-  //TODO Add "always on display".
   _Settings({
     this.version = 0,
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
     this.wrapPages = true,
+    this.keepAwake = false,
     this.autoConfirmActions = false,
     this.distanceUnits = DistanceUnits.nm,
     this.speedUnits = SpeedUnits.kts,
