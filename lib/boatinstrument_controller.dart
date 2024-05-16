@@ -135,8 +135,8 @@ class BoatInstrumentController {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: (error) ? Colors.orange : null, content: Text(msg)));
   }
 
-  Future<bool> askToConfirm(BuildContext context, String question) async {
-    if(_settings!.autoConfirmActions) {
+  Future<bool> askToConfirm(BuildContext context, String question, {alwaysAsk = false}) async {
+    if(!alwaysAsk && _settings!.autoConfirmActions) {
       return true;
     }
 
@@ -146,6 +146,7 @@ class BoatInstrumentController {
       builder: (BuildContext context) {
         return AlertDialog(
             title: Text(question),
+            shape: Border.all(color: Colors.grey),
             actions: [
               TextButton(child: const Text('Cancel'), onPressed: () {Navigator.pop(context, false);}),
               TextButton(child: const Text('OK'), onPressed: () {Navigator.pop(context, true);}),

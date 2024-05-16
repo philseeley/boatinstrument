@@ -225,7 +225,10 @@ class _EditPagesState extends State<EditPagesPage> {
           title: TextFormField(
               initialValue: page.name,
               onChanged: (value) => page.name = value),
-          trailing: (p == 0) ? null : IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);})
+          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);}),
+            ReorderableDragStartListener(index: p, child: const Icon(Icons.drag_handle))
+          ])
       ));
     }
 
@@ -236,7 +239,7 @@ class _EditPagesState extends State<EditPagesPage> {
             IconButton(icon: const Icon(Icons.add),onPressed:  _addPage)
           ],
         ),
-        body: ReorderableListView(children: pageList, onReorder: (oldIndex, newIndex) {
+        body: ReorderableListView(buildDefaultDragHandles: false, children: pageList, onReorder: (oldIndex, newIndex) {
           setState(() {
             if (oldIndex < newIndex) {
               newIndex -= 1;
@@ -261,9 +264,14 @@ class _EditPagesState extends State<EditPagesPage> {
     }));
   }
 
-  void _deletePage(int papeNum) {
-    setState(() {
-      widget._controller._settings?.pages.removeAt(papeNum);
-    });
+  _deletePage(int papeNum) async {
+    if(await widget._controller.askToConfirm(context, 'Delete page "${widget._controller._settings?.pages[papeNum].name}"', alwaysAsk: true)) {
+      setState(() {
+        widget._controller._settings?.pages.removeAt(papeNum);
+        if (widget._controller._settings!.pages.isEmpty) {
+          widget._controller._settings?.pages.add(_Page._newPage());
+        }
+      });
+    }
   }
 }
