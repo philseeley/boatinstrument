@@ -40,6 +40,7 @@ class _EditPageState extends State<_EditPage> {
       onSelected: (value) {
         setState(() {
           box.id = value.id;
+          Navigator.pop(context);
         });
       },
       child: ListTile(title: Text(text), trailing: const Icon(Icons.arrow_right)),
