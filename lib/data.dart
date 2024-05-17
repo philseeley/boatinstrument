@@ -23,7 +23,10 @@ double averageDouble(double current, double next, { int smooth = 1 }) {
 abstract class BoxSettings {}
 
 abstract class BoxWidget extends StatefulWidget {
-  const BoxWidget({super.key});
+  final BoatInstrumentController controller;
+  final BoxConstraints constraints;
+
+  const BoxWidget(this.controller, this.constraints, {super.key});
 
   String get id;
 
@@ -39,9 +42,8 @@ abstract class BoxWidget extends StatefulWidget {
 }
 
 class BlankBox extends BoxWidget {
-  final BoatInstrumentController _controller;
 
-  const BlankBox(this._controller, {super.key});
+  const BlankBox(super.controller, super.constraints, {super.key});
 
   static const String sid = '_BLANK_';
   @override
@@ -56,7 +58,7 @@ class _BlankBoxState extends State<BlankBox> {
   @override
   void initState() {
     super.initState();
-    widget._controller.configure(widget);
+    widget.controller.configure(widget);
   }
 
   @override
@@ -68,7 +70,7 @@ class _BlankBoxState extends State<BlankBox> {
 class WidgetDetails {
   final String id;
   final String description;
-  final BoxWidget Function(BoatInstrumentController) build;
+  final BoxWidget Function(BoatInstrumentController, BoxConstraints constraints) build;
 
   WidgetDetails(this.id, this.description, this.build);
 }
@@ -76,19 +78,19 @@ class WidgetDetails {
 //TODO widget for web page. Can't find a WebView widget that works on macos so difficult to test.
 //TODO rudder angle
 List<WidgetDetails> widgetDetails = [
-  WidgetDetails(BlankBox.sid, 'Blank', (controller) {return BlankBox(controller, key: UniqueKey());}), // This is the default Box.
-  WidgetDetails(DepthBox.sid, 'Depth', (controller) {return DepthBox(controller, key: UniqueKey());}),
-  WidgetDetails(SpeedBox.sid, 'Speed Through Water', (controller) {return SpeedBox(controller, key: UniqueKey());}),
-  WidgetDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller) {return SpeedOverGroundBox(controller, key: UniqueKey());}),
-  WidgetDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller) {return WindSpeedApparentBox(controller, key: UniqueKey());}),
-  WidgetDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller) {return WindSpeedTrueBox(controller, key: UniqueKey());}),
-  WidgetDetails(WindRoseBox.sid, 'Wind Rose', (controller) {return WindRoseBox(controller, key: UniqueKey());}),
-  WidgetDetails(WindRoseCHBox.sid, 'Wind Rose CH', (controller) {return WindRoseCHBox(controller, key: UniqueKey());}),
-  WidgetDetails(PositionBox.sid, 'Position', (controller) {return PositionBox(controller, key: UniqueKey());}),
-  WidgetDetails(CourseOverGroundBox.sid, 'Course Over Ground', (controller) {return CourseOverGroundBox(controller, key: UniqueKey());}),
-  WidgetDetails(SeaTemperatureBox.sid, 'Sea Temperature', (controller) {return SeaTemperatureBox(controller, key: UniqueKey());}),
-  WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller) {return AutoPilotStatusBox(controller, key: UniqueKey());}),
-  WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller) {return AutoPilotControlBox(controller, key: UniqueKey());}),
+  WidgetDetails(BlankBox.sid, 'Blank', (controller, constraints) {return BlankBox(controller, constraints, key: UniqueKey());}), // This is the default Box.
+  WidgetDetails(DepthBox.sid, 'Depth', (controller, constraints) {return DepthBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(SpeedBox.sid, 'Speed Through Water', (controller, constraints) {return SpeedBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller, constraints) {return SpeedOverGroundBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller, constraints) {return WindSpeedApparentBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller, constraints) {return WindSpeedTrueBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(WindRoseBox.sid, 'Wind Rose', (controller, constraints) {return WindRoseBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(WindRoseCHBox.sid, 'Wind Rose CH', (controller, constraints) {return WindRoseCHBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(PositionBox.sid, 'Position', (controller, constraints) {return PositionBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(CourseOverGroundBox.sid, 'Course Over Ground', (controller, constraints) {return CourseOverGroundBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(SeaTemperatureBox.sid, 'Sea Temperature', (controller, constraints) {return SeaTemperatureBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller, constraints) {return AutoPilotStatusBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller, constraints) {return AutoPilotControlBox(controller, constraints, key: UniqueKey());}),
 ];
 
 WidgetDetails getWidgetDetails(String id) {

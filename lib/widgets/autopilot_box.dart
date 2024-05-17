@@ -38,10 +38,9 @@ class _Settings extends BoxSettings {
 
 class AutoPilotControlBox extends BoxWidget {
 
-  final BoatInstrumentController _controller;
   _Settings _editSettings = _Settings();
 
-  AutoPilotControlBox(this._controller, {super.key});
+  AutoPilotControlBox(super._controller, super._constraints, {super.key});
 
   @override
   State<AutoPilotControlBox> createState() => _AutoPilotControlState();
@@ -56,7 +55,7 @@ class AutoPilotControlBox extends BoxWidget {
   @override
   Widget getSettingsWidget(Map<String, dynamic> json) {
     _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(_controller, _editSettings);
+    return _SettingsWidget(super.controller, _editSettings);
   }
 
   @override
@@ -73,7 +72,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget._controller.configure(widget));
+    _settings = _$SettingsFromJson(widget.controller.configure(widget));
   }
 
   _sendCommand(String path, String params) async {
@@ -84,7 +83,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
 
     try {
       Uri uri = Uri.http(
-          widget._controller.signalkServer,
+          widget.controller.signalkServer,
           '/signalk/v1/api/vessels/self/$path');
 
       http.Response response = await http.put(
@@ -98,10 +97,10 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
       );
 
       if(response.statusCode != 200) {//TODO should be a constant for this
-        widget._controller.showMessage(context, response.reasonPhrase ?? '', error: true);
+        widget.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
       }
     } catch (e) {
-      widget._controller.l.e('Error Sending to WebSocket', error: e);
+      widget.controller.l.e('Error Sending to WebSocket', error: e);
     }
   }
 
@@ -110,7 +109,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   }
 
   _setState(AutopilotState state) async {
-    if(await widget._controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
+    if(await widget.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
       await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
     }
   }
@@ -253,9 +252,7 @@ class _SettingsState extends State<_SettingsWidget> {
 class AutoPilotStatusBox extends BoxWidget {
   static const String sid = 'autopilot-display';
 
-  final BoatInstrumentController controller;
-
-  const AutoPilotStatusBox(this.controller, {super.key});
+  const AutoPilotStatusBox(super._controller, super._constraints, {super.key});
 
   @override
   State<AutoPilotStatusBox> createState() => _AutoPilotDisplayState();

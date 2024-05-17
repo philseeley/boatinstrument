@@ -8,7 +8,7 @@ enum WindRoseType {
 }
 
 class WindRoseCHBox extends WindRoseBox {
-  const WindRoseCHBox(super._controller, {super.type = WindRoseType.closeHaul, super.key});
+  const WindRoseCHBox(super._controller, super._constraints, {super.type = WindRoseType.closeHaul, super.key});
 
   static String sid = 'wind-rose-ch';
   @override
@@ -16,10 +16,9 @@ class WindRoseCHBox extends WindRoseBox {
 }
 
 class WindRoseBox extends BoxWidget {
-  final BoatInstrumentController _controller;
   final WindRoseType _type;
 
-  const WindRoseBox(this._controller, {type = WindRoseType.normal, super.key}) : _type = type;
+  const WindRoseBox(super._controller, super._constraints, {type = WindRoseType.normal, super.key}) : _type = type;
 
   @override
   State<WindRoseBox> createState() => _WindRoseBoxState();
@@ -41,7 +40,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   @override
   void initState() {
     super.initState();
-    widget._controller.configure(widget, onUpdate: _processData, paths: {
+    widget.controller.configure(widget, onUpdate: _processData, paths: {
       'environment.wind.angleApparent',
       'environment.wind.angleTrueWater'
     });
@@ -80,17 +79,17 @@ class _WindRoseBoxState extends State<WindRoseBox> {
             double latest = (u.value as num).toDouble();
             _windAngleApparent = averageAngle(
                 _windAngleApparent ?? latest, latest,
-                smooth: widget._controller.valueSmoothing);
+                smooth: widget.controller.valueSmoothing);
             break;
           case 'environment.wind.angleTrueWater':
             double latest = (u.value as num).toDouble();
             _windAngleTrue = averageAngle(
                 _windAngleTrue ?? latest, latest,
-                smooth: widget._controller.valueSmoothing);
+                smooth: widget.controller.valueSmoothing);
             break;
         }
       } catch (e) {
-        widget._controller.l.e("Error converting $u", error: e);
+        widget.controller.l.e("Error converting $u", error: e);
       }
 
       if (mounted) {

@@ -135,7 +135,7 @@ class BoatInstrumentController {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: (error) ? Colors.orange : null, content: Text(msg)));
   }
 
-  Future<bool> askToConfirm(BuildContext context, String question, {alwaysAsk = false}) async {
+  Future<bool> askToConfirm(BuildContext context, String question, {bool alwaysAsk = false}) async {
     if(!alwaysAsk && _settings!.autoConfirmActions) {
       return true;
     }
@@ -168,7 +168,9 @@ class BoatInstrumentController {
             child: DecoratedBox(
                 position: DecorationPosition.foreground,
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 2)),
-                child: addWidget(getWidgetDetails(box.id).build(this)))));
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return addWidget(getWidgetDetails(box.id).build(this, constraints));
+                }))));
       }
       return Row(children: widgets);
     });

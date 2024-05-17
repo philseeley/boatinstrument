@@ -3,9 +3,8 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:latlong_formatter/latlong_formatter.dart';
 
 class PositionBox extends BoxWidget {
-  final BoatInstrumentController _controller;
 
-  const PositionBox(this._controller, {super.key});
+  const PositionBox(super._controller, super._constraints, {super.key});
 
   @override
   State<PositionBox> createState() => _PositionBoxState();
@@ -23,16 +22,16 @@ class _PositionBoxState extends State<PositionBox> {
   @override
   void initState() {
     super.initState();
-    widget._controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'});
+    widget.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'});
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Text('Position', style: widget._controller.headTS),
+      Text('Position', style: widget.controller.headTS),
       Text((_latitude == null && _longitude == null) ?
         '--- --.--- -\n--- --.--- -' :
-        llf.format(LatLong(_latitude!, _longitude!)), style: widget._controller.infoTS)
+        llf.format(LatLong(_latitude!, _longitude!)), style: widget.controller.infoTS)
     ]);
   }
 
@@ -41,7 +40,7 @@ class _PositionBoxState extends State<PositionBox> {
       _latitude = updates[0].value['latitude'];
       _longitude = updates[0].value['longitude'];
     } catch (e) {
-      widget._controller.l.e("Error converting $updates", error: e);
+      widget.controller.l.e("Error converting $updates", error: e);
     }
 
     if(mounted) {

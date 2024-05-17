@@ -119,7 +119,9 @@ class _EditPageState extends State<_EditPage> {
             sButtons.add(IconButton(onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.keyboard_arrow_down, color: Colors.orange)));
           }
 
-          BoxWidget boxWidget = getWidgetDetails(box.id).build(widget._controller);
+          LayoutBuilder layoutBoxWidget = LayoutBuilder(builder: (context, constraints) {
+            return getWidgetDetails(box.id).build(widget._controller, constraints);
+          });
 
           PopupMenuButton boxWidgetMenu = PopupMenuButton(
             icon: const Icon(Icons.list, color: Colors.blue),
@@ -136,9 +138,11 @@ class _EditPageState extends State<_EditPage> {
           );
 
           List<Widget> stack = [
-            boxWidget,
+            layoutBoxWidget,
             boxWidgetMenu
           ];
+
+          BoxWidget boxWidget = getWidgetDetails(box.id).build(widget._controller, const BoxConstraints(maxWidth: 100.0, maxHeight: 100.0));
 
           if(boxWidget.hasSettings) {
             stack.add(Positioned(top: 0, right: 0, child: IconButton(onPressed: () {_showSettingsPage(boxWidget);}, icon: const Icon(Icons.settings, color: Colors.blue))));
