@@ -188,19 +188,18 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
       valueText = fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue!);
     }
 
-    // We use this to determine the relationship between the font height and width, as we can only
-    // control the font size by its height.
-    Size txtSize = _textSize(valueText, widget.controller.infoTS);
-    double aspectRatio = txtSize.width / txtSize.height;
-
     const double pad = 5.0;
 
     // Assume the font height is the height of the available Box.
     double fontSize = widget.constraints.maxHeight-widget.controller.headTS.fontSize!-(3*pad) - 1.0;
 
+    // We use this to determine the relationship between the font height and width, as we can only
+    // control the font size by its height.
+    Size txtSize = _textSize(valueText, widget.controller.infoTS.copyWith(fontSize: fontSize));
+
     // Check if we're constrained by width.
-    if((fontSize*aspectRatio) > (widget.constraints.maxWidth-(2*pad))) {
-      fontSize = ((widget.constraints.maxWidth-(2*pad)) / aspectRatio) - 20.0;
+    if(txtSize.width > (widget.constraints.maxWidth-(2*pad))) {
+      fontSize = (fontSize * ((widget.constraints.maxWidth-(2*pad)) / txtSize.width)) * 0.9;
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
