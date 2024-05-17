@@ -200,7 +200,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
 
     // Check if we're constrained by width.
     if((fontSize*aspectRatio) > (widget.constraints.maxWidth-(2*pad))) {
-      fontSize = ((widget.constraints.maxWidth-(2*pad)) / aspectRatio) - 1.0;
+      fontSize = ((widget.constraints.maxWidth-(2*pad)) / aspectRatio) - 20.0;
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
