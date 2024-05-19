@@ -191,20 +191,21 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
     const double pad = 5.0;
 
     // Assume the font height is the height of the available Box.
-    double fontSize = widget.constraints.maxHeight-widget.controller.headTS.fontSize!-(3*pad) - 1.0;
+    double fontSize = widget.constraints.maxHeight-widget.controller.headTS.fontSize! - pad - 1.0;
 
     // We use this to determine the relationship between the font height and width, as we can only
     // control the font size by its height.
     Size txtSize = _textSize(valueText, widget.controller.infoTS.copyWith(fontSize: fontSize));
 
     // Check if we're constrained by width.
-    if(txtSize.width > (widget.constraints.maxWidth-(2*pad))) {
-      fontSize = (fontSize * ((widget.constraints.maxWidth-(2*pad)) / txtSize.width)) * 0.9;
+    if(txtSize.width > (widget.constraints.maxWidth)) {
+      fontSize = (fontSize * (widget.constraints.maxWidth / txtSize.width)) - 1.0;
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} - ${widget._units()}', style: widget.controller.headTS))]),
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child:  Text(valueText, style: widget.controller.infoTS.copyWith(fontSize: fontSize)))))
+      // We need to disable the device text scaling as this interferes with our text scaling.
+      Expanded(child: Center(child: Text(valueText, textScaler: TextScaler.noScaling,  style: widget.controller.infoTS.copyWith(fontSize: fontSize))))
     ]);
   }
 
