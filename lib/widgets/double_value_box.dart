@@ -17,7 +17,7 @@ class SeaTemperatureBox extends _DoubleValueBox {
       case TemperatureUnits.c:
         return temp - 273.15;
       case TemperatureUnits.f:
-        return temp - 459.67;//TODO this isn't correct
+        return (temp - 273.15) * 9/5 + 32;
     }
   }
 
@@ -101,7 +101,7 @@ abstract class _SpeedBox extends _DoubleValueBox {
       case SpeedUnits.mph:
         return speed * 2.236936;
       case SpeedUnits.kts:
-        return speed * 1.943844; //TODO or uk kts 1.942603
+        return speed * 1.943844;
     }
   }
 
@@ -141,7 +141,7 @@ abstract class _WindSpeedBox extends _DoubleValueBox {
       case SpeedUnits.mph:
         return speed * 2.236936;
       case SpeedUnits.kts:
-        return speed * 1.943844; //TODO or uk kts 1.942603
+        return speed * 1.943844;
     }
   }
 
