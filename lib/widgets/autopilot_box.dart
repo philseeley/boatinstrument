@@ -331,10 +331,10 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
       }
     }
 
-    const rudderStr = '===================='; // 40 degrees
+    const rudderStr = '============================================='; // 90 degrees
     double rudderAngle = _rudderAngle??0;
     int rudderAngleLen = rad2Deg(rudderAngle.abs());
-    rudderAngleLen = ((rudderAngleLen.toDouble()/40.0)*rudderStr.length).toInt();
+    rudderAngleLen = ((rudderAngleLen.toDouble()/90.0)*rudderStr.length).toInt();
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
