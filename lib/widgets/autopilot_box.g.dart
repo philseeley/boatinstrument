@@ -9,7 +9,7 @@ part of 'autopilot_box.dart';
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       enableLock: json['enableLock'] as bool? ?? true,
       lockSeconds: json['lockSeconds'] as int? ?? 3,
-      clientID: json['clientID'] as String? ?? 'boatinstrument-autopilot-1234',
+      clientID: json['clientID'],
       authToken: json['authToken'] as String? ?? '',
     );
 

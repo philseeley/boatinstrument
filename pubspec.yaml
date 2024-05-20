@@ -43,6 +43,7 @@ dependencies:
   resizable_widget: ^1.0.5
   latlong_formatter:
   wakelock_plus:
+  nanoid:
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:nanoid/nanoid.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -31,9 +32,9 @@ class _Settings extends BoxSettings {
   _Settings({
     this.enableLock = true,
     this.lockSeconds = 3,
-    this.clientID = 'boatinstrument-autopilot-1234',//TODO GUID
+    clientID,
     this.authToken = ''
-  });
+  }) : clientID = clientID??'boatinstrument-autopilot-${customAlphabet('0123456789', 4)}';
 }
 
 class AutoPilotControlBox extends BoxWidget {
