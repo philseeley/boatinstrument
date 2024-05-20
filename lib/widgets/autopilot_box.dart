@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -97,7 +98,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
           body: params
       );
 
-      if(response.statusCode != 200) {//TODO should be a constant for this
+      if(response.statusCode != HttpStatus.ok) {
         widget.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
       }
     } catch (e) {
