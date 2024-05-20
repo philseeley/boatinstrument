@@ -44,6 +44,8 @@ dependencies:
   latlong_formatter:
   wakelock_plus:
   nanoid:
+  share:
+  file_picker:
 
 dev_dependencies:
   flutter_test:

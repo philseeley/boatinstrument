@@ -94,8 +94,10 @@ class _SettingsState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        actions: [//TODO share as file or string.
+        actions: [
           IconButton(icon: const Icon(Icons.web), onPressed: _editPages),
+          IconButton(icon: const Icon(Icons.share), onPressed: _share),
+          IconButton(icon: const Icon(Icons.file_open), onPressed: _import),
           IconButton(icon: const Icon(Icons.notes),onPressed:  _showLog)
         ],
       ),
@@ -222,6 +224,24 @@ class _SettingsState extends State<SettingsPage> {
         context, MaterialPageRoute(builder: (context) {
       return const LogDisplay();
     }));
+  }
+
+  void _share () async {
+    await Share.shareFiles([widget._controller._settings!.fileName]);
+  }
+
+  void _import () async {
+    FilePickerResult? fpResult = await FilePicker.platform.pickFiles();
+
+    if(fpResult != null) {
+      try {
+        File f = File(fpResult.files.single.path!);
+        widget._controller._settings = await _Settings.readSettings(f);
+        setState(() {});
+      } catch (e) {
+        widget._controller.l.e('Failed to import settings', error: e);
+      }
+    }
   }
 
   void _editPages () async {

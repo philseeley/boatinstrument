@@ -255,6 +255,8 @@ class _Settings {
 
   static File? _store;
 
+  String get fileName => _store!.absolute.path;
+
   _Settings({
     this.version = 0,
     this.valueSmoothing = 1,
@@ -282,13 +284,16 @@ class _Settings {
 
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
 
-  static load() async {
+  static Future<_Settings> load() async {
     Directory directory = await path_provider.getApplicationDocumentsDirectory();
     _store = File('${directory.path}/settings.json');
 
-    String? s = _store?.readAsStringSync();
-    dynamic data = json.decode(s ?? "");
+    return readSettings(_store!);
+  }
 
+  static readSettings(File f) async {
+    String s = f.readAsStringSync();
+    dynamic data = json.decode(s);
     return _Settings.fromJson(data);
   }
 
