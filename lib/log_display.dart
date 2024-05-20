@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:share/share.dart';
 
 class LogDisplay extends StatefulWidget {
 
@@ -18,7 +19,12 @@ class _LogDisplayState extends State<LogDisplay> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Log"),
-        actions: [//TODO share button.
+        actions: [
+          IconButton(icon: const Icon(Icons.share),
+              onPressed: () {
+                _share(entries);
+              },
+          ),
           IconButton(icon: const Icon(Icons.refresh),
               onPressed: () {
                 setState(() {});();
@@ -38,5 +44,9 @@ class _LogDisplayState extends State<LogDisplay> {
         }
       )
     );
+  }
+
+  void _share (List<String> entries) async {
+    await Share.share(entries.join('\n'));
   }
 }
