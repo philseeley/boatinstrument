@@ -36,6 +36,18 @@ class _SettingsState extends State<SettingsPage> {
               initialValue: settings.signalkServer,
               onChanged: (value) => settings.signalkServer = value)
       ),
+      ListTile(
+          leading: const Text("Signalk Subscription Policy:"),
+          title: _signalkPolicyMenu()
+      ),
+      ListTile(
+          leading: const Text("Signalk Subscription Min Period:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: settings.signalkMinPeriod.toString(),
+              onChanged: (value) => settings.signalkMinPeriod = int.parse(value))
+      ),
       SwitchListTile(title: const Text("Wraparound page change:"),
           value: settings.wrapPages,
           onChanged: (bool value) {
@@ -89,6 +101,25 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
+  }
+
+  DropdownMenu _signalkPolicyMenu() {
+    List<DropdownMenuEntry<SignalkPolicy>> l = [];
+    for(var v in SignalkPolicy.values) {
+      l.add(DropdownMenuEntry<SignalkPolicy>(
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<SignalkPolicy>(
+      initialSelection: widget._controller._settings?.signalkPolicy,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.signalkPolicy = value!;
+      },
+    );
+
+    return menu;
   }
 
   DropdownMenu _distanceMenu() {

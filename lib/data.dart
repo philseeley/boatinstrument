@@ -180,6 +180,16 @@ class _Page {
   static _Page _newPage() => _Page('Page Name', [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1)], 1)]);
 }
 
+enum SignalkPolicy {
+  instant('Instant'),
+  ideal('Ideal'),
+  fixed('Fixed');
+
+  final String displayName;
+
+  const SignalkPolicy(this.displayName);
+}
+
 enum DistanceUnits {
   meters('Meters', 'm'),
   km('Kilometers', 'km'),
@@ -230,6 +240,8 @@ class _Settings {
   int version;
   int valueSmoothing;
   String signalkServer;
+  SignalkPolicy signalkPolicy;
+  int signalkMinPeriod;
   bool wrapPages;
   bool keepAwake;
   bool autoConfirmActions;
@@ -247,6 +259,8 @@ class _Settings {
     this.version = 0,
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
+    this.signalkPolicy = SignalkPolicy.instant,
+    this.signalkMinPeriod = 1000,
     this.wrapPages = true,
     this.keepAwake = false,
     this.autoConfirmActions = false,

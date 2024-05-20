@@ -5,6 +5,7 @@ import 'dart:math' as m;
 
 import 'package:boatinstrument/widgets/position_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
@@ -275,9 +276,13 @@ class BoatInstrumentController {
         paths.add(path);
       }
     }
-    //TODO is there an option to not get stale data?
+
     for(String path in paths) {
-      subscribe.add({"path": path});
+      subscribe.add({
+        "path": path,
+        "policy": _settings!.signalkPolicy.name,
+        "minPeriod": _settings!.signalkMinPeriod.toString()
+        });
     }
 
     // Unsubscribe from all updates first.

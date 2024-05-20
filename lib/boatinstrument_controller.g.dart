@@ -57,6 +57,10 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       valueSmoothing: json['valueSmoothing'] as int? ?? 1,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
+      signalkPolicy:
+          $enumDecodeNullable(_$SignalkPolicyEnumMap, json['signalkPolicy']) ??
+              SignalkPolicy.instant,
+      signalkMinPeriod: json['signalkMinPeriod'] as int? ?? 1000,
       wrapPages: json['wrapPages'] as bool? ?? true,
       keepAwake: json['keepAwake'] as bool? ?? false,
       autoConfirmActions: json['autoConfirmActions'] as bool? ?? false,
@@ -86,6 +90,8 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
       'valueSmoothing': instance.valueSmoothing,
       'signalkServer': instance.signalkServer,
+      'signalkPolicy': _$SignalkPolicyEnumMap[instance.signalkPolicy]!,
+      'signalkMinPeriod': instance.signalkMinPeriod,
       'wrapPages': instance.wrapPages,
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,
@@ -97,6 +103,12 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'pages': instance.pages,
       'widgetSettings': instance.widgetSettings,
     };
+
+const _$SignalkPolicyEnumMap = {
+  SignalkPolicy.instant: 'instant',
+  SignalkPolicy.ideal: 'ideal',
+  SignalkPolicy.fixed: 'fixed',
+};
 
 const _$DistanceUnitsEnumMap = {
   DistanceUnits.meters: 'meters',
