@@ -288,7 +288,7 @@ class _Settings {
     Directory directory = await path_provider.getApplicationDocumentsDirectory();
     _store = File('${directory.path}/settings.json');
 
-    return readSettings(_store!);
+    return await readSettings(_store!);
   }
 
   static readSettings(File f) async {
