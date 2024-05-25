@@ -36,39 +36,40 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   static const Image _icon = Image(image: AssetImage('assets/icon.png'));
 
-  BoatInstrumentController? controller;
+  late final ThemeProvider _themeProvider;
+
+  BoatInstrumentController controller = BoatInstrumentController();
   int _pageNum = 0;
 
   @override
   void initState() {
     super.initState();
+    _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     _configure();
   }
 
   _configure () async {
-    controller = BoatInstrumentController();
-    await controller?.loadSettings();
-    await controller?.connect();
+    await controller.loadSettings();
+    await controller.connect();
 
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    themeProvider.setDarkMode(controller!.darkMode);
+    _themeProvider.setDarkMode(controller.darkMode);
   }
 
   @override
   Widget build(BuildContext context) {
-    if(controller == null || !controller!.ready) {
+    if(!controller.ready) {
       return const Center(child: _icon);
     }
 
-    WakelockPlus.toggle(enable: controller!.keepAwake);
+    WakelockPlus.toggle(enable: controller.keepAwake);
 
-    controller?.clear();
+    controller.clear();
 
     return Scaffold(
       body: GestureDetector(
         onHorizontalDragEnd: _movePage,
         onVerticalDragEnd: _showSnackBar,
-        child: controller?.buildPage(_pageNum),
+        child: controller.buildPage(_pageNum),
       ),
     ); //DragGestureRecognizer
   }
@@ -76,14 +77,14 @@ class _MainPageState extends State<MainPage> {
   showEditPagesPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return EditPagesPage(controller!);
+      return EditPagesPage(controller);
     }));
 
-    controller?.save();
+    controller.save();
 
     setState(() {
-      if(_pageNum >= controller!.numOfPages) {
-        _pageNum = controller!.numOfPages-1;
+      if(_pageNum >= controller.numOfPages) {
+        _pageNum = controller.numOfPages-1;
       }
     });
   }
@@ -92,9 +93,9 @@ class _MainPageState extends State<MainPage> {
     if(details.primaryVelocity != 0.0) {
       int newPage = 0;
       if (details.primaryVelocity! > 0.0) {
-        newPage = controller!.prevPageNum(_pageNum);
+        newPage = controller.prevPageNum(_pageNum);
       } else {
-        newPage = controller!.nextPageNum(_pageNum);
+        newPage = controller.nextPageNum(_pageNum);
       }
       if(newPage != _pageNum) {
         setState(() {
@@ -102,7 +103,7 @@ class _MainPageState extends State<MainPage> {
         });
 
         SnackBar snackBar = SnackBar(
-          content: Text(controller!.pageName(_pageNum)),
+          content: Text(controller.pageName(_pageNum)),
           duration: const Duration(milliseconds: 500),
         );
 
@@ -115,7 +116,7 @@ class _MainPageState extends State<MainPage> {
     if(details.primaryVelocity != 0.0 && details.primaryVelocity! < 0.0) {
       //TODO Would prefer a top bar.
       SnackBar snackBar = SnackBar(
-        content: Text(controller!.pageName(_pageNum)),
+        content: Text(controller.pageName(_pageNum)),
         action: SnackBarAction(label: 'Edit >', onPressed: showEditPagesPage),
       );
 

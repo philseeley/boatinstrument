@@ -54,7 +54,7 @@ class _EditPagesState extends State<EditPagesPage> {
 
   void _nightMode() {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    themeProvider.setNightMode();
+    themeProvider.toggleNightMode(widget._controller._settings!.darkMode);
   }
 
   void _addPage() {
