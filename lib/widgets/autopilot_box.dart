@@ -99,7 +99,9 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
       );
 
       if(response.statusCode != HttpStatus.ok) {
-        widget.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
+        if(mounted) {
+          widget.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
+        }
       }
     } catch (e) {
       widget.controller.l.e('Error Sending to WebSocket', error: e);
