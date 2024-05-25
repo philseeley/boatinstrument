@@ -61,6 +61,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
           $enumDecodeNullable(_$SignalkPolicyEnumMap, json['signalkPolicy']) ??
               SignalkPolicy.instant,
       signalkMinPeriod: json['signalkMinPeriod'] as int? ?? 1000,
+      darkMode: json['darkMode'] as bool? ?? true,
       wrapPages: json['wrapPages'] as bool? ?? true,
       keepAwake: json['keepAwake'] as bool? ?? false,
       autoConfirmActions: json['autoConfirmActions'] as bool? ?? false,
@@ -92,6 +93,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'signalkServer': instance.signalkServer,
       'signalkPolicy': _$SignalkPolicyEnumMap[instance.signalkPolicy]!,
       'signalkMinPeriod': instance.signalkMinPeriod,
+      'darkMode': instance.darkMode,
       'wrapPages': instance.wrapPages,
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,

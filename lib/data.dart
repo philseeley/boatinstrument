@@ -263,6 +263,7 @@ class _Settings {
   String signalkServer;
   SignalkPolicy signalkPolicy;
   int signalkMinPeriod;
+  bool darkMode;
   bool wrapPages;
   bool keepAwake;
   bool autoConfirmActions;
@@ -284,6 +285,7 @@ class _Settings {
     this.signalkServer = 'openplotter.local:3000',
     this.signalkPolicy = SignalkPolicy.instant,
     this.signalkMinPeriod = 1000,
+    this.darkMode = true,
     this.wrapPages = true,
     this.keepAwake = false,
     this.autoConfirmActions = false,

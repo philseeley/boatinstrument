@@ -50,7 +50,8 @@ class _MainPageState extends State<MainPage> {
     await controller?.loadSettings();
     await controller?.connect();
 
-    setState(() {});
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    themeProvider.setDarkMode(controller!.darkMode);
   }
 
   @override
@@ -72,10 +73,10 @@ class _MainPageState extends State<MainPage> {
     ); //DragGestureRecognizer
   }
 
-  showSettingsPage () async {
+  showEditPagesPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return SettingsPage(controller!);
+      return EditPagesPage(controller!);
     }));
 
     controller?.save();
@@ -99,7 +100,7 @@ class _MainPageState extends State<MainPage> {
         setState(() {
           _pageNum = newPage;
         });
-        
+
         SnackBar snackBar = SnackBar(
           content: Text(controller!.pageName(_pageNum)),
           duration: const Duration(milliseconds: 500),
@@ -115,7 +116,7 @@ class _MainPageState extends State<MainPage> {
       //TODO Would prefer a top bar.
       SnackBar snackBar = SnackBar(
         content: Text(controller!.pageName(_pageNum)),
-        action: SnackBarAction(label: 'Settings >', onPressed: showSettingsPage),
+        action: SnackBarAction(label: 'Edit >', onPressed: showEditPagesPage),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
