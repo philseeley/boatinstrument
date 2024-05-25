@@ -53,6 +53,8 @@ class _MainPageState extends State<MainPage> {
     await controller.connect();
 
     _themeProvider.setDarkMode(controller.darkMode);
+
+    setState(() {});
   }
 
   @override
