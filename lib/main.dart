@@ -5,9 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-//TODO check build for pi/ARM on Linux as cross compilation is not supported yet.
 //TODO do we want different pages for landscape and portrait?
-//TODO does HDMI carry sound?
 void main() {
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: const NavApp()));
 }
@@ -101,6 +99,13 @@ class _MainPageState extends State<MainPage> {
         setState(() {
           _pageNum = newPage;
         });
+        
+        SnackBar snackBar = SnackBar(
+          content: Text(controller!.pageName(_pageNum)),
+          duration: const Duration(milliseconds: 500),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
