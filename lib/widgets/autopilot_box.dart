@@ -387,8 +387,8 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
           case 'steering.rudderAngle':
             _rudderAngle = (u.value as num).toDouble();
             break;
-          case 'notifications.autopilot.*':
-          //TODO
+          case 'notifications.autopilot.*'://TODO this this need to be a regex or something.
+            widget.controller.showMessage(context, u.value, error: true);
             break;
         }
       } catch (e) {
