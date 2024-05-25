@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/position_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 import 'package:circular_buffer/circular_buffer.dart';
@@ -67,8 +69,6 @@ class BoatInstrumentController {
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
-  final TextStyle headTS;
-  final TextStyle infoTS;
 
   bool get ready => _settings != null;
 
@@ -81,8 +81,6 @@ class BoatInstrumentController {
   DepthUnits get depthUnits => _settings!.depthUnits;
   TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
   int get numOfPages => _settings!.pages.length;
-
-  BoatInstrumentController(this.headTS, this.infoTS);
 
   loadSettings() async {
     try {

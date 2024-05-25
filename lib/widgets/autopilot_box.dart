@@ -293,8 +293,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
 
   @override
   Widget build(BuildContext context) {
-    BoatInstrumentController c = widget.controller;
-    TextStyle s = widget.controller.headTS; //TODO we should be able to set the font size for the whole widget using a Theme.
+    TextStyle s = const TextStyle(fontSize: 20);
 
     List<Widget> pilot = [
       Text("Pilot", style: s),
@@ -344,10 +343,10 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
         Column(children: actual)
       ]),
       Row(children: [
-        Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: c.headTS.apply(color: Colors.red), textAlign: TextAlign.right)),
-        Expanded(child: Text(rudderStr.substring(0, rudderAngle > 0 ? rudderAngleLen : 0), style: c.headTS.apply(color: Colors.green))),
+        Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: const TextStyle(color: Colors.red), textAlign: TextAlign.right)),
+        Expanded(child: Text(rudderStr.substring(0, rudderAngle > 0 ? rudderAngleLen : 0), style: const TextStyle(color: Colors.green))),
       ]),
-      Text(_error??'', style: c.headTS.apply(color: Colors.red))
+      Text(_error??'', style: const TextStyle(color: Colors.red))
     ]);
   }
 

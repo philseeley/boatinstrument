@@ -14,6 +14,7 @@ class _SettingsState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     _Settings settings = widget._controller._settings!;
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     List<Widget> list = [
       ListTile(
@@ -48,6 +49,13 @@ class _SettingsState extends State<SettingsPage> {
               initialValue: settings.signalkMinPeriod.toString(),
               onChanged: (value) => settings.signalkMinPeriod = int.parse(value))
       ),
+      SwitchListTile(title: const Text("Dark Mode:"),
+          value: themeProvider.themeData == ThemeProvider.nightTheme,
+          onChanged: (bool value) {
+            setState(() {
+              themeProvider.themeData = value ? ThemeProvider.nightTheme : ThemeProvider.lightTheme;
+            });
+          }),
       SwitchListTile(title: const Text("Wraparound page change:"),
           value: settings.wrapPages,
           onChanged: (bool value) {

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -188,14 +187,16 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
       valueText = fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue!);
     }
 
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+
     const double pad = 5.0;
 
     // Assume the font height is the height of the available Box.
-    double fontSize = widget.constraints.maxHeight-widget.controller.headTS.fontSize! - (3*pad) - 1.0;
+    double fontSize = widget.constraints.maxHeight - style.fontSize! - (3*pad) - 1.0;
 
     // We use this to determine the relationship between the font height and width, as we can only
     // control the font size by its height.
-    Size txtSize = _textSize(valueText, widget.controller.infoTS.copyWith(fontSize: fontSize));
+    Size txtSize = _textSize(valueText, style.copyWith(fontSize: fontSize));
 
     // Check if we're constrained by width.
     if(txtSize.width > (widget.constraints.maxWidth - (2*pad))) {
@@ -203,9 +204,9 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} - ${widget._units()}', style: widget.controller.headTS))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} - ${widget._units()}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: widget.controller.infoTS.copyWith(fontSize: fontSize)))))
+      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);
   }
 

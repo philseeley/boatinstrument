@@ -27,11 +27,13 @@ class _PositionBoxState extends State<PositionBox> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle style = Theme.of(context).textTheme.titleMedium!;
+
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Text('Position', style: widget.controller.headTS),
+      Text('Position', style: style),
       Text((_latitude == null && _longitude == null) ?
         '--- --.--- -\n--- --.--- -' :
-        llf.format(LatLong(_latitude!, _longitude!)), style: widget.controller.infoTS)
+        llf.format(LatLong(_latitude!, _longitude!)), style: style)
     ]);
   }
 

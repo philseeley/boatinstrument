@@ -1,13 +1,15 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'theme_provider.dart';
 
 //TODO check build for pi/ARM on Linux as cross compilation is not supported yet.
 //TODO do we want different pages for landscape and portrait?
 //TODO does HDMI carry sound?
 void main() {
-  runApp(const NavApp());
+  runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: const NavApp()));
 }
 
 class NavApp extends StatelessWidget {
@@ -17,25 +19,17 @@ class NavApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    //TODO find better fonts. LCD?
-    ThemeData themeData = ThemeData(colorScheme: const ColorScheme.highContrastDark(), fontFamily: 'Red Hat Mono');
-
-    TextStyle headTS = themeData.textTheme.titleMedium!.copyWith(height: 1.0, fontSize: 20);
-    TextStyle infoTS = themeData.textTheme.bodyLarge!.copyWith(height: 1.0, fontSize: 40);
 
     return MaterialApp(
-      home: MainPage(headTS, infoTS),
+      home: const MainPage(),
       //TODO light/dark/night mode.
-      theme: themeData
+      theme:  Provider.of<ThemeProvider>(context).themeData
     );
   }
 }
 
 class MainPage extends StatefulWidget {
-  final TextStyle _headTS;
-  final TextStyle _infoTS;
-
-  const MainPage(this._headTS, this._infoTS, {super.key});
+  const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -54,7 +48,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _configure () async {
-    controller = BoatInstrumentController(widget._headTS, widget._infoTS);
+    controller = BoatInstrumentController();
     await controller?.loadSettings();
     await controller?.connect();
 
