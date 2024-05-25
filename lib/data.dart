@@ -20,6 +20,27 @@ double averageDouble(double current, double next, { int smooth = 1 }) {
   return ((current * smooth) + next) / (1 + smooth);
 }
 
+// Assumption is that the font characters are higher than they are wide.
+// NOTE: the style MUST have the height set to 1.0.
+double maxFontSize(String text, TextStyle style, double availableHeight, double availableWidth) {
+  // Haven't worked out why the "- 1.0" is required.
+  double fontSize = availableHeight - 1.0;
+
+  // We use this to determine the relationship between the font height and width, as we can only
+  // control the font size by its height.
+
+  TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style.copyWith(fontSize: fontSize)), maxLines: 1, textDirection: TextDirection.ltr)
+    ..layout(minWidth: 0, maxWidth: double.infinity);
+
+  // Check if we're constrained by width.
+  if(textPainter.size.width > availableWidth) {
+    fontSize = (fontSize * (availableWidth / textPainter.size.width)) - 1.0;
+  }
+
+  return fontSize;
+}
+
 abstract class BoxSettings {}
 
 abstract class BoxWidget extends StatefulWidget {

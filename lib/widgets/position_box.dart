@@ -27,13 +27,20 @@ class _PositionBoxState extends State<PositionBox> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).textTheme.titleMedium!;
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+    const double pad = 5.0;
+
+    String text = (_latitude == null || _longitude == null) ?
+      '--- --.--- -\n--- --.--- -' :
+      llf.format(LatLong(_latitude!, _longitude!));
+
+    double fontSize = maxFontSize(text, style, (widget.constraints.maxHeight - style.fontSize! - (3*pad))/2, widget.constraints.maxWidth - (2*pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Text('Position', style: style),
-      Text((_latitude == null && _longitude == null) ?
-        '--- --.--- -\n--- --.--- -' :
-        llf.format(LatLong(_latitude!, _longitude!)), style: style)
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Position', style: style))]),
+      // We need to disable the device text scaling as this interferes with our text scaling.
+      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
+
     ]);
   }
 
