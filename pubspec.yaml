@@ -48,6 +48,7 @@ dependencies:
   file_picker:
   provider:
   flutter_inappwebview: ^6.0.0
+  screen_brightness:
 
 dev_dependencies:
   flutter_test:
