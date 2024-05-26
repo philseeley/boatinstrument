@@ -326,7 +326,7 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   void _share () async {
-    await Share.shareFiles([widget._controller._settings!.fileName]);
+    await Share.shareXFiles([XFile(widget._controller._settings!.fileName)], subject: 'Boat Instrument Settings');
   }
 
   void _import () async {

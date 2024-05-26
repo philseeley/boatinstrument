@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 class LogDisplay extends StatefulWidget {
 
@@ -47,6 +47,6 @@ class _LogDisplayState extends State<LogDisplay> {
   }
 
   void _share (List<String> entries) async {
-    await Share.share(entries.join('\n'));
+    await Share.share(entries.join('\n'), subject: 'Boat Instrument Log');
   }
 }

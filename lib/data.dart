@@ -42,7 +42,7 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
 }
 
 abstract class BoxSettings {}
-
+//TODO need to have per-box settings, e.g. for webview box.
 abstract class BoxWidget extends StatefulWidget {
   final BoatInstrumentController controller;
   final BoxConstraints constraints;

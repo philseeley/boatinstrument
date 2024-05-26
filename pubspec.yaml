@@ -37,14 +37,14 @@ dependencies:
   format:
   slide_to_act:
   web_socket_channel:
-  vector_math: ^2.1.4
+  vector_math:
   logger:
   circular_buffer:
-  resizable_widget: ^1.0.5
+  resizable_widget:
   latlong_formatter:
   wakelock_plus:
   nanoid:
-  share:
+  share_plus:
   file_picker:
   provider:
   flutter_inappwebview: ^6.0.0
@@ -58,7 +58,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
   build_runner:
   json_serializable:
