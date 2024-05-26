@@ -112,6 +112,7 @@ List<WidgetDetails> widgetDetails = [
   WidgetDetails(SeaTemperatureBox.sid, 'Sea Temperature', (controller, constraints) {return SeaTemperatureBox(controller, constraints, key: UniqueKey());}),
   WidgetDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller, constraints) {return AutoPilotStatusBox(controller, constraints, key: UniqueKey());}),
   WidgetDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller, constraints) {return AutoPilotControlBox(controller, constraints, key: UniqueKey());}),
+  WidgetDetails(WebViewBox.sid, 'Web Page', (controller, constraints) {return WebViewBox(controller, constraints, key: UniqueKey());}),
 ];
 
 WidgetDetails getWidgetDetails(String id) {

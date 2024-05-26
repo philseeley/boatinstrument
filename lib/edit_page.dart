@@ -68,6 +68,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AutoPilotStatusBox.sid),
         _widgetMenuEntry(AutoPilotControlBox.sid),
         ]),
+      _widgetMenuEntry(WebViewBox.sid)
     ];
 
     return popupMenuEntries;

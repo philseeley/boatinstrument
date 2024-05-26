@@ -40,8 +40,6 @@ class _Settings extends BoxSettings {
 
 class AutoPilotControlBox extends BoxWidget {
 
-  _Settings _editSettings = _Settings();
-
   AutoPilotControlBox(super._controller, super._constraints, {super.key});
 
   @override
@@ -50,6 +48,8 @@ class AutoPilotControlBox extends BoxWidget {
   static const String sid = 'autopilot-control';
   @override
   String get id => sid;
+
+  _Settings _editSettings = _Settings();
 
   @override
   bool get hasSettings => true;
@@ -67,7 +67,7 @@ class AutoPilotControlBox extends BoxWidget {
 }
 
 class _AutoPilotControlState extends State<AutoPilotControlBox> {
-  _Settings _settings =_Settings();
+  _Settings _settings = _Settings();
   bool _locked = true;
   Timer? _lockTimer;
 
