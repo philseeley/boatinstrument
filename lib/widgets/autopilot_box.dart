@@ -64,6 +64,12 @@ class AutoPilotControlBox extends BoxWidget {
   Map<String, dynamic> getSettingsJson() {
     return _$SettingsToJson(_editSettings);
   }
+
+  @override
+  Widget? getSettingsHelp() {
+    return const Text('''To be able to control the autopilot, the device must be given read/write permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+The Client ID can be set reflect the instrument's location, e.g. "boatinstrument-autopilot-helm". Or the ID can be set to the same for all instruments to share the same authorisation.''');
+  }
 }
 
 class _AutoPilotControlState extends State<AutoPilotControlBox> {
@@ -203,8 +209,8 @@ class _SettingsState extends State<_SettingsWidget> {
         leading: const Text("Lock Timeout:"),
         title: Slider(
             min: 2.0,
-            max: 20.0,
-            divisions: 18,
+            max: 60.0,
+            divisions: 58,
             value: s.lockSeconds.toDouble(),
             label: "${s.lockSeconds.toInt()}s",
             onChanged: (double value) {

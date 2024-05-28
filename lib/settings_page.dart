@@ -45,7 +45,7 @@ class _EditPagesState extends State<EditPagesPage> {
         appBar: AppBar(
           title: const Text("Pages"),
           actions: [
-            IconButton(icon: const Icon(Icons.nightlight),onPressed:  _nightMode),
+            IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
             IconButton(icon: Icon(_brightnessIcons[_brightness]),onPressed:  _setBrightness),
             IconButton(icon: const Icon(Icons.add),onPressed:  _addPage),
             IconButton(icon: const Icon(Icons.settings), onPressed: _showSettingsPage),
@@ -215,7 +215,8 @@ class _SettingsState extends State<SettingsPage> {
         actions: [
           IconButton(icon: const Icon(Icons.share), onPressed: _share),
           IconButton(icon: const Icon(Icons.file_open), onPressed: _import),
-          IconButton(icon: const Icon(Icons.notes),onPressed:  _showLog)
+          IconButton(icon: const Icon(Icons.help), onPressed: _showHelpPage),
+          IconButton(icon: const Icon(Icons.notes),onPressed: _showLog)
         ],
       ),
       body: ListView(children: list)
@@ -334,6 +335,14 @@ class _SettingsState extends State<SettingsPage> {
     );
 
     return menu;
+  }
+
+  _showHelpPage () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _HelpPage(widget._controller);
+    })
+    );
   }
 
   void _showLog () async {

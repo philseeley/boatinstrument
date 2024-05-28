@@ -8,9 +8,9 @@ part 'webview_box.g.dart';
 
 @JsonSerializable()
 class _Settings {
-  String url = '';
+  String url;
 
-  _Settings(this.url);
+  _Settings({this.url = ''});
 }
 //TODO the view isn't scrollable. Do we want it to be? Do we want it to be more browser like?
 class WebViewBox extends BoxWidget {
@@ -39,6 +39,11 @@ class WebViewBox extends BoxWidget {
   Map<String, dynamic> getPerBoxSettingsJson() {
     return _$SettingsToJson(_settings);
   }
+
+  @override
+  Widget? getPerBoxSettingsHelp() {
+    return const Text('''Enter the full URL of the Web Page to display.''');
+  }
 }
 
 class _WebViewBoxState extends State<WebViewBox> {
@@ -58,7 +63,7 @@ class _WebViewBoxState extends State<WebViewBox> {
       return const Center(child: Text('No Web Page set'));
     } else {
       return InAppWebView(
-          initialUrlRequest: URLRequest(url: WebUri(widget._settings.url!))
+          initialUrlRequest: URLRequest(url: WebUri(widget._settings.url))
       );
     }
   }

@@ -41,7 +41,6 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   return fontSize;
 }
 
-//TODO need to have per-box settings, e.g. for webview box.
 abstract class BoxWidget extends StatefulWidget {
   final BoatInstrumentController controller;
   final BoxConstraints constraints;
@@ -69,6 +68,9 @@ abstract class BoxWidget extends StatefulWidget {
   Map<String, dynamic> getPerBoxSettingsJson() {
     return {};
   }
+
+  Widget? getSettingsHelp() => null;
+  Widget? getPerBoxSettingsHelp() => null;
 }
 
 class BlankBox extends BoxWidget {
@@ -97,6 +99,40 @@ class _BlankBoxState extends State<BlankBox> {
   }
 }
 
+class HelpBox extends BoxWidget {
+
+  const HelpBox(super.controller, _, super.constraints, {super.key});
+
+  static const String sid = '_HELP_';
+  @override
+  String get id => sid;
+
+  @override
+  State<HelpBox> createState() => _HelpBoxState();
+}
+
+class _HelpBoxState extends State<HelpBox> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.configure(widget);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: IconButton(icon: const Icon(Icons.help), onPressed: _showHelpPage));
+  }
+
+  _showHelpPage () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+          return _HelpPage(widget.controller);
+         })
+    );
+  }
+}
+
 class BoxDetails {
   final String id;
   final String description;
@@ -109,6 +145,7 @@ class BoxDetails {
 //TODO rudder angle
 List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (controller, settings, constraints) {return BlankBox(controller, settings, constraints, key: UniqueKey());}), // This is the default Box.
+  BoxDetails(HelpBox.sid, 'Help', (controller, settings, constraints) {return HelpBox(controller, settings, constraints, key: UniqueKey());}), // This is the default Box.
   BoxDetails(DepthBox.sid, 'Depth', (controller, settings, constraints) {return DepthBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(SpeedBox.sid, 'Speed Through Water', (controller, settings, constraints) {return SpeedBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller, settings, constraints) {return SpeedOverGroundBox(controller, settings, constraints, key: UniqueKey());}),
@@ -172,7 +209,7 @@ class _Box extends _Resizable{
   }
 
   factory _Box.help() {
-    return _Box(BlankBox.sid, {}, 1.0);//TODO needs to be a Box with a Help button.
+    return _Box(HelpBox.sid, {}, 1.0);
   }
 
   factory _Box.fromJson(Map<String, dynamic> json) =>
@@ -328,7 +365,7 @@ class _Settings {
 
   static Future<_Settings> load() async {
     Directory directory = await path_provider.getApplicationDocumentsDirectory();
-    _store = File('${directory.path}/settings.json');
+    _store = File('${directory.path}/boatinstrument.json');
 
     return await readSettings(_store!);
   }

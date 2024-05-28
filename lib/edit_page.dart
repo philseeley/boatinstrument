@@ -145,7 +145,7 @@ class _EditPageState extends State<_EditPage> {
             boxWidgetMenu
           ];
 
-          BoxWidget editBoxWidget = getBoxDetails(box.id).build(widget._controller, box.settings, const BoxConstraints(maxWidth: 100.0, maxHeight: 100.0));
+          BoxWidget editBoxWidget = getBoxDetails(box.id).build(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0));
 
           List<Widget> settingsButtons = [];
           if(editBoxWidget.hasSettings) {
@@ -294,6 +294,7 @@ class _EditPageState extends State<_EditPage> {
           );
         })
     );
+
     widget._controller._settings?.boxSettings[boxWidget.id] = boxWidget.getSettingsJson();
 
     setState(() {});
