@@ -7,7 +7,7 @@ part of 'webview_box.dart';
 // **************************************************************************
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      url: json['url'] as String?,
+      json['url'] as String,
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{

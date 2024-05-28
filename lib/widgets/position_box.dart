@@ -4,7 +4,7 @@ import 'package:latlong_formatter/latlong_formatter.dart';
 
 class PositionBox extends BoxWidget {
 
-  const PositionBox(super._controller, super._constraints, {super.key});
+  const PositionBox(super._controller, _, super._constraints, {super.key});
 
   @override
   State<PositionBox> createState() => _PositionBoxState();

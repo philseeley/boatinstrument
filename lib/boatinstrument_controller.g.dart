@@ -8,12 +8,14 @@ part of 'boatinstrument_controller.dart';
 
 _Box _$BoxFromJson(Map<String, dynamic> json) => _Box(
       json['id'] as String,
+      json['settings'] as Map<String, dynamic>,
       (json['percentage'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$BoxToJson(_Box instance) => <String, dynamic>{
       'percentage': instance.percentage,
       'id': instance.id,
+      'settings': instance.settings,
     };
 
 _Row _$RowFromJson(Map<String, dynamic> json) => _Row(
@@ -53,14 +55,14 @@ Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
     };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      version: json['version'] as int? ?? 0,
-      valueSmoothing: json['valueSmoothing'] as int? ?? 1,
+      version: (json['version'] as num?)?.toInt() ?? 0,
+      valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
       signalkPolicy:
           $enumDecodeNullable(_$SignalkPolicyEnumMap, json['signalkPolicy']) ??
               SignalkPolicy.instant,
-      signalkMinPeriod: json['signalkMinPeriod'] as int? ?? 1000,
+      signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 1000,
       darkMode: json['darkMode'] as bool? ?? true,
       wrapPages: json['wrapPages'] as bool? ?? true,
       keepAwake: json['keepAwake'] as bool? ?? false,
@@ -84,8 +86,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
               ?.map((e) => _Page.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      widgetSettings: json['widgetSettings'],
-    );
+    )..boxSettings = json['boxSettings'] as Map<String, dynamic>;
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
@@ -103,7 +104,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'depthUnits': _$DepthUnitsEnumMap[instance.depthUnits]!,
       'temperatureUnits': _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
       'pages': instance.pages,
-      'widgetSettings': instance.widgetSettings,
+      'boxSettings': instance.boxSettings,
     };
 
 const _$SignalkPolicyEnumMap = {

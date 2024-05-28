@@ -8,7 +8,7 @@ enum WindRoseType {
 }
 
 class WindRoseCHBox extends WindRoseBox {
-  const WindRoseCHBox(super._controller, super._constraints, {super.type = WindRoseType.closeHaul, super.key});
+  const WindRoseCHBox(super._controller, super._, super._constraints, {super.type = WindRoseType.closeHaul, super.key});
 
   static String sid = 'wind-rose-ch';
   @override
@@ -18,7 +18,7 @@ class WindRoseCHBox extends WindRoseBox {
 class WindRoseBox extends BoxWidget {
   final WindRoseType _type;
 
-  const WindRoseBox(super._controller, super._constraints, {type = WindRoseType.normal, super.key}) : _type = type;
+  const WindRoseBox(super._controller, _, super._constraints, {type = WindRoseType.normal, super.key}) : _type = type;
 
   @override
   State<WindRoseBox> createState() => _WindRoseBoxState();

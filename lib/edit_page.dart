@@ -6,6 +6,7 @@ class _EditPage extends StatefulWidget {
   final _Page _editPage =  _Page('_TMP_', []);
 
   _EditPage(this._controller, this._page) {
+
     for(_Column c in _page.columns) {
       _Column ec = _Column([], c.percentage);
       _editPage.columns.add(ec);
@@ -13,7 +14,7 @@ class _EditPage extends StatefulWidget {
         _Row er = _Row([], r.percentage);
         ec.rows.add(er);
         for(_Box b in r.boxes) {
-          er.boxes.add(_Box(b.id, b.percentage));
+          er.boxes.add(_Box(b.id, b.settings, b.percentage));
         }
       }
     }
@@ -25,13 +26,13 @@ class _EditPage extends StatefulWidget {
 
 class _EditPageState extends State<_EditPage> {
 
-  PopupMenuItem<WidgetDetails> _widgetMenuEntry(String id) {
-    WidgetDetails wd = getWidgetDetails(id);
-    return PopupMenuItem<WidgetDetails>(value: wd, child: Text(wd.description));
+  PopupMenuItem<BoxDetails> _widgetMenuEntry(String id) {
+    BoxDetails wd = getBoxDetails(id);
+    return PopupMenuItem<BoxDetails>(value: wd, child: Text(wd.description));
   }
 
-  PopupMenuItem<WidgetDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<WidgetDetails>> subMenuEntries) {
-    return PopupMenuItem(child: PopupMenuButton<WidgetDetails>(
+  PopupMenuItem<BoxDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<BoxDetails>> subMenuEntries) {
+    return PopupMenuItem(child: PopupMenuButton<BoxDetails>(
       tooltip: '',
       shape: Border.all(color: Colors.grey),
       itemBuilder: (context) {
@@ -48,7 +49,7 @@ class _EditPageState extends State<_EditPage> {
   }
 
   _getWidgetMenus(_Box box) {
-    List<PopupMenuEntry<WidgetDetails>> popupMenuEntries = [
+    List<PopupMenuEntry<BoxDetails>> popupMenuEntries = [
       _widgetMenuEntry(BlankBox.sid),
       _widgetSubMenuEntry(box, 'Environment', [
         _widgetMenuEntry(DepthBox.sid),
@@ -122,7 +123,7 @@ class _EditPageState extends State<_EditPage> {
           }
 
           LayoutBuilder layoutBoxWidget = LayoutBuilder(builder: (context, constraints) {
-            return getWidgetDetails(box.id).build(widget._controller, constraints);
+            return getBoxDetails(box.id).build(widget._controller, box.settings, constraints);
           });
 
           PopupMenuButton boxWidgetMenu = PopupMenuButton(
@@ -134,7 +135,7 @@ class _EditPageState extends State<_EditPage> {
             },
             onSelected: (value) {
               setState(() {
-                box.id = (value as WidgetDetails).id;
+                box.id = (value as BoxDetails).id;
               });
             },
           );
@@ -144,11 +145,16 @@ class _EditPageState extends State<_EditPage> {
             boxWidgetMenu
           ];
 
-          BoxWidget boxWidget = getWidgetDetails(box.id).build(widget._controller, const BoxConstraints(maxWidth: 100.0, maxHeight: 100.0));
+          BoxWidget editBoxWidget = getBoxDetails(box.id).build(widget._controller, box.settings, const BoxConstraints(maxWidth: 100.0, maxHeight: 100.0));
 
-          if(boxWidget.hasSettings) {
-            stack.add(Positioned(top: 0, right: 0, child: IconButton(onPressed: () {_showSettingsPage(boxWidget);}, icon: const Icon(Icons.settings, color: Colors.blue))));
+          List<Widget> settingsButtons = [];
+          if(editBoxWidget.hasSettings) {
+            settingsButtons.add(IconButton(onPressed: () {_showSettingsPage(editBoxWidget);}, icon: const Icon(Icons.settings)));
           }
+          if(editBoxWidget.hasPerBoxSettings) {
+            settingsButtons.add(IconButton(onPressed: () {_showPerBoxSettingsPage(editBoxWidget, ci, ri, bi);}, icon: const Icon(Icons.settings, color: Colors.blue)));
+          }
+          stack.add(Positioned(top: 0, right: 0, child: Row(children: settingsButtons)));
 
           stack.addAll([
             Positioned(bottom: 0, left: 0, child: IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
@@ -203,7 +209,7 @@ class _EditPageState extends State<_EditPage> {
 
   void _addBox(_Row r, int bi, {bool after = false}) {
     setState(() {
-      _Box b = _Box(widgetDetails[0].id, 1);
+      _Box b = _Box.blank();
       double pc = r.boxes[bi].percentage / 2;
       r.boxes[bi].percentage = pc;
       b.percentage = pc;
@@ -214,7 +220,7 @@ class _EditPageState extends State<_EditPage> {
 
   void _addRow(_Column c, int ri, {bool after = false}) {
     setState(() {
-      _Row r = _Row([_Box(widgetDetails[0].id, 1)], 1);
+      _Row r = _Row([_Box.blank()], 1);
       double pc = c.rows[ri].percentage / 2;
       c.rows[ri].percentage = pc;
       r.percentage = pc;
@@ -225,7 +231,7 @@ class _EditPageState extends State<_EditPage> {
 
   void _addColumn(_Page p, int ci, {bool after = false}) {
     setState(() {
-      _Column c = _Column([_Row([_Box(widgetDetails[0].id, 1)], 1)], 1);
+      _Column c = _Column([_Row([_Box.blank()], 1)], 1);
       double pc = p.columns[ci].percentage / 2;
       p.columns[ci].percentage = pc;
       c.percentage = pc;
@@ -263,7 +269,7 @@ class _EditPageState extends State<_EditPage> {
             page.columns[ci].percentage += c.percentage;
           } else {
             // Need to have one Box for the current screen.
-            page.columns = [_Column([_Row([_Box(widgetDetails[0].id, 1.0)], 1.0)], 1.0)];
+            page.columns = [_Column([_Row([_Box.blank()], 1.0)], 1.0)];
           }
         }
       }
@@ -272,6 +278,7 @@ class _EditPageState extends State<_EditPage> {
 
   void _save() {
     widget._page.columns = widget._editPage.columns;
+    widget._controller.save();
     _close();
   }
 
@@ -282,20 +289,32 @@ class _EditPageState extends State<_EditPage> {
   _showSettingsPage (BoxWidget boxWidget) async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _BoxSettingsPage(widget._controller, boxWidget);
+          return _BoxSettingsPage(
+              boxWidget.getSettingsWidget(widget._controller.getBoxSettings(boxWidget.id))!
+          );
+        })
+    );
+    widget._controller._settings?.boxSettings[boxWidget.id] = boxWidget.getSettingsJson();
+
+    setState(() {});
+  }
+
+  _showPerBoxSettingsPage (BoxWidget boxWidget, int ci, ri, bi) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _BoxSettingsPage(boxWidget.getPerBoxSettingsWidget()!);
     }));
 
-    widget._controller.saveWidgetSettings(boxWidget.id, boxWidget.getSettingsJson());
+    widget._editPage.columns[ci].rows[ri].boxes[bi].settings = boxWidget.getPerBoxSettingsJson();
 
     setState(() {});
   }
 }
 
 class _BoxSettingsPage extends StatefulWidget {
-  final BoatInstrumentController _controller;
-  final BoxWidget _boxWidget;
+  final Widget _settingsWidget;
 
-  const _BoxSettingsPage(this._controller, this._boxWidget);
+  const _BoxSettingsPage(this._settingsWidget);
 
   @override
   createState() => _BoxSettingsState();
@@ -305,11 +324,9 @@ class _BoxSettingsState extends State<_BoxSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget settingsWidget = widget._boxWidget.getSettingsWidget(widget._controller.getWidgetSettings(widget._boxWidget.id))!;
-
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: settingsWidget
+      body: widget._settingsWidget
     );
   }
 }

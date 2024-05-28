@@ -7,17 +7,18 @@ import 'package:json_annotation/json_annotation.dart';
 part 'webview_box.g.dart';
 
 @JsonSerializable()
-class _Settings extends BoxSettings {
-  String? url;
+class _Settings {
+  String url = '';
 
-  _Settings({
-    this.url
-  });
+  _Settings(this.url);
 }
-
+//TODO the view isn't scrollable. Do we want it to be? Do we want it to be more browser like?
 class WebViewBox extends BoxWidget {
+  late _Settings _settings;
 
-  WebViewBox(super._controller, super._constraints, {super.key});
+  WebViewBox(super._controller, settingsJson, super._constraints, {super.key}) {
+    _settings = _$SettingsFromJson(settingsJson);
+  }
 
   @override
   State<WebViewBox> createState() => _WebViewBoxState();
@@ -26,30 +27,26 @@ class WebViewBox extends BoxWidget {
   @override
   String get id => sid;
 
-  _Settings _editSettings = _Settings();
+  @override
+  bool get hasPerBoxSettings => true;
 
   @override
-  bool get hasSettings => true;
-
-  @override
-  Widget getSettingsWidget(Map<String, dynamic> json) {
-    _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(super.controller, _editSettings);
+  Widget getPerBoxSettingsWidget() {
+    return _SettingsWidget(_settings);
   }
 
   @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$SettingsToJson(_editSettings);
+  Map<String, dynamic> getPerBoxSettingsJson() {
+    return _$SettingsToJson(_settings);
   }
 }
 
 class _WebViewBoxState extends State<WebViewBox> {
-  _Settings _settings = _Settings();
 
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget.controller.configure(widget));
+    widget.controller.configure(widget);
   }
 
   @override
@@ -57,11 +54,11 @@ class _WebViewBoxState extends State<WebViewBox> {
     if(Platform.isMacOS) {
       return const Center(child: Text('Not implemented on MacOS'));
     }
-    if(_settings.url == null) {
+    if(widget._settings.url.isEmpty) {
       return const Center(child: Text('No Web Page set'));
     } else {
       return InAppWebView(
-          initialUrlRequest: URLRequest(url: WebUri(_settings.url!))
+          initialUrlRequest: URLRequest(url: WebUri(widget._settings.url!))
       );
     }
   }
@@ -70,7 +67,7 @@ class _WebViewBoxState extends State<WebViewBox> {
 class _SettingsWidget extends StatefulWidget {
   final _Settings _settings;
 
-  const _SettingsWidget(_, this._settings);
+  const _SettingsWidget(this._settings);
 
   @override
   createState() => _SettingsState();
@@ -87,7 +84,7 @@ class _SettingsState extends State<_SettingsWidget> {
           leading: const Text("Web Site:"),
           title: TextFormField(
               initialValue: s.url,
-              onChanged: (value) => s.url = value)
+              onChanged: (value) => s.url = value.trim())
       ),
     ]);
   }

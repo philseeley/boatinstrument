@@ -24,7 +24,7 @@ enum AutopilotState {
 }
 
 @JsonSerializable()
-class _Settings extends BoxSettings {
+class _Settings {
   bool enableLock;
   int lockSeconds;
   String clientID;
@@ -40,7 +40,7 @@ class _Settings extends BoxSettings {
 
 class AutoPilotControlBox extends BoxWidget {
 
-  AutoPilotControlBox(super._controller, super._constraints, {super.key});
+  AutoPilotControlBox(super._controller, _, super._constraints, {super.key});
 
   @override
   State<AutoPilotControlBox> createState() => _AutoPilotControlState();
@@ -256,7 +256,7 @@ class _SettingsState extends State<_SettingsWidget> {
 class AutoPilotStatusBox extends BoxWidget {
   static const String sid = 'autopilot-display';
 
-  const AutoPilotStatusBox(super._controller, super._constraints, {super.key});
+  const AutoPilotStatusBox(super._controller, _, super._constraints, {super.key});
 
   @override
   State<AutoPilotStatusBox> createState() => _AutoPilotDisplayState();

@@ -102,8 +102,8 @@ class BoatInstrumentController {
     return widget;
   }
 
-  Map<String, dynamic> getWidgetSettings(String widgetID) {
-    return _settings?.widgetSettings[widgetID]??{};
+  Map<String, dynamic> getBoxSettings(String boxID) {
+    return _settings?.boxSettings[boxID]??{};
   }
 
   Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, Set<String> paths = const {}}) {
@@ -123,12 +123,7 @@ class BoatInstrumentController {
       _subscribe();
     }
 
-    return getWidgetSettings(widget.id);
-  }
-
-  void saveWidgetSettings(String widgetID, Map<String, dynamic> widgetSettings) {
-    _settings?.widgetSettings[widgetID] = widgetSettings;
-    save();
+    return getBoxSettings(widget.id);
   }
 
   void save() {
@@ -173,7 +168,7 @@ class BoatInstrumentController {
                 position: DecorationPosition.foreground,
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 2)),
                 child: LayoutBuilder(builder: (context, constraints) {
-                  return addWidget(getWidgetDetails(box.id).build(this, constraints));
+                  return addWidget(getBoxDetails(box.id).build(this, box.settings, constraints));
                 }))));
       }
       return Row(children: widgets);

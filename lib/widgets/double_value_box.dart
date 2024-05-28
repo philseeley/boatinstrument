@@ -7,7 +7,7 @@ class SeaTemperatureBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  SeaTemperatureBox(controller, constraints, {super.key}) : super(controller, constraints, 'Sea Temp', 'environment.water.temperature') {
+  SeaTemperatureBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'Sea Temp', 'environment.water.temperature') {
     _setup(_convertTemp, _tempUnits);
   }
 
@@ -30,7 +30,7 @@ class CourseOverGroundBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  CourseOverGroundBox(controller, constraints, {super.key}) : super(controller, constraints, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0) {
+  CourseOverGroundBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0) {
     _setup(_convertCOG, _cogUnits);
   }
 
@@ -48,7 +48,7 @@ class DepthBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  DepthBox(controller, constraints, {super.key}) :
+  DepthBox(controller, _, constraints, {super.key}) :
         super(controller, constraints, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
     _setup(_convertDepth, _depthUnits);
   }
@@ -74,7 +74,7 @@ class SpeedOverGroundBox extends _SpeedBox {
   @override
   String get id => sid;
 
-  SpeedOverGroundBox(controller, constraints, {super.key}) : super(controller, constraints, 'SOG', 'navigation.speedOverGround');
+  SpeedOverGroundBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'SOG', 'navigation.speedOverGround');
 }
 
 class SpeedBox extends _SpeedBox {
@@ -82,7 +82,7 @@ class SpeedBox extends _SpeedBox {
   @override
   String get id => sid;
 
-  SpeedBox(controller, constraints, {super.key}) : super(controller, constraints, 'Speed', 'navigation.speedThroughWater');
+  SpeedBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'Speed', 'navigation.speedThroughWater');
 }
 
 abstract class _SpeedBox extends _DoubleValueBox {
@@ -114,7 +114,7 @@ class WindSpeedApparentBox extends _WindSpeedBox {
   @override
   String get id => sid;
 
-  WindSpeedApparentBox(controller, constraints, {super.key}) : super(controller, constraints, 'AWS', 'environment.wind.speedApparent');
+  WindSpeedApparentBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'AWS', 'environment.wind.speedApparent');
 }
 
 class WindSpeedTrueBox extends _WindSpeedBox {
@@ -122,7 +122,7 @@ class WindSpeedTrueBox extends _WindSpeedBox {
   @override
   String get id => sid;
 
-  WindSpeedTrueBox(controller, constraints, {super.key}) : super(controller, constraints, 'TWS', 'environment.wind.speedTrue');
+  WindSpeedTrueBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'TWS', 'environment.wind.speedTrue');
 }
 
 abstract class _WindSpeedBox extends _DoubleValueBox {
