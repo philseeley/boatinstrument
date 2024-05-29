@@ -41,6 +41,7 @@ class _EditPageState extends State<_EditPage> {
       onSelected: (value) {
         setState(() {
           box.id = value.id;
+          box.settings = {};
           Navigator.pop(context);
         });
       },
