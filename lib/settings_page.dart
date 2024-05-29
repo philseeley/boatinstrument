@@ -10,16 +10,6 @@ class EditPagesPage extends StatefulWidget {
 }
 
 class _EditPagesState extends State<EditPagesPage> {
-  static const _brightnessStep = 4;
-  static const _brightnessMax = 12;
-  static final Map<int, IconData> _brightnessIcons = {
-    12: Icons.brightness_high,
-    8: Icons.brightness_medium,
-    4: Icons.brightness_low,
-    0: Icons.brightness_4_outlined
-  };
-
-  int _brightness = _brightnessMax;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +35,6 @@ class _EditPagesState extends State<EditPagesPage> {
         appBar: AppBar(
           title: const Text("Pages"),
           actions: [
-            IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
-            IconButton(icon: Icon(_brightnessIcons[_brightness]),onPressed:  _setBrightness),
             IconButton(icon: const Icon(Icons.add),onPressed:  _addPage),
             IconButton(icon: const Icon(Icons.settings), onPressed: _showSettingsPage),
           ],
@@ -61,18 +49,6 @@ class _EditPagesState extends State<EditPagesPage> {
           });
         })
     );
-  }
-
-  void _setBrightness() {
-    setState(() {
-      _brightness = (_brightness < _brightnessStep) ? _brightnessMax : _brightness - _brightnessStep;
-    });
-    ScreenBrightness().setScreenBrightness(_brightness/_brightnessMax);
-  }
-
-  void _nightMode() {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    themeProvider.toggleNightMode(widget._controller._settings!.darkMode);
   }
 
   void _addPage() {

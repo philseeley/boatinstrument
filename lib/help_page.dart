@@ -8,8 +8,10 @@ class _HelpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<ListTile> list = [
-      ListTile(title: RichText(text: const TextSpan(children: [
-        TextSpan(text: '''The display shows a number of Pages and swiping left/right moves between them. Swiping up and selecting Edit show the list of Pages. Press the '''),
+      ListTile(title: RichText(text: TextSpan(style: Theme.of(context).textTheme.bodyMedium, children: const [
+        TextSpan(text: '''The display shows a number of Pages and swiping left/right moves between them. Swiping down and selecting '''),
+        WidgetSpan(child: Icon(Icons.web)),
+        TextSpan(text: ''' shows the list of Pages. Press the '''),
         WidgetSpan(child: Icon(Icons.edit)),
         TextSpan(text: ''' button to edit a Page. Each Page is made up of multiple Columns (Red), containing multiple Rows (Orange), containing multiple Boxes (Blue).
 The contents of each Box is selected through the '''),
@@ -17,7 +19,8 @@ The contents of each Box is selected through the '''),
         TextSpan(text: ''' button. If the Box has settings these are set through the '''),
         WidgetSpan(child: Icon(Icons.settings)),
         TextSpan(text: ''' buttons in the top right of the Box. The Blue button sets the per-Box settings and the White/Black button sets the Box Type settings that are shared between all instances of the Box.
-The sizes of the Page elements can be adjusted by dragging the coloured Box borders. If the last Box in a Row or Column is deleted, the Row or Column is also deleted.''')]))),
+The sizes of the Page elements can be adjusted by dragging the coloured Box borders. If the last Box in a Row or Column is deleted, the Row or Column is also deleted.
+Swiping up or pressing the back button hides the top bar.''')]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness')),
       const ListTile(leading: Icon(Icons.share), title: Text('Shares/Exports the Settings')),

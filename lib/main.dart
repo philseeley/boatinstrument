@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
@@ -20,7 +23,6 @@ class NavApp extends StatelessWidget {
 
     return MaterialApp(
       home: const MainPage(),
-      //TODO light/dark/night mode.
       theme:  Provider.of<ThemeProvider>(context).themeData
     );
   }
@@ -37,8 +39,20 @@ class _MainPageState extends State<MainPage> {
   static const Image _icon = Image(image: AssetImage('assets/icon.png'));
 
   late final ThemeProvider _themeProvider;
+  static const _brightnessStep = 4;
+  static const _brightnessMax = 12;
+  static final Map<int, IconData> _brightnessIcons = {
+    12: Icons.brightness_high,
+    8: Icons.brightness_medium,
+    4: Icons.brightness_low,
+    1: Icons.brightness_4_outlined,
+    0: Icons.brightness_4_outlined
+  };
 
-  BoatInstrumentController controller = BoatInstrumentController();
+  bool _showAppBar = false;
+  int _brightness = _brightnessMax;
+
+  final BoatInstrumentController _controller = BoatInstrumentController();
   int _pageNum = 0;
 
   @override
@@ -49,44 +63,80 @@ class _MainPageState extends State<MainPage> {
   }
 
   _configure () async {
-    await controller.loadSettings();
-    await controller.connect();
+    await _controller.loadSettings();
+    await _controller.connect();
 
-    _themeProvider.setDarkMode(controller.darkMode);
+    _themeProvider.setDarkMode(_controller.darkMode);
+
+    // Convert the current system brightness into the closest step.
+    // Note: We add the step as _setBrightness() will remove it.
+    _brightness = (await ScreenBrightness().system * _brightnessMax).toInt();
+    _brightness = _brightness - (_brightness % _brightnessStep) + _brightnessStep;
+    _setBrightness();
 
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if(!controller.ready) {
+    if(!_controller.ready) {
       return const Center(child: _icon);
     }
 
-    WakelockPlus.toggle(enable: controller.keepAwake);
+    WakelockPlus.toggle(enable: _controller.keepAwake);
 
-    controller.clear();
+    _controller.clear();
+
+    AppBar? appBar;
+    if(_showAppBar) {
+      appBar = AppBar(
+        leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
+        title: Text(_controller.pageName(_pageNum)),
+        actions: [
+          IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
+          IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed:  _setBrightness),
+          IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage),
+        ]);
+    }
 
     return Scaffold(
+      appBar: appBar,
       body: GestureDetector(
         onHorizontalDragEnd: _movePage,
-        onVerticalDragEnd: _showSnackBar,
-        child: controller.buildPage(_pageNum),
+        onVerticalDragEnd: _displayAppBar,
+        child: _controller.buildPage(_pageNum),
       ),
     ); //DragGestureRecognizer
   }
 
-  showEditPagesPage () async {
+  void _setBrightness() {
+    setState(() {
+      _brightness = (_brightness < _brightnessStep) ? _brightnessMax : _brightness - _brightnessStep;
+      if(Platform.isMacOS && _brightness == 0) {
+        _brightness = 1;
+      }
+    });
+
+    ScreenBrightness().setScreenBrightness(_brightness/_brightnessMax);
+  }
+
+  void _nightMode() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    themeProvider.toggleNightMode(_controller.darkMode);
+  }
+
+  _showEditPagesPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return EditPagesPage(controller);
+      return EditPagesPage(_controller);
     }));
 
-    controller.save();
+    _controller.save();
 
     setState(() {
-      if(_pageNum >= controller.numOfPages) {
-        _pageNum = controller.numOfPages-1;
+      _showAppBar = false;
+      if(_pageNum >= _controller.numOfPages) {
+        _pageNum = _controller.numOfPages-1;
       }
     });
   }
@@ -95,9 +145,9 @@ class _MainPageState extends State<MainPage> {
     if(details.primaryVelocity != 0.0) {
       int newPage = 0;
       if (details.primaryVelocity! > 0.0) {
-        newPage = controller.prevPageNum(_pageNum);
+        newPage = _controller.prevPageNum(_pageNum);
       } else {
-        newPage = controller.nextPageNum(_pageNum);
+        newPage = _controller.nextPageNum(_pageNum);
       }
       if(newPage != _pageNum) {
         setState(() {
@@ -105,7 +155,7 @@ class _MainPageState extends State<MainPage> {
         });
 
         SnackBar snackBar = SnackBar(
-          content: Text(controller.pageName(_pageNum)),
+          content: Text(_controller.pageName(_pageNum)),
           duration: const Duration(milliseconds: 500),
         );
 
@@ -114,15 +164,15 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  void _showSnackBar (DragEndDetails details) {
-    if(details.primaryVelocity != 0.0 && details.primaryVelocity! < 0.0) {
-      //TODO Would prefer a top bar.
-      SnackBar snackBar = SnackBar(
-        content: Text(controller.pageName(_pageNum)),
-        action: SnackBarAction(label: 'Edit >', onPressed: showEditPagesPage),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  void _displayAppBar (DragEndDetails details) async {
+    if(details.primaryVelocity != null) {
+      setState(() {
+        if(details.primaryVelocity! > 0.0) {
+          _showAppBar = true;
+        } else {
+          _showAppBar = false;
+        }
+      });
     }
   }
 }

@@ -121,7 +121,7 @@ class _HelpBoxState extends State<HelpBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: IconButton(icon: const Icon(Icons.help), onPressed: _showHelpPage));
+    return Container(alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
   }
 
   _showHelpPage () async {
@@ -141,7 +141,6 @@ class BoxDetails {
   BoxDetails(this.id, this.description, this.build);
 }
 
-//TODO widget for web page. Can't find a WebView widget that works on macos so difficult to test.
 //TODO rudder angle
 List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (controller, settings, constraints) {return BlankBox(controller, settings, constraints, key: UniqueKey());}), // This is the default Box.
