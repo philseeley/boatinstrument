@@ -40,7 +40,7 @@ class _Settings {
 
 class AutoPilotControlBox extends BoxWidget {
 
-  AutoPilotControlBox(super._controller, _, super._constraints, {super.key});
+  AutoPilotControlBox(super.controller, _, super.constraints, {super.key});
 
   @override
   State<AutoPilotControlBox> createState() => _AutoPilotControlState();
@@ -262,7 +262,7 @@ class _SettingsState extends State<_SettingsWidget> {
 class AutoPilotStatusBox extends BoxWidget {
   static const String sid = 'autopilot-display';
 
-  const AutoPilotStatusBox(super._controller, _, super._constraints, {super.key});
+  const AutoPilotStatusBox(super.controller, _, super.constraints, {super.key});
 
   @override
   State<AutoPilotStatusBox> createState() => _AutoPilotDisplayState();

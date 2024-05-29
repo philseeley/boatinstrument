@@ -43,7 +43,7 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
 
 abstract class BoxWidget extends StatefulWidget {
   final BoatInstrumentController controller;
-  final BoxConstraints constraints;
+  final BoxConstraints? constraints;
 
   const BoxWidget(this.controller, this.constraints, {super.key});
 
@@ -121,7 +121,7 @@ class _HelpBoxState extends State<HelpBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
+    return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
   }
 
   _showHelpPage () async {
@@ -136,7 +136,7 @@ class _HelpBoxState extends State<HelpBox> {
 class BoxDetails {
   final String id;
   final String description;
-  final BoxWidget Function(BoatInstrumentController, Map<String, dynamic> settings, BoxConstraints) build;
+  final BoxWidget Function(BoatInstrumentController, Map<String, dynamic> settings, BoxConstraints?) build;
 
   BoxDetails(this.id, this.description, this.build);
 }

@@ -190,9 +190,13 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     const double pad = 5.0;
+    double fontSize = 14.0;
 
-    double fontSize = maxFontSize(valueText, style, widget.constraints.maxHeight - style.fontSize! - (3*pad), widget.constraints.maxWidth - (2*pad));
-
+    if(widget.constraints != null) {
+      fontSize = maxFontSize(valueText, style,
+          widget.constraints!.maxHeight - style.fontSize! - (3 * pad),
+          widget.constraints!.maxWidth - (2 * pad));
+    }
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} - ${widget._units()}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.

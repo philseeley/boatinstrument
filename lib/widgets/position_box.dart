@@ -4,7 +4,7 @@ import 'package:latlong_formatter/latlong_formatter.dart';
 
 class PositionBox extends BoxWidget {
 
-  const PositionBox(super._controller, _, super._constraints, {super.key});
+  const PositionBox(super.controller, _, super.constraints, {super.key});
 
   @override
   State<PositionBox> createState() => _PositionBoxState();
@@ -34,8 +34,12 @@ class _PositionBoxState extends State<PositionBox> {
       '--- --.--- -\n--- --.--- -' :
       llf.format(LatLong(_latitude!, _longitude!));
 
-    double fontSize = maxFontSize(text, style, (widget.constraints.maxHeight - style.fontSize! - (3*pad))/2, widget.constraints.maxWidth - (2*pad));
-
+    double fontSize = 14.0;
+    if(widget.constraints != null) {
+      fontSize = maxFontSize(text, style,
+          (widget.constraints!.maxHeight - style.fontSize! - (3 * pad)) / 2,
+          widget.constraints!.maxWidth - (2 * pad));
+    }
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Position', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.

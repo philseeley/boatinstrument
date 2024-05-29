@@ -16,7 +16,7 @@ class _Settings {
 class WebViewBox extends BoxWidget {
   late _Settings _settings;
 
-  WebViewBox(super._controller, settingsJson, super._constraints, {super.key}) {
+  WebViewBox(super.controller, settingsJson, super.constraints, {super.key}) {
     _settings = _$SettingsFromJson(settingsJson);
   }
 
@@ -60,7 +60,9 @@ class _WebViewBoxState extends State<WebViewBox> {
       return const Center(child: Text('Not implemented on MacOS'));
     }
     if(widget._settings.url.isEmpty) {
-      return const Center(child: Text('No Web Page set'));
+      return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: const Text('No Web Page set'));
+    } else if(widget.constraints == null) {
+        return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: Text(widget._settings.url));
     } else {
       return InAppWebView(
           initialUrlRequest: URLRequest(url: WebUri(widget._settings.url))

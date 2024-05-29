@@ -123,7 +123,7 @@ class _EditPageState extends State<_EditPage> {
           }
 
           LayoutBuilder layoutBoxWidget = LayoutBuilder(builder: (context, constraints) {
-            return getBoxDetails(box.id).build(widget._controller, box.settings, constraints);
+            return getBoxDetails(box.id).build(widget._controller, box.settings, null);
           });
 
           PopupMenuButton boxWidgetMenu = PopupMenuButton(
@@ -145,7 +145,7 @@ class _EditPageState extends State<_EditPage> {
             boxWidgetMenu
           ];
 
-          BoxWidget editBoxWidget = getBoxDetails(box.id).build(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0));
+          BoxWidget editBoxWidget = getBoxDetails(box.id).build(widget._controller, box.settings, null);
 
           List<Widget> settingsButtons = [];
           if(editBoxWidget.hasSettings) {
