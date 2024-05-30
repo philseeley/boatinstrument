@@ -54,15 +54,18 @@ class _NeedlePainter extends CustomPainter {
   void paint(Canvas canvas, Size canvasSize) {
     double size = min(canvasSize.width, canvasSize.height);
     Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = _color
-      ..strokeWidth = 10.0;
+      ..style = PaintingStyle.fill
+      ..color = _color;
 
     Path needle = Path()
-      // ..moveTo(size/2, size/2)
-      ..lineTo(0, size/2);
+      ..moveTo(-10.0, 0.0)
+      ..lineTo(0.0, -size/2)
+      ..lineTo(10.0, 0.0)
+      ..moveTo(0.0, 0.0)
+      ..addArc(const Offset(-10, -10.0) & const Size(20.0, 20.0), 0.0, pi)
+      ..close();
     canvas.translate(size/2, size/2);
-    canvas.rotate(_angle+pi);
+    canvas.rotate(_angle);
     canvas.drawPath(needle, paint);
   }
 
