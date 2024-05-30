@@ -64,8 +64,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
-        _widgetMenuEntry(WindRoseBox.sid),
-        _widgetMenuEntry(WindRoseCHBox.sid)]),
+        _widgetMenuEntry(WindRoseBox.sid)]),
       _widgetSubMenuEntry(box, 'Autopilot', [
         _widgetMenuEntry(AutoPilotStatusBox.sid),
         _widgetMenuEntry(AutoPilotControlBox.sid),
