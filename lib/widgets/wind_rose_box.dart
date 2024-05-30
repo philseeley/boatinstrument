@@ -30,12 +30,25 @@ class _RosePainter extends CustomPainter {
     paint.color = Colors.red;
     canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(300)-(pi/2), deg2Rad(40), false, paint);
     paint.color = fg;
+
     for(int a = 0; a < 360; a += 10) {
       paint.strokeWidth = 10.0;
+      double width = 0.01;
       if (a % 30 == 0) {
         paint.strokeWidth = 20.0;
+        width = 0.02;
       }
-      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(a)-(pi/2)-0.005, 0.01, false, paint);
+      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(a)-(pi/2)-(width/2), width, false, paint);
+    }
+
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    canvas.translate(size/2, size/2);
+    for(int a = 0; a < 360; a += 30) {
+      tp.text = TextSpan(text: a.toString(), style: Theme.of(_context).textTheme.bodyMedium);
+      tp.layout();
+      double x = cos(deg2Rad(a)-(pi/2)) * (size/2-40.0);
+      double y = sin(deg2Rad(a)-(pi/2)) * (size/2-40.0);
+      tp.paint(canvas, Offset(x-tp.size.width/2, y-tp.size.height/2));
     }
   }
 
@@ -109,21 +122,22 @@ class _WindRoseBoxState extends State<WindRoseBox> {
 
   @override
   Widget build(BuildContext context) {
-    double angleApparent = _windAngleApparent??0.0;
-    double angleTrue = _windAngleTrue??0.0;
 
     List<Widget> stack = [
       CustomPaint(size: Size.infinite, painter: _RosePainter(context, widget._type))
     ];
 
     if(_windAngleTrue != null) {
+      double angleTrue = _windAngleTrue!;
       stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(Colors.yellow, angleTrue)));
     }
 
     if(_windAngleApparent != null) {
+      double angleApparent = _windAngleApparent!;
       stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(Colors.blue, angleApparent)));
     }
-    return Container(padding: const EdgeInsets.all(20.0), child: Stack(children: stack));
+
+    return Container(padding: const EdgeInsets.all(5.0), child: Stack(children: stack));
   }
 
   _processData(List<Update> updates) {
