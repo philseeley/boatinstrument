@@ -68,10 +68,10 @@ class _MainPageState extends State<MainPage> {
 
     _themeProvider.setDarkMode(_controller.darkMode);
 
-    // Convert the current system brightness into the closest step.
-    // Note: We add the step as _setBrightness() will remove it.
-    _brightness = (await ScreenBrightness().system * _brightnessMax).toInt();
-    _brightness = _brightness - (_brightness % _brightnessStep) + _brightnessStep;
+    // Convert the current system brightness into the closest step, rounding up.
+    // Note: We add the step as well as _setBrightness() will remove it.
+    _brightness = (await ScreenBrightness().system * _brightnessMax).ceil();
+    _brightness = _brightness - (_brightness % _brightnessStep) + (_brightnessStep*2);
     _setBrightness();
 
     setState(() {});
@@ -111,7 +111,7 @@ class _MainPageState extends State<MainPage> {
 
   void _setBrightness() {
     setState(() {
-      _brightness = (_brightness < _brightnessStep) ? _brightnessMax : _brightness - _brightnessStep;
+      _brightness = ((_brightness < _brightnessStep) || (_brightness > _brightnessMax)) ? _brightnessMax : _brightness - _brightnessStep;
       if(Platform.isMacOS && _brightness == 0) {
         _brightness = 1;
       }
@@ -153,13 +153,6 @@ class _MainPageState extends State<MainPage> {
         setState(() {
           _pageNum = newPage;
         });
-
-        SnackBar snackBar = SnackBar(
-          content: Text(_controller.pageName(_pageNum)),
-          duration: const Duration(milliseconds: 500),
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }
