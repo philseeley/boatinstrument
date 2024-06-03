@@ -150,6 +150,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller, settings, constraints) {return SpeedOverGroundBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller, settings, constraints) {return WindSpeedApparentBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller, settings, constraints) {return WindSpeedTrueBox(controller, settings, constraints, key: UniqueKey());}),
+  BoxDetails(WindDirectionTrueBox.sid, 'Wind Direction True', (controller, settings, constraints) {return WindDirectionTrueBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(WindRoseBox.sid, 'Wind Rose', (controller, settings, constraints) {return WindRoseBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(PositionBox.sid, 'Position', (controller, settings, constraints) {return PositionBox(controller, settings, constraints, key: UniqueKey());}),
   BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', (controller, settings, constraints) {return CourseOverGroundBox(controller, settings, constraints, key: UniqueKey());}),
