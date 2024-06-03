@@ -212,7 +212,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
          (widget.maxValue != null && next > widget.maxValue!)) {
         _displayValue = null;
       } else {
-        _value = averageDouble(_value ?? next, next);
+        _value = averageDouble(_value ?? next, next, smooth: widget.controller.valueSmoothing);
         _displayValue = widget._convert(_value!);
       }
     } catch (e) {
