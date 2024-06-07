@@ -121,7 +121,7 @@ class WindSpeedTrueBox extends _WindSpeedBox {
   @override
   String get id => sid;
 
-  WindSpeedTrueBox(config, {super.key}) : super(config.controller, 'TWS', 'environment.wind.speedTrue');
+  WindSpeedTrueBox(config, {super.key}) : super(config, 'TWS', 'environment.wind.speedTrue');
 }
 
 abstract class _WindSpeedBox extends _DoubleValueBox {
