@@ -16,8 +16,8 @@ class _Settings {
 class WebViewBox extends BoxWidget {
   late _Settings _settings;
 
-  WebViewBox(super.controller, settingsJson, super.constraints, {super.key}) {
-    _settings = _$SettingsFromJson(settingsJson);
+  WebViewBox(super.config, {super.key}) {
+    _settings = _$SettingsFromJson(config.settings);
   }
 
   @override
@@ -51,7 +51,7 @@ class _WebViewBoxState extends State<WebViewBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget);
+    widget.config.controller.configure(widget);
   }
 
   @override
@@ -61,7 +61,7 @@ class _WebViewBoxState extends State<WebViewBox> {
     }
     if(widget._settings.url.isEmpty) {
       return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: const Text('No Web Page set'));
-    } else if(widget.constraints == null) {
+    } else if(widget.config.editMode) {
         return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: Text(widget._settings.url));
     } else {
       return InAppWebView(

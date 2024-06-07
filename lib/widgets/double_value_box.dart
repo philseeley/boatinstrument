@@ -7,12 +7,12 @@ class SeaTemperatureBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  SeaTemperatureBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'Sea Temp', 'environment.water.temperature') {
+  SeaTemperatureBox(config, {super.key}) : super(config, 'Sea Temp', 'environment.water.temperature') {
     _setup(_convertTemp, _tempUnits);
   }
 
   double _convertTemp(double temp) {
-    switch (controller.temperatureUnits) {
+    switch (config.controller.temperatureUnits) {
       case TemperatureUnits.c:
         return temp - 273.15;
       case TemperatureUnits.f:
@@ -21,7 +21,7 @@ class SeaTemperatureBox extends _DoubleValueBox {
   }
 
   String _tempUnits() {
-    return controller.temperatureUnits.unit;
+    return config.controller.temperatureUnits.unit;
   }
 }
 
@@ -30,7 +30,7 @@ class CourseOverGroundBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  CourseOverGroundBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0) {
+  CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0) {
     _setup(_convertCOG, _cogUnits);
   }
 
@@ -48,13 +48,12 @@ class DepthBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  DepthBox(controller, _, constraints, {super.key}) :
-        super(controller, constraints, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
+  DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
     _setup(_convertDepth, _depthUnits);
   }
 
   double _convertDepth(double depth) {
-    switch (controller.depthUnits) {
+    switch (config.controller.depthUnits) {
       case DepthUnits.m:
         return depth;
       case DepthUnits.ft:
@@ -65,7 +64,7 @@ class DepthBox extends _DoubleValueBox {
   }
 
   String _depthUnits() {
-    return controller.depthUnits.unit;
+    return config.controller.depthUnits.unit;
   }
 }
 
@@ -74,7 +73,7 @@ class SpeedOverGroundBox extends _SpeedBox {
   @override
   String get id => sid;
 
-  SpeedOverGroundBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'SOG', 'navigation.speedOverGround');
+  SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
 }
 
 class SpeedBox extends _SpeedBox {
@@ -82,17 +81,17 @@ class SpeedBox extends _SpeedBox {
   @override
   String get id => sid;
 
-  SpeedBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'Speed', 'navigation.speedThroughWater');
+  SpeedBox(config, {super.key}) : super(config, 'Speed', 'navigation.speedThroughWater');
 }
 
 abstract class _SpeedBox extends _DoubleValueBox {
 
-  _SpeedBox(super.controller, super.constraints, super.title, super.path, {super.key}) {
+  _SpeedBox(super.config, super.title, super.path, {super.key}) {
     _setup(_convertSpeed, _speedUnits);
   }
 
   double _convertSpeed(double speed) {
-    switch (controller.speedUnits) {
+    switch (config.controller.speedUnits) {
       case SpeedUnits.mps:
         return speed;
       case SpeedUnits.kph:
@@ -105,7 +104,7 @@ abstract class _SpeedBox extends _DoubleValueBox {
   }
 
   String _speedUnits() {
-    return controller.speedUnits.unit;
+    return config.controller.speedUnits.unit;
   }
 }
 
@@ -114,7 +113,7 @@ class WindSpeedApparentBox extends _WindSpeedBox {
   @override
   String get id => sid;
 
-  WindSpeedApparentBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'AWS', 'environment.wind.speedApparent');
+  WindSpeedApparentBox(config, {super.key}) : super(config, 'AWS', 'environment.wind.speedApparent');
 }
 
 class WindSpeedTrueBox extends _WindSpeedBox {
@@ -122,17 +121,17 @@ class WindSpeedTrueBox extends _WindSpeedBox {
   @override
   String get id => sid;
 
-  WindSpeedTrueBox(controller, _, constraints, {super.key}) : super(controller, constraints, 'TWS', 'environment.wind.speedTrue');
+  WindSpeedTrueBox(config, {super.key}) : super(config.controller, 'TWS', 'environment.wind.speedTrue');
 }
 
 abstract class _WindSpeedBox extends _DoubleValueBox {
 
-  _WindSpeedBox(super.controller, super.constraints, super.title, super.path, {super.key}) {
+  _WindSpeedBox(super.config, super.title, super.path, {super.key}) {
     _setup(_convertSpeed, _speedUnits);
   }
 
   double _convertSpeed(double speed) {
-    switch (controller.windSpeedUnits) {
+    switch (config.controller.windSpeedUnits) {
       case SpeedUnits.mps:
         return speed;
       case SpeedUnits.kph:
@@ -145,7 +144,7 @@ abstract class _WindSpeedBox extends _DoubleValueBox {
   }
 
   String _speedUnits() {
-    return controller.windSpeedUnits.unit;
+    return config.controller.windSpeedUnits.unit;
   }
 }
 
@@ -159,7 +158,7 @@ abstract class _DoubleValueBox extends BoxWidget {
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueBox(super.controller, super.constraints, this._title, this._path, {precision = 1, minLen =  2, this.minValue, this.maxValue, super.key}): _precision = precision, _minLen = minLen;
+  _DoubleValueBox(super.config, this._title, this._path, {precision = 1, minLen =  2, this.minValue, this.maxValue, super.key}): _precision = precision, _minLen = minLen;
 
   _setup(convert, units) {
     _convert = convert;
@@ -177,26 +176,26 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget, onUpdate: _processData, paths: { widget._path });
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: { widget._path });
   }
 
   @override
   Widget build(BuildContext context) {
-    String valueText = '-';
-    if(_displayValue != null) {
-      valueText = fmt.format('{:${widget._minLen+1+widget._precision}.${widget._precision}f}', _displayValue!);
+    if(widget.config.editMode) {
+      _displayValue = 12.3;
     }
+
+    String valueText = (_displayValue == null) ?
+      '-' :
+      fmt.format('{:${widget._minLen+(widget._precision > 0?1:0)+widget._precision}.${widget._precision}f}', _displayValue!);
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     const double pad = 5.0;
-    double fontSize = 14.0;
+    double fontSize = maxFontSize(valueText, style,
+          widget.config.constraints.maxHeight - style.fontSize! - (3 * pad),
+          widget.config.constraints.maxWidth - (2 * pad));
 
-    if(widget.constraints != null) {
-      fontSize = maxFontSize(valueText, style,
-          widget.constraints!.maxHeight - style.fontSize! - (3 * pad),
-          widget.constraints!.maxWidth - (2 * pad));
-    }
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} - ${widget._units()}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
@@ -212,11 +211,11 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
          (widget.maxValue != null && next > widget.maxValue!)) {
         _displayValue = null;
       } else {
-        _value = averageDouble(_value ?? next, next, smooth: widget.controller.valueSmoothing);
+        _value = averageDouble(_value ?? next, next, smooth: widget.config.controller.valueSmoothing);
         _displayValue = widget._convert(_value!);
       }
     } catch (e) {
-      widget.controller.l.e("Error converting $updates", error: e);
+      widget.config.controller.l.e("Error converting $updates", error: e);
     }
 
     if(mounted) {

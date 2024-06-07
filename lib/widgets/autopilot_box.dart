@@ -40,7 +40,7 @@ class _Settings {
 
 class AutoPilotControlBox extends BoxWidget {
 
-  AutoPilotControlBox(super.controller, _, super.constraints, {super.key});
+  AutoPilotControlBox(super.config, {super.key});
 
   @override
   State<AutoPilotControlBox> createState() => _AutoPilotControlState();
@@ -57,7 +57,7 @@ class AutoPilotControlBox extends BoxWidget {
   @override
   Widget getSettingsWidget(Map<String, dynamic> json) {
     _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(super.controller, _editSettings);
+    return _SettingsWidget(super.config.controller, _editSettings);
   }
 
   @override
@@ -80,7 +80,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget.controller.configure(widget));
+    _settings = _$SettingsFromJson(widget.config.controller.configure(widget));
   }
 
   _sendCommand(String path, String params) async {
@@ -91,7 +91,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
 
     try {
       Uri uri = Uri.http(
-          widget.controller.signalkServer,
+          widget.config.controller.signalkServer,
           '/signalk/v1/api/vessels/self/$path');
 
       http.Response response = await http.put(
@@ -106,11 +106,11 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
 
       if(response.statusCode != HttpStatus.ok) {
         if(mounted) {
-          widget.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
+          widget.config.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
         }
       }
     } catch (e) {
-      widget.controller.l.e('Error Sending to WebSocket', error: e);
+      widget.config.controller.l.e('Error Sending to WebSocket', error: e);
     }
   }
 
@@ -119,7 +119,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   }
 
   _setState(AutopilotState state) async {
-    if(await widget.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
+    if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
       await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
     }
   }
@@ -262,7 +262,7 @@ class _SettingsState extends State<_SettingsWidget> {
 class AutoPilotStatusBox extends BoxWidget {
   static const String sid = 'autopilot-display';
 
-  const AutoPilotStatusBox(super.controller, _, super.constraints, {super.key});
+  const AutoPilotStatusBox(super.config, {super.key});
 
   @override
   State<AutoPilotStatusBox> createState() => _AutoPilotDisplayState();
@@ -286,7 +286,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget, onUpdate: _processData, paths: {
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: {
       "steering.autopilot.state",
       "navigation.courseOverGroundTrue",
       "steering.autopilot.target.windAngleApparent",
@@ -369,7 +369,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
             double cogLatest = (u.value as num).toDouble();
             _courseOverGroundTrue = averageAngle(
                 _courseOverGroundTrue ?? cogLatest, cogLatest,
-                smooth: widget.controller.valueSmoothing);
+                smooth: widget.config.controller.valueSmoothing);
             break;
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = (u.value as num).toDouble();
@@ -378,7 +378,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
             double waa = (u.value as num).toDouble();
             _windAngleApparent = averageAngle(
                 _windAngleApparent ?? waa, waa,
-                smooth: widget.controller.valueSmoothing, relative: true);
+                smooth: widget.config.controller.valueSmoothing, relative: true);
             break;
           case 'navigation.currentRoute.waypoints':
             _waypoint = u.value[1]['name'];
@@ -396,11 +396,11 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
             _rudderAngle = (u.value as num).toDouble();
             break;
           case 'notifications.autopilot.*'://TODO this this need to be a regex or something.
-            widget.controller.showMessage(context, u.value, error: true);
+            widget.config.controller.showMessage(context, u.value, error: true);
             break;
         }
       } catch (e) {
-        widget.controller.l.e("Error converting $u", error: e);
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 

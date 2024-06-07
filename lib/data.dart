@@ -41,11 +41,19 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   return fontSize;
 }
 
-abstract class BoxWidget extends StatefulWidget {
+class BoxWidgetConfig {
   final BoatInstrumentController controller;
-  final BoxConstraints? constraints;
+  final Map<String, dynamic> settings;
+  final BoxConstraints constraints;
+  final bool editMode;
 
-  const BoxWidget(this.controller, this.constraints, {super.key});
+  BoxWidgetConfig(this.controller, this.settings, this.constraints, this.editMode);
+}
+
+abstract class BoxWidget extends StatefulWidget {
+  final BoxWidgetConfig config;
+
+  const BoxWidget(this.config, {super.key});
 
   String get id;
 
@@ -75,7 +83,7 @@ abstract class BoxWidget extends StatefulWidget {
 
 class BlankBox extends BoxWidget {
 
-  const BlankBox(super.controller, _, super.constraints, {super.key});
+  const BlankBox(super.config, {super.key});
 
   static const String sid = '_BLANK_';
   @override
@@ -90,7 +98,7 @@ class _BlankBoxState extends State<BlankBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget);
+    widget.config.controller.configure(widget);
   }
 
   @override
@@ -101,7 +109,7 @@ class _BlankBoxState extends State<BlankBox> {
 
 class HelpBox extends BoxWidget {
 
-  const HelpBox(super.controller, _, super.constraints, {super.key});
+  const HelpBox(super.config, {super.key});
 
   static const String sid = '_HELP_';
   @override
@@ -116,7 +124,7 @@ class _HelpBoxState extends State<HelpBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget);
+    widget.config.controller.configure(widget);
   }
 
   @override
@@ -127,7 +135,7 @@ class _HelpBoxState extends State<HelpBox> {
   _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-          return _HelpPage(widget.controller);
+          return _HelpPage(widget.config.controller);
          })
     );
   }
@@ -136,28 +144,28 @@ class _HelpBoxState extends State<HelpBox> {
 class BoxDetails {
   final String id;
   final String description;
-  final BoxWidget Function(BoatInstrumentController, Map<String, dynamic> settings, BoxConstraints?) build;
+  final BoxWidget Function(BoxWidgetConfig config) build;
 
   BoxDetails(this.id, this.description, this.build);
 }
 
 //TODO rudder angle
 List<BoxDetails> boxDetails = [
-  BoxDetails(BlankBox.sid, 'Blank', (controller, settings, constraints) {return BlankBox(controller, settings, constraints, key: UniqueKey());}), // This is the default Box.
-  BoxDetails(HelpBox.sid, 'Help', (controller, settings, constraints) {return HelpBox(controller, settings, constraints, key: UniqueKey());}), // This is the default Box.
-  BoxDetails(DepthBox.sid, 'Depth', (controller, settings, constraints) {return DepthBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(SpeedBox.sid, 'Speed Through Water', (controller, settings, constraints) {return SpeedBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (controller, settings, constraints) {return SpeedOverGroundBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (controller, settings, constraints) {return WindSpeedApparentBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (controller, settings, constraints) {return WindSpeedTrueBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(WindDirectionTrueBox.sid, 'Wind Direction True', (controller, settings, constraints) {return WindDirectionTrueBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(WindRoseBox.sid, 'Wind Rose', (controller, settings, constraints) {return WindRoseBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(PositionBox.sid, 'Position', (controller, settings, constraints) {return PositionBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', (controller, settings, constraints) {return CourseOverGroundBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(SeaTemperatureBox.sid, 'Sea Temperature', (controller, settings, constraints) {return SeaTemperatureBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (controller, settings, constraints) {return AutoPilotStatusBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(AutoPilotControlBox.sid, 'Autopilot Control', (controller, settings, constraints) {return AutoPilotControlBox(controller, settings, constraints, key: UniqueKey());}),
-  BoxDetails(WebViewBox.sid, 'Web Page', (controller, settings, constraints) {return WebViewBox(controller, settings, constraints, key: UniqueKey());}),
+  BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
+  BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
+  BoxDetails(DepthBox.sid, 'Depth', (config) {return DepthBox(config, key: UniqueKey());}),
+  BoxDetails(SpeedBox.sid, 'Speed Through Water', (config) {return SpeedBox(config, key: UniqueKey());}),
+  BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (config) {return SpeedOverGroundBox(config, key: UniqueKey());}),
+  BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (config) {return WindSpeedApparentBox(config, key: UniqueKey());}),
+  BoxDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (config) {return WindSpeedTrueBox(config, key: UniqueKey());}),
+  BoxDetails(WindDirectionTrueBox.sid, 'Wind Direction True', (config) {return WindDirectionTrueBox(config, key: UniqueKey());}),
+  BoxDetails(WindRoseBox.sid, 'Wind Rose', (config) {return WindRoseBox(config, key: UniqueKey());}),
+  BoxDetails(PositionBox.sid, 'Position', (config) {return PositionBox(config, key: UniqueKey());}),
+  BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', (config) {return CourseOverGroundBox(config, key: UniqueKey());}),
+  BoxDetails(SeaTemperatureBox.sid, 'Sea Temperature', (config) {return SeaTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (config) {return AutoPilotStatusBox(config, key: UniqueKey());}),
+  BoxDetails(AutoPilotControlBox.sid, 'Autopilot Control', (config) {return AutoPilotControlBox(config, key: UniqueKey());}),
+  BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),
 ];
 
 BoxDetails getBoxDetails(String id) {

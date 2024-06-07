@@ -30,7 +30,7 @@ Swiping up or pressing the back button hides the top bar.''')]))),
     ];
 
     for(BoxDetails b in boxDetails) {
-      BoxWidget? box = b.build(_controller, {}, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0));
+      BoxWidget? box = b.build(BoxWidgetConfig(_controller, {}, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0), true));
       Widget? boxHelp = box.getSettingsHelp();
       Widget? perBoxHelp = box.getPerBoxSettingsHelp();
       if(boxHelp != null || perBoxHelp != null) {

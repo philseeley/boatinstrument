@@ -6,7 +6,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 
 class WindDirectionTrueBox extends BoxWidget {
 
-  const WindDirectionTrueBox(super.controller, _, super.constraints, {super.key});
+  const WindDirectionTrueBox(super.config, {super.key});
 
   @override
   State<WindDirectionTrueBox> createState() => _WindDirectionTrueBoxState();
@@ -27,7 +27,7 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget, onUpdate: _processData, paths: {'environment.wind.directionTrue'});
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'environment.wind.directionTrue'});
   }
 
   @override
@@ -35,15 +35,16 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
 
+    if(widget.config.editMode) {
+      _direction = deg2Rad(123);
+    }
+
     String text = (_direction == null) ?
       '-' : fmt.format('{:${3}d}', rad2Deg(_direction));
 
-    double fontSize = 14.0;
-    if(widget.constraints != null) {
-      fontSize = maxFontSize(text, style,
-          (widget.constraints!.maxHeight - style.fontSize! - (3 * pad)),
-          widget.constraints!.maxWidth - (2 * pad));
-    }
+    double fontSize = maxFontSize(text, style,
+          (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)),
+          widget.config.constraints.maxWidth - (2 * pad));
 
     const f = (2*pi)/16;
     String cardinal = (_direction == null) ? '' : _cardinalDirections[((_direction!+(f/2))/f).toInt()];
@@ -60,9 +61,9 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
     try {
       double next = (updates[0].value as num).toDouble();
 
-      _direction = averageDouble(_direction ?? next, next, smooth: widget.controller.valueSmoothing);
+      _direction = averageDouble(_direction ?? next, next, smooth: widget.config.controller.valueSmoothing);
     } catch (e) {
-      widget.controller.l.e("Error converting $updates", error: e);
+      widget.config.controller.l.e("Error converting $updates", error: e);
     }
 
     if(mounted) {

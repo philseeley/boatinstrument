@@ -4,7 +4,7 @@ import 'package:latlong_formatter/latlong_formatter.dart';
 
 class PositionBox extends BoxWidget {
 
-  const PositionBox(super.controller, _, super.constraints, {super.key});
+  const PositionBox(super.config, {super.key});
 
   @override
   State<PositionBox> createState() => _PositionBoxState();
@@ -22,7 +22,7 @@ class _PositionBoxState extends State<PositionBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'});
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'});
   }
 
   @override
@@ -30,16 +30,17 @@ class _PositionBoxState extends State<PositionBox> {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
 
+    if(widget.config.editMode) {
+      _latitude = _longitude = 0;
+    }
     String text = (_latitude == null || _longitude == null) ?
       '--- --.--- -\n--- --.--- -' :
       llf.format(LatLong(_latitude!, _longitude!));
 
-    double fontSize = 14.0;
-    if(widget.constraints != null) {
-      fontSize = maxFontSize(text, style,
-          (widget.constraints!.maxHeight - style.fontSize! - (3 * pad)) / 2,
-          widget.constraints!.maxWidth - (2 * pad));
-    }
+    double fontSize = maxFontSize(text, style,
+          (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
+          widget.config.constraints.maxWidth - (2 * pad));
+
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Position', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
@@ -53,7 +54,7 @@ class _PositionBoxState extends State<PositionBox> {
       _latitude = updates[0].value['latitude'];
       _longitude = updates[0].value['longitude'];
     } catch (e) {
-      widget.controller.l.e("Error converting $updates", error: e);
+      widget.config.controller.l.e("Error converting $updates", error: e);
     }
 
     if(mounted) {

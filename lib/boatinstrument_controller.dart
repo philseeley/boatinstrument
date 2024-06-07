@@ -169,7 +169,7 @@ class BoatInstrumentController {
                 position: DecorationPosition.foreground,
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 2)),
                 child: LayoutBuilder(builder: (context, constraints) {
-                  return addWidget(getBoxDetails(box.id).build(this, box.settings, constraints));
+                  return addWidget(getBoxDetails(box.id).build(BoxWidgetConfig(this, box.settings, constraints, false)));
                 }))));
       }
       return Row(children: widgets);

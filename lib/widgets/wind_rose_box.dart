@@ -117,8 +117,8 @@ class _NeedlePainter extends CustomPainter {
 class WindRoseBox extends BoxWidget {
   late _Settings _settings;
 
-   WindRoseBox(super.controller, settingsJson, super.constraints, {super.key}) {
-    _settings = _$SettingsFromJson(settingsJson);
+   WindRoseBox(super.config, {super.key}) {
+    _settings = _$SettingsFromJson(config.settings);
   }
 
   @override
@@ -155,7 +155,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   @override
   void initState() {
     super.initState();
-    widget.controller.configure(widget, onUpdate: _processData, paths: {
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: {
       'environment.wind.angleApparent',
       'environment.wind.angleTrueWater'
     });
@@ -214,17 +214,17 @@ class _WindRoseBoxState extends State<WindRoseBox> {
             double latest = (u.value as num).toDouble();
             _windAngleApparent = averageAngle(
                 _windAngleApparent ?? latest, latest,
-                smooth: widget.controller.valueSmoothing);
+                smooth: widget.config.controller.valueSmoothing);
             break;
           case 'environment.wind.angleTrueWater':
             double latest = (u.value as num).toDouble();
             _windAngleTrue = averageAngle(
                 _windAngleTrue ?? latest, latest,
-                smooth: widget.controller.valueSmoothing);
+                smooth: widget.config.controller.valueSmoothing);
             break;
         }
       } catch (e) {
-        widget.controller.l.e("Error converting $u", error: e);
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
 
       if (mounted) {
