@@ -3,10 +3,23 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'wind_direction_true_box.g.dart';
+
+@JsonSerializable()
+class _Settings {
+  bool cardinalPrimary;
+
+  _Settings({this.cardinalPrimary = false});
+}
 
 class WindDirectionTrueBox extends BoxWidget {
+  late _Settings _settings;
 
-  const WindDirectionTrueBox(super.config, {super.key});
+  WindDirectionTrueBox(super.config, {super.key})  {
+    _settings = _$SettingsFromJson(config.settings);
+  }
 
   @override
   State<WindDirectionTrueBox> createState() => _WindDirectionTrueBoxState();
@@ -14,6 +27,19 @@ class WindDirectionTrueBox extends BoxWidget {
   static String sid = 'wind-direction-true';
   @override
   String get id => sid;
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  Widget getPerBoxSettingsWidget() {
+    return _SettingsWidget(_settings);
+  }
+
+  @override
+  Map<String, dynamic> getPerBoxSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
 }
 
 class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
@@ -39,20 +65,27 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
       _direction = deg2Rad(123);
     }
 
-    String text = (_direction == null) ?
+    String direction = (_direction == null) ?
       '-' : fmt.format('{:${3}d}', rad2Deg(_direction));
 
-    double fontSize = maxFontSize(text, style,
+    const f = (2*pi)/16;
+    String cardinal = (_direction == null) ? '-' : _cardinalDirections[((_direction!+(f/2))/f).toInt()];
+
+    String primaryText = direction;
+    String subText = cardinal;
+    if(widget._settings.cardinalPrimary) {
+      primaryText = cardinal;
+      subText = direction;
+    }
+
+    double fontSize = maxFontSize(primaryText, style,
           (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)),
           widget.config.constraints.maxWidth - (2 * pad));
 
-    const f = (2*pi)/16;
-    String cardinal = (_direction == null) ? '' : _cardinalDirections[((_direction!+(f/2))/f).toInt()];
-
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('TWD deg $cardinal', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('TWD deg $subText', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
+      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(primaryText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
     ]);
   }
@@ -69,5 +102,32 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
     if(mounted) {
       setState(() {});
     }
+  }
+}
+
+class _SettingsWidget extends StatefulWidget {
+  final _Settings _settings;
+
+  const _SettingsWidget(this._settings);
+
+  @override
+  createState() => _SettingsState();
+}
+
+class _SettingsState extends State<_SettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _Settings s = widget._settings;
+
+    return ListView(children: [
+      SwitchListTile(title: const Text("Primary Cardinal:"),
+          value: s.cardinalPrimary,
+          onChanged: (bool value) {
+            setState(() {
+              s.cardinalPrimary = value;
+            });
+          }),
+    ]);
   }
 }
