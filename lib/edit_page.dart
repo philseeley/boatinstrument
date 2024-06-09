@@ -155,14 +155,14 @@ class _EditPageState extends State<_EditPage> {
           if(editBoxWidget.hasPerBoxSettings) {
             settingsButtons.add(IconButton(onPressed: () {_showPerBoxSettingsPage(editBoxWidget, ci, ri, bi);}, icon: const Icon(Icons.settings, color: Colors.blue)));
           }
-          stack.add(Positioned(top: 0, right: 0, child: Row(children: settingsButtons)));
 
           stack.addAll([
-            Positioned(bottom: 0, left: 0, child: IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
             Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
             Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),
             Positioned(right: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons)),
             Positioned(left: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: wButtons)),
+            Positioned(top: 0, right: 0, child: Row(children: settingsButtons)),
+            Positioned(bottom: 0, left: 0, child: IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
           ]);
           boxes.add(Stack(alignment: Alignment.center, children: stack));
 
