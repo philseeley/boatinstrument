@@ -276,6 +276,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
   double? _courseOverGroundTrue;
   double? _targetWindAngleApparent;
   double? _windAngleApparent;
+  double? _targetHeadingTrue;
   double? _targetHeadingMagnetic;
   double? _magneticVariation;
   String? _waypoint;
@@ -293,6 +294,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
       "environment.wind.angleApparent",
       "navigation.currentRoute.waypoints",
       "navigation.courseGreatCircle.crossTrackError",
+      "steering.autopilot.target.headingTrue",
       "steering.autopilot.target.headingMagnetic",
       "navigation.magneticVariation",
       "steering.rudderAngle",
@@ -313,9 +315,12 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
       case AutopilotState.standby:
         break;
       case AutopilotState.auto:
-        if(_targetHeadingMagnetic != null &&
-            _magneticVariation != null) {
-          double headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
+        double? headingTrue = _targetHeadingTrue;
+        if(headingTrue == null && (_targetHeadingMagnetic != null &&
+            _magneticVariation != null)) {
+          headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
+        }
+        if(headingTrue != null) {
           pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: s));
         }
         break;
@@ -385,6 +390,9 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
             break;
           case 'navigation.courseGreatCircle.crossTrackError':
             _crossTrackError = (u.value as num).toDouble();
+            break;
+          case 'steering.autopilot.target.headingTrue':
+            _targetHeadingTrue = (u.value as num).toDouble();
             break;
           case 'steering.autopilot.target.headingMagnetic':
             _targetHeadingMagnetic = (u.value as num).toDouble();
