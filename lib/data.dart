@@ -162,7 +162,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(WindRoseBox.sid, 'Wind Rose', (config) {return WindRoseBox(config, key: UniqueKey());}),
   BoxDetails(PositionBox.sid, 'Position', (config) {return PositionBox(config, key: UniqueKey());}),
   BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', (config) {return CourseOverGroundBox(config, key: UniqueKey());}),
-  BoxDetails(SeaTemperatureBox.sid, 'Sea Temperature', (config) {return SeaTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(WaterTemperatureBox.sid, 'Sea Temperature', (config) {return WaterTemperatureBox(config, key: UniqueKey());}),
   BoxDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (config) {return AutoPilotStatusBox(config, key: UniqueKey());}),
   BoxDetails(AutoPilotControlBox.sid, 'Autopilot Control', (config) {return AutoPilotControlBox(config, key: UniqueKey());}),
   BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),

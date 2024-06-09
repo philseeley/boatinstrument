@@ -54,7 +54,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(BlankBox.sid),
       _widgetSubMenuEntry(box, 'Environment', [
         _widgetMenuEntry(DepthBox.sid),
-        _widgetMenuEntry(SeaTemperatureBox.sid)]),
+        _widgetMenuEntry(WaterTemperatureBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),

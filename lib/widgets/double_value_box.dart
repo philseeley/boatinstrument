@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 
-class SeaTemperatureBox extends _DoubleValueBox {
+class WaterTemperatureBox extends _DoubleValueBox {
   static const String sid = 'sea-temperature';
   @override
   String get id => sid;
 
-  SeaTemperatureBox(config, {super.key}) : super(config, 'Sea Temp', 'environment.water.temperature') {
+  WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature') {
     _setup(_convertTemp, _tempUnits);
   }
 
