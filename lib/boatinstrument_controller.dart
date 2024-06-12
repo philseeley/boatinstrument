@@ -318,7 +318,7 @@ class BoatInstrumentController {
     _networkTimer?.cancel();
     _networkTimer = Timer(Duration(milliseconds: _settings!.signalkConnectionTimeout), connect);
   }
-  //TODO add callback when no data so boxes can clear their displays. Or do we want to showMessage or other overall visual clue?
+
   _processData(data) {
     _networkTimeout();
 

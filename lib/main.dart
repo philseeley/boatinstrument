@@ -168,13 +168,16 @@ class _MainPageState extends State<MainPage> {
 
   void _displayAppBar (DragEndDetails details) async {
     if(details.primaryVelocity != null) {
-      setState(() {
-        if(details.primaryVelocity! > 0.0) {
-          _showAppBar = true;
-        } else {
-          _showAppBar = false;
-        }
-      });
+      bool showAppBar = false;
+      if(details.primaryVelocity! > 0.0) {
+        showAppBar = true;
+      }
+
+      if(_showAppBar != showAppBar) {
+        setState(() {
+          _showAppBar = showAppBar;
+        });
+      }
     }
   }
 }
