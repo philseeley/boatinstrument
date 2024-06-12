@@ -30,7 +30,7 @@ class CourseOverGroundBox extends _DoubleValueBox {
   @override
   String get id => sid;
 
-  CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0) {
+  CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true) {
     _setup(_convertCOG, _cogUnits);
   }
 
@@ -155,10 +155,11 @@ abstract class _DoubleValueBox extends BoxWidget {
   final int _minLen;
   final double? minValue;
   final double? maxValue;
+  final bool angle;
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueBox(super.config, this._title, this._path, {precision = 1, minLen =  2, this.minValue, this.maxValue, super.key}): _precision = precision, _minLen = minLen;
+  _DoubleValueBox(super.config, this._title, this._path, {precision = 1, minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key}): _precision = precision, _minLen = minLen;
 
   _setup(convert, units) {
     _convert = convert;
@@ -211,7 +212,13 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
          (widget.maxValue != null && next > widget.maxValue!)) {
         _displayValue = null;
       } else {
-        _value = averageDouble(_value ?? next, next, smooth: widget.config.controller.valueSmoothing);
+        if(widget.angle) {
+          _value = averageAngle(_value ?? next, next,
+              smooth: widget.config.controller.valueSmoothing);
+        } else {
+          _value = averageDouble(_value ?? next, next,
+              smooth: widget.config.controller.valueSmoothing);
+        }
         _displayValue = widget._convert(_value!);
       }
     } catch (e) {

@@ -94,7 +94,7 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
     try {
       double next = (updates[0].value as num).toDouble();
 
-      _direction = averageDouble(_direction ?? next, next, smooth: widget.config.controller.valueSmoothing);
+      _direction = averageAngle(_direction ?? next, next, smooth: widget.config.controller.valueSmoothing);
     } catch (e) {
       widget.config.controller.l.e("Error converting $updates", error: e);
     }
