@@ -68,11 +68,14 @@ class _MainPageState extends State<MainPage> {
 
     _themeProvider.setDarkMode(_controller.darkMode);
 
-    // Convert the current system brightness into the closest step, rounding up.
-    // Note: We add the step as well as _setBrightness() will remove it.
-    _brightness = (await ScreenBrightness().system * _brightnessMax).ceil();
-    _brightness = _brightness - (_brightness % _brightnessStep) + (_brightnessStep*2);
-    _setBrightness();
+    if(_controller.brightnessControl) {
+      // Convert the current system brightness into the closest step, rounding up.
+      // Note: We add the step as well as _setBrightness() will remove it.
+      _brightness = (await ScreenBrightness().system * _brightnessMax).ceil();
+      _brightness =
+          _brightness - (_brightness % _brightnessStep) + (_brightnessStep * 2);
+      _setBrightness();
+    }
 
     setState(() {});
   }
@@ -87,16 +90,22 @@ class _MainPageState extends State<MainPage> {
 
     _controller.clear();
 
+    List<Widget> actions = [
+      IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
+    ];
+
+    if(_controller.brightnessControl) {
+      actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
+    }
+
+    actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
+
     AppBar? appBar;
     if(_showAppBar) {
       appBar = AppBar(
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
         title: Text(_controller.pageName(_pageNum)),
-        actions: [
-          IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
-          IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed:  _setBrightness),
-          IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage),
-        ]);
+        actions: actions);
     }
 
     return Scaffold(

@@ -328,6 +328,7 @@ class _Settings {
   int signalkMinPeriod;
   bool darkMode;
   bool wrapPages;
+  bool brightnessControl;
   bool keepAwake;
   bool autoConfirmActions;
   DistanceUnits distanceUnits;
@@ -350,6 +351,7 @@ class _Settings {
     this.signalkMinPeriod = 1000,
     this.darkMode = true,
     this.wrapPages = true,
+    this.brightnessControl = false,
     this.keepAwake = false,
     this.autoConfirmActions = false,
     this.distanceUnits = DistanceUnits.nm,

@@ -156,6 +156,16 @@ class _SettingsState extends State<SettingsPage> {
               settings.keepAwake = value;
             });
           }),
+      SwitchListTile(title: const Text("Show Brightness Controls:"),
+          value: settings.brightnessControl,
+          onChanged: (bool value) {
+            setState(() {
+              settings.brightnessControl = value;
+              if(!value) {
+                ScreenBrightness().resetScreenBrightness();
+              }
+            });
+          }),
       SwitchListTile(title: const Text("Auto confirm actions:"),
           value: settings.autoConfirmActions,
           onChanged: (bool value) {

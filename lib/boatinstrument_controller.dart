@@ -11,6 +11,7 @@ import 'package:boatinstrument/widgets/wind_direction_true_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 import 'package:circular_buffer/circular_buffer.dart';
@@ -78,6 +79,7 @@ class BoatInstrumentController {
   String get signalkServer => _settings!.signalkServer;
   int get valueSmoothing => _settings!.valueSmoothing;
   bool get darkMode => _settings!.darkMode;
+  bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   SpeedUnits get speedUnits => _settings!.speedUnits;

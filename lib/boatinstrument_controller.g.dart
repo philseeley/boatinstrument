@@ -65,6 +65,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 1000,
       darkMode: json['darkMode'] as bool? ?? true,
       wrapPages: json['wrapPages'] as bool? ?? true,
+      brightnessControl: json['brightnessControl'] as bool? ?? false,
       keepAwake: json['keepAwake'] as bool? ?? false,
       autoConfirmActions: json['autoConfirmActions'] as bool? ?? false,
       distanceUnits:
@@ -96,6 +97,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'signalkMinPeriod': instance.signalkMinPeriod,
       'darkMode': instance.darkMode,
       'wrapPages': instance.wrapPages,
+      'brightnessControl': instance.brightnessControl,
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
