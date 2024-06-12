@@ -237,6 +237,12 @@ class BoatInstrumentController {
     try {
       l.i("Connecting to: $signalkServer");
 
+      for(_WidgetData wd in _widgetData) {
+        if(wd.onUpdate != null) {
+          wd.onUpdate!(null);
+        }
+      }
+
       _channel?.sink.close();
 
       _channel = WebSocketChannel.connect(
@@ -281,7 +287,7 @@ class BoatInstrumentController {
     for(String path in paths) {
       subscribe.add({
         "path": path,
-        "policy": _settings!.signalkPolicy.name,
+        "policy": 'instant',
         "minPeriod": _settings!.signalkMinPeriod.toString()
         });
     }
@@ -310,11 +316,13 @@ class BoatInstrumentController {
 
   void _networkTimeout () {
     _networkTimer?.cancel();
-    _networkTimer = Timer(const Duration(seconds: 20), connect);
+    _networkTimer = Timer(Duration(milliseconds: _settings!.signalkConnectionTimeout), connect);
   }
   //TODO add callback when no data so boxes can clear their displays. Or do we want to showMessage or other overall visual clue?
   _processData(data) {
     _networkTimeout();
+
+    DateTime now = DateTime.now();
 
     dynamic d = json.decode(data);
 
@@ -333,6 +341,7 @@ class BoatInstrumentController {
               for(String p in wd.paths) {
                 if(path == p) {
                   wd.updates.add(Update(path, v['value']));
+                  wd.lastUpdate = now;
                 }
               }
             }
@@ -342,8 +351,12 @@ class BoatInstrumentController {
         }
 
         for(_WidgetData wd in _widgetData) {
-          if(wd.onUpdate != null && wd.updates.isNotEmpty) {
-            wd.onUpdate!(wd.updates);
+          if(wd.onUpdate != null) {
+            if(wd.updates.isNotEmpty) {
+              wd.onUpdate!(wd.updates);
+            } else if(now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
+              wd.onUpdate!(null);
+            }
           }
         }
       }

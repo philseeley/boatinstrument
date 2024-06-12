@@ -186,11 +186,12 @@ class Update {
   Update(this.path, this.value);
 }
 
-typedef OnUpdate = Function(List<Update> updates);
+typedef OnUpdate = Function(List<Update>? updates);
 
 class _WidgetData {
   Widget widget;
   bool configured = false;
+  DateTime lastUpdate = DateTime.now();
   OnUpdate? onUpdate;
   Set<String> paths = {};
   List<Update> updates = [];
@@ -264,16 +265,6 @@ class _Page {
   static _Page _newPage() => _Page('Page Name', [_Column([_Row([_Box.help()], 1)], 1)]);
 }
 
-enum SignalkPolicy {
-  instant('Instant'),
-  ideal('Ideal'),
-  fixed('Fixed');
-
-  final String displayName;
-
-  const SignalkPolicy(this.displayName);
-}
-
 enum DistanceUnits {
   meters('Meters', 'm'),
   km('Kilometers', 'km'),
@@ -324,8 +315,9 @@ class _Settings {
   int version;
   int valueSmoothing;
   String signalkServer;
-  SignalkPolicy signalkPolicy;
   int signalkMinPeriod;
+  int signalkConnectionTimeout;
+  int dataTimeout;
   bool darkMode;
   bool wrapPages;
   bool brightnessControl;
@@ -347,8 +339,9 @@ class _Settings {
     this.version = 0,
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
-    this.signalkPolicy = SignalkPolicy.instant,
     this.signalkMinPeriod = 1000,
+    this.signalkConnectionTimeout = 20000,
+    this.dataTimeout = 10000,
     this.darkMode = true,
     this.wrapPages = true,
     this.brightnessControl = false,

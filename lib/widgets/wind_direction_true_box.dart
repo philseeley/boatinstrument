@@ -90,13 +90,18 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
     ]);
   }
 
-  _processData(List<Update> updates) {
-    try {
-      double next = (updates[0].value as num).toDouble();
+  _processData(List<Update>? updates) {
+    if(updates == null) {
+      _direction = null;
+    } else {
+      try {
+        double next = (updates[0].value as num).toDouble();
 
-      _direction = averageAngle(_direction ?? next, next, smooth: widget.config.controller.valueSmoothing);
-    } catch (e) {
-      widget.config.controller.l.e("Error converting $updates", error: e);
+        _direction = averageAngle(_direction ?? next, next,
+            smooth: widget.config.controller.valueSmoothing);
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $updates", error: e);
+      }
     }
 
     if(mounted) {

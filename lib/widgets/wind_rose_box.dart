@@ -206,30 +206,34 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   //   });
   // }
 
-  _processData(List<Update> updates) {
-    for (Update u in updates) {
-      try {
-        switch (u.path) {
-          case 'environment.wind.angleApparent':
-            double latest = (u.value as num).toDouble();
-            _windAngleApparent = averageAngle(
-                _windAngleApparent ?? latest, latest,
-                smooth: widget.config.controller.valueSmoothing);
-            break;
-          case 'environment.wind.angleTrueWater':
-            double latest = (u.value as num).toDouble();
-            _windAngleTrue = averageAngle(
-                _windAngleTrue ?? latest, latest,
-                smooth: widget.config.controller.valueSmoothing);
-            break;
+  _processData(List<Update>? updates) {
+    if(updates == null) {
+      _windAngleApparent = _windAngleTrue = null;
+    } else {
+      for (Update u in updates) {
+        try {
+          switch (u.path) {
+            case 'environment.wind.angleApparent':
+              double latest = (u.value as num).toDouble();
+              _windAngleApparent = averageAngle(
+                  _windAngleApparent ?? latest, latest,
+                  smooth: widget.config.controller.valueSmoothing);
+              break;
+            case 'environment.wind.angleTrueWater':
+              double latest = (u.value as num).toDouble();
+              _windAngleTrue = averageAngle(
+                  _windAngleTrue ?? latest, latest,
+                  smooth: widget.config.controller.valueSmoothing);
+              break;
+          }
+        } catch (e) {
+          widget.config.controller.l.e("Error converting $u", error: e);
         }
-      } catch (e) {
-        widget.config.controller.l.e("Error converting $u", error: e);
       }
+    }
 
-      if (mounted) {
-        setState(() {});
-      }
+    if (mounted) {
+      setState(() {});
     }
   }
 }

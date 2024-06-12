@@ -363,52 +363,58 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
     ]);
   }
 
-  _processData(List<Update> updates) {
-    for (Update u in updates) {
-      try {
-        switch (u.path) {
-          case 'steering.autopilot.state':
-            _autopilotState = AutopilotState.values.byName(u.value);
-            break;
-          case 'navigation.courseOverGroundTrue':
-            double cogLatest = (u.value as num).toDouble();
-            _courseOverGroundTrue = averageAngle(
-                _courseOverGroundTrue ?? cogLatest, cogLatest,
-                smooth: widget.config.controller.valueSmoothing);
-            break;
-          case 'steering.autopilot.target.windAngleApparent':
-            _targetWindAngleApparent = (u.value as num).toDouble();
-            break;
-          case 'environment.wind.angleApparent':
-            double waa = (u.value as num).toDouble();
-            _windAngleApparent = averageAngle(
-                _windAngleApparent ?? waa, waa,
-                smooth: widget.config.controller.valueSmoothing, relative: true);
-            break;
-          case 'navigation.currentRoute.waypoints':
-            _waypoint = u.value[1]['name'];
-            break;
-          case 'navigation.courseGreatCircle.crossTrackError':
-            _crossTrackError = (u.value as num).toDouble();
-            break;
-          case 'steering.autopilot.target.headingTrue':
-            _targetHeadingTrue = (u.value as num).toDouble();
-            break;
-          case 'steering.autopilot.target.headingMagnetic':
-            _targetHeadingMagnetic = (u.value as num).toDouble();
-            break;
-          case 'navigation.magneticVariation':
-            _magneticVariation = (u.value as num).toDouble();
-            break;
-          case 'steering.rudderAngle':
-            _rudderAngle = (u.value as num).toDouble();
-            break;
-          case 'notifications.autopilot.*'://TODO this this need to be a regex or something.
-            widget.config.controller.showMessage(context, u.value, error: true);
-            break;
+  _processData(List<Update>? updates) {
+    if(updates == null) {
+      _autopilotState = null;
+    } else {
+      for (Update u in updates) {
+        try {
+          switch (u.path) {
+            case 'steering.autopilot.state':
+              _autopilotState = AutopilotState.values.byName(u.value);
+              break;
+            case 'navigation.courseOverGroundTrue':
+              double cogLatest = (u.value as num).toDouble();
+              _courseOverGroundTrue = averageAngle(
+                  _courseOverGroundTrue ?? cogLatest, cogLatest,
+                  smooth: widget.config.controller.valueSmoothing);
+              break;
+            case 'steering.autopilot.target.windAngleApparent':
+              _targetWindAngleApparent = (u.value as num).toDouble();
+              break;
+            case 'environment.wind.angleApparent':
+              double waa = (u.value as num).toDouble();
+              _windAngleApparent = averageAngle(
+                  _windAngleApparent ?? waa, waa,
+                  smooth: widget.config.controller.valueSmoothing,
+                  relative: true);
+              break;
+            case 'navigation.currentRoute.waypoints':
+              _waypoint = u.value[1]['name'];
+              break;
+            case 'navigation.courseGreatCircle.crossTrackError':
+              _crossTrackError = (u.value as num).toDouble();
+              break;
+            case 'steering.autopilot.target.headingTrue':
+              _targetHeadingTrue = (u.value as num).toDouble();
+              break;
+            case 'steering.autopilot.target.headingMagnetic':
+              _targetHeadingMagnetic = (u.value as num).toDouble();
+              break;
+            case 'navigation.magneticVariation':
+              _magneticVariation = (u.value as num).toDouble();
+              break;
+            case 'steering.rudderAngle':
+              _rudderAngle = (u.value as num).toDouble();
+              break;
+            case 'notifications.autopilot.*': //TODO this this need to be a regex or something.
+              widget.config.controller.showMessage(
+                  context, u.value, error: true);
+              break;
+          }
+        } catch (e) {
+          widget.config.controller.l.e("Error converting $u", error: e);
         }
-      } catch (e) {
-        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 

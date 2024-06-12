@@ -116,24 +116,6 @@ class _SettingsState extends State<SettingsPage> {
               });
             }),
       ),
-      ListTile(
-          leading: const Text("Signalk Server:"),
-          title: TextFormField(
-              initialValue: settings.signalkServer,
-              onChanged: (value) => settings.signalkServer = value)
-      ),
-      ListTile(
-          leading: const Text("Signalk Subscription Policy:"),
-          title: _signalkPolicyMenu()
-      ),
-      ListTile(
-          leading: const Text("Signalk Subscription Min Period:"),
-          title: TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.signalkMinPeriod.toString(),
-              onChanged: (value) => settings.signalkMinPeriod = int.parse(value))
-      ),
       SwitchListTile(title: const Text("Dark Mode:"),
           value: settings.darkMode,
           onChanged: (bool value) {
@@ -193,6 +175,39 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Temperature:"),
           title: _temperatureMenu()
       ),
+      ListTile(
+          leading: const Text("Signalk Server:"),
+          title: TextFormField(
+              initialValue: settings.signalkServer,
+              onChanged: (value) => settings.signalkServer = value)
+      ),
+      ListTile(
+          leading: const Text("Signalk Subscription Min Period:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: settings.signalkMinPeriod.toString(),
+              onChanged: (value) => settings.signalkMinPeriod = int.parse(value)),
+          trailing: const Text('milliseconds')
+      ),
+      ListTile(
+          leading: const Text("Signalk Connection Timeout:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: settings.signalkConnectionTimeout.toString(),
+              onChanged: (value) => settings.signalkConnectionTimeout = int.parse(value)),
+          trailing: const Text('milliseconds')
+      ),
+      ListTile(
+          leading: const Text("Data Timeout:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: settings.dataTimeout.toString(),
+              onChanged: (value) => settings.dataTimeout = int.parse(value)),
+          trailing: const Text('milliseconds')
+      ),
     ];
 
     return Scaffold(
@@ -207,25 +222,6 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
-  }
-
-  DropdownMenu _signalkPolicyMenu() {
-    List<DropdownMenuEntry<SignalkPolicy>> l = [];
-    for(var v in SignalkPolicy.values) {
-      l.add(DropdownMenuEntry<SignalkPolicy>(
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<SignalkPolicy>(
-      initialSelection: widget._controller._settings?.signalkPolicy,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.signalkPolicy = value!;
-      },
-    );
-
-    return menu;
   }
 
   DropdownMenu _distanceMenu() {

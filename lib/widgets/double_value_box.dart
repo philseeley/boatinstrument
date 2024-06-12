@@ -204,25 +204,29 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
     ]);
   }
 
-  _processData(List<Update> updates) {
-    try {
-      double next = (updates[0].value as num).toDouble();
+  _processData(List<Update>? updates) {
+    if(updates == null) {
+      _displayValue = null;
+    } else {
+      try {
+        double next = (updates[0].value as num).toDouble();
 
-      if((widget.minValue != null && next < widget.minValue!) ||
-         (widget.maxValue != null && next > widget.maxValue!)) {
-        _displayValue = null;
-      } else {
-        if(widget.angle) {
-          _value = averageAngle(_value ?? next, next,
-              smooth: widget.config.controller.valueSmoothing);
+        if ((widget.minValue != null && next < widget.minValue!) ||
+            (widget.maxValue != null && next > widget.maxValue!)) {
+          _displayValue = null;
         } else {
-          _value = averageDouble(_value ?? next, next,
-              smooth: widget.config.controller.valueSmoothing);
+          if (widget.angle) {
+            _value = averageAngle(_value ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+          } else {
+            _value = averageDouble(_value ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+          }
+          _displayValue = widget._convert(_value!);
         }
-        _displayValue = widget._convert(_value!);
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $updates", error: e);
       }
-    } catch (e) {
-      widget.config.controller.l.e("Error converting $updates", error: e);
     }
 
     if(mounted) {

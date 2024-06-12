@@ -49,12 +49,16 @@ class _PositionBoxState extends State<PositionBox> {
     ]);
   }
 
-  _processData(List<Update> updates) {
-    try {
-      _latitude = updates[0].value['latitude'];
-      _longitude = updates[0].value['longitude'];
-    } catch (e) {
-      widget.config.controller.l.e("Error converting $updates", error: e);
+  _processData(List<Update>? updates) {
+    if(updates == null) {
+      _latitude = _longitude = null;
+    } else {
+      try {
+        _latitude = updates[0].value['latitude'];
+        _longitude = updates[0].value['longitude'];
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $updates", error: e);
+      }
     }
 
     if(mounted) {
