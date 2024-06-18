@@ -149,25 +149,6 @@ class BoxDetails {
   BoxDetails(this.id, this.description, this.build);
 }
 
-//TODO rudder angle
-List<BoxDetails> boxDetails = [
-  BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
-  BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
-  BoxDetails(DepthBox.sid, 'Depth', (config) {return DepthBox(config, key: UniqueKey());}),
-  BoxDetails(SpeedBox.sid, 'Speed Through Water', (config) {return SpeedBox(config, key: UniqueKey());}),
-  BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (config) {return SpeedOverGroundBox(config, key: UniqueKey());}),
-  BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (config) {return WindSpeedApparentBox(config, key: UniqueKey());}),
-  BoxDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (config) {return WindSpeedTrueBox(config, key: UniqueKey());}),
-  BoxDetails(WindDirectionTrueBox.sid, 'Wind Direction True', (config) {return WindDirectionTrueBox(config, key: UniqueKey());}),
-  BoxDetails(WindRoseBox.sid, 'Wind Rose', (config) {return WindRoseBox(config, key: UniqueKey());}),
-  BoxDetails(PositionBox.sid, 'Position', (config) {return PositionBox(config, key: UniqueKey());}),
-  BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', (config) {return CourseOverGroundBox(config, key: UniqueKey());}),
-  BoxDetails(WaterTemperatureBox.sid, 'Sea Temperature', (config) {return WaterTemperatureBox(config, key: UniqueKey());}),
-  BoxDetails(AutoPilotStatusBox.sid, 'Autopilot Status', (config) {return AutoPilotStatusBox(config, key: UniqueKey());}),
-  BoxDetails(AutoPilotControlBox.sid, 'Autopilot Control', (config) {return AutoPilotControlBox(config, key: UniqueKey());}),
-  BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),
-];
-
 BoxDetails getBoxDetails(String id) {
   for(BoxDetails wd in boxDetails) {
     if(wd.id == id) {

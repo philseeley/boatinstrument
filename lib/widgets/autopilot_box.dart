@@ -281,7 +281,6 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
   double? _magneticVariation;
   String? _waypoint;
   double? _crossTrackError;
-  double? _rudderAngle;
   String? _error;
 
   @override
@@ -297,7 +296,6 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
       "steering.autopilot.target.headingTrue",
       "steering.autopilot.target.headingMagnetic",
       "navigation.magneticVariation",
-      "steering.rudderAngle",
     });
   }
 
@@ -345,19 +343,10 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
       }
     }
 
-    const rudderStr = '============================================='; // 90 degrees
-    double rudderAngle = _rudderAngle??0;
-    int rudderAngleLen = rad2Deg(rudderAngle.abs());
-    rudderAngleLen = ((rudderAngleLen.toDouble()/90.0)*rudderStr.length).toInt();
-
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Column(children: pilot),
         Column(children: actual)
-      ]),
-      Row(children: [
-        Expanded(child: Text(rudderStr.substring(0, rudderAngle < 0 ? rudderAngleLen : 0), style: const TextStyle(color: Colors.red), textAlign: TextAlign.right)),
-        Expanded(child: Text(rudderStr.substring(0, rudderAngle > 0 ? rudderAngleLen : 0), style: const TextStyle(color: Colors.green))),
       ]),
       Text(_error??'', style: const TextStyle(color: Colors.red))
     ]);
@@ -403,9 +392,6 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
               break;
             case 'navigation.magneticVariation':
               _magneticVariation = (u.value as num).toDouble();
-              break;
-            case 'steering.rudderAngle':
-              _rudderAngle = (u.value as num).toDouble();
               break;
             case 'notifications.autopilot.*': //TODO this this need to be a regex or something.
               widget.config.controller.showMessage(
