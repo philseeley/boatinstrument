@@ -49,7 +49,7 @@ dependencies:
   provider:
   flutter_inappwebview: ^6.0.0
   screen_brightness:
-  url_launcher:
+  flutter_email_sender:
 
 dev_dependencies:
   flutter_test:

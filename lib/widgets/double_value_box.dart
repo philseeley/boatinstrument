@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 part 'double_value_box.g.dart';
 
@@ -201,7 +203,7 @@ class CustomDoubleValueBox extends _DoubleValueBox {
 
   @override
   Widget getPerBoxSettingsWidget() {
-    return _SettingsWidget(_settings);
+    return _SettingsWidget(config, _settings);
   }
 
   @override
@@ -220,9 +222,10 @@ class CustomDoubleValueBox extends _DoubleValueBox {
 }
 
 class _SettingsWidget extends StatefulWidget {
+  final BoxWidgetConfig _config;
   final _Settings _settings;
 
-  const _SettingsWidget(this._settings);
+  const _SettingsWidget(this._config, this._settings);
 
   @override
   createState() => _SettingsState();
@@ -236,8 +239,8 @@ class _SettingsState extends State<_SettingsWidget> {
 
     return ListView(children: [
       ListTile(
-        leading: const Text("Please share your setting to the developers for permanent inclusion."),
-        title: IconButton(onPressed: _emailSettings, icon: const Icon(Icons.share)),
+        leading: IconButton(onPressed: _emailSettings, icon: const Icon(Icons.email)),
+        title: const Text("Please email your setting to the developers for permanent inclusion."),
       ),
       ListTile(
         leading: const Text("Title:"),
@@ -301,19 +304,38 @@ class _SettingsState extends State<_SettingsWidget> {
     ]);
   }
 
-  //TODO need to check this works.
-  static String mailURL = "mailto:feedback@wheretofly.info?subject=Custom%20Box%20Settings";
-  static String supportURL = "https://github.com/philseeley/boatinstrument/issues";
-
-  openUrl(String url) async {
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-  }
-
+  //TODO need to check this works
   void _emailSettings() async {
+    _Settings s = widget._settings;
+
+    final Email email = Email(
+      body:
+'''Title: ${s.title}
+Path: ${s.path}
+Precision: ${s.precision}
+Min Length: ${s.minLen}
+Min Value: ${s.minValue}
+Max Value: ${s.maxValue}
+Is Angle: ${s.angle}
+Units: ${s.units}
+Multiplier: ${s.multiplier}''',
+      subject: 'Boat Instrument Custom Box Settings',
+      recipients: ['feedback@wheretofly.info'],
+      isHTML: false,
+    );
+
     try {
-      await openUrl(mailURL);
-    } on PlatformException catch (_){
-      openUrl(supportURL);
+      await FlutterEmailSender.send(email);
+    } on PlatformException catch (e) {
+      if(mounted) {
+        if (Platform.isIOS && e.code == 'not_available') {
+          widget._config.controller.showMessage(context,
+              'On iOS you must install and configure the Apple EMail App with an account.', error: true);
+        }
+      }
+      widget._config.controller.l.e('Error Sending Email', error: e);
+    } catch (e) {
+      widget._config.controller.l.e('Error Sending Email', error: e);
     }
   }
 }
