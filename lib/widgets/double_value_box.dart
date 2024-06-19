@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+part 'double_value_box.g.dart';
 
 class WaterTemperatureBox extends _DoubleValueBox {
   static const String sid = 'sea-temperature';
@@ -148,18 +153,183 @@ abstract class _WindSpeedBox extends _DoubleValueBox {
   }
 }
 
+@JsonSerializable()
+class _Settings {
+  String title;
+  String path;
+  int precision;
+  int minLen;
+  double minValue;
+  double maxValue;
+  bool angle;
+  String units;
+  double multiplier;
+
+  _Settings({
+    this.title = 'title',
+    this.path = 'path',
+    this.precision = 1,
+    this.minLen = 2,
+    this.minValue = 0,
+    this.maxValue = 100,
+    this.angle = false,
+    this.units = 'units',
+    this.multiplier = 1
+  });
+}
+
+class CustomDoubleValueBox extends _DoubleValueBox {
+  late _Settings _settings;
+  String _unitsString;
+  double _multiplier;
+
+  CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.key}) {
+    _setup(_multiply, _getUnits);
+  }
+
+  factory CustomDoubleValueBox.fromSettings(config, {key}) {
+    _Settings s = _$SettingsFromJson(config.settings);
+    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, key: key);
+  }
+
+  static String sid = 'custom-double-value';
+  @override
+  String get id => sid;
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  Widget getPerBoxSettingsWidget() {
+    return _SettingsWidget(_settings);
+  }
+
+  @override
+  Map<String, dynamic> getPerBoxSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
+
+  double _multiply(double value) {
+    return value * _multiplier;
+  }
+
+  String _getUnits() {
+    return _unitsString;
+  }
+
+}
+
+class _SettingsWidget extends StatefulWidget {
+  final _Settings _settings;
+
+  const _SettingsWidget(this._settings);
+
+  @override
+  createState() => _SettingsState();
+}
+
+class _SettingsState extends State<_SettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _Settings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+        leading: const Text("Please share your setting to the developers for permanent inclusion."),
+        title: IconButton(onPressed: _emailSettings, icon: const Icon(Icons.share)),
+      ),
+      ListTile(
+        leading: const Text("Title:"),
+        title: TextFormField(
+            initialValue: s.title,
+            onChanged: (value) => s.title = value)
+      ),
+      ListTile(
+        leading: const Text("Signalk Path:"),
+        title: TextFormField(
+            initialValue: s.path,
+            onChanged: (value) => s.path = value)
+      ),
+      ListTile(
+          leading: const Text("Units:"),
+          title: TextFormField(
+              initialValue: s.units,
+              onChanged: (value) => s.units = value)
+      ),
+      ListTile(
+        leading: const Text("Multiplier:"),
+        title: TextFormField(
+            initialValue: s.multiplier.toString(),
+            onChanged: (value) => s.multiplier = double.parse(value)),
+      ),
+      ListTile(
+        leading: const Text("Precision:"),
+        title: TextFormField(
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            initialValue: s.precision.toString(),
+            onChanged: (value) => s.precision = int.parse(value)),
+      ),
+      ListTile(
+        leading: const Text("Min Length:"),
+        title: TextFormField(
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            initialValue: s.minLen.toString(),
+            onChanged: (value) => s.minLen = int.parse(value)),
+      ),
+      ListTile(
+        leading: const Text("Min Value:"),
+        title: TextFormField(
+            initialValue: s.minValue.toString(),
+            onChanged: (value) => s.minValue = double.parse(value)),
+      ),
+      ListTile(
+        leading: const Text("Max Value:"),
+        title: TextFormField(
+            initialValue: s.maxValue.toString(),
+            onChanged: (value) => s.maxValue = double.parse(value)),
+      ),
+      SwitchListTile(title: const Text("Is Angle:"),
+          value: s.angle,
+          onChanged: (bool value) {
+            setState(() {
+              s.angle = value;
+            });
+          }),
+    ]);
+  }
+
+  //TODO need to check this works.
+  static String mailURL = "mailto:feedback@wheretofly.info?subject=Custom%20Box%20Settings";
+  static String supportURL = "https://github.com/philseeley/boatinstrument/issues";
+
+  openUrl(String url) async {
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
+  void _emailSettings() async {
+    try {
+      await openUrl(mailURL);
+    } on PlatformException catch (_){
+      openUrl(supportURL);
+    }
+  }
+}
+
 abstract class _DoubleValueBox extends BoxWidget {
-  final String _title;
-  final String _path;
-  final int _precision;
-  final int _minLen;
+  final String title;
+  final String path;
+  final int precision;
+  final int minLen;
   final double? minValue;
   final double? maxValue;
   final bool angle;
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueBox(super.config, this._title, this._path, {precision = 1, minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key}): _precision = precision, _minLen = minLen;
+  _DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key});
 
   _setup(convert, units) {
     _convert = convert;
@@ -177,7 +347,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: { widget._path });
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: { widget.path });
   }
 
   @override
@@ -188,7 +358,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
 
     String valueText = (_displayValue == null) ?
       '-' :
-      fmt.format('{:${widget._minLen+(widget._precision > 0?1:0)+widget._precision}.${widget._precision}f}', _displayValue!);
+      fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', _displayValue!);
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
@@ -198,7 +368,7 @@ class _DoubleValueBoxState extends State<_DoubleValueBox> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} - ${widget._units()}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget._units()}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);

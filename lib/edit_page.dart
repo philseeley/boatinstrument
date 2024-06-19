@@ -41,6 +41,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(AutoPilotControlBox.sid, 'Autopilot Control', (config) {return AutoPilotControlBox(config, key: UniqueKey());}),
   BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, 'Rudder Angle', (config) {return RudderAngleBox(config, key: UniqueKey());}),
+  BoxDetails(CustomDoubleValueBox.sid, 'Custom Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -90,7 +91,9 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AutoPilotStatusBox.sid),
         _widgetMenuEntry(AutoPilotControlBox.sid),
         ]),
-      _widgetMenuEntry(WebViewBox.sid)
+      _widgetMenuEntry(WebViewBox.sid),
+      _widgetSubMenuEntry(box, 'Custom', [
+        _widgetMenuEntry(CustomDoubleValueBox.sid)]),
     ];
 
     return popupMenuEntries;
