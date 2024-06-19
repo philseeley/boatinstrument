@@ -42,6 +42,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, 'Rudder Angle', (config) {return RudderAngleBox(config, key: UniqueKey());}),
   BoxDetails(CustomDoubleValueBox.sid, 'Custom Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -92,6 +93,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AutoPilotControlBox.sid),
         ]),
       _widgetMenuEntry(WebViewBox.sid),
+      _widgetMenuEntry(DateTimeBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid)]),
     ];

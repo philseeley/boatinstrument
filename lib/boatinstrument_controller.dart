@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as m;
 
 import 'package:boatinstrument/theme_provider.dart';
+import 'package:boatinstrument/widgets/date_time_box.dart';
 import 'package:boatinstrument/widgets/position_box.dart';
 import 'package:boatinstrument/widgets/rudder_angle_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
