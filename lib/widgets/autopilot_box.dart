@@ -67,7 +67,8 @@ class AutoPilotControlBox extends BoxWidget {
 
   @override
   Widget? getSettingsHelp() {
-    return const Text('''To be able to control the autopilot, the device must be given read/write permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+    return const Text('''Ensure the signalk-autopilot plugin is installed on signalk.
+To be able to control the autopilot, the device must be given read/write permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-autopilot-helm". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
   }
 }
