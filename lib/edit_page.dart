@@ -7,14 +7,18 @@ class _EditPage extends StatefulWidget {
 
   _EditPage(this._controller, this._page) {
 
-    for(_Column c in _page.columns) {
-      _Column ec = _Column([], c.percentage);
-      _editPage.columns.add(ec);
-      for(_Row r in c.rows) {
-        _Row er = _Row([], r.percentage);
-        ec.rows.add(er);
-        for(_Box b in r.boxes) {
-          er.boxes.add(_Box(b.id, b.settings, b.percentage));
+    for(_PageRow pr in _page.pageRows) {
+      _PageRow epr = _PageRow([], pr.percentage);
+      _editPage.pageRows.add(epr);
+      for (_Column c in pr.columns) {
+        _Column ec = _Column([], c.percentage);
+        epr.columns.add(ec);
+        for (_Row r in c.rows) {
+          _Row er = _Row([], r.percentage);
+          ec.rows.add(er);
+          for (_Box b in r.boxes) {
+            er.boxes.add(_Box(b.id, b.settings, b.percentage));
+          }
         }
       }
     }
@@ -23,7 +27,7 @@ class _EditPage extends StatefulWidget {
   @override
   State<_EditPage> createState() => _EditPageState();
 }
-
+//TODO XTE, Heading, Set&Drift, Attitude(pitch, yaw, roll)
 List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
@@ -103,107 +107,125 @@ class _EditPageState extends State<_EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> columns = [];
-    List<double> columnsPercent = [];
+    List<Widget> pageRows = [];
+    List<double> pageRowsPercent = [];
 
-    for(int ci = 0; ci < widget._editPage.columns.length; ++ci) {
-      _Column column = widget._editPage.columns[ci];
+    for(int pri = 0; pri < widget._editPage.pageRows.length; ++pri) {
+      _PageRow pageRow = widget._editPage.pageRows[pri];
 
-      List<Widget> rows = [];
-      List<double> rowsPercent = [];
+      List<Widget> columns = [];
+      List<double> columnsPercent = [];
 
-      for (int ri = 0; ri < column.rows.length; ++ri) {
-        _Row row = column.rows[ri];
+      for(int ci = 0; ci < pageRow.columns.length; ++ci) {
+        _Column column = pageRow.columns[ci];
 
-        List<Widget> boxes = [];
-        List<double> boxesPercent = [];
+        List<Widget> rows = [];
+        List<double> rowsPercent = [];
 
-        for (int bi = 0; bi < row.boxes.length; ++bi) {
-          _Box box = row.boxes[bi];
+        for (int ri = 0; ri < column.rows.length; ++ri) {
+          _Row row = column.rows[ri];
 
-          List<Widget> nButtons = [];
-          List<Widget> sButtons = [];
-          List<Widget> eButtons = [];
-          List<Widget> wButtons = [];
+          List<Widget> boxes = [];
+          List<double> boxesPercent = [];
 
-          wButtons.add(IconButton(onPressed: () {_addBox(row, bi);}, icon: const Icon(Icons.keyboard_arrow_left, color: Colors.blue)));
+          for (int bi = 0; bi < row.boxes.length; ++bi) {
+            _Box box = row.boxes[bi];
 
-          if(bi == 0 && ri == 0) {
-            wButtons.add(IconButton(onPressed: () {_addColumn(widget._editPage, ci);}, icon: const Icon(Icons.keyboard_double_arrow_left, color: Colors.red)));
+            List<Widget> nButtons = [];
+            List<Widget> sButtons = [];
+            List<Widget> eButtons = [];
+            List<Widget> wButtons = [];
+
+            wButtons.add(IconButton(tooltip: 'Box Before', onPressed: () {_addBox(row, bi);}, icon: const Icon(Icons.arrow_circle_left_outlined, color: Colors.blue)));
+
+            if(bi == 0 && ri == 0 && ci == 0) {
+              nButtons.add(IconButton(tooltip: 'Page Row Above', onPressed: () {_addPageRow(widget._editPage, pri);}, icon: const Icon(Icons.arrow_circle_up_outlined, color: Colors.red)));
+            }
+
+            if(bi == 0 && ri == 0) {
+              wButtons.add(IconButton(tooltip: 'Column Before', onPressed: () {_addColumn(pageRow, ci);}, icon: const Icon(Icons.arrow_circle_left_outlined, color: Colors.orange)));
+            }
+
+            if(bi == 0) {
+              nButtons.add(IconButton(tooltip: 'Row Above', onPressed: () {_addRow(column, ri);}, icon: const Icon(Icons.arrow_circle_up_outlined, color: Colors.green)));
+            }
+
+            if(bi == row.boxes.length-1) {
+              eButtons.add(IconButton(tooltip: 'Box After', onPressed: () {_addBox(row, bi, after: true);}, icon: const Icon(Icons.arrow_circle_right_outlined, color: Colors.blue)));
+            }
+
+            if(pri == (widget._editPage.pageRows.length-1) && ci == 0 && ri == (column.rows.length-1) && bi == 0) {
+              sButtons.add(IconButton(tooltip: 'Page Row Below', onPressed: () {_addPageRow(widget._editPage, ci, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.red)));
+            }
+
+            if(ci == pageRow.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
+              eButtons.add(IconButton(tooltip: 'Column After', onPressed: () {_addColumn(pageRow, ci, after: true);}, icon: const Icon(Icons.arrow_circle_right_outlined, color: Colors.orange)));
+            }
+
+            if(ri == column.rows.length-1 && bi == 0) {
+              sButtons.add(IconButton(tooltip: 'Row Below', onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.green)));
+            }
+
+            LayoutBuilder layoutBoxWidget = LayoutBuilder(builder: (context, constraints) {
+              return getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, constraints, true));
+            });
+
+            PopupMenuButton boxWidgetMenu = PopupMenuButton(
+              icon: const Icon(Icons.list, color: Colors.blue),
+              tooltip: 'Box Type',
+              shape: Border.all(color: Colors.grey),
+              itemBuilder: (BuildContext context) {
+                return _getWidgetMenus(box);
+              },
+              onSelected: (value) {
+                setState(() {
+                  box.id = (value as BoxDetails).id;
+                });
+              },
+            );
+
+            List<Widget> stack = [
+              layoutBoxWidget
+            ];
+
+            BoxWidget editBoxWidget = getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0), true));
+
+            List<Widget> settingsButtons = [];
+            if(editBoxWidget.hasSettings) {
+              settingsButtons.add(IconButton(tooltip: 'Settings', onPressed: () {_showSettingsPage(editBoxWidget);}, icon: const Icon(Icons.settings)));
+            }
+            if(editBoxWidget.hasPerBoxSettings) {
+              settingsButtons.add(IconButton(tooltip: 'Box Settings', onPressed: () {_showPerBoxSettingsPage(editBoxWidget, pri, ci, ri, bi);}, icon: const Icon(Icons.settings, color: Colors.blue)));
+            }
+
+            stack.addAll([
+              Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
+              Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),
+              Positioned(right: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons)),
+              Positioned(left: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: wButtons)),
+              Positioned(top: 0, right: 0, child: Row(children: settingsButtons)),
+              Positioned(bottom: 0, left: 0, child: IconButton(tooltip: 'Delete Box', onPressed: () {_deleteBox(pri, ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
+              boxWidgetMenu
+            ]);
+            boxes.add(Stack(alignment: Alignment.center, children: stack));
+
+            boxesPercent.add(box.percentage);
           }
 
-          if(bi == 0) {
-            nButtons.add(IconButton(onPressed: () {_addRow(column, ri);}, icon: const Icon(Icons.keyboard_arrow_up, color: Colors.orange)));
-          }
-
-          if(bi == row.boxes.length-1) {
-            eButtons.add(IconButton(onPressed: () {_addBox(row, bi, after: true);}, icon: const Icon(Icons.keyboard_arrow_right, color: Colors.blue)));
-          }
-
-          if(ci == widget._editPage.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
-            eButtons.add(IconButton(onPressed: () {_addColumn(widget._editPage, ci, after: true);}, icon: const Icon(Icons.keyboard_double_arrow_right, color: Colors.red)));
-          }
-
-          if(ri == column.rows.length-1 && bi == 0) {
-            sButtons.add(IconButton(onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.keyboard_arrow_down, color: Colors.orange)));
-          }
-
-          LayoutBuilder layoutBoxWidget = LayoutBuilder(builder: (context, constraints) {
-            return getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, constraints, true));
-          });
-
-          PopupMenuButton boxWidgetMenu = PopupMenuButton(
-            icon: const Icon(Icons.list, color: Colors.blue),
-            tooltip: 'Box Type',
-            shape: Border.all(color: Colors.grey),
-            itemBuilder: (BuildContext context) {
-              return _getWidgetMenus(box);
-            },
-            onSelected: (value) {
-              setState(() {
-                box.id = (value as BoxDetails).id;
-              });
-            },
-          );
-
-          List<Widget> stack = [
-            layoutBoxWidget,
-            boxWidgetMenu
-          ];
-
-          BoxWidget editBoxWidget = getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0), true));
-
-          List<Widget> settingsButtons = [];
-          if(editBoxWidget.hasSettings) {
-            settingsButtons.add(IconButton(onPressed: () {_showSettingsPage(editBoxWidget);}, icon: const Icon(Icons.settings)));
-          }
-          if(editBoxWidget.hasPerBoxSettings) {
-            settingsButtons.add(IconButton(onPressed: () {_showPerBoxSettingsPage(editBoxWidget, ci, ri, bi);}, icon: const Icon(Icons.settings, color: Colors.blue)));
-          }
-
-          stack.addAll([
-            Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
-            Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),
-            Positioned(right: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons)),
-            Positioned(left: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: wButtons)),
-            Positioned(top: 0, right: 0, child: Row(children: settingsButtons)),
-            Positioned(bottom: 0, left: 0, child: IconButton(onPressed: () {_deleteBox(ci, ri, bi);}, icon: const Icon(Icons.delete, color: Colors.blue))),
-          ]);
-          boxes.add(Stack(alignment: Alignment.center, children: stack));
-
-          boxesPercent.add(box.percentage);
+          rows.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, row.boxes);}, isHorizontalSeparator: false, separatorColor: Colors.blue, separatorSize: 16, percentages: boxesPercent, children: boxes));
+          rowsPercent.add(row.percentage);
         }
 
-        rows.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, row.boxes);}, isHorizontalSeparator: false, separatorColor: Colors.blue, separatorSize: 16, percentages: boxesPercent, children: boxes));
-        rowsPercent.add(row.percentage);
+        columns.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, column.rows);}, isHorizontalSeparator: true, separatorColor: Colors.green, separatorSize: 16, percentages: rowsPercent, children: rows));
+        columnsPercent.add(column.percentage);
       }
 
-      columns.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, column.rows);}, isHorizontalSeparator: true, separatorColor: Colors.orange, separatorSize: 16, percentages: rowsPercent, children: rows));
-      columnsPercent.add(column.percentage);
+      pageRows.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, pageRow.columns);}, isHorizontalSeparator: false, separatorColor: Colors.orange, separatorSize: 16, percentages: columnsPercent, children: columns));
+      pageRowsPercent.add(pageRow.percentage);
     }
 
     return Scaffold(
-      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.columns);}, isHorizontalSeparator: false, separatorColor: Colors.red, separatorSize: 16, percentages: columnsPercent, children: columns),
+      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: const Icon(Icons.save), onPressed: _save),
         IconButton(icon: const Icon(Icons.close), onPressed: _close)
@@ -255,55 +277,75 @@ class _EditPageState extends State<_EditPage> {
     });
   }
 
-  void _addColumn(_Page p, int ci, {bool after = false}) {
+  void _addColumn(_PageRow pr, int ci, {bool after = false}) {
     setState(() {
       _Column c = _Column([_Row([_Box.blank()], 1)], 1);
-      double pc = p.columns[ci].percentage / 2;
-      p.columns[ci].percentage = pc;
+      double pc = pr.columns[ci].percentage / 2;
+      pr.columns[ci].percentage = pc;
       c.percentage = pc;
-      p.columns.insert(after ? ci+1 : ci, c);
-      c.percentage += _diff(p.columns);
+      pr.columns.insert(after ? ci+1 : ci, c);
+      c.percentage += _diff(pr.columns);
     });
   }
 
-  void _deleteBox(int ci, int ri, int bi) {
+  void _addPageRow(_Page p, int pri, {bool after = false}) {
+    setState(() {
+      _PageRow pr = _PageRow([_Column([_Row([_Box.blank()], 1)], 1)], 1);
+      double ppr = p.pageRows[pri].percentage / 2;
+      p.pageRows[pri].percentage = ppr;
+      pr.percentage = ppr;
+      p.pageRows.insert(after ? pri+1 : pri, pr);
+      pr.percentage += _diff(p.pageRows);
+    });
+  }
+
+  void _deleteBox(int pri, int ci, int ri, int bi) {
     _Page page = widget._editPage;
 
     setState(() {
-      _Box b = page.columns[ci].rows[ri].boxes[bi];
-      page.columns[ci].rows[ri].boxes.removeAt(bi);
-      if(page.columns[ci].rows[ri].boxes.isNotEmpty) {
-        if(bi >= page.columns[ci].rows[ri].boxes.length) {
+      _Box b = page.pageRows[pri].columns[ci].rows[ri].boxes[bi];
+      page.pageRows[pri].columns[ci].rows[ri].boxes.removeAt(bi);
+      if(page.pageRows[pri].columns[ci].rows[ri].boxes.isNotEmpty) {
+        if(bi >= page.pageRows[pri].columns[ci].rows[ri].boxes.length) {
           --bi;
         }
-        page.columns[ci].rows[ri].boxes[bi].percentage += b.percentage;
+        page.pageRows[pri].columns[ci].rows[ri].boxes[bi].percentage += b.percentage;
       } else {
-        _Row r = page.columns[ci].rows[ri];
-        page.columns[ci].rows.removeAt(ri);
-        if(page.columns[ci].rows.isNotEmpty) {
-          if(ri >= page.columns[ci].rows.length) {
+        _Row r = page.pageRows[pri].columns[ci].rows[ri];
+        page.pageRows[pri].columns[ci].rows.removeAt(ri);
+        if(page.pageRows[pri].columns[ci].rows.isNotEmpty) {
+          if(ri >= page.pageRows[pri].columns[ci].rows.length) {
             --ri;
           }
-          page.columns[ci].rows[ri].percentage += r.percentage;
+          page.pageRows[pri].columns[ci].rows[ri].percentage += r.percentage;
         } else {
-          _Column c = page.columns[ci];
-          page.columns.removeAt(ci);
-          if(page.columns.isNotEmpty) {
-            if(ci >= page.columns.length) {
+          _Column c = page.pageRows[pri].columns[ci];
+          page.pageRows[pri].columns.removeAt(ci);
+          if(page.pageRows[pri].columns.isNotEmpty) {
+            if(ci >= page.pageRows[pri].columns.length) {
               --ci;
             }
-            page.columns[ci].percentage += c.percentage;
+            page.pageRows[pri].columns[ci].percentage += c.percentage;
           } else {
-            // Need to have one Box for the current screen.
-            page.columns = [_Column([_Row([_Box.blank()], 1.0)], 1.0)];
+            _PageRow pr = page.pageRows[pri];
+            page.pageRows.removeAt(pri);
+            if(page.pageRows.isNotEmpty) {
+              if(pri >= page.pageRows.length) {
+                --pri;
+              }
+              page.pageRows[pri].percentage += pr.percentage;
+            } else {
+              // Need to have one Box for the current screen.
+              page.pageRows = [_PageRow([_Column([_Row([_Box.blank()], 1.0)], 1.0)], 1)];
           }
         }
+      }
       }
     });
   }
 
   void _save() {
-    widget._page.columns = widget._editPage.columns;
+    widget._page.pageRows = widget._editPage.pageRows;
     widget._controller.save();
     _close();
   }
@@ -326,13 +368,13 @@ class _EditPageState extends State<_EditPage> {
     setState(() {});
   }
 
-  _showPerBoxSettingsPage (BoxWidget boxWidget, int ci, ri, bi) async {
+  _showPerBoxSettingsPage (BoxWidget boxWidget, int pri, int ci, ri, bi) async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return _BoxSettingsPage(boxWidget.getPerBoxSettingsWidget()!);
     }));
 
-    widget._editPage.columns[ci].rows[ri].boxes[bi].settings = boxWidget.getPerBoxSettingsJson();
+    widget._editPage.pageRows[pri].columns[ci].rows[ri].boxes[bi].settings = boxWidget.getPerBoxSettingsJson();
 
     setState(() {});
   }

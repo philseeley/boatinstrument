@@ -193,19 +193,32 @@ class BoatInstrumentController {
     });
   }
 
+  Widget _buildPageRow(_PageRow pageRow) {
+    return LayoutBuilder(builder: (context, constraints) {
+      List<Widget> widgets = [];
+      for (var column in pageRow.columns) {
+        widgets.add(SizedBox(
+            width: constraints.maxWidth * column.percentage,
+            height: double.infinity,
+            child: _buildColumn(column)));
+      }
+      return Row(children: widgets);
+    });
+  }
+
   Widget buildPage(int pageNum) {
     _Page page = _settings!.pages[pageNum];
 
     return LayoutBuilder(builder: (context, constraints) {
       List<Widget> widgets = [];
-      for(var column in page.columns) {
+      for(var pageRow in page.pageRows) {
         widgets.add(SizedBox(
-          width: constraints.maxWidth * column.percentage,
-          height: double.infinity,
-          child: _buildColumn(column)));
+          width: double.infinity,
+          height: constraints.maxHeight * pageRow.percentage,
+          child: _buildPageRow(pageRow)));
       }
 
-      return Row(children: widgets);
+      return Column(children: widgets);
     });
   }
 

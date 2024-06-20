@@ -42,16 +42,28 @@ Map<String, dynamic> _$ColumnToJson(_Column instance) => <String, dynamic>{
       'rows': instance.rows,
     };
 
-_Page _$PageFromJson(Map<String, dynamic> json) => _Page(
-      json['name'] as String,
+_PageRow _$PageRowFromJson(Map<String, dynamic> json) => _PageRow(
       (json['columns'] as List<dynamic>)
           .map((e) => _Column.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      (json['percentage'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$PageRowToJson(_PageRow instance) => <String, dynamic>{
+      'percentage': instance.percentage,
+      'columns': instance.columns,
+    };
+
+_Page _$PageFromJson(Map<String, dynamic> json) => _Page(
+      json['name'] as String,
+      (json['pageRows'] as List<dynamic>)
+          .map((e) => _PageRow.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
       'name': instance.name,
-      'columns': instance.columns,
+      'pageRows': instance.pageRows,
     };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(

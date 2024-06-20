@@ -23,8 +23,10 @@ double averageDouble(double current, double next, { int smooth = 1 }) {
 // Assumption is that the font characters are higher than they are wide.
 // NOTE: the style MUST have the height set to 1.0.
 double maxFontSize(String text, TextStyle style, double availableHeight, double availableWidth) {
-  // Haven't worked out why the "- 1.0" is required.
+  //TODO Haven't worked out why the "- 1.0" is required.
   double fontSize = availableHeight - 1.0;
+  // The size must be greater than 0 to avoid rendering errors.
+  fontSize = (fontSize > 0.0) ? fontSize : 1.0;
 
   // We use this to determine the relationship between the font height and width, as we can only
   // control the font size by its height.
@@ -187,7 +189,7 @@ class _Resizable {
 }
 
 @JsonSerializable()
-class _Box extends _Resizable{
+class _Box extends _Resizable {
   String id;
   Map<String, dynamic> settings;
 
@@ -208,7 +210,7 @@ class _Box extends _Resizable{
 }
 
 @JsonSerializable()
-class _Row extends _Resizable{
+class _Row extends _Resizable {
   List<_Box> boxes;
 
   _Row(this.boxes, super.percentage);
@@ -220,7 +222,7 @@ class _Row extends _Resizable{
 }
 
 @JsonSerializable()
-class _Column extends _Resizable{
+class _Column extends _Resizable {
   List<_Row> rows;
 
   _Column(this.rows, super.percentage);
@@ -232,18 +234,30 @@ class _Column extends _Resizable{
 }
 
 @JsonSerializable()
-class _Page {
-  String name;
+class _PageRow extends _Resizable {
   List<_Column> columns;
 
-  _Page(this.name, this.columns);
+  _PageRow(this.columns, super.percentage);
+
+  factory _PageRow.fromJson(Map<String, dynamic> json) =>
+      _$PageRowFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PageRowToJson(this);
+}
+
+@JsonSerializable()
+class _Page {
+  String name;
+  List<_PageRow> pageRows;
+
+  _Page(this.name, this.pageRows);
 
   factory _Page.fromJson(Map<String, dynamic> json) =>
       _$PageFromJson(json);
 
   Map<String, dynamic> toJson() => _$PageToJson(this);
 
-  static _Page _newPage() => _Page('Page Name', [_Column([_Row([_Box.help()], 1)], 1)]);
+  static _Page _newPage() => _Page('Page Name', [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
 }
 
 enum DistanceUnits {

@@ -13,7 +13,8 @@ class _HelpPage extends StatelessWidget {
         WidgetSpan(child: Icon(Icons.web)),
         TextSpan(text: ''' shows the list of Pages. Press the '''),
         WidgetSpan(child: Icon(Icons.edit)),
-        TextSpan(text: ''' button to edit a Page. Each Page is made up of multiple Columns (Red), containing multiple Rows (Orange), containing multiple Boxes (Blue).
+        TextSpan(text: ''' button to edit a Page. Each Page is made up of multiple Page Rows (Red), containing multiple Columns (Orange), containing multiple Rows (Green), containing multiple Boxes (Blue). Use the coloured arrows to add Page elements.
+Hint: sometimes you may need to temporarily resize a Box to show all the buttons.
 The contents of each Box is selected through the '''),
         WidgetSpan(child: Icon(Icons.list, color: Colors.blue)),
         TextSpan(text: ''' button. If the Box has settings these are set through the '''),
