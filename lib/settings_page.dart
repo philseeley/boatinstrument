@@ -25,6 +25,7 @@ class _EditPagesState extends State<EditPagesPage> {
               initialValue: page.name,
               onChanged: (value) => page.name = value),
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            IconButton(icon: const Icon(Icons.copy), onPressed: () {_copyPage(p, page);}),
             IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);}),
             ReorderableDragStartListener(index: p, child: const Icon(Icons.drag_handle))
           ])
@@ -73,10 +74,19 @@ class _EditPagesState extends State<EditPagesPage> {
       }));
   }
 
-  _deletePage(int papeNum) async {
-    if(await widget._controller.askToConfirm(context, 'Delete page "${widget._controller._settings?.pages[papeNum].name}"', alwaysAsk: true)) {
+  _copyPage(int pageNum, _Page page) {
+    setState(() {
+      widget._controller._settings?.pages.insert(pageNum+1, page.clone());
+      if (widget._controller._settings!.pages.isEmpty) {
+        widget._controller._settings?.pages.add(_Page._newPage());
+      }
+    });
+  }
+
+  _deletePage(int pageNum) async {
+    if(await widget._controller.askToConfirm(context, 'Delete page "${widget._controller._settings?.pages[pageNum].name}"', alwaysAsk: true)) {
       setState(() {
-        widget._controller._settings?.pages.removeAt(papeNum);
+        widget._controller._settings?.pages.removeAt(pageNum);
         if (widget._controller._settings!.pages.isEmpty) {
           widget._controller._settings?.pages.add(_Page._newPage());
         }

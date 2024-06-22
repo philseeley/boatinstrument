@@ -258,6 +258,28 @@ class _Page {
   Map<String, dynamic> toJson() => _$PageToJson(this);
 
   static _Page _newPage() => _Page('Page Name', [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
+
+  _Page clone() {
+    _Page clone = _Page('$name - copy', []);
+
+    for(_PageRow pr in pageRows) {
+      _PageRow epr = _PageRow([], pr.percentage);
+      clone.pageRows.add(epr);
+      for (_Column c in pr.columns) {
+        _Column ec = _Column([], c.percentage);
+        epr.columns.add(ec);
+        for (_Row r in c.rows) {
+          _Row er = _Row([], r.percentage);
+          ec.rows.add(er);
+          for (_Box b in r.boxes) {
+            er.boxes.add(_Box(b.id, b.settings, b.percentage));
+          }
+        }
+      }
+    }
+
+    return clone;
+  }
 }
 
 enum DistanceUnits {

@@ -3,25 +3,10 @@ part of 'boatinstrument_controller.dart';
 class _EditPage extends StatefulWidget {
   final BoatInstrumentController _controller;
   final _Page _page;
-  final _Page _editPage =  _Page('_TMP_', []);
+  late final _Page _editPage;
 
   _EditPage(this._controller, this._page) {
-
-    for(_PageRow pr in _page.pageRows) {
-      _PageRow epr = _PageRow([], pr.percentage);
-      _editPage.pageRows.add(epr);
-      for (_Column c in pr.columns) {
-        _Column ec = _Column([], c.percentage);
-        epr.columns.add(ec);
-        for (_Row r in c.rows) {
-          _Row er = _Row([], r.percentage);
-          ec.rows.add(er);
-          for (_Box b in r.boxes) {
-            er.boxes.add(_Box(b.id, b.settings, b.percentage));
-          }
-        }
-      }
-    }
+    _editPage = _page.clone();
   }
 
   @override

@@ -24,6 +24,7 @@ The sizes of the Page elements can be adjusted by dragging the coloured Box bord
 Swiping up or pressing the back button hides the top bar.''')]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness')),
+      const ListTile(leading: Icon(Icons.copy), title: Text('Copy/Clone a Page')),
       const ListTile(leading: Icon(Icons.share), title: Text('Shares/Exports the Settings')),
       const ListTile(leading: Icon(Icons.file_open), title: Text('Imports Settings from a file')),
       const ListTile(leading: Icon(Icons.notes), title: Text('Shows the message/error log')),
