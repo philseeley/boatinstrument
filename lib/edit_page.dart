@@ -358,7 +358,8 @@ class _EditPageState extends State<_EditPage> {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
           return _BoxSettingsPage(
-              boxWidget.getSettingsWidget(widget._controller.getBoxSettings(boxWidget.id))!
+              boxWidget.getSettingsWidget(widget._controller.getBoxSettings(boxWidget.id))!,
+              boxWidget.getSettingsHelp()
           );
         })
     );
@@ -371,7 +372,7 @@ class _EditPageState extends State<_EditPage> {
   _showPerBoxSettingsPage (BoxWidget boxWidget, int pri, int ci, ri, bi) async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _BoxSettingsPage(boxWidget.getPerBoxSettingsWidget()!);
+      return _BoxSettingsPage(boxWidget.getPerBoxSettingsWidget()!, boxWidget.getPerBoxSettingsHelp());
     }));
 
     widget._editPage.pageRows[pri].columns[ci].rows[ri].boxes[bi].settings = boxWidget.getPerBoxSettingsJson();
@@ -382,8 +383,9 @@ class _EditPageState extends State<_EditPage> {
 
 class _BoxSettingsPage extends StatefulWidget {
   final Widget _settingsWidget;
+  final Widget? _helpWidget;
 
-  const _BoxSettingsPage(this._settingsWidget);
+  const _BoxSettingsPage(this._settingsWidget, this._helpWidget);
 
   @override
   createState() => _BoxSettingsState();
@@ -393,9 +395,46 @@ class _BoxSettingsState extends State<_BoxSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> actions = [];
+    if (widget._helpWidget != null) {
+      actions.add(IconButton(onPressed: _showHelpPage, icon: const Icon(Icons.help)));
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: widget._settingsWidget
+        appBar: AppBar(
+          title: const Text('Settings'),
+          actions: actions,
+        ),
+        body: widget._settingsWidget
+    );
+  }
+
+  _showHelpPage () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _BoxHelpPage(widget._helpWidget!);
+    }));
+  }
+}
+
+class _BoxHelpPage extends StatefulWidget {
+  final Widget _helpWidget;
+
+  const _BoxHelpPage(this._helpWidget);
+
+  @override
+  createState() => _BoxHelpState();
+}
+
+class _BoxHelpState extends State<_BoxHelpPage> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Help'),
+        ),
+        body: ListView(children: [ListTile(title: widget._helpWidget)])
     );
   }
 }
