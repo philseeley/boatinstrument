@@ -93,7 +93,7 @@ class SpeedBox extends _SpeedBox {
 
 abstract class _SpeedBox extends _DoubleValueBox {
 
-  _SpeedBox(super.config, super.title, super.path, {super.key}) {
+  _SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1){
     _setup(_convertSpeed, _speedUnits);
   }
 
