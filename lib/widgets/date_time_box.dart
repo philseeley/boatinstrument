@@ -37,7 +37,7 @@ class DateTimeBox extends BoxWidget {
   }
 
   @override
-  State<DateTimeBox> createState() => _DateTImeBoxState();
+  State<DateTimeBox> createState() => _DateTimeBoxState();
 
   static String sid = 'date-time';
   @override
@@ -75,8 +75,8 @@ class DateTimeBox extends BoxWidget {
     return _$PerBoxSettingsToJson(_perBoxSettings);
   }
 }
-//TODO fix typo
-class _DateTImeBoxState extends State<DateTimeBox> {
+
+class _DateTimeBoxState extends State<DateTimeBox> {
   _Settings _settings = _Settings();
   DateTime? _dateTime;
 
