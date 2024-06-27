@@ -33,6 +33,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(CustomDoubleValueBox.sid, 'Custom Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
+  BoxDetails(GaugeBox.sid, 'Test Gauge', (config) {return GaugeBox(config, GaugeOrientation.down, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -85,6 +86,7 @@ class _EditPageState extends State<_EditPage> {
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
+      // _widgetMenuEntry(GaugeBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid)]),
     ];
