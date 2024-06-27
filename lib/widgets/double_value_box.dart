@@ -36,29 +36,6 @@ class CrossTrackErrorBox extends DoubleValueBox {
   }
 }
 
-class WaterTemperatureBox extends DoubleValueBox {
-  static const String sid = 'sea-temperature';
-  @override
-  String get id => sid;
-
-  WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature') {
-    setup(_convertTemp, _tempUnits);
-  }
-
-  double _convertTemp(double temp) {
-    switch (config.controller.temperatureUnits) {
-      case TemperatureUnits.c:
-        return temp - 273.15;
-      case TemperatureUnits.f:
-        return (temp - 273.15) * 9/5 + 32;
-    }
-  }
-
-  String _tempUnits() {
-    return config.controller.temperatureUnits.unit;
-  }
-}
-
 class CourseOverGroundBox extends DoubleValueBox {
   static const String sid = 'course-over-ground';
   @override
