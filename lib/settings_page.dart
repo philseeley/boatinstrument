@@ -238,6 +238,7 @@ class _SettingsState extends State<SettingsPage> {
     List<DropdownMenuEntry<DistanceUnits>> l = [];
     for(var v in DistanceUnits.values) {
       l.add(DropdownMenuEntry<DistanceUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
           label: v.displayName));
     }
@@ -257,6 +258,7 @@ class _SettingsState extends State<SettingsPage> {
     List<DropdownMenuEntry<SpeedUnits>> l = [];
     for(var v in SpeedUnits.values) {
       l.add(DropdownMenuEntry<SpeedUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
           label: v.displayName));
     }
@@ -276,6 +278,7 @@ class _SettingsState extends State<SettingsPage> {
     List<DropdownMenuEntry<SpeedUnits>> l = [];
     for(var v in SpeedUnits.values) {
       l.add(DropdownMenuEntry<SpeedUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
           label: v.displayName));
     }
@@ -295,6 +298,7 @@ class _SettingsState extends State<SettingsPage> {
     List<DropdownMenuEntry<DepthUnits>> l = [];
     for(var v in DepthUnits.values) {
       l.add(DropdownMenuEntry<DepthUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
           label: v.displayName));
     }
@@ -314,6 +318,7 @@ class _SettingsState extends State<SettingsPage> {
     List<DropdownMenuEntry<TemperatureUnits>> l = [];
     for(var v in TemperatureUnits.values) {
       l.add(DropdownMenuEntry<TemperatureUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
           label: v.displayName));
     }
