@@ -11,7 +11,7 @@ part 'wind_direction_true_box.g.dart';
 class _Settings {
   bool cardinalPrimary;
 
-  _Settings({this.cardinalPrimary = false});
+  _Settings({this.cardinalPrimary = true});
 }
 
 class WindDirectionTrueBox extends BoxWidget {

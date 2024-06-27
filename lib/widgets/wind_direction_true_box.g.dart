@@ -7,7 +7,7 @@ part of 'wind_direction_true_box.dart';
 // **************************************************************************
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      cardinalPrimary: json['cardinalPrimary'] as bool? ?? false,
+      cardinalPrimary: json['cardinalPrimary'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
