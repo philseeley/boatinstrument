@@ -20,7 +20,8 @@ class WindSpeedTrueBox extends WindSpeedBox {
 abstract class WindSpeedBox extends DoubleValueBox {
 
   WindSpeedBox(super.config, super.title, super.path, {super.key}) {
-    setup(_convertSpeed, _speedUnits);
+    super.convert = _convertSpeed;
+    super.units = _speedUnits;
   }
 
   double _convertSpeed(double speed) {

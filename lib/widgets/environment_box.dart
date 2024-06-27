@@ -7,7 +7,8 @@ class DepthBox extends DoubleValueBox {
   String get id => sid;
 
   DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
-    setup(_convertDepth, _depthUnits);
+    super.convert = _convertDepth;
+    super.units = _depthUnits;
   }
 
   double _convertDepth(double depth) {
@@ -32,7 +33,8 @@ class WaterTemperatureBox extends DoubleValueBox {
   String get id => sid;
 
   WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature') {
-    setup(_convertTemp, _tempUnits);
+    super.convert = _convertTemp;
+    super.units = _tempUnits;
   }
 
   double _convertTemp(double temp) {

@@ -7,7 +7,8 @@ class CrossTrackErrorBox extends DoubleValueBox {
   String get id => sid;
 
   CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2) {
-    setup(_convertXTE, _xteUnits);
+    super.convert = _convertXTE;
+    super.units = _xteUnits;
   }
 
   double _convertXTE(double xte) {
@@ -34,7 +35,8 @@ class CourseOverGroundBox extends DoubleValueBox {
   String get id => sid;
 
   CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true) {
-    setup(_convertCOG, _cogUnits);
+    super.convert = _convertCOG;
+    super.units = _cogUnits;
   }
 
   double _convertCOG(double cog) {

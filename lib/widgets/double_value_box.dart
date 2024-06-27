@@ -12,7 +12,8 @@ part 'double_value_box.g.dart';
 abstract class SpeedBox extends DoubleValueBox {
 
   SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1){
-    setup(_convertSpeed, _speedUnits);
+    super.convert = _convertSpeed;
+    super.units = _speedUnits;
   }
 
   double _convertSpeed(double speed) {
@@ -60,11 +61,12 @@ class _Settings {
 
 class CustomDoubleValueBox extends DoubleValueBox {
   late _Settings _settings;
-  String _unitsString;
-  double _multiplier;
+  final String _unitsString;
+  final double _multiplier;
 
   CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.key}) {
-    setup(_multiply, _getUnits);
+    super.convert = _multiply;
+    super.units = _getUnits;
   }
 
   factory CustomDoubleValueBox.fromSettings(config, {key}) {
@@ -226,15 +228,11 @@ abstract class DoubleValueBox extends BoxWidget {
   final double? minValue;
   final double? maxValue;
   final bool angle;
-  late double Function(double value) _convert;
-  late String Function() _units;
+  late final double Function(double value) convert;
+  late final String Function() units;
 
+  //ignore: prefer_const_constructors_in_immutables
   DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key});
-
-  setup(convert, units) {
-    _convert = convert;
-    _units = units;
-  }
 
   @override
   State<DoubleValueBox> createState() => _DoubleValueBoxState();
@@ -268,7 +266,7 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget._units()}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget.units()}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);
@@ -292,7 +290,7 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
             _value = averageDouble(_value ?? next, next,
                 smooth: widget.config.controller.valueSmoothing);
           }
-          _displayValue = widget._convert(_value!);
+          _displayValue = widget.convert(_value!);
         }
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
