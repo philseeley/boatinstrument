@@ -12,7 +12,7 @@ class _EditPage extends StatefulWidget {
   @override
   State<_EditPage> createState() => _EditPageState();
 }
-//TODO XTE delta, Heading, Set&Drift, Attitude(pitch, yaw, roll)
+//TODO XTE delta and graph, Heading, Set&Drift, Attitude(pitch, yaw, roll)
 List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.

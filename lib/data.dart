@@ -356,7 +356,7 @@ class _Settings {
     this.version = 0,
     this.valueSmoothing = 1,
     this.signalkServer = 'openplotter.local:3000',
-    this.signalkMinPeriod = 1000,
+    this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
     this.dataTimeout = 10000,
     this.darkMode = true,
