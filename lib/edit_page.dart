@@ -17,7 +17,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(DepthBox.sid, 'Depth', (config) {return DepthBox(config, key: UniqueKey());}),
-  BoxDetails(SpeedBox.sid, 'Speed Through Water', (config) {return SpeedBox(config, key: UniqueKey());}),
+  BoxDetails(SpeedThroughWaterBox.sid, 'Speed Through Water', (config) {return SpeedThroughWaterBox(config, key: UniqueKey());}),
   BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (config) {return SpeedOverGroundBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (config) {return WindSpeedApparentBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (config) {return WindSpeedTrueBox(config, key: UniqueKey());}),
@@ -72,7 +72,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CrossTrackErrorBox.sid),
         _widgetMenuEntry(PositionBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
-        _widgetMenuEntry(SpeedBox.sid),
+        _widgetMenuEntry(SpeedThroughWaterBox.sid),
         _widgetMenuEntry(RudderAngleBox.sid)]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),

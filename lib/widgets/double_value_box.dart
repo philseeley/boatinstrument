@@ -9,13 +9,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'double_value_box.g.dart';
 
-class CrossTrackErrorBox extends _DoubleValueBox {
+class CrossTrackErrorBox extends DoubleValueBox {
   static const String sid = 'navigation-xte';
   @override
   String get id => sid;
 
   CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2) {
-    _setup(_convertXTE, _xteUnits);
+    setup(_convertXTE, _xteUnits);
   }
 
   double _convertXTE(double xte) {
@@ -36,13 +36,13 @@ class CrossTrackErrorBox extends _DoubleValueBox {
   }
 }
 
-class WaterTemperatureBox extends _DoubleValueBox {
+class WaterTemperatureBox extends DoubleValueBox {
   static const String sid = 'sea-temperature';
   @override
   String get id => sid;
 
   WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature') {
-    _setup(_convertTemp, _tempUnits);
+    setup(_convertTemp, _tempUnits);
   }
 
   double _convertTemp(double temp) {
@@ -59,13 +59,13 @@ class WaterTemperatureBox extends _DoubleValueBox {
   }
 }
 
-class CourseOverGroundBox extends _DoubleValueBox {
+class CourseOverGroundBox extends DoubleValueBox {
   static const String sid = 'course-over-ground';
   @override
   String get id => sid;
 
   CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true) {
-    _setup(_convertCOG, _cogUnits);
+    setup(_convertCOG, _cogUnits);
   }
 
   double _convertCOG(double cog) {
@@ -77,32 +77,7 @@ class CourseOverGroundBox extends _DoubleValueBox {
   }
 }
 
-class DepthBox extends _DoubleValueBox {
-  static const String sid = 'depth';
-  @override
-  String get id => sid;
-
-  DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
-    _setup(_convertDepth, _depthUnits);
-  }
-
-  double _convertDepth(double depth) {
-    switch (config.controller.depthUnits) {
-      case DepthUnits.m:
-        return depth;
-      case DepthUnits.ft:
-        return depth * 3.28084;
-      case DepthUnits.fa:
-        return depth * 0.546807;
-    }
-  }
-
-  String _depthUnits() {
-    return config.controller.depthUnits.unit;
-  }
-}
-
-class SpeedOverGroundBox extends _SpeedBox {
+class SpeedOverGroundBox extends SpeedBox {
   static const String sid = 'speed-over-ground';
   @override
   String get id => sid;
@@ -110,18 +85,10 @@ class SpeedOverGroundBox extends _SpeedBox {
   SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
 }
 
-class SpeedBox extends _SpeedBox {
-  static const String sid = 'speed-through-water';
-  @override
-  String get id => sid;
+abstract class SpeedBox extends DoubleValueBox {
 
-  SpeedBox(config, {super.key}) : super(config, 'Speed', 'navigation.speedThroughWater');
-}
-
-abstract class _SpeedBox extends _DoubleValueBox {
-
-  _SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1){
-    _setup(_convertSpeed, _speedUnits);
+  SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1){
+    setup(_convertSpeed, _speedUnits);
   }
 
   double _convertSpeed(double speed) {
@@ -142,7 +109,7 @@ abstract class _SpeedBox extends _DoubleValueBox {
   }
 }
 
-class WindSpeedApparentBox extends _WindSpeedBox {
+class WindSpeedApparentBox extends WindSpeedBox {
   static const String sid = 'wind-speed-apparent';
   @override
   String get id => sid;
@@ -150,7 +117,7 @@ class WindSpeedApparentBox extends _WindSpeedBox {
   WindSpeedApparentBox(config, {super.key}) : super(config, 'AWS', 'environment.wind.speedApparent');
 }
 
-class WindSpeedTrueBox extends _WindSpeedBox {
+class WindSpeedTrueBox extends WindSpeedBox {
   static const String sid = 'wind-speed-true';
   @override
   String get id => sid;
@@ -158,10 +125,10 @@ class WindSpeedTrueBox extends _WindSpeedBox {
   WindSpeedTrueBox(config, {super.key}) : super(config, 'TWS', 'environment.wind.speedTrue');
 }
 
-abstract class _WindSpeedBox extends _DoubleValueBox {
+abstract class WindSpeedBox extends DoubleValueBox {
 
-  _WindSpeedBox(super.config, super.title, super.path, {super.key}) {
-    _setup(_convertSpeed, _speedUnits);
+  WindSpeedBox(super.config, super.title, super.path, {super.key}) {
+    setup(_convertSpeed, _speedUnits);
   }
 
   double _convertSpeed(double speed) {
@@ -207,13 +174,13 @@ class _Settings {
   });
 }
 
-class CustomDoubleValueBox extends _DoubleValueBox {
+class CustomDoubleValueBox extends DoubleValueBox {
   late _Settings _settings;
   String _unitsString;
   double _multiplier;
 
   CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.key}) {
-    _setup(_multiply, _getUnits);
+    setup(_multiply, _getUnits);
   }
 
   factory CustomDoubleValueBox.fromSettings(config, {key}) {
@@ -367,7 +334,7 @@ Multiplier: ${s.multiplier}''',
   }
 }
 
-abstract class _DoubleValueBox extends BoxWidget {
+abstract class DoubleValueBox extends BoxWidget {
   final String title;
   final String path;
   final int precision;
@@ -378,18 +345,18 @@ abstract class _DoubleValueBox extends BoxWidget {
   late double Function(double value) _convert;
   late String Function() _units;
 
-  _DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key});
+  DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key});
 
-  _setup(convert, units) {
+  setup(convert, units) {
     _convert = convert;
     _units = units;
   }
 
   @override
-  State<_DoubleValueBox> createState() => _DoubleValueBoxState();
+  State<DoubleValueBox> createState() => _DoubleValueBoxState();
 }
 
-class _DoubleValueBoxState extends State<_DoubleValueBox> {
+class _DoubleValueBoxState extends State<DoubleValueBox> {
   double? _value;
   double? _displayValue;
 
