@@ -12,7 +12,7 @@ class _EditPage extends StatefulWidget {
   @override
   State<_EditPage> createState() => _EditPageState();
 }
-//TODO XTE, Heading, Set&Drift, Attitude(pitch, yaw, roll)
+//TODO XTE delta, Heading, Set&Drift, Attitude(pitch, yaw, roll)
 List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
@@ -32,6 +32,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(RudderAngleBox.sid, 'Rudder Angle', (config) {return RudderAngleBox(config, key: UniqueKey());}),
   BoxDetails(CustomDoubleValueBox.sid, 'Custom Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
+  BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -68,6 +69,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
+        _widgetMenuEntry(CrossTrackErrorBox.sid),
         _widgetMenuEntry(PositionBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedBox.sid),

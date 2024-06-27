@@ -9,6 +9,33 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'double_value_box.g.dart';
 
+class CrossTrackErrorBox extends _DoubleValueBox {
+  static const String sid = 'navigation-xte';
+  @override
+  String get id => sid;
+
+  CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2) {
+    _setup(_convertXTE, _xteUnits);
+  }
+
+  double _convertXTE(double xte) {
+    switch (config.controller.distanceUnits) {
+      case DistanceUnits.meters:
+        return xte;
+      case DistanceUnits.km:
+        return xte * 0.001;
+      case DistanceUnits.miles:
+        return xte * 0.000621371;
+      case DistanceUnits.nm:
+        return xte * 0.000539957;
+    }
+  }
+
+  String _xteUnits() {
+    return config.controller.distanceUnits.unit;
+  }
+}
+
 class WaterTemperatureBox extends _DoubleValueBox {
   static const String sid = 'sea-temperature';
   @override
