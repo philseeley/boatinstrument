@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong_formatter/latlong_formatter.dart';
+
+part 'position_box.g.dart';
+
+@JsonSerializable()
+class _Settings {
+  String latFormat;
+  String lonFormat;
+
+  _Settings({
+    this.latFormat = '0{lat0d 0m.mmm c}',
+    this.lonFormat = '{lon0d 0m.mmm c}'
+  });
+}
 
 class PositionBox extends BoxWidget {
 
-  const PositionBox(super.config, {super.key});
+  PositionBox(super.config, {super.key});
 
   @override
   State<PositionBox> createState() => _PositionBoxState();
@@ -12,17 +26,38 @@ class PositionBox extends BoxWidget {
   static String sid = 'position';
   @override
   String get id => sid;
+
+  _Settings _editSettings = _Settings();
+
+  @override
+  bool get hasSettings => true;
+
+  @override
+  Widget getSettingsWidget(Map<String, dynamic> json) {
+    _editSettings = _$SettingsFromJson(json);
+    return _SettingsWidget(_editSettings);
+  }
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_editSettings);
+  }
+
+  @override
+  Widget? getSettingsHelp() => const Text('For a full list of formats see https://pub.dev/packages/latlong_formatter');
 }
 
 class _PositionBoxState extends State<PositionBox> {
-  LatLongFormatter llf = LatLongFormatter('0{lat0d 0m.mmm c}\n{lon0d 0m.mmm c}');
+  _Settings _settings = _Settings();
+  LatLongFormatter _llf = LatLongFormatter('');
   double? _latitude;
   double? _longitude;
 
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'});
+    _settings = _$SettingsFromJson(widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'}));
+    _llf = LatLongFormatter('${_settings.latFormat}\n${_settings.lonFormat}');
   }
 
   @override
@@ -35,7 +70,7 @@ class _PositionBoxState extends State<PositionBox> {
     }
     String text = (_latitude == null || _longitude == null) ?
       '--- --.--- -\n--- --.--- -' :
-      llf.format(LatLong(_latitude!, _longitude!));
+      _llf.format(LatLong(_latitude!, _longitude!));
 
     double fontSize = maxFontSize(text, style,
           (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
@@ -64,5 +99,39 @@ class _PositionBoxState extends State<PositionBox> {
     if(mounted) {
       setState(() {});
     }
+  }
+}
+
+class _SettingsWidget extends StatefulWidget {
+  final _Settings _settings;
+
+  const _SettingsWidget(this._settings);
+
+  @override
+  createState() => _SettingsState();
+}
+
+class _SettingsState extends State<_SettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _Settings s = widget._settings;
+
+    List<Widget> list = [
+      ListTile(
+          leading: const Text("Lat Format:"),
+          title: TextFormField(
+              initialValue: s.latFormat,
+              onChanged: (value) => s.latFormat = value)
+      ),
+      ListTile(
+          leading: const Text("Long Format:"),
+          title: TextFormField(
+              initialValue: s.lonFormat,
+              onChanged: (value) => s.lonFormat = value)
+      ),
+    ];
+
+    return ListView(children: list);
   }
 }
