@@ -7,17 +7,25 @@ part of 'date_time_box.dart';
 // **************************************************************************
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      showDate: json['showDate'] as bool? ?? true,
-      showTime: json['showTime'] as bool? ?? true,
-      utc: json['utc'] as bool? ?? false,
       dateFormat: json['dateFormat'] as String? ?? 'yyyy-MM-dd',
       timeFormat: json['timeFormat'] as String? ?? 'HH:mm:ss',
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
+      'dateFormat': instance.dateFormat,
+      'timeFormat': instance.timeFormat,
+    };
+
+_PerBoxSettings _$PerBoxSettingsFromJson(Map<String, dynamic> json) =>
+    _PerBoxSettings(
+      showDate: json['showDate'] as bool? ?? true,
+      showTime: json['showTime'] as bool? ?? true,
+      utc: json['utc'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$PerBoxSettingsToJson(_PerBoxSettings instance) =>
+    <String, dynamic>{
       'showDate': instance.showDate,
       'showTime': instance.showTime,
       'utc': instance.utc,
-      'dateFormat': instance.dateFormat,
-      'timeFormat': instance.timeFormat,
     };

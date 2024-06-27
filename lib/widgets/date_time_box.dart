@@ -7,26 +7,33 @@ part 'date_time_box.g.dart';
 
 @JsonSerializable()
 class _Settings {
-  bool showDate;
-  bool showTime;
-  bool utc;
   String dateFormat;
   String timeFormat;
 
   _Settings({
-    this.showDate = true,
-    this.showTime = true,
-    this.utc = false,
     this.dateFormat = 'yyyy-MM-dd',
     this.timeFormat = 'HH:mm:ss'
   });
 }
 
+@JsonSerializable()
+class _PerBoxSettings {
+  bool showDate;
+  bool showTime;
+  bool utc;
+
+  _PerBoxSettings({
+    this.showDate = true,
+    this.showTime = true,
+    this.utc = false
+  });
+}
+
 class DateTimeBox extends BoxWidget {
-  late _Settings _settings;
+  late _PerBoxSettings _perBoxSettings;
 
   DateTimeBox(super.config, {super.key})  {
-    _settings = _$SettingsFromJson(config.settings);
+    _perBoxSettings = _$PerBoxSettingsFromJson(config.settings);
   }
 
   @override
@@ -36,32 +43,53 @@ class DateTimeBox extends BoxWidget {
   @override
   String get id => sid;
 
+  _Settings _editSettings = _Settings();
+
+  @override
+  bool get hasSettings => true;
+
+  @override
+  Widget getSettingsWidget(Map<String, dynamic> json) {
+    _editSettings = _$SettingsFromJson(json);
+    return _SettingsWidget(_editSettings);
+  }
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_editSettings);
+  }
+
+  @override
+  Widget? getSettingsHelp() => const Text('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
+
   @override
   bool get hasPerBoxSettings => true;
 
   @override
   Widget getPerBoxSettingsWidget() {
-    return _SettingsWidget(_settings);
+    return _PerBoxSettingsWidget(_perBoxSettings);
   }
 
   @override
   Map<String, dynamic> getPerBoxSettingsJson() {
-    return _$SettingsToJson(_settings);
+    return _$PerBoxSettingsToJson(_perBoxSettings);
   }
 }
-
+//TODO fix typo
 class _DateTImeBoxState extends State<DateTimeBox> {
+  _Settings _settings = _Settings();
   DateTime? _dateTime;
 
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.datetime'});
+    _settings = _$SettingsFromJson(widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.datetime'}));
+
   }
 
   @override
   Widget build(BuildContext context) {
-    _Settings s = widget._settings;
+    _PerBoxSettings perBoxSettings = widget._perBoxSettings;
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
@@ -76,17 +104,17 @@ class _DateTImeBoxState extends State<DateTimeBox> {
     if(_dateTime == null) {
       dateTimeString = '-';
     } else {
-      DateTime dt = s.utc ? _dateTime!.toUtc() : _dateTime!.toLocal();
+      DateTime dt = perBoxSettings.utc ? _dateTime!.toUtc() : _dateTime!.toLocal();
 
-      if(s.showDate) {
-        dateTimeString += DateFormat(s.dateFormat).format(dt);
+      if(perBoxSettings.showDate) {
+        dateTimeString += DateFormat(_settings.dateFormat).format(dt);
       }
-      if(s.showTime) {
-        if(s.showDate) {
+      if(perBoxSettings.showTime) {
+        if(perBoxSettings.showDate) {
           ++lines;
           dateTimeString += '\n';
         }
-        dateTimeString += DateFormat(s.timeFormat).format(dt);
+        dateTimeString += DateFormat(_settings.timeFormat).format(dt);
       }
     }
 
@@ -134,6 +162,37 @@ class _SettingsState extends State<_SettingsWidget> {
     _Settings s = widget._settings;
 
     return ListView(children: [
+      ListTile(
+          leading: const Text('Date Format:'),
+          title: TextFormField(
+              initialValue: s.dateFormat,
+              onChanged: (value) => s.dateFormat = value)
+      ),
+      ListTile(
+          leading: const Text('Time Format:'),
+          title: TextFormField(
+              initialValue: s.timeFormat,
+              onChanged: (value) => s.timeFormat = value)
+      ),
+    ]);
+  }
+}
+class _PerBoxSettingsWidget extends StatefulWidget {
+  final _PerBoxSettings _perBoxSettings;
+
+  const _PerBoxSettingsWidget(this._perBoxSettings);
+
+  @override
+  createState() => _PerBoxSettingsState();
+}
+
+class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _PerBoxSettings s = widget._perBoxSettings;
+
+    return ListView(children: [
       SwitchListTile(title: const Text('Show Date:'),
           value: s.showDate,
           onChanged: (bool value) {
@@ -155,21 +214,6 @@ class _SettingsState extends State<_SettingsWidget> {
               s.utc = value;
             });
           }),
-      ListTile(
-          leading: const Text('Date Format:'),
-          title: TextFormField(
-              initialValue: s.dateFormat,
-              onChanged: (value) => s.dateFormat = value)
-      ),
-      ListTile(
-          leading: const Text('Time Format:'),
-          title: TextFormField(
-              initialValue: s.timeFormat,
-              onChanged: (value) => s.timeFormat = value)
-      ),
-      const ListTile(
-          leading: Text('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html'),
-      ),
     ]);
   }
 }
