@@ -6,26 +6,26 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'wind_rose_box.g.dart';
 
-// enum WindRoseType {
-//   normal('Normal'),
-//   closeHaul('Close Haul'),
-//   auto('Auto');
-//
-//   final String displayName;
-//
-//   const WindRoseType(this.displayName);
-// }
+enum WindRoseType {
+  normal('Normal'),
+  closeHaul('Close Haul'),
+  auto('Auto');
+
+  final String displayName;
+
+  const WindRoseType(this.displayName);
+}
 
 @JsonSerializable()
 class _Settings {
-  // WindRoseType type;
+  WindRoseType type;
   bool showLabels;
-  // bool showButton;
+  bool showButton;
 
   _Settings({
-    // this.type = WindRoseType.normal,
+    this.type = WindRoseType.normal,
     this.showLabels = true,
-    // this.showButton = false
+    this.showButton = false
   });
 }
 
@@ -46,13 +46,18 @@ class _RosePainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     canvas.drawCircle(Offset(size/2, size/2), size/2, paint);
+
+    int multi = 1;
+    if(_settings.type == WindRoseType.closeHaul) {
+      multi = 2;
+    }
     paint..strokeWidth = 20.0..color = Colors.green;
-    canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad((20).toInt())-(pi/2), deg2Rad((40).toInt()), false, paint);
+    canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad((20*multi).toInt())-(pi/2), deg2Rad((40*multi).toInt()), false, paint);
     paint.color = Colors.red;
-    canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad((-20).toInt())-(pi/2), deg2Rad((-40).toInt()), false, paint);
+    canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad((-20*multi).toInt())-(pi/2), deg2Rad((-40*multi).toInt()), false, paint);
     paint.color = fg;
 
-    for(int a = 0; a < 360; a += 10) {
+    for(int a = 0; a <= 180; a += 10) {
       paint.strokeWidth = 10.0;
       double width = 0.01;
       if (a % 30 == 0) {
@@ -60,7 +65,19 @@ class _RosePainter extends CustomPainter {
         width = 0.02;
       }
 
-      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(a)-(pi/2)-(width/2), width, false, paint);
+      int adjustedA = a;
+      if(_settings.type == WindRoseType.closeHaul) {
+        if(a <= 60) {
+          adjustedA *= 2;
+        } else {
+          adjustedA -= 60;
+          adjustedA ~/= 2;
+          adjustedA += 120;
+        }
+      }
+
+      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(adjustedA)-(pi/2)-(width/2), width, false, paint);
+      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(-adjustedA)-(pi/2)-(width/2), width, false, paint);
     }
 
     if(_settings.showLabels) {
@@ -72,8 +89,20 @@ class _RosePainter extends CustomPainter {
             .textTheme
             .bodyMedium);
         tp.layout();
-        double x = cos(deg2Rad(a) - (pi / 2)) * (size / 2 - 40.0);
-        double y = sin(deg2Rad(a) - (pi / 2)) * (size / 2 - 40.0);
+
+        int adjustedA = a;
+        if(_settings.type == WindRoseType.closeHaul) {
+          if(a <= 60) {
+            adjustedA *= 2;
+          } else {
+            adjustedA -= 60;
+            adjustedA ~/= 2;
+            adjustedA += 120;
+          }
+        }
+
+        double x = cos(deg2Rad(adjustedA) - (pi / 2)) * (size / 2 - 40.0);
+        double y = sin(deg2Rad(adjustedA) - (pi / 2)) * (size / 2 - 40.0);
         tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
         tp.paint(canvas, Offset(-x - tp.size.width / 2, y - tp.size.height / 2));
       }
@@ -86,10 +115,11 @@ class _RosePainter extends CustomPainter {
 
 class _NeedlePainter extends CustomPainter {
 
+  final WindRoseType _type;
   final Color _color;
   final double _angle;
 
-  _NeedlePainter(this._color, this._angle);
+  _NeedlePainter(this._type, this._color, this._angle);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -105,13 +135,25 @@ class _NeedlePainter extends CustomPainter {
       ..moveTo(0.0, 0.0)
       ..addArc(const Offset(-10, -10.0) & const Size(20.0, 20.0), 0.0, pi)
       ..close();
+
+    int adjustedA = rad2Deg(_angle);
+    if(_type == WindRoseType.closeHaul) {
+      if(adjustedA.abs() <= 60) {
+        adjustedA *= 2;
+      } else {
+        adjustedA -= (adjustedA < 0) ? -60 : 60;
+        adjustedA ~/= 2;
+        adjustedA += (adjustedA < 0) ? -120 : 120;
+      }
+    }
+
     canvas.translate(size/2, size/2);
-    canvas.rotate(_angle);
+    canvas.rotate(deg2Rad(adjustedA));
     canvas.drawPath(needle, paint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class WindRoseBox extends BoxWidget {
@@ -141,10 +183,10 @@ class WindRoseBox extends BoxWidget {
     return _$SettingsToJson(_settings);
   }
 
-  // @override
-  // Widget? getPerBoxSettingsHelp() {
-  //   return const Text('''The Switch Button allow you to cycle through the Wind Rose types from the display.''');
-  // }
+  @override
+  Widget? getPerBoxSettingsHelp() {
+    return const Text('''The Switch Button allow you to cycle through the Wind Rose types from the display.''');
+  }
 }
 
 class _WindRoseBoxState extends State<WindRoseBox> {
@@ -165,46 +207,46 @@ class _WindRoseBoxState extends State<WindRoseBox> {
 
   @override
   Widget build(BuildContext context) {
-
     List<Widget> stack = [
-      CustomPaint(size: Size.infinite, painter: _rosePainter)// _RosePainter(context, widget._type))
+      CustomPaint(size: Size.infinite, painter: _rosePainter)
     ];
 
     if(_windAngleTrue != null) {
       double angleTrue = _windAngleTrue!;
-      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(Colors.yellow, angleTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(widget._settings.type, Colors.yellow, angleTrue)));
     }
 
     if(_windAngleApparent != null) {
       double angleApparent = _windAngleApparent!;
-      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(Colors.blue, angleApparent)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(widget._settings.type, Colors.blue, angleApparent)));
     }
 
-    // if(widget._settings.showButton) {
-    //   stack.add(Positioned(right: 0, bottom: 0, child:
-    //   IconButton(icon: Icon((widget._settings.type == WindRoseType.auto) ? Icons.lock_open : Icons.lock),
-    //       onPressed: _cycleType))
-    //   );
-    // }
+    if(widget._settings.showButton) {
+      stack.add(Positioned(right: 0, bottom: 0, child:
+      IconButton(icon: Icon((widget._settings.type == WindRoseType.auto) ? Icons.lock_open : Icons.lock),
+          onPressed: _cycleType))
+      );
+    }
 
-    return Container(padding: const EdgeInsets.all(5.0), child: Stack(children: stack));
+    // We wrap the rose in a RepaintBoundary so that other changes on the screen don't force a repaint.
+    return Container(padding: const EdgeInsets.all(5.0), child: RepaintBoundary(child: Stack(children: stack)));
   }
 
-  // void _cycleType () {
-  //   setState(() {
-  //     switch (widget._settings.type) {
-  //       case WindRoseType.normal:
-  //         widget._settings.type = WindRoseType.closeHaul;
-  //         break;
-  //       case WindRoseType.closeHaul:
-  //         widget._settings.type = WindRoseType.auto;
-  //         break;
-  //       case WindRoseType.auto:
-  //         widget._settings.type = WindRoseType.normal;
-  //         break;
-  //     }
-  //   });
-  // }
+  void _cycleType () {
+    setState(() {
+      switch (widget._settings.type) {
+        case WindRoseType.normal:
+          widget._settings.type = WindRoseType.closeHaul;
+          break;
+        case WindRoseType.closeHaul:
+          widget._settings.type = WindRoseType.auto;
+          break;
+        case WindRoseType.auto:
+          widget._settings.type = WindRoseType.normal;
+          break;
+      }
+    });
+  }
 
   _processData(List<Update>? updates) {
     if(updates == null) {
@@ -217,13 +259,15 @@ class _WindRoseBoxState extends State<WindRoseBox> {
               double latest = (u.value as num).toDouble();
               _windAngleApparent = averageAngle(
                   _windAngleApparent ?? latest, latest,
-                  smooth: widget.config.controller.valueSmoothing);
+                  smooth: widget.config.controller.valueSmoothing,
+                  relative: true);
               break;
             case 'environment.wind.angleTrueWater':
               double latest = (u.value as num).toDouble();
               _windAngleTrue = averageAngle(
                   _windAngleTrue ?? latest, latest,
-                  smooth: widget.config.controller.valueSmoothing);
+                  smooth: widget.config.controller.valueSmoothing,
+                  relative: true);
               break;
           }
         } catch (e) {
@@ -254,10 +298,10 @@ class _SettingsState extends State<_SettingsWidget> {
     _Settings s = widget._settings;
 
     return ListView(children: [
-      // ListTile(
-      //     leading: const Text("Type:"),
-      //     title: _roseTypeMenu()
-      // ),
+      ListTile(
+          leading: const Text("Type:"),
+          title: _roseTypeMenu()
+      ),
       SwitchListTile(title: const Text("Show Labels:"),
           value: s.showLabels,
           onChanged: (bool value) {
@@ -265,32 +309,33 @@ class _SettingsState extends State<_SettingsWidget> {
               s.showLabels = value;
             });
           }),
-      // SwitchListTile(title: const Text("Show Switch Button:"),
-      //     value: s.showButton,
-      //     onChanged: (bool value) {
-      //       setState(() {
-      //         s.showButton = value;
-      //       });
-      //     }),
+      SwitchListTile(title: const Text("Show Switch Button:"),
+          value: s.showButton,
+          onChanged: (bool value) {
+            setState(() {
+              s.showButton = value;
+            });
+          }),
     ]);
   }
 
-  // DropdownMenu _roseTypeMenu() {
-  //   List<DropdownMenuEntry<WindRoseType>> l = [];
-  //   for(var v in WindRoseType.values) {
-  //     l.add(DropdownMenuEntry<WindRoseType>(
-  //         value: v,
-  //         label: v.displayName));
-  //   }
-  //
-  //   DropdownMenu menu = DropdownMenu<WindRoseType>(
-  //     initialSelection: widget._settings.type,
-  //     dropdownMenuEntries: l,
-  //     onSelected: (value) {
-  //       widget._settings.type = value!;
-  //     },
-  //   );
-  //
-  //   return menu;
-  // }
+  DropdownMenu _roseTypeMenu() {
+    List<DropdownMenuEntry<WindRoseType>> l = [];
+    for(var v in WindRoseType.values) {
+      l.add(DropdownMenuEntry<WindRoseType>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<WindRoseType>(
+      initialSelection: widget._settings.type,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._settings.type = value!;
+      },
+    );
+
+    return menu;
+  }
 }
