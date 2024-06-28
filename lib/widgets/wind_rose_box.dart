@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -21,19 +22,22 @@ class _Settings {
   WindRoseType type;
   bool showLabels;
   bool showButton;
+  int autoSwitchingDelay;
 
   _Settings({
     this.type = WindRoseType.normal,
     this.showLabels = true,
-    this.showButton = false
+    this.showButton = false,
+    this.autoSwitchingDelay = 15
   });
 }
 
 class _RosePainter extends CustomPainter {
   final BuildContext _context;
   final _Settings _settings;
+  final WindRoseType _type;
 
-  _RosePainter(this._context, this._settings);
+  _RosePainter(this._context, this._settings, this._type);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -48,7 +52,7 @@ class _RosePainter extends CustomPainter {
     canvas.drawCircle(Offset(size/2, size/2), size/2, paint);
 
     int multi = 1;
-    if(_settings.type == WindRoseType.closeHaul) {
+    if(_type == WindRoseType.closeHaul) {
       multi = 2;
     }
     paint..strokeWidth = 20.0..color = Colors.green;
@@ -66,7 +70,7 @@ class _RosePainter extends CustomPainter {
       }
 
       int adjustedA = a;
-      if(_settings.type == WindRoseType.closeHaul) {
+      if(_type == WindRoseType.closeHaul) {
         if(a <= 60) {
           adjustedA *= 2;
         } else {
@@ -91,7 +95,7 @@ class _RosePainter extends CustomPainter {
         tp.layout();
 
         int adjustedA = a;
-        if(_settings.type == WindRoseType.closeHaul) {
+        if(_type == WindRoseType.closeHaul) {
           if(a <= 60) {
             adjustedA *= 2;
           } else {
@@ -192,7 +196,8 @@ class WindRoseBox extends BoxWidget {
 class _WindRoseBoxState extends State<WindRoseBox> {
   double? _windAngleApparent;
   double? _windAngleTrue;
-  late _RosePainter _rosePainter;
+  WindRoseType _displayType = WindRoseType.normal;
+  Timer? _autoTimer;
 
   @override
   void initState() {
@@ -201,24 +206,39 @@ class _WindRoseBoxState extends State<WindRoseBox> {
       'environment.wind.angleApparent',
       'environment.wind.angleTrueWater'
     });
-
-    _rosePainter = _RosePainter(context, widget._settings);
   }
 
   @override
   Widget build(BuildContext context) {
+    if(widget._settings.type == WindRoseType.auto) {
+      if((_displayType == WindRoseType.normal && rad2Deg(_windAngleApparent) <= 60) ||
+         (_displayType == WindRoseType.closeHaul && rad2Deg(_windAngleApparent) > 60)) {
+        _autoTimer ??= Timer(Duration(seconds: widget._settings.autoSwitchingDelay), () {
+          _displayType = (_displayType == WindRoseType.normal) ? WindRoseType.closeHaul : WindRoseType.normal;
+        });
+      } else {
+        _autoTimer?.cancel();
+        _autoTimer = null;
+      }
+    } else {
+      _autoTimer?.cancel();
+      _autoTimer = null;
+
+      _displayType = widget._settings.type;
+    }
+
     List<Widget> stack = [
-      CustomPaint(size: Size.infinite, painter: _rosePainter)
+      CustomPaint(size: Size.infinite, painter: _RosePainter(context, widget._settings, _displayType))
     ];
 
     if(_windAngleTrue != null) {
       double angleTrue = _windAngleTrue!;
-      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(widget._settings.type, Colors.yellow, angleTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, angleTrue)));
     }
 
     if(_windAngleApparent != null) {
       double angleApparent = _windAngleApparent!;
-      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(widget._settings.type, Colors.blue, angleApparent)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.blue, angleApparent)));
     }
 
     if(widget._settings.showButton) {
@@ -234,17 +254,10 @@ class _WindRoseBoxState extends State<WindRoseBox> {
 
   void _cycleType () {
     setState(() {
-      switch (widget._settings.type) {
-        case WindRoseType.normal:
-          widget._settings.type = WindRoseType.closeHaul;
-          break;
-        case WindRoseType.closeHaul:
-          widget._settings.type = WindRoseType.auto;
-          break;
-        case WindRoseType.auto:
-          widget._settings.type = WindRoseType.normal;
-          break;
-      }
+      int i = widget._settings.type.index;
+      ++i;
+      i = (i >= WindRoseType.values.length) ? 0 : i;
+      widget._settings.type = WindRoseType.values[i];
     });
   }
 
@@ -316,6 +329,20 @@ class _SettingsState extends State<_SettingsWidget> {
               s.showButton = value;
             });
           }),
+      ListTile(
+        leading: const Text("Auto Switch Delay:"),
+        title: Slider(
+            min: 1,
+            max: 60,
+            divisions: 60,
+            value: s.autoSwitchingDelay.toDouble(),
+            label: "${s.autoSwitchingDelay}",
+            onChanged: (double value) {
+              setState(() {
+                s.autoSwitchingDelay = value.toInt();
+              });
+            }),
+      ),
     ]);
   }
 

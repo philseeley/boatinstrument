@@ -11,12 +11,14 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
           WindRoseType.normal,
       showLabels: json['showLabels'] as bool? ?? true,
       showButton: json['showButton'] as bool? ?? false,
+      autoSwitchingDelay: (json['autoSwitchingDelay'] as num?)?.toInt() ?? 15,
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'type': _$WindRoseTypeEnumMap[instance.type]!,
       'showLabels': instance.showLabels,
       'showButton': instance.showButton,
+      'autoSwitchingDelay': instance.autoSwitchingDelay,
     };
 
 const _$WindRoseTypeEnumMap = {
