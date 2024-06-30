@@ -119,6 +119,12 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
     await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
   }
 
+  _autoTack(String direction) async {
+    if(await widget.config.controller.askToConfirm(context, 'Tack to "$direction"?')) {
+      await _sendCommand("steering/autopilot/actions/tack", '{"value": "$direction"}');
+    }
+  }
+
   _setState(AutopilotState state) async {
     if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
       await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
@@ -147,18 +153,29 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
     List<Row> controlButtons = [];
     bool disabled = _settings.enableLock && _locked;
 
-    for(int i in [1, 10]) {
-      controlButtons.add(Row(
+    controlButtons.add(const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          //TODO button beep
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-i);}, icon: const Icon(Icons.chevron_left)),
-          Text("$i", style: Theme.of(context).textTheme.titleLarge),
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(i);}, icon: const Icon(Icons.chevron_right)),
+          Text('Tack'),
+          Text(' 10  '),
+          Text(' 1  '),
+          Text('  1 '),
+          Text('  10 '),
+          Text('Tack'),
         ]
-      ));
-    }
-
+    ));
+    //TODO Button beep
+    controlButtons.add(Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward)),
+        ]
+    ));
     List<Widget> stateButtons = [];
     for(AutopilotState state in AutopilotState.values) {
       stateButtons.add(ElevatedButton(
