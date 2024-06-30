@@ -22,7 +22,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
       case DistanceUnits.nm:
         return xte * 0.000539957;
       case DistanceUnits.nmM:
-        if(xte < 300) {
+        if(xte <= config.controller.m2nmThreshold) {
           return xte;
         } else {
           return xte * 0.000539957;
@@ -32,7 +32,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
 
   String _xteUnits(double xte) {
     if(config.controller.distanceUnits == DistanceUnits.nmM &&
-       xte < 300) {
+       xte <= config.controller.m2nmThreshold) {
       return 'm';
     }
     return config.controller.distanceUnits.unit;

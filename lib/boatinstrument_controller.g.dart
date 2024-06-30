@@ -83,6 +83,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       distanceUnits:
           $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
               DistanceUnits.nm,
+      m2nmThreshold: (json['m2nmThreshold'] as num?)?.toInt() ?? 500,
       speedUnits:
           $enumDecodeNullable(_$SpeedUnitsEnumMap, json['speedUnits']) ??
               SpeedUnits.kts,
@@ -114,6 +115,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
+      'm2nmThreshold': instance.m2nmThreshold,
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,
       'windSpeedUnits': _$SpeedUnitsEnumMap[instance.windSpeedUnits]!,
       'depthUnits': _$DepthUnitsEnumMap[instance.depthUnits]!,

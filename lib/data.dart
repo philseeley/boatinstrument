@@ -342,6 +342,7 @@ class _Settings {
   bool keepAwake;
   bool autoConfirmActions;
   DistanceUnits distanceUnits;
+  int m2nmThreshold;
   SpeedUnits speedUnits;
   SpeedUnits windSpeedUnits;
   DepthUnits depthUnits;
@@ -366,6 +367,7 @@ class _Settings {
     this.keepAwake = false,
     this.autoConfirmActions = false,
     this.distanceUnits = DistanceUnits.nm,
+    this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,
     this.windSpeedUnits = SpeedUnits.kts,
     this.depthUnits = DepthUnits.m,

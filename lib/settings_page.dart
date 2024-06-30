@@ -170,6 +170,20 @@ class _SettingsState extends State<SettingsPage> {
           title: _distanceMenu()
       ),
       ListTile(
+        leading: const Text("Meters to NM threshold:"),
+        title: Slider(
+            min: 100,
+            max: 1000,
+            divisions: 900,
+            value: settings.m2nmThreshold.toDouble(),
+            label: "${settings.m2nmThreshold.toInt()}",
+            onChanged: (double value) {
+              setState(() {
+                settings.m2nmThreshold = value.toInt();
+              });
+            }),
+      ),
+      ListTile(
           leading: const Text("Speed:      "),
           title: _speedMenu()
       ),
