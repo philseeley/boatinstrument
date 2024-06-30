@@ -37,7 +37,7 @@ abstract class WindSpeedBox extends DoubleValueBox {
     }
   }
 
-  String _speedUnits() {
+  String _speedUnits(_) {
     return config.controller.windSpeedUnits.unit;
   }
 }

@@ -29,7 +29,7 @@ abstract class SpeedBox extends DoubleValueBox {
     }
   }
 
-  String _speedUnits() {
+  String _speedUnits(_) {
     return config.controller.speedUnits.unit;
   }
 }
@@ -95,7 +95,7 @@ class CustomDoubleValueBox extends DoubleValueBox {
     return value * _multiplier;
   }
 
-  String _getUnits() {
+  String _getUnits(_) {
     return _unitsString;
   }
 
@@ -230,7 +230,7 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool angle;
   final bool smoothing;
   late final double Function(double value) convert;
-  late final String Function() units;
+  late final String Function(double value) units;
 
   //ignore: prefer_const_constructors_in_immutables
   DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.smoothing = true, super.key});
@@ -267,7 +267,7 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget.units()}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget.units(_value??0)}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);

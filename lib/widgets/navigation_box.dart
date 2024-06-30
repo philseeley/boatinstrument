@@ -21,10 +21,20 @@ class CrossTrackErrorBox extends DoubleValueBox {
         return xte * 0.000621371;
       case DistanceUnits.nm:
         return xte * 0.000539957;
+      case DistanceUnits.nmM:
+        if(xte < 300) {
+          return xte;
+        } else {
+          return xte * 0.000539957;
+        }
     }
   }
 
-  String _xteUnits() {
+  String _xteUnits(double xte) {
+    if(config.controller.distanceUnits == DistanceUnits.nmM &&
+       xte < 300) {
+      return 'm';
+    }
     return config.controller.distanceUnits.unit;
   }
 }
@@ -43,7 +53,7 @@ class CourseOverGroundBox extends DoubleValueBox {
     return rad2Deg(cog) * 1.0;
   }
 
-  String _cogUnits() {
+  String _cogUnits(_) {
     return 'deg';
   }
 }

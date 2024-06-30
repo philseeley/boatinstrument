@@ -22,7 +22,7 @@ class DepthBox extends DoubleValueBox {
     }
   }
 
-  String _depthUnits() {
+  String _depthUnits(_) {
     return config.controller.depthUnits.unit;
   }
 }
@@ -46,7 +46,7 @@ class WaterTemperatureBox extends DoubleValueBox {
     }
   }
 
-  String _tempUnits() {
+  String _tempUnits(_) {
     return config.controller.temperatureUnits.unit;
   }
 }

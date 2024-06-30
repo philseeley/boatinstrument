@@ -286,7 +286,8 @@ enum DistanceUnits {
   meters('Meters', 'm'),
   km('Kilometers', 'km'),
   miles('Miles', 'mile'),
-  nm('Nautical Miles', 'nm');
+  nm('Nautical Miles', 'nm'),
+  nmM('Nautical Miles/Meters', 'nm');
 
   final String displayName;
   final String unit;

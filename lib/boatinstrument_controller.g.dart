@@ -127,6 +127,7 @@ const _$DistanceUnitsEnumMap = {
   DistanceUnits.km: 'km',
   DistanceUnits.miles: 'miles',
   DistanceUnits.nm: 'nm',
+  DistanceUnits.nmM: 'nmM',
 };
 
 const _$SpeedUnitsEnumMap = {
