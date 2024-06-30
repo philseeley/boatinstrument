@@ -33,6 +33,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(CustomDoubleValueBox.sid, 'Custom Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
+  BoxDetails(WindSpeedTrueBeaufortBox.sid, 'True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
   BoxDetails(GaugeBox.sid, 'Test Gauge', (config) {return GaugeBox(config, GaugeOrientation.down, key: UniqueKey());}),
 ];
 
@@ -79,6 +80,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WindSpeedApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
         _widgetMenuEntry(WindDirectionTrueBox.sid),
+        _widgetMenuEntry(WindSpeedTrueBeaufortBox.sid),
         _widgetMenuEntry(WindRoseBox.sid)]),
       _widgetSubMenuEntry(box, 'Autopilot', [
         _widgetMenuEntry(AutoPilotStatusBox.sid),
