@@ -12,7 +12,7 @@ class _EditPage extends StatefulWidget {
   @override
   State<_EditPage> createState() => _EditPageState();
 }
-//TODO XTE delta and graph, Heading, Set&Drift, Attitude(pitch, yaw, roll)
+//TODO XTE delta and graph, Attitude(pitch, yaw, roll)
 List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
@@ -35,6 +35,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedTrueBeaufortBox.sid, 'True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
   BoxDetails(SetAndDriftBox.sid, 'Set & Drift', (config) {return SetAndDriftBox(config, key: UniqueKey());}),
+  BoxDetails(HeadingBox.sid, 'Heading', (config) {return HeadingBox(config, key: UniqueKey());}),
   BoxDetails(GaugeBox.sid, 'Test Gauge', (config) {return GaugeBox(config, GaugeOrientation.down, key: UniqueKey());}),
 ];
 
@@ -73,6 +74,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
+        _widgetMenuEntry(HeadingBox.sid),
         _widgetMenuEntry(CrossTrackErrorBox.sid),
         _widgetMenuEntry(PositionBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [

@@ -65,3 +65,22 @@ class SpeedOverGroundBox extends SpeedBox {
 
   SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
 }
+
+class HeadingBox extends DoubleValueBox {
+  static const String sid = 'heading';
+  @override
+  String get id => sid;
+
+  HeadingBox(config, {super.key}) : super(config, 'Heading', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true) {
+    super.convert = _convert;
+    super.units = _units;
+  }
+
+  double _convert(double cog) {
+    return rad2Deg(cog) * 1.0;
+  }
+
+  String _units(_) {
+    return 'deg';
+  }
+}
