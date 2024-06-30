@@ -145,9 +145,9 @@ class _NeedlePainter extends CustomPainter {
       if(adjustedA.abs() <= 60) {
         adjustedA *= 2;
       } else {
-        adjustedA -= (adjustedA < 0) ? -60 : 60;
+        adjustedA -= (_angle < 0) ? -60 : 60;
         adjustedA ~/= 2;
-        adjustedA += (adjustedA < 0) ? -120 : 120;
+        adjustedA += (_angle < 0) ? -120 : 120;
       }
     }
 
@@ -211,8 +211,8 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   @override
   Widget build(BuildContext context) {
     if(widget._settings.type == WindRoseType.auto) {
-      if((_displayType == WindRoseType.normal && rad2Deg(_windAngleApparent) <= 60) ||
-         (_displayType == WindRoseType.closeHaul && rad2Deg(_windAngleApparent) > 60)) {
+      if((_displayType == WindRoseType.normal && rad2Deg(_windAngleApparent).abs() <= 60) ||
+         (_displayType == WindRoseType.closeHaul && rad2Deg(_windAngleApparent).abs() > 60)) {
         _autoTimer ??= Timer(Duration(seconds: widget._settings.autoSwitchingDelay), () {
           _displayType = (_displayType == WindRoseType.normal) ? WindRoseType.closeHaul : WindRoseType.normal;
         });
