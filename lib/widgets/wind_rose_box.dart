@@ -232,13 +232,11 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     ];
 
     if(_windAngleTrue != null) {
-      double angleTrue = _windAngleTrue!;
-      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, angleTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, _windAngleTrue!)));
     }
 
     if(_windAngleApparent != null) {
-      double angleApparent = _windAngleApparent!;
-      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.blue, angleApparent)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.blue, _windAngleApparent!)));
     }
 
     if(widget._settings.showButton) {
