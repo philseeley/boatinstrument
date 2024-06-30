@@ -117,6 +117,8 @@ class BoatInstrumentController {
     return _settings?.boxSettings[boxID]??{};
   }
 
+  // Each Box MUST call this in the Widget's State initState(), even if not subscribing to any Signalk data.
+  // If there are Box type settings they will be returned.
   Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, Set<String> paths = const {}}) {
     bool configured = true;
 

@@ -57,28 +57,44 @@ abstract class BoxWidget extends StatefulWidget {
 
   const BoxWidget(this.config, {super.key});
 
+  // This should be overridden to return a static and unique string.
+  // The static string is used to identify the Box class prior to instantiation.
+  // e.g.
+  //   static String sid = 'my-value';
+  //   @override
+  //   String get id => sid;
   String get id;
 
+  // Set if the Box has settings common to all Boxes of this type.
   bool get hasSettings => false;
 
+  // Should return a Widget tree for configuring the Settings.
+  // This would normally be a ListView.
   Widget? getSettingsWidget(Map<String, dynamic> json) {
     return null;
   }
 
+  // Should return the Settings as a JSON map.
   Map<String, dynamic> getSettingsJson() {
     return {};
   }
 
+  // Set if the Box has instance settings.
   bool get hasPerBoxSettings => false;
 
+  // Should return a Widget tree for configuring the Settings.
+  // This would normally be a ListView.
   Widget? getPerBoxSettingsWidget() {
     return null;
   }
 
+  // Should return the instance Settings as a JSON map.
   Map<String, dynamic> getPerBoxSettingsJson() {
     return {};
   }
 
+  // If the Settings are not obvious, these should return help Widgets.
+  // This would normally be a simple Text Widget.
   Widget? getSettingsHelp() => null;
   Widget? getPerBoxSettingsHelp() => null;
 }
