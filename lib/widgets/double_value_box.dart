@@ -228,11 +228,12 @@ abstract class DoubleValueBox extends BoxWidget {
   final double? minValue;
   final double? maxValue;
   final bool angle;
+  final bool smoothing;
   late final double Function(double value) convert;
   late final String Function() units;
 
   //ignore: prefer_const_constructors_in_immutables
-  DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, super.key});
+  DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.smoothing = true, super.key});
 
   @override
   State<DoubleValueBox> createState() => _DoubleValueBoxState();
@@ -283,13 +284,18 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
             (widget.maxValue != null && next > widget.maxValue!)) {
           _displayValue = null;
         } else {
-          if (widget.angle) {
-            _value = averageAngle(_value ?? next, next,
-                smooth: widget.config.controller.valueSmoothing);
+          if(widget.smoothing) {
+            if (widget.angle) {
+              _value = averageAngle(_value ?? next, next,
+                  smooth: widget.config.controller.valueSmoothing);
+            } else {
+              _value = averageDouble(_value ?? next, next,
+                  smooth: widget.config.controller.valueSmoothing);
+            }
           } else {
-            _value = averageDouble(_value ?? next, next,
-                smooth: widget.config.controller.valueSmoothing);
+            _value = next;
           }
+
           _displayValue = widget.convert(_value!);
         }
       } catch (e) {

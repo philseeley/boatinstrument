@@ -6,7 +6,7 @@ class DepthBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0) {
+  DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0, smoothing: false) {
     super.convert = _convertDepth;
     super.units = _depthUnits;
   }
