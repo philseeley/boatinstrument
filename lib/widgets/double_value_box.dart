@@ -17,16 +17,7 @@ abstract class SpeedBox extends DoubleValueBox {
   }
 
   double _convertSpeed(double speed) {
-    switch (config.controller.speedUnits) {
-      case SpeedUnits.mps:
-        return speed;
-      case SpeedUnits.kph:
-        return speed * 3.6;
-      case SpeedUnits.mph:
-        return speed * 2.236936;
-      case SpeedUnits.kts:
-        return speed * 1.943844;
-    }
+    return convertSpeed(config.controller.speedUnits, speed);
   }
 
   String _speedUnits(_) {

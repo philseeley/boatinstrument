@@ -43,6 +43,19 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   return fontSize;
 }
 
+double convertSpeed(SpeedUnits units, double speed) {
+  switch (units) {
+    case SpeedUnits.mps:
+      return speed;
+    case SpeedUnits.kph:
+      return speed * 3.6;
+    case SpeedUnits.mph:
+      return speed * 2.236936;
+    case SpeedUnits.kts:
+      return speed * 1.943844;
+  }
+}
+
 class BoxWidgetConfig {
   final BoatInstrumentController controller;
   final Map<String, dynamic> settings;

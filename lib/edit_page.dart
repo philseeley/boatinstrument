@@ -34,6 +34,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedTrueBeaufortBox.sid, 'True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
+  BoxDetails(SetAndDriftBox.sid, 'Set & Drift', (config) {return SetAndDriftBox(config, key: UniqueKey());}),
   BoxDetails(GaugeBox.sid, 'Test Gauge', (config) {return GaugeBox(config, GaugeOrientation.down, key: UniqueKey());}),
 ];
 
@@ -67,6 +68,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(BlankBox.sid),
       _widgetSubMenuEntry(box, 'Environment', [
         _widgetMenuEntry(DepthBox.sid),
+        _widgetMenuEntry(SetAndDriftBox.sid),
         _widgetMenuEntry(WaterTemperatureBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),

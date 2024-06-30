@@ -83,6 +83,9 @@ Boxes can have Box type and/or Box instance settings. The
 [DateTimeBox](lib/widgets/date_time_box.dart) is a good example of a
 Box that has both Box Type and per-Box settings.
 
+If the new Box is to display a single value, consider subclassing the
+[DoubleValueBox](lib/widgets/double_value_box.dart).
+
 For Boxes with settings, the JSON serialising code should be generated with:
 ```shell
 dart run build_runner build --delete-conflicting-outputs
