@@ -36,6 +36,9 @@ List<BoxDetails> boxDetails = [
   BoxDetails(WindSpeedTrueBeaufortBox.sid, 'True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
   BoxDetails(SetAndDriftBox.sid, 'Set & Drift', (config) {return SetAndDriftBox(config, key: UniqueKey());}),
   BoxDetails(HeadingBox.sid, 'Heading', (config) {return HeadingBox(config, key: UniqueKey());}),
+  BoxDetails(NextPointDistanceBox.sid, 'Next Point Distance', (config) {return NextPointDistanceBox(config, key: UniqueKey());}),
+  BoxDetails(NextPointVelocityMadeGoodBox.sid, 'Next Point VMG', (config) {return NextPointVelocityMadeGoodBox(config, key: UniqueKey());}),
+  BoxDetails(NextPointDistanceTimeToGo.sid, 'Next Point TTG', (config) {return NextPointDistanceTimeToGo(config, key: UniqueKey());}),
   BoxDetails(GaugeBox.sid, 'Test Gauge', (config) {return GaugeBox(config, GaugeOrientation.down, key: UniqueKey());}),
 ];
 
@@ -75,6 +78,9 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
         _widgetMenuEntry(HeadingBox.sid),
+        _widgetMenuEntry(NextPointDistanceBox.sid),
+        _widgetMenuEntry(NextPointVelocityMadeGoodBox.sid),
+        _widgetMenuEntry(NextPointDistanceTimeToGo.sid),
         _widgetMenuEntry(CrossTrackErrorBox.sid),
         _widgetMenuEntry(PositionBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [

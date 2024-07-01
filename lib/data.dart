@@ -43,6 +43,33 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   return fontSize;
 }
 
+double convertDistance(BoatInstrumentController controller, double distance) {
+  switch (controller.distanceUnits) {
+    case DistanceUnits.meters:
+      return distance;
+    case DistanceUnits.km:
+      return distance * 0.001;
+    case DistanceUnits.miles:
+      return distance * 0.000621371;
+    case DistanceUnits.nm:
+      return distance * 0.000539957;
+    case DistanceUnits.nmM:
+      if(distance <= controller.m2nmThreshold) {
+        return distance;
+      } else {
+        return distance * 0.000539957;
+      }
+  }
+}
+
+String distanceUnits(BoatInstrumentController controller, double distance) {
+  if(controller.distanceUnits == DistanceUnits.nmM &&
+      distance <= controller.m2nmThreshold) {
+    return 'm';
+  }
+  return controller.distanceUnits.unit;
+}
+
 double convertSpeed(SpeedUnits units, double speed) {
   switch (units) {
     case SpeedUnits.mps:
