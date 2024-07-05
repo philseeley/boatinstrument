@@ -39,7 +39,8 @@ List<BoxDetails> boxDetails = [
   BoxDetails(NextPointDistanceBox.sid, 'Next Point Distance', (config) {return NextPointDistanceBox(config, key: UniqueKey());}),
   BoxDetails(NextPointVelocityMadeGoodBox.sid, 'Next Point VMG', (config) {return NextPointVelocityMadeGoodBox(config, key: UniqueKey());}),
   BoxDetails(NextPointDistanceTimeToGo.sid, 'Next Point TTG', (config) {return NextPointDistanceTimeToGo(config, key: UniqueKey());}),
-  BoxDetails(GaugeBox.sid, 'Test Gauge', (config) {return GaugeBox(config, GaugeOrientation.down, key: UniqueKey());}),
+  BoxDetails(AttitudeRollGaugeBox.sid, 'Roll Gauge', (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
+  BoxDetails(TestGauge.sid, 'Test Gauge', (config) {return TestGauge(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -85,7 +86,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(PositionBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedThroughWaterBox.sid),
-        _widgetMenuEntry(RudderAngleBox.sid)]),
+        _widgetMenuEntry(RudderAngleBox.sid),
+        _widgetMenuEntry(AttitudeRollGaugeBox.sid)]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
@@ -98,7 +100,7 @@ class _EditPageState extends State<_EditPage> {
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
-      // _widgetMenuEntry(GaugeBox.sid),
+      // _widgetMenuEntry(TestGauge.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid)]),
     ];
