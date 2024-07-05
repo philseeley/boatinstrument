@@ -110,13 +110,8 @@ abstract class BoxWidget extends StatefulWidget {
 
   // Should return a Widget tree for configuring the Settings.
   // This would normally be a ListView.
-  Widget? getSettingsWidget(Map<String, dynamic> json) {
+  BoxSettingsWidget? getSettingsWidget(Map<String, dynamic> json) {
     return null;
-  }
-
-  // Should return the Settings as a JSON map.
-  Map<String, dynamic> getSettingsJson() {
-    return {};
   }
 
   // Set if the Box has instance settings.
@@ -124,19 +119,21 @@ abstract class BoxWidget extends StatefulWidget {
 
   // Should return a Widget tree for configuring the Settings.
   // This would normally be a ListView.
-  Widget? getPerBoxSettingsWidget() {
+  BoxSettingsWidget? getPerBoxSettingsWidget() {
     return null;
-  }
-
-  // Should return the instance Settings as a JSON map.
-  Map<String, dynamic> getPerBoxSettingsJson() {
-    return {};
   }
 
   // If the Settings are not obvious, these should return help Widgets.
   // This would normally be a simple Text Widget.
   Widget? getSettingsHelp() => null;
   Widget? getPerBoxSettingsHelp() => null;
+}
+
+abstract class BoxSettingsWidget extends StatefulWidget {
+  const BoxSettingsWidget({super.key});
+
+  // Should return the Settings as a JSON map.
+  Map<String, dynamic> getSettingsJson();
 }
 
 class BlankBox extends BoxWidget {

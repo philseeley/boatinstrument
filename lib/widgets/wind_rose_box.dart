@@ -161,7 +161,7 @@ class _NeedlePainter extends CustomPainter {
 }
 
 class WindRoseBox extends BoxWidget {
-  late _Settings _settings;
+  late final _Settings _settings;
 
    WindRoseBox(super.config, {super.key}) {
     _settings = _$SettingsFromJson(config.settings);
@@ -178,13 +178,8 @@ class WindRoseBox extends BoxWidget {
   bool get hasPerBoxSettings => true;
 
   @override
-  Widget getPerBoxSettingsWidget() {
+  BoxSettingsWidget getPerBoxSettingsWidget() {
     return _SettingsWidget(_settings);
-  }
-
-  @override
-  Map<String, dynamic> getPerBoxSettingsJson() {
-    return _$SettingsToJson(_settings);
   }
 
   @override
@@ -293,10 +288,15 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   }
 }
 
-class _SettingsWidget extends StatefulWidget {
+class _SettingsWidget extends BoxSettingsWidget {
   final _Settings _settings;
 
   const _SettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
 
   @override
   createState() => _SettingsState();

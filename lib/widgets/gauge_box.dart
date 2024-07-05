@@ -103,7 +103,7 @@ abstract class DoubleValueSemiGaugeBox extends BoxWidget {
   final String path;
   final double minValue;
   final double maxValue;
-  double Function(Update update)? extractValue;
+  late final double Function(Update update)? extractValue;
 
   //ignore: prefer_const_constructors_in_immutables
   DoubleValueSemiGaugeBox(super.config, this.title, this.orientation, this.path, this.minValue, this.maxValue, {super.key});

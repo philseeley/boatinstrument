@@ -40,7 +40,7 @@ class _Settings {
 
 class AutoPilotControlBox extends BoxWidget {
 
-  AutoPilotControlBox(super.config, {super.key});
+  const AutoPilotControlBox(super.config, {super.key});
 
   @override
   State<AutoPilotControlBox> createState() => _AutoPilotControlState();
@@ -49,20 +49,12 @@ class AutoPilotControlBox extends BoxWidget {
   @override
   String get id => sid;
 
-  _Settings _editSettings = _Settings();
-
   @override
   bool get hasSettings => true;
 
   @override
-  Widget getSettingsWidget(Map<String, dynamic> json) {
-    _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(super.config.controller, _editSettings);
-  }
-
-  @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$SettingsToJson(_editSettings);
+  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
+    return _SettingsWidget(super.config.controller, _$SettingsFromJson(json));
   }
 
   @override
@@ -199,7 +191,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   }
 }
 
-class _SettingsWidget extends StatefulWidget {
+class _SettingsWidget extends BoxSettingsWidget {
   final BoatInstrumentController _controller;
   final _Settings _settings;
 
@@ -207,6 +199,11 @@ class _SettingsWidget extends StatefulWidget {
 
   @override
   createState() => _SettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
 }
 
 class _SettingsState extends State<_SettingsWidget> {

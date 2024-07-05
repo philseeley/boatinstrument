@@ -14,7 +14,7 @@ class _Settings {
 }
 //TODO the view isn't scrollable. Do we want it to be? Do we want it to be more browser like?
 class WebViewBox extends BoxWidget {
-  late _Settings _settings;
+  late final _Settings _settings;
 
   WebViewBox(super.config, {super.key}) {
     _settings = _$SettingsFromJson(config.settings);
@@ -31,13 +31,8 @@ class WebViewBox extends BoxWidget {
   bool get hasPerBoxSettings => true;
 
   @override
-  Widget getPerBoxSettingsWidget() {
+  BoxSettingsWidget getPerBoxSettingsWidget() {
     return _SettingsWidget(_settings);
-  }
-
-  @override
-  Map<String, dynamic> getPerBoxSettingsJson() {
-    return _$SettingsToJson(_settings);
   }
 
   @override
@@ -71,10 +66,15 @@ class _WebViewBoxState extends State<WebViewBox> {
   }
 }
 
-class _SettingsWidget extends StatefulWidget {
+class _SettingsWidget extends BoxSettingsWidget {
   final _Settings _settings;
 
   const _SettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
 
   @override
   createState() => _SettingsState();

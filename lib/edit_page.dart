@@ -358,27 +358,30 @@ class _EditPageState extends State<_EditPage> {
   }
 
   _showSettingsPage (BoxWidget boxWidget) async {
+    BoxSettingsWidget boxSettingsWidget =  boxWidget.getSettingsWidget(widget._controller.getBoxSettings(boxWidget.id))!;
+
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
           return _BoxSettingsPage(
-              boxWidget.getSettingsWidget(widget._controller.getBoxSettings(boxWidget.id))!,
+              boxSettingsWidget,
               boxWidget.getSettingsHelp()
           );
         })
     );
 
-    widget._controller._settings?.boxSettings[boxWidget.id] = boxWidget.getSettingsJson();
+    widget._controller._settings?.boxSettings[boxWidget.id] = boxSettingsWidget.getSettingsJson();
 
     setState(() {});
   }
 
   _showPerBoxSettingsPage (BoxWidget boxWidget, int pri, int ci, ri, bi) async {
+    BoxSettingsWidget boxSettingsWidget = boxWidget.getPerBoxSettingsWidget()!;
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _BoxSettingsPage(boxWidget.getPerBoxSettingsWidget()!, boxWidget.getPerBoxSettingsHelp());
+      return _BoxSettingsPage(boxSettingsWidget, boxWidget.getPerBoxSettingsHelp());
     }));
 
-    widget._editPage.pageRows[pri].columns[ci].rows[ri].boxes[bi].settings = boxWidget.getPerBoxSettingsJson();
+    widget._editPage.pageRows[pri].columns[ci].rows[ri].boxes[bi].settings = boxSettingsWidget.getSettingsJson();
 
     setState(() {});
   }

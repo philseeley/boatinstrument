@@ -18,7 +18,7 @@ class _Settings {
 
 class PositionBox extends BoxWidget {
 
-  PositionBox(super.config, {super.key});
+  const PositionBox(super.config, {super.key});
 
   @override
   State<PositionBox> createState() => _PositionBoxState();
@@ -27,20 +27,12 @@ class PositionBox extends BoxWidget {
   @override
   String get id => sid;
 
-  _Settings _editSettings = _Settings();
-
   @override
   bool get hasSettings => true;
 
   @override
-  Widget getSettingsWidget(Map<String, dynamic> json) {
-    _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(_editSettings);
-  }
-
-  @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$SettingsToJson(_editSettings);
+  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
+    return _SettingsWidget(_$SettingsFromJson(json));
   }
 
   @override
@@ -102,10 +94,15 @@ class _PositionBoxState extends State<PositionBox> {
   }
 }
 
-class _SettingsWidget extends StatefulWidget {
+class _SettingsWidget extends BoxSettingsWidget {
   final _Settings _settings;
 
   const _SettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
 
   @override
   createState() => _SettingsState();

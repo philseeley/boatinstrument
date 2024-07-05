@@ -30,7 +30,7 @@ class _PerBoxSettings {
 }
 
 class DateTimeBox extends BoxWidget {
-  late _PerBoxSettings _perBoxSettings;
+  late final _PerBoxSettings _perBoxSettings;
 
   DateTimeBox(super.config, {super.key})  {
     _perBoxSettings = _$PerBoxSettingsFromJson(config.settings);
@@ -43,20 +43,12 @@ class DateTimeBox extends BoxWidget {
   @override
   String get id => sid;
 
-  _Settings _editSettings = _Settings();
-
   @override
   bool get hasSettings => true;
 
   @override
-  Widget getSettingsWidget(Map<String, dynamic> json) {
-    _editSettings = _$SettingsFromJson(json);
-    return _SettingsWidget(_editSettings);
-  }
-
-  @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$SettingsToJson(_editSettings);
+  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
+    return _SettingsWidget(_$SettingsFromJson(json));
   }
 
   @override
@@ -66,13 +58,8 @@ class DateTimeBox extends BoxWidget {
   bool get hasPerBoxSettings => true;
 
   @override
-  Widget getPerBoxSettingsWidget() {
+  BoxSettingsWidget getPerBoxSettingsWidget() {
     return _PerBoxSettingsWidget(_perBoxSettings);
-  }
-
-  @override
-  Map<String, dynamic> getPerBoxSettingsJson() {
-    return _$PerBoxSettingsToJson(_perBoxSettings);
   }
 }
 
@@ -146,10 +133,15 @@ class _DateTimeBoxState extends State<DateTimeBox> {
   }
 }
 
-class _SettingsWidget extends StatefulWidget {
+class _SettingsWidget extends BoxSettingsWidget {
   final _Settings _settings;
 
   const _SettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
 
   @override
   createState() => _SettingsState();
@@ -177,10 +169,15 @@ class _SettingsState extends State<_SettingsWidget> {
     ]);
   }
 }
-class _PerBoxSettingsWidget extends StatefulWidget {
+class _PerBoxSettingsWidget extends BoxSettingsWidget {
   final _PerBoxSettings _perBoxSettings;
 
   const _PerBoxSettingsWidget(this._perBoxSettings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$PerBoxSettingsToJson(_perBoxSettings);
+  }
 
   @override
   createState() => _PerBoxSettingsState();

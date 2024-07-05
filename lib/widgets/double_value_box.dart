@@ -51,7 +51,7 @@ class _Settings {
 }
 
 class CustomDoubleValueBox extends DoubleValueBox {
-  late _Settings _settings;
+  late final _Settings _settings;
   final String _unitsString;
   final double _multiplier;
 
@@ -73,13 +73,8 @@ class CustomDoubleValueBox extends DoubleValueBox {
   bool get hasPerBoxSettings => true;
 
   @override
-  Widget getPerBoxSettingsWidget() {
+  BoxSettingsWidget getPerBoxSettingsWidget() {
     return _SettingsWidget(config, _settings);
-  }
-
-  @override
-  Map<String, dynamic> getPerBoxSettingsJson() {
-    return _$SettingsToJson(_settings);
   }
 
   double _multiply(double value) {
@@ -92,11 +87,17 @@ class CustomDoubleValueBox extends DoubleValueBox {
 
 }
 
-class _SettingsWidget extends StatefulWidget {
+class _SettingsWidget extends BoxSettingsWidget {
   final BoxWidgetConfig _config;
   final _Settings _settings;
 
   const _SettingsWidget(this._config, this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
+
 
   @override
   createState() => _SettingsState();
