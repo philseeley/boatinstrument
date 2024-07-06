@@ -13,7 +13,7 @@ class SpeedThroughWaterBox extends SpeedBox {
 }
 
 class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
-  AttitudeRollGaugeBox(config, {super.key}) : super(config, 'Roll', GaugeOrientation.down, 'navigation.attitude', -pi/2, pi/2) {
+  AttitudeRollGaugeBox(config, {super.key}) : super(config, 'Roll', GaugeOrientation.down, 'navigation.attitude', -pi/2, pi/2, mirror: true, angle: true) {
     super.extractValue = _extractRoll;
   }
 

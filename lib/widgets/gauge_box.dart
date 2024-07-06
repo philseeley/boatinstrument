@@ -100,13 +100,15 @@ class _NeedlePainter extends CustomPainter {
 abstract class DoubleValueSemiGaugeBox extends BoxWidget {
   final String title;
   final GaugeOrientation orientation;
+  final bool mirror;
   final String path;
   final double minValue;
   final double maxValue;
+  final bool angle;
   late final double Function(Update update)? extractValue;
 
   //ignore: prefer_const_constructors_in_immutables
-  DoubleValueSemiGaugeBox(super.config, this.title, this.orientation, this.path, this.minValue, this.maxValue, {super.key});
+  DoubleValueSemiGaugeBox(super.config, this.title, this.orientation, this.path, this.minValue, this.maxValue, {this.mirror = false, this.angle = false, super.key});
 
   @override
   State<DoubleValueSemiGaugeBox> createState() => _DoubleValueSemiGaugeBoxState();
@@ -135,6 +137,9 @@ class _DoubleValueSemiGaugeBoxState extends State<DoubleValueSemiGaugeBox> {
 
     if(_value != null) {
       double angle = (((pi)/(widget.maxValue - widget.minValue)) * (_value! - widget.minValue)) - pi/2;
+      if(widget.mirror) {
+        angle = (pi*2)-angle;
+      }
       stack.add(CustomPaint(
           size: Size.infinite,
           painter: _NeedlePainter(Theme.of(context).colorScheme.onSurface, o, angle)
@@ -160,8 +165,13 @@ class _DoubleValueSemiGaugeBoxState extends State<DoubleValueSemiGaugeBox> {
             next > widget.maxValue) {
           _value = null;
         } else {
-          _value = averageDouble(_value ?? next, next,
-              smooth: widget.config.controller.valueSmoothing);
+          if (widget.angle) {
+            _value = averageAngle(_value ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+          } else {
+            _value = averageDouble(_value ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+          }
         }
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
