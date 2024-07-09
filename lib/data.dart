@@ -2,7 +2,6 @@ part of 'boatinstrument_controller.dart';
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
-double meters2NM(double m) => double.parse((m*0.00054).toStringAsPrecision(2));
 String val2PS(num val) => val < 0 ? 'P' : 'S';
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
@@ -64,7 +63,7 @@ double convertDistance(BoatInstrumentController controller, double distance) {
 
 String distanceUnits(BoatInstrumentController controller, double distance) {
   if(controller.distanceUnits == DistanceUnits.nmM &&
-      distance <= controller.m2nmThreshold) {
+      distance.abs() <= controller.m2nmThreshold) {
     return 'm';
   }
   return controller.distanceUnits.unit;

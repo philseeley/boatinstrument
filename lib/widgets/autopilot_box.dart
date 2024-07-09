@@ -296,7 +296,6 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
   double? _magneticVariation;
   String? _waypoint;
   double? _crossTrackError;
-  String? _error;
 
   @override
   void initState() {
@@ -354,7 +353,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
 
     if((_autopilotState??AutopilotState.standby) == AutopilotState.route) {
       if(_crossTrackError != null) {
-        actual.add(Text("XTE: ${meters2NM(_crossTrackError!.abs()).toStringAsFixed(2)} ${val2PS(_crossTrackError!)}", style: s));
+        actual.add(Text("XTE: ${convertDistance(widget.config.controller, _crossTrackError!.abs()).toStringAsFixed(2)}${distanceUnits(widget.config.controller, _crossTrackError!)} ${val2PS(_crossTrackError!)}", style: s));
       }
     }
 
@@ -363,7 +362,6 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
         Column(children: pilot),
         Column(children: actual)
       ]),
-      Text(_error??'', style: const TextStyle(color: Colors.red))
     ]);
   }
 
