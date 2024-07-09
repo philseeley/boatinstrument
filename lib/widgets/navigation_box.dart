@@ -7,17 +7,16 @@ class CrossTrackErrorBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2) {
-    super.convert = _convertXTE;
-    super.units = _xteUnits;
+  const CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2);
+
+  @override
+  double convert(double value) {
+    return convertDistance (config.controller, value);
   }
 
-  double _convertXTE(double xte) {
-    return convertDistance (config.controller, xte);
-  }
-
-  String _xteUnits(double xte) {
-    return distanceUnits(config.controller, xte);
+  @override
+  String units(double value) {
+    return distanceUnits(config.controller, value);
   }
 }
 
@@ -26,16 +25,15 @@ class CourseOverGroundBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true) {
-    super.convert = _convertCOG;
-    super.units = _cogUnits;
+  const CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value) * 1.0;
   }
 
-  double _convertCOG(double cog) {
-    return rad2Deg(cog) * 1.0;
-  }
-
-  String _cogUnits(_) {
+  @override
+  String units(double value) {
     return 'deg';
   }
 }
@@ -45,7 +43,7 @@ class SpeedOverGroundBox extends SpeedBox {
   @override
   String get id => sid;
 
-  SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+  const SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
 }
 
 class HeadingBox extends DoubleValueBox {
@@ -53,16 +51,15 @@ class HeadingBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  HeadingBox(config, {super.key}) : super(config, 'Heading', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true) {
-    super.convert = _convert;
-    super.units = _units;
+  const HeadingBox(config, {super.key}) : super(config, 'Heading', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value) * 1.0;
   }
 
-  double _convert(double cog) {
-    return rad2Deg(cog) * 1.0;
-  }
-
-  String _units(_) {
+  @override
+  String units(double value) {
     return 'deg';
   }
 }
@@ -72,17 +69,16 @@ class NextPointDistanceBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Distance', 'navigation.courseGreatCircle.nextPoint.distance', precision: 2) {
-    super.convert = _convert;
-    super.units = _units;
+  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Distance', 'navigation.courseGreatCircle.nextPoint.distance', precision: 2);
+
+  @override
+  double convert(double value) {
+    return convertDistance (config.controller, value);
   }
 
-  double _convert(double distance) {
-    return convertDistance (config.controller, distance);
-  }
-
-  String _units(double distance) {
-    return distanceUnits(config.controller, distance);
+  @override
+  String units(double value) {
+    return distanceUnits(config.controller, value);
   }
 }
 
@@ -91,7 +87,7 @@ class NextPointVelocityMadeGoodBox extends SpeedBox {
   @override
   String get id => sid;
 
-  NextPointVelocityMadeGoodBox(config, {super.key}) : super(config, 'WPT VMG', 'navigation.courseGreatCircle.nextPoint.velocityMadeGood');
+  const NextPointVelocityMadeGoodBox(config, {super.key}) : super(config, 'WPT VMG', 'navigation.courseGreatCircle.nextPoint.velocityMadeGood');
 }
 
 class NextPointDistanceTimeToGo extends BoxWidget {

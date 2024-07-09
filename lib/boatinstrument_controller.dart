@@ -7,7 +7,6 @@ import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
 import 'package:boatinstrument/widgets/date_time_box.dart';
 import 'package:boatinstrument/widgets/environment_box.dart';
-import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/position_box.dart';
 import 'package:boatinstrument/widgets/rudder_angle_box.dart';

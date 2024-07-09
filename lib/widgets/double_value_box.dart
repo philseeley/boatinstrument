@@ -11,16 +11,15 @@ part 'double_value_box.g.dart';
 
 abstract class SpeedBox extends DoubleValueBox {
 
-  SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1){
-    super.convert = _convertSpeed;
-    super.units = _speedUnits;
+  const SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1);
+
+  @override
+  double convert(double value) {
+    return convertSpeed(config.controller.speedUnits, value);
   }
 
-  double _convertSpeed(double speed) {
-    return convertSpeed(config.controller.speedUnits, speed);
-  }
-
-  String _speedUnits(_) {
+  @override
+  String units(double value) {
     return config.controller.speedUnits.unit;
   }
 }
@@ -51,14 +50,11 @@ class _Settings {
 }
 
 class CustomDoubleValueBox extends DoubleValueBox {
-  late final _Settings _settings;
+  final _Settings _settings;
   final String _unitsString;
   final double _multiplier;
 
-  CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.key}) {
-    super.convert = _multiply;
-    super.units = _getUnits;
-  }
+  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.key});
 
   factory CustomDoubleValueBox.fromSettings(config, {key}) {
     _Settings s = _$SettingsFromJson(config.settings);
@@ -77,14 +73,15 @@ class CustomDoubleValueBox extends DoubleValueBox {
     return _SettingsWidget(config, _settings);
   }
 
-  double _multiply(double value) {
+  @override
+  double convert(double value) {
     return value * _multiplier;
   }
 
-  String _getUnits(_) {
+  @override
+  String units(double value) {
     return _unitsString;
   }
-
 }
 
 class _SettingsWidget extends BoxSettingsWidget {
@@ -97,7 +94,6 @@ class _SettingsWidget extends BoxSettingsWidget {
   Map<String, dynamic> getSettingsJson() {
     return _$SettingsToJson(_settings);
   }
-
 
   @override
   createState() => _SettingsState();
@@ -221,19 +217,24 @@ abstract class DoubleValueBox extends BoxWidget {
   final double? maxValue;
   final bool angle;
   final bool smoothing;
-  late final double Function(double value) convert;
-  late final String Function(double value) units;
 
-  //ignore: prefer_const_constructors_in_immutables
-  DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.smoothing = true, super.key});
+  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.smoothing = true, super.key});
 
   @override
-  State<DoubleValueBox> createState() => _DoubleValueBoxState();
+  State<DoubleValueBox> createState() => DoubleValueBoxState();
+
+  double extractValue(Update update) {
+    return (update.value as num).toDouble();
+  }
+
+  double convert(double value);
+
+  String units(double value);
 }
 
-class _DoubleValueBoxState extends State<DoubleValueBox> {
-  double? _value;
-  double? _displayValue;
+class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
+  double? value;
+  double? displayValue;
 
   @override
   void initState() {
@@ -244,12 +245,12 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      _displayValue = 12.3;
+      displayValue = 12.3;
     }
 
-    String valueText = (_displayValue == null) ?
+    String valueText = (displayValue == null) ?
       '-' :
-      fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', _displayValue!);
+      fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', displayValue!);
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
@@ -259,7 +260,7 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget.units(_value??0)}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget.units(value??0)}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);
@@ -267,28 +268,28 @@ class _DoubleValueBoxState extends State<DoubleValueBox> {
 
   _processData(List<Update>? updates) {
     if(updates == null) {
-      _displayValue = null;
+      displayValue = null;
     } else {
       try {
-        double next = (updates[0].value as num).toDouble();
+        double next = widget.extractValue(updates[0]);
 
         if ((widget.minValue != null && next < widget.minValue!) ||
             (widget.maxValue != null && next > widget.maxValue!)) {
-          _displayValue = null;
+          displayValue = null;
         } else {
           if(widget.smoothing) {
             if (widget.angle) {
-              _value = averageAngle(_value ?? next, next,
+              value = averageAngle(value ?? next, next,
                   smooth: widget.config.controller.valueSmoothing);
             } else {
-              _value = averageDouble(_value ?? next, next,
+              value = averageDouble(value ?? next, next,
                   smooth: widget.config.controller.valueSmoothing);
             }
           } else {
-            _value = next;
+            value = next;
           }
 
-          _displayValue = widget.convert(_value!);
+          displayValue = widget.convert(value!);
         }
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);

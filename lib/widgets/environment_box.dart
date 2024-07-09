@@ -8,23 +8,22 @@ class DepthBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0, smoothing: false) {
-    super.convert = _convertDepth;
-    super.units = _depthUnits;
-  }
+  const DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0, smoothing: false);
 
-  double _convertDepth(double depth) {
+  @override
+  double convert(double value) {
     switch (config.controller.depthUnits) {
       case DepthUnits.m:
-        return depth;
+        return value;
       case DepthUnits.ft:
-        return depth * 3.28084;
+        return value * 3.28084;
       case DepthUnits.fa:
-        return depth * 0.546807;
+        return value * 0.546807;
     }
   }
 
-  String _depthUnits(_) {
+  @override
+  String units(double value) {
     return config.controller.depthUnits.unit;
   }
 }
@@ -34,21 +33,20 @@ class WaterTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature') {
-    super.convert = _convertTemp;
-    super.units = _tempUnits;
-  }
+  const WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature');
 
-  double _convertTemp(double temp) {
+  @override
+  double convert(double value) {
     switch (config.controller.temperatureUnits) {
       case TemperatureUnits.c:
-        return temp - 273.15;
+        return value - 273.15;
       case TemperatureUnits.f:
-        return (temp - 273.15) * 9/5 + 32;
+        return (value - 273.15) * 9/5 + 32;
     }
   }
 
-  String _tempUnits(_) {
+  @override
+  String units(double value) {
     return config.controller.temperatureUnits.unit;
   }
 }
