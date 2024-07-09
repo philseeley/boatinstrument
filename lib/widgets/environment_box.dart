@@ -64,8 +64,9 @@ class SetAndDriftBox extends BoxWidget {
 }
 
 class _SetAndDriftBoxState extends State<SetAndDriftBox> {
-  int? _set;
+  double? _set;
   double? _drift;
+  double? _displayDrift;
 
   @override
   void initState() {
@@ -79,20 +80,20 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
     const double pad = 5.0;
 
     if(widget.config.editMode) {
-      _set = 123;
-      _drift = 12.3;
+      _set = deg2Rad(123);
+      _displayDrift = 12.3;
     }
 
-    String text = (_set == null || _drift == null) ?
+    String text = (_set == null || _displayDrift == null) ?
       '-\n-' :
-      fmt.format('{:3}\n{:.1f}', _set!, _drift);
+      fmt.format('{:3}\n{:.1f}', rad2Deg(_set), _displayDrift);
 
     double fontSize = maxFontSize(text, style,
         (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Set&Drift ${widget.config.controller.speedUnits.unit}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Set&Drift deg-${widget.config.controller.speedUnits.unit}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
@@ -101,11 +102,17 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
 
   _processData(List<Update>? updates) {
     if(updates == null) {
-      _set = _drift = null;
+      _set = _drift = _displayDrift = null;
     } else {
       try {
-        _set = rad2Deg((updates[0].value['setTrue'] as num).toDouble());
-        _drift = convertSpeed(widget.config.controller.speedUnits, (updates[0].value['drift'] as num).toDouble());
+        double next = (updates[0].value['setTrue'] as num).toDouble();
+        _set = averageAngle(_set ?? next, next,
+            smooth: widget.config.controller.valueSmoothing);
+        next = (updates[0].value['drift'] as num).toDouble();
+        _drift = averageDouble(_drift ?? next, next,
+            smooth: widget.config.controller.valueSmoothing);
+
+        _displayDrift = convertSpeed(widget.config.controller.speedUnits, _drift!);
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
       }
