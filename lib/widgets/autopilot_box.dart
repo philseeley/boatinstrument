@@ -182,7 +182,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
     if(_settings.enableLock && _locked) {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(
         text: "Unlock",
-        outerColor: Colors.black,
+        outerColor: Colors.grey,
         onSubmit: () { return _unlock();},
       ))));
     }
