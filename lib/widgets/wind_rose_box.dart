@@ -263,6 +263,11 @@ class _WindRoseBoxState extends State<WindRoseBox> {
           switch (u.path) {
             case 'environment.wind.angleApparent':
               double latest = (u.value as num).toDouble();
+
+              if(_windAngleApparent == null && widget._settings.type == WindRoseType.auto) {
+                _displayType = (rad2Deg(latest.abs()) <= 60) ? WindRoseType.closeHaul : WindRoseType.normal;
+              }
+
               _windAngleApparent = averageAngle(
                   _windAngleApparent ?? latest, latest,
                   smooth: widget.config.controller.valueSmoothing,
