@@ -89,10 +89,9 @@ class _RosePainter extends CustomPainter {
       try {
         canvas.translate(size / 2, size / 2);
         for (int a = 0; a <= 180; a += 30) {
-          tp.text = TextSpan(text: a.toString(), style: Theme
-              .of(_context)
-              .textTheme
-              .bodyMedium);
+          tp.text = TextSpan(
+              text: a.toString(),
+              style: Theme.of(_context).textTheme.bodyMedium);
           tp.layout();
 
           int adjustedA = a;

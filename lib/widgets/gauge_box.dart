@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'double_value_box.dart';
 
+//TODO need circular gauge, like rev-counter.
+
 enum GaugeOrientation {
   down(0, 0.0, -0.5, null, 0, 0, null, null, 0, null, 0),
   left(pi/2, 0.0, 0.0, 0, null, 0, null, null, 0, 0, null),
@@ -28,10 +30,13 @@ enum GaugeOrientation {
 }
 
 class _GaugePainter extends CustomPainter {
-  final Color _color;
+  final BuildContext _context;
   final GaugeOrientation _orientation;
+  final bool _mirror;
+  final double _minValue;
+  final double _maxValue;
 
-  _GaugePainter(this._color, this._orientation);
+  _GaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -40,7 +45,7 @@ class _GaugePainter extends CustomPainter {
 
     Paint paint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = _color
+      ..color = Theme.of(_context).colorScheme.onSurface
       ..strokeWidth = 2.0;
 
     double base = w;
@@ -49,12 +54,40 @@ class _GaugePainter extends CustomPainter {
       base = h;
     }
 
+    canvas.save();
     canvas.translate(base*_orientation._xm, base*_orientation._ym);
     canvas.translate(base/2, base/2);
     canvas.rotate(_orientation._rotation);
     canvas.translate(-base/2, -base/2);
 
     canvas.drawArc(Rect.fromLTWH(0, 0, base, base), 0.0, pi, true, paint);
+    canvas.restore();
+
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    try {
+      canvas.translate((base / 2) + base*_orientation._xm, (base / 2) + base*_orientation._ym);
+
+      double diff = (_maxValue - _minValue) / 4;
+      for (int i = 0; i <= 4; ++i) {
+        String label = (_minValue + (diff*i)).toInt().toString();
+
+        tp.text = TextSpan(
+            text: label,
+            style: Theme.of(_context).textTheme.bodyMedium);
+        tp.layout();
+
+        double angle = (_mirror ? pi - pi/4*i : pi/4*i) + _orientation._rotation;
+        angle = i == 0 ? angle-0.07: angle;
+        angle = i == 4 ? angle+0.07: angle;
+        double x = cos(angle) * (base / 2 - 20.0);
+        double y = sin(angle) * (base / 2 - 20.0);
+
+        tp.paint(
+            canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+      }
+    } finally {
+      tp.dispose();
+    }
   }
 
   @override
@@ -125,7 +158,7 @@ class _DoubleValueSemiGaugeBoxState extends DoubleValueBoxState<DoubleValueSemiG
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _GaugePainter(Theme.of(context).colorScheme.onSurface, o)
+          painter: _GaugePainter(context, o, widget.mirror, widget.minValue!, widget.maxValue!)
       )
     ];
 
@@ -140,6 +173,6 @@ class _DoubleValueSemiGaugeBoxState extends DoubleValueBoxState<DoubleValueSemiG
       ));
     }
 
-    return Container(padding: const EdgeInsets.all(5.0), child: Stack(children: stack));
+    return Container(padding: const EdgeInsets.all(5.0), child: RepaintBoundary(child: Stack(children: stack)));
   }
 }
