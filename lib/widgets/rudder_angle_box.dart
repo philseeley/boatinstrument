@@ -38,23 +38,27 @@ class _RudderAnglePainter extends CustomPainter {
 
     paint.color = Theme.of(_context).colorScheme.onSurface;
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
-    canvas.translate(max, 0);
-    for (int a = 0; a <= _settings.maxAngle; a += 10) {
-      double x = max/(_settings.maxAngle/a);
+    try {
+      canvas.translate(max, 0);
+      for (int a = 0; a <= _settings.maxAngle; a += 10) {
+        double x = max / (_settings.maxAngle / a);
 
-      canvas.drawRect(Rect.fromLTWH(x-1, 0, 2, canvasSize.height), paint);
-      canvas.drawRect(Rect.fromLTWH(-x-1, 0, 2, canvasSize.height), paint);
+        canvas.drawRect(Rect.fromLTWH(x - 1, 0, 2, canvasSize.height), paint);
+        canvas.drawRect(Rect.fromLTWH(-x - 1, 0, 2, canvasSize.height), paint);
 
-      if(_settings.showLabels && a != 0) {
-        tp.text = TextSpan(text: a.toString(), style: Theme
-            .of(_context)
-            .textTheme
-            .bodyMedium);
-        tp.layout();
+        if (_settings.showLabels && a != 0) {
+          tp.text = TextSpan(text: a.toString(), style: Theme
+              .of(_context)
+              .textTheme
+              .bodyMedium);
+          tp.layout();
 
-        tp.paint(canvas, Offset(x - tp.size.width - 2, 0));
-        tp.paint(canvas, Offset(-x + 2, 0));
+          tp.paint(canvas, Offset(x - tp.size.width - 2, 0));
+          tp.paint(canvas, Offset(-x + 2, 0));
+        }
       }
+    } finally {
+      tp.dispose();
     }
   }
 

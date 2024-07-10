@@ -33,10 +33,13 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style.copyWith(fontSize: fontSize)), maxLines: 1, textDirection: TextDirection.ltr)
     ..layout(minWidth: 0, maxWidth: double.infinity);
-
-  // Check if we're constrained by width.
-  if(textPainter.size.width > availableWidth) {
-    fontSize = (fontSize * (availableWidth / textPainter.size.width)) - 1.0;
+  try {
+    // Check if we're constrained by width.
+    if (textPainter.size.width > availableWidth) {
+      fontSize = (fontSize * (availableWidth / textPainter.size.width)) - 1.0;
+    }
+  } finally {
+    textPainter.dispose();
   }
 
   return fontSize;

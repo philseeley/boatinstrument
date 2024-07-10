@@ -86,29 +86,35 @@ class _RosePainter extends CustomPainter {
 
     if(_settings.showLabels) {
       TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
-      canvas.translate(size / 2, size / 2);
-      for (int a = 0; a <= 180; a += 30) {
-        tp.text = TextSpan(text: a.toString(), style: Theme
-            .of(_context)
-            .textTheme
-            .bodyMedium);
-        tp.layout();
+      try {
+        canvas.translate(size / 2, size / 2);
+        for (int a = 0; a <= 180; a += 30) {
+          tp.text = TextSpan(text: a.toString(), style: Theme
+              .of(_context)
+              .textTheme
+              .bodyMedium);
+          tp.layout();
 
-        int adjustedA = a;
-        if(_type == WindRoseType.closeHaul) {
-          if(a <= 60) {
-            adjustedA *= 2;
-          } else {
-            adjustedA -= 60;
-            adjustedA ~/= 2;
-            adjustedA += 120;
+          int adjustedA = a;
+          if (_type == WindRoseType.closeHaul) {
+            if (a <= 60) {
+              adjustedA *= 2;
+            } else {
+              adjustedA -= 60;
+              adjustedA ~/= 2;
+              adjustedA += 120;
+            }
           }
-        }
 
-        double x = cos(deg2Rad(adjustedA) - (pi / 2)) * (size / 2 - 40.0);
-        double y = sin(deg2Rad(adjustedA) - (pi / 2)) * (size / 2 - 40.0);
-        tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
-        tp.paint(canvas, Offset(-x - tp.size.width / 2, y - tp.size.height / 2));
+          double x = cos(deg2Rad(adjustedA) - (pi / 2)) * (size / 2 - 40.0);
+          double y = sin(deg2Rad(adjustedA) - (pi / 2)) * (size / 2 - 40.0);
+          tp.paint(
+              canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+          tp.paint(
+              canvas, Offset(-x - tp.size.width / 2, y - tp.size.height / 2));
+        }
+      } finally {
+        tp.dispose();
       }
     }
   }
