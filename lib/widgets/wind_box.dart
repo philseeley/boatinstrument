@@ -86,16 +86,7 @@ abstract class WindSpeedBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    switch (config.controller.windSpeedUnits) {
-      case SpeedUnits.mps:
-        return value;
-      case SpeedUnits.kph:
-        return value * 3.6;
-      case SpeedUnits.mph:
-        return value * 2.236936;
-      case SpeedUnits.kts:
-        return value * 1.943844;
-    }
+    return convertSpeed(config.controller.windSpeedUnits, value);
   }
 
   @override

@@ -1,10 +1,9 @@
 import 'dart:math';
 
+import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'double_value_box.dart';
-
-//TODO need circular gauge, like rev-counter.
 
 enum GaugeOrientation {
   down(0, 0.0, -0.5, null, 0, 0, null, null, 0, null, 0),
@@ -29,14 +28,14 @@ enum GaugeOrientation {
       this._unitsTop, this._unitsBottom, this._unitsLeft, this._unitsRight);
 }
 
-class _GaugePainter extends CustomPainter {
+class _SemiGaugePainter extends CustomPainter {
   final BuildContext _context;
   final GaugeOrientation _orientation;
   final bool _mirror;
   final double _minValue;
   final double _maxValue;
 
-  _GaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue);
+  _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -73,12 +72,12 @@ class _GaugePainter extends CustomPainter {
 
         tp.text = TextSpan(
             text: label,
-            style: Theme.of(_context).textTheme.bodyMedium);
+            style: Theme.of(_context).textTheme.bodyMedium?.copyWith(backgroundColor: Theme.of(_context).colorScheme.surface));
         tp.layout();
 
         double angle = (_mirror ? pi - pi/4*i : pi/4*i) + _orientation._rotation;
-        angle = i == 0 ? angle-0.07: angle;
-        angle = i == 4 ? angle+0.07: angle;
+        angle = i == 0 ? angle: angle;
+        angle = i == 4 ? angle: angle;
         double x = cos(angle) * (base / 2 - 20.0);
         double y = sin(angle) * (base / 2 - 20.0);
 
@@ -94,13 +93,13 @@ class _GaugePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _NeedlePainter extends CustomPainter {
+class _SemiGaugeNeedlePainter extends CustomPainter {
 
   final Color _color;
   final GaugeOrientation _orientation;
   final double _angle;
 
-  _NeedlePainter(this._color, this._orientation, this._angle);
+  _SemiGaugeNeedlePainter(this._color, this._orientation, this._angle);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -158,18 +157,148 @@ class _DoubleValueSemiGaugeBoxState extends DoubleValueBoxState<DoubleValueSemiG
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _GaugePainter(context, o, widget.mirror, widget.minValue!, widget.maxValue!)
+          painter: _SemiGaugePainter(context, o, widget.mirror, widget.minValue!, widget.maxValue!)
       )
     ];
 
     if(displayValue != null) {
-      double angle = (((pi)/(widget.maxValue! - widget.minValue!)) * (displayValue! - widget.minValue!)) - pi/2;
+      double angle = ((pi/(widget.maxValue! - widget.minValue!)) * (displayValue! - widget.minValue!)) - pi/2;
       if(widget.mirror) {
         angle = (pi*2)-angle;
       }
       stack.add(CustomPaint(
           size: Size.infinite,
-          painter: _NeedlePainter(Theme.of(context).colorScheme.onSurface, o, angle)
+          painter: _SemiGaugeNeedlePainter(Theme.of(context).colorScheme.onSurface, o, angle)
+      ));
+    }
+
+    return Container(padding: const EdgeInsets.all(15.0), child: RepaintBoundary(child: Stack(children: stack)));
+  }
+}
+
+final double circularGaugeOffset = deg2Rad(20);
+
+class _CircularGaugePainter extends CustomPainter {
+  final BuildContext _context;
+  final double _minValue;
+  final double _maxValue;
+  final double _step;
+
+  _CircularGaugePainter(this._context, this._minValue, this._maxValue, this._step);
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    double size = min(canvasSize.width, canvasSize.height);
+
+    Paint paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = Theme.of(_context).colorScheme.onSurface
+      ..strokeWidth = 2.0;
+
+    canvas.drawArc(Rect.fromLTWH(0, 0, size, size), pi/2+circularGaugeOffset, 2*pi-(circularGaugeOffset*2), false, paint);
+
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    try {
+      paint.strokeWidth = 20.0;
+      double width = 0.02;
+
+      double steps = (_maxValue - _minValue) / _step;
+      double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
+
+      for (double i = 0; i <= steps; ++i) {
+
+        canvas.drawArc(
+            const Offset(10.0, 10.0) & Size(size - 20.0, size - 20.0),
+            (i*angleStep) + (pi / 2) + circularGaugeOffset - (width / 2), width, false, paint);
+
+        tp.text = TextSpan(
+            text: (i*_step).toInt().toString(),
+            style: Theme
+                .of(_context)
+                .textTheme
+                .bodyMedium);
+        tp.layout();
+
+        double x = cos((i*angleStep) + (pi / 2) + circularGaugeOffset) * (size / 2 - 40.0);
+        double y = sin((i*angleStep) + (pi / 2) + circularGaugeOffset) * (size / 2 - 40.0);
+
+        canvas.save();
+        canvas.translate(size / 2, size / 2);
+        tp.paint(
+            canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+        canvas.restore();
+      }
+    } finally {
+      tp.dispose();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CircularGaugeNeedlePainter extends CustomPainter {
+  final Color _color;
+  final double _angle;
+
+  _CircularGaugeNeedlePainter(this._color, this._angle);
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    double size = min(canvasSize.width, canvasSize.height);
+    Paint paint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = _color;
+
+    Path needle = Path()
+      ..moveTo(-10.0, 0.0)
+      ..lineTo(0.0, -size/2)
+      ..lineTo(10.0, 0.0)
+      ..moveTo(0.0, 0.0)
+      ..addArc(const Offset(-10, -10.0) & const Size(20.0, 20.0), 0.0, pi)
+      ..close();
+
+    canvas.translate(size/2, size/2);
+    canvas.rotate(pi+_angle+circularGaugeOffset);
+    canvas.drawPath(needle, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+abstract class DoubleValueCircularGaugeBox extends DoubleValueBox {
+  final double step;
+
+  const DoubleValueCircularGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required this.step, super.key});
+
+  @override
+  DoubleValueBoxState<DoubleValueCircularGaugeBox> createState() => _DoubleValueCircularGaugeBoxState();
+}
+
+class _DoubleValueCircularGaugeBoxState extends DoubleValueBoxState<DoubleValueCircularGaugeBox> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    List<Widget> stack = [
+      Positioned(top: 0, left: 0, child: Text(widget.title)),
+      Positioned(top: 0, right: 0, child: Text(widget.units(displayValue??0.0))),
+      CustomPaint(
+          size: Size.infinite,
+          painter: _CircularGaugePainter(context, widget.minValue!, widget.maxValue!, widget.step)
+      )
+    ];
+
+    if(displayValue != null) {
+      double steps = widget.maxValue! - widget.minValue!;
+      double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
+
+      double angle = angleStep * displayValue!;
+
+      stack.add(CustomPaint(
+          size: Size.infinite,
+          painter: _CircularGaugeNeedlePainter(Theme.of(context).colorScheme.onSurface, angle)
       ));
     }
 

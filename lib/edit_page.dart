@@ -99,7 +99,6 @@ class _EditPageState extends State<_EditPage> {
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
-      // _widgetMenuEntry(TestGauge.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid)]),
     ];
