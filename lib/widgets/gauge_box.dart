@@ -39,12 +39,13 @@ class _SemiGaugePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
+    ThemeData theme = Theme.of(_context);
     double w = canvasSize.width;
     double h = canvasSize.height;
 
     Paint paint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Theme.of(_context).colorScheme.onSurface
+      ..color = theme.colorScheme.onSurface
       ..strokeWidth = 2.0;
 
     double base = w;
@@ -72,7 +73,7 @@ class _SemiGaugePainter extends CustomPainter {
 
         tp.text = TextSpan(
             text: label,
-            style: Theme.of(_context).textTheme.bodyMedium?.copyWith(backgroundColor: Theme.of(_context).colorScheme.surface));
+            style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
         tp.layout();
 
         double angle = (_mirror ? pi - pi/4*i : pi/4*i) + _orientation._rotation;
@@ -94,12 +95,10 @@ class _SemiGaugePainter extends CustomPainter {
 }
 
 class _SemiGaugeNeedlePainter extends CustomPainter {
-
-  final Color _color;
   final GaugeOrientation _orientation;
   final double _angle;
 
-  _SemiGaugeNeedlePainter(this._color, this._orientation, this._angle);
+  _SemiGaugeNeedlePainter(this._orientation, this._angle);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -108,7 +107,7 @@ class _SemiGaugeNeedlePainter extends CustomPainter {
 
     Paint paint = Paint()
       ..style = PaintingStyle.fill
-      ..color = _color;
+      ..color = Colors.blue;
 
     double base = w;
     if(_orientation == GaugeOrientation.left ||
@@ -140,7 +139,7 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueBox {
   final GaugeOrientation orientation;
   final bool mirror;
 
-  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {required super.minValue, required super.maxValue, this.mirror = false, super.angle, super.key});
+  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {super.minValue = 0, required super.maxValue, this.mirror = false, super.angle, super.key});
 
   @override
   DoubleValueBoxState<DoubleValueSemiGaugeBox> createState() => _DoubleValueSemiGaugeBoxState();
@@ -168,7 +167,7 @@ class _DoubleValueSemiGaugeBoxState extends DoubleValueBoxState<DoubleValueSemiG
       }
       stack.add(CustomPaint(
           size: Size.infinite,
-          painter: _SemiGaugeNeedlePainter(Theme.of(context).colorScheme.onSurface, o, angle)
+          painter: _SemiGaugeNeedlePainter(o, angle)
       ));
     }
 
@@ -238,17 +237,16 @@ class _CircularGaugePainter extends CustomPainter {
 }
 
 class _CircularGaugeNeedlePainter extends CustomPainter {
-  final Color _color;
   final double _angle;
 
-  _CircularGaugeNeedlePainter(this._color, this._angle);
+  _CircularGaugeNeedlePainter(this._angle);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
     double size = min(canvasSize.width, canvasSize.height);
     Paint paint = Paint()
       ..style = PaintingStyle.fill
-      ..color = _color;
+      ..color = Colors.blue;
 
     Path needle = Path()
       ..moveTo(-10.0, 0.0)
@@ -298,10 +296,84 @@ class _DoubleValueCircularGaugeBoxState extends DoubleValueBoxState<DoubleValueC
 
       stack.add(CustomPaint(
           size: Size.infinite,
-          painter: _CircularGaugeNeedlePainter(Theme.of(context).colorScheme.onSurface, angle)
+          painter: _CircularGaugeNeedlePainter(angle)
       ));
     }
 
     return Container(padding: const EdgeInsets.all(5.0), child: RepaintBoundary(child: Stack(children: stack)));
+  }
+}
+
+class _BarGaugePainter extends CustomPainter {
+  final BuildContext _context;
+  final double _minValue;
+  final double _maxValue;
+  final double _step;
+  final double? _value;
+
+  _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._value);
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    ThemeData theme = Theme.of(_context);
+    double w = canvasSize.width;
+    double h = canvasSize.height;
+
+    Paint paint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.blue;
+
+    if(_value != null) {
+      double step = h/(_maxValue - _minValue);
+      canvas.drawRect(Rect.fromLTRB(35, h-(step*_value), w, h), paint);
+    }
+
+    paint.color = theme.colorScheme.onSurface;
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    try {
+      double steps = (_maxValue - _minValue) / _step;
+      double lineStep = h / steps;
+
+      for (int i = 0; i <= steps; ++i) {
+        canvas.drawRect(Rect.fromLTWH(0, h-(lineStep*i)-1, w, 2), paint);
+
+        tp.text = TextSpan(
+            text: (i*_step+_minValue).toInt().toString(),
+            style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
+        tp.layout();
+
+        tp.paint(canvas, Offset(5, h-(i*lineStep)-(tp.size.height/2)));
+      }
+    } finally {
+      tp.dispose();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+abstract class DoubleValueBarGaugeBox extends DoubleValueBox {
+  final double step;
+
+  const DoubleValueBarGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required this.step, super.key});
+
+  @override
+  State<DoubleValueBarGaugeBox> createState() => _DoubleValueBarGaugeBoxState();
+}
+
+class _DoubleValueBarGaugeBoxState extends DoubleValueBoxState<DoubleValueBarGaugeBox> {
+  @override
+  Widget build(BuildContext context) {
+    const double pad = 5.0;
+    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.title, style: Theme.of(context).textTheme.titleMedium))]),
+      Expanded(child: Padding(padding: const EdgeInsets.all(pad),
+        child: RepaintBoundary(child: CustomPaint(
+          size: Size.infinite,
+          painter: _BarGaugePainter(context, widget.minValue!, widget.maxValue!, widget.step, displayValue)
+      )))),
+      Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
+    ]);
   }
 }
