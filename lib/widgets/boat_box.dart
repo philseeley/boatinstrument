@@ -100,10 +100,10 @@ class _RudderAnglePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-class RudderAngleBox extends BoxWidget {
+class RudderAngleBox extends DoubleValueBox {
   late final _RudderAngleSettings _settings;
 
-  RudderAngleBox(super.config, {super.key}) {
+  RudderAngleBox(config, {super.key}) : super(config, '', 'steering.rudderAngle') {
     _settings = _$RudderAngleSettingsFromJson(config.settings);
   }
 
@@ -121,38 +121,22 @@ class RudderAngleBox extends BoxWidget {
   BoxSettingsWidget getPerBoxSettingsWidget() {
     return _RudderAngleSettingsWidget(_settings);
   }
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return '_NOT_USED_';
+  }
 }
 
-class _RudderAngleBoxState extends State<RudderAngleBox> {
-  double? _rudderAngle;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {
-      "steering.rudderAngle",
-    });
-  }
-
+class _RudderAngleBoxState extends DoubleValueBoxState<RudderAngleBox> {
   @override
   Widget build(BuildContext context) {
-    return Container(padding: const EdgeInsets.all(5.0), child: CustomPaint(size: Size.infinite, painter: _RudderAnglePainter(context, widget._settings, _rudderAngle)));
-  }
-
-  _processData(List<Update>? updates) {
-    if(updates == null) {
-      _rudderAngle = null;
-    } else {
-      try {
-        _rudderAngle = (updates[0].value as num).toDouble();
-      } catch (e) {
-        widget.config.controller.l.e("Error converting $updates", error: e);
-      }
-    }
-
-    if(mounted) {
-      setState(() {});
-    }
+    return Container(padding: const EdgeInsets.all(5.0), child: CustomPaint(size: Size.infinite, painter: _RudderAnglePainter(context, widget._settings, displayValue)));
   }
 }
 
