@@ -119,7 +119,7 @@ class RudderAngleBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _SettingsWidget(_settings);
+    return _RudderAngleSettingsWidget(_settings);
   }
 }
 
@@ -156,10 +156,10 @@ class _RudderAngleBoxState extends State<RudderAngleBox> {
   }
 }
 
-class _SettingsWidget extends BoxSettingsWidget {
+class _RudderAngleSettingsWidget extends BoxSettingsWidget {
   final _RudderAngleSettings _settings;
 
-  const _SettingsWidget(this._settings);
+  const _RudderAngleSettingsWidget(this._settings);
 
   @override
   Map<String, dynamic> getSettingsJson() {
@@ -167,10 +167,10 @@ class _SettingsWidget extends BoxSettingsWidget {
   }
 
   @override
-  createState() => _SettingsState();
+  createState() => _RudderAngleSettingsState();
 }
 
-class _SettingsState extends State<_SettingsWidget> {
+class _RudderAngleSettingsState extends State<_RudderAngleSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {

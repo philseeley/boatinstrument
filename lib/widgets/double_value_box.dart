@@ -172,7 +172,6 @@ class _SettingsState extends State<_SettingsWidget> {
     ]);
   }
 
-  //TODO need to check this works
   void _emailSettings() async {
     _Settings s = widget._settings;
 

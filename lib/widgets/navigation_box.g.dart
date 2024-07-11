@@ -1,17 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'position_box.dart';
+part of 'navigation_box.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
+_PositionSettings _$PositionSettingsFromJson(Map<String, dynamic> json) =>
+    _PositionSettings(
       latFormat: json['latFormat'] as String? ?? '0{lat0d 0m.mmm c}',
       lonFormat: json['lonFormat'] as String? ?? '{lon0d 0m.mmm c}',
     );
 
-Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
+Map<String, dynamic> _$PositionSettingsToJson(_PositionSettings instance) =>
+    <String, dynamic>{
       'latFormat': instance.latFormat,
       'lonFormat': instance.lonFormat,
     };
