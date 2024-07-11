@@ -56,7 +56,7 @@ double convertDistance(BoatInstrumentController controller, double distance) {
     case DistanceUnits.nm:
       return distance * 0.000539957;
     case DistanceUnits.nmM:
-      if(distance <= controller.m2nmThreshold) {
+      if(distance.abs() <= controller.m2nmThreshold) {
         return distance;
       } else {
         return distance * 0.000539957;
