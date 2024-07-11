@@ -11,7 +11,6 @@ import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
-import 'package:boatinstrument/widgets/wind_direction_true_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
