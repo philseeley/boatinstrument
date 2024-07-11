@@ -63,7 +63,7 @@ class _RudderAnglePainter extends CustomPainter {
     Paint paint = Paint()..style = PaintingStyle.fill;
 
     if(_rudderAngle != null) {
-      paint.color = (_rudderAngle! < 0) ? Colors.red : Colors.green;
+      paint.color = (_rudderAngle < 0) ? Colors.red : Colors.green;
 
       canvas.drawRect(Rect.fromLTWH(
           max, 0, max / (_settings.maxAngle / rad2Deg(_rudderAngle)),
@@ -136,7 +136,18 @@ class RudderAngleBox extends DoubleValueBox {
 class _RudderAngleBoxState extends DoubleValueBoxState<RudderAngleBox> {
   @override
   Widget build(BuildContext context) {
-    return Container(padding: const EdgeInsets.all(5.0), child: CustomPaint(size: Size.infinite, painter: _RudderAnglePainter(context, widget._settings, displayValue)));
+    return Container(
+        padding: const EdgeInsets.all(5.0),
+        child: RepaintBoundary(
+            child: CustomPaint(
+                size: Size.infinite,
+                painter: _RudderAnglePainter(
+                    context,
+                    widget._settings,
+                    displayValue)
+            )
+        )
+    );
   }
 }
 
