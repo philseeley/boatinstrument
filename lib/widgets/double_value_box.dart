@@ -259,7 +259,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} - ${widget.units(value??0)}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} ${widget.units(value??0)}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);
