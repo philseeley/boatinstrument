@@ -40,6 +40,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(NextPointVelocityMadeGoodBox.sid, 'Next Point VMG', (config) {return NextPointVelocityMadeGoodBox(config, key: UniqueKey());}),
   BoxDetails(NextPointDistanceTimeToGo.sid, 'Next Point TTG', (config) {return NextPointDistanceTimeToGo(config, key: UniqueKey());}),
   BoxDetails(AttitudeRollGaugeBox.sid, 'Roll Gauge', (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
+  BoxDetails(CrossTrackErrorDeltaBox.sid, 'XTE Delta', (config) {return CrossTrackErrorDeltaBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -82,6 +83,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(NextPointVelocityMadeGoodBox.sid),
         _widgetMenuEntry(NextPointDistanceTimeToGo.sid),
         _widgetMenuEntry(CrossTrackErrorBox.sid),
+        _widgetMenuEntry(CrossTrackErrorDeltaBox.sid),
         _widgetMenuEntry(PositionBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedThroughWaterBox.sid),

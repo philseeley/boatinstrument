@@ -238,7 +238,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: { widget.path });
+    widget.config.controller.configure(widget, onUpdate: processUpdates, paths: { widget.path });
   }
 
   @override
@@ -265,9 +265,9 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
     ]);
   }
 
-  _processData(List<Update>? updates) {
+  processUpdates(List<Update>? updates) {
     if(updates == null) {
-      displayValue = null;
+      value = displayValue = null;
     } else {
       try {
         double next = widget.extractValue(updates[0]);

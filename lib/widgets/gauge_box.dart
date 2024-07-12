@@ -139,13 +139,13 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueBox {
   final GaugeOrientation orientation;
   final bool mirror;
 
-  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {super.minValue = 0, required super.maxValue, this.mirror = false, super.angle, super.key});
+  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {super.smoothing, super.minValue = 0, required super.maxValue, this.mirror = false, super.angle, super.key});
 
   @override
-  DoubleValueBoxState<DoubleValueSemiGaugeBox> createState() => _DoubleValueSemiGaugeBoxState();
+  DoubleValueSemiGaugeBoxState<DoubleValueSemiGaugeBox> createState() => DoubleValueSemiGaugeBoxState();
 }
 
-class _DoubleValueSemiGaugeBoxState extends DoubleValueBoxState<DoubleValueSemiGaugeBox> {
+class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends DoubleValueBoxState<T> {
 
   @override
   Widget build(BuildContext context) {
@@ -175,6 +175,7 @@ class _DoubleValueSemiGaugeBoxState extends DoubleValueBoxState<DoubleValueSemiG
   }
 }
 
+// This is the number of degrees that the circular gauge starts at from dead south.
 final double circularGaugeOffset = deg2Rad(20);
 
 class _CircularGaugePainter extends CustomPainter {

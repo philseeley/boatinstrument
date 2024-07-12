@@ -1,4 +1,5 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'double_value_box.dart';
@@ -15,12 +16,75 @@ class CrossTrackErrorBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertDistance (config.controller, value);
+    return convertDistance(config.controller, value);
   }
 
   @override
   String units(double value) {
     return distanceUnits(config.controller, value);
+  }
+}
+
+class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
+  static const String sid = 'navigation-xte-delta';
+  @override
+  String get id => sid;
+
+  const CrossTrackErrorDeltaBox(config, {super.key}) : super(config, 'XTE', GaugeOrientation.up, 'navigation.courseGreatCircle.crossTrackError', minValue: -2, maxValue: 2);
+
+  @override
+  double convert(double value) {
+    // Not used as we always use meters in the processUpdates method.
+    throw UnimplementedError();
+  }
+
+  @override
+  String units(double value) {
+    return 'delta';
+  }
+
+  @override
+  DoubleValueSemiGaugeBoxState<CrossTrackErrorDeltaBox> createState() => _CrossTrackErrorDeltaBoxState();
+}
+
+class _CrossTrackErrorDeltaBoxState extends DoubleValueSemiGaugeBoxState<CrossTrackErrorDeltaBox> {
+  double _lastValue = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    if(value != null) {
+      double diff = value! - _lastValue;
+      _lastValue = value!;
+      if (diff < widget.minValue! || diff > widget.maxValue!) {
+        displayValue = null;
+      }
+      else {
+        displayValue = diff;
+      }
+    }
+    return super.build(context);
+  }
+
+  // We override this because we don't want to check min and max as the gauge needs these to
+  // be adjusted for the diff, not the absolute value.
+  @override
+  processUpdates(List<Update>? updates) {
+    if(updates == null) {
+      value = displayValue = null;
+    } else {
+      try {
+        double next = widget.extractValue(updates[0]);
+
+        value = averageDouble(value ?? next, next,
+            smooth: widget.config.controller.valueSmoothing);
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $updates", error: e);
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
   }
 }
 
