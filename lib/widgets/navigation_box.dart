@@ -1,6 +1,7 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'double_value_box.dart';
 import 'package:latlong_formatter/latlong_formatter.dart';
@@ -189,6 +190,8 @@ class _NextPointDistanceTimeToGoState extends State<NextPointDistanceTimeToGo> {
     }
 
     String ttgString = '-';
+    String etaString = '';
+
     if(_timeToGo != null) {
       Duration ttg = Duration(seconds: _timeToGo!);
       List<String> parts = ttg.toString().split(RegExp('[.:]'));
@@ -201,6 +204,16 @@ class _NextPointDistanceTimeToGoState extends State<NextPointDistanceTimeToGo> {
       } else {
         ttgString = '${parts[1]}m${parts[2]}s';
       }
+
+      DateTime now = DateTime.now();
+      DateTime eta = now.add(ttg);
+      String fmt = '';
+      if(eta.year != now.year) {
+        fmt = 'yyyy-MM-dd ';
+      } else if(eta.month != now.month || eta.day != now.day) {
+        fmt = 'MMM-dd ';
+      }
+      etaString = DateFormat('${fmt}HH:mm').format(DateTime.now().add(ttg));
     }
 
     double fontSize = maxFontSize(ttgString, style,
@@ -208,7 +221,7 @@ class _NextPointDistanceTimeToGoState extends State<NextPointDistanceTimeToGo> {
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('WPT TTG', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('WPT TTG $etaString', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(ttgString, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
