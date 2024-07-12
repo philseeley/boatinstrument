@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -51,6 +52,8 @@ class _MainPageState extends State<MainPage> {
 
   bool _showAppBar = false;
   int _brightness = _brightnessMax;
+  bool _rotatePages = false;
+  Timer? _pageTimer;
 
   final BoatInstrumentController _controller = BoatInstrumentController();
   int _pageNum = 0;
@@ -77,6 +80,10 @@ class _MainPageState extends State<MainPage> {
       _setBrightness();
     }
 
+    if(_controller.pageTimerOnStart) {
+      _togglePageTimer();
+    }
+
     setState(() {});
   }
 
@@ -92,6 +99,7 @@ class _MainPageState extends State<MainPage> {
 
     List<Widget> actions = [
       IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
+      IconButton(icon: Icon(_rotatePages ? Icons.timer_outlined : Icons.timer_off_outlined), onPressed:  _togglePageTimer),
     ];
 
     if(_controller.brightnessControl) {
@@ -134,7 +142,35 @@ class _MainPageState extends State<MainPage> {
     themeProvider.toggleNightMode(_controller.darkMode);
   }
 
+  void _togglePageTimer() {
+    setState(() {
+      _rotatePages = !_rotatePages;
+    });
+
+    _rotatePages ? _startPageTimer() : _stopPageTimer();
+  }
+
+  void _startPageTimer() {
+    _stopPageTimer();
+    _pageTimer = Timer(Duration(seconds: _controller.pageChangeSeconds), _rotatePage);
+  }
+
+  void _stopPageTimer() {
+    _pageTimer?.cancel();
+    _pageTimer = null;
+  }
+
+  _rotatePage() {
+    setState(() {
+      _pageNum = _controller.nextPageNum(_pageNum, alwaysRotate: true);
+    });
+
+    _startPageTimer();
+  }
+
   _showEditPagesPage () async {
+    _stopPageTimer();
+
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return EditPagesPage(_controller);
@@ -148,6 +184,10 @@ class _MainPageState extends State<MainPage> {
         _pageNum = _controller.numOfPages-1;
       }
     });
+
+    if(_rotatePages) {
+      _startPageTimer();
+    }
   }
 
   void _movePage (DragEndDetails details) {

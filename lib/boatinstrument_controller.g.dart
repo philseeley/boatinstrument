@@ -80,6 +80,8 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       brightnessControl: json['brightnessControl'] as bool? ?? false,
       keepAwake: json['keepAwake'] as bool? ?? false,
       autoConfirmActions: json['autoConfirmActions'] as bool? ?? false,
+      pageTimerOnStart: json['pageTimerOnStart'] as bool? ?? false,
+      pageChangeSeconds: (json['pageChangeSeconds'] as num?)?.toInt() ?? 20,
       distanceUnits:
           $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
               DistanceUnits.nm,
@@ -114,6 +116,8 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'brightnessControl': instance.brightnessControl,
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,
+      'pageTimerOnStart': instance.pageTimerOnStart,
+      'pageChangeSeconds': instance.pageChangeSeconds,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
       'm2nmThreshold': instance.m2nmThreshold,
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,

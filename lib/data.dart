@@ -396,6 +396,8 @@ class _Settings {
   bool brightnessControl;
   bool keepAwake;
   bool autoConfirmActions;
+  bool pageTimerOnStart;
+  int pageChangeSeconds;
   DistanceUnits distanceUnits;
   int m2nmThreshold;
   SpeedUnits speedUnits;
@@ -421,6 +423,8 @@ class _Settings {
     this.brightnessControl = false,
     this.keepAwake = false,
     this.autoConfirmActions = false,
+    this.pageTimerOnStart = false,
+    this.pageChangeSeconds = 20,
     this.distanceUnits = DistanceUnits.nm,
     this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,

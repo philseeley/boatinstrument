@@ -165,6 +165,27 @@ class _SettingsState extends State<SettingsPage> {
               settings.autoConfirmActions = value;
             });
           }),
+      SwitchListTile(title: const Text("Rotate Pages on Start:"),
+          value: settings.pageTimerOnStart,
+          onChanged: (bool value) {
+            setState(() {
+              settings.pageTimerOnStart = value;
+            });
+          }),
+      ListTile(
+        leading: const Text("Rotate Page Delay:"),
+        title: Slider(
+            min: 3,
+            max: 120,
+            divisions: 118,
+            value: settings.pageChangeSeconds.toDouble(),
+            label: "${settings.pageChangeSeconds}",
+            onChanged: (double value) {
+              setState(() {
+                settings.pageChangeSeconds = value.toInt();
+              });
+            }),
+      ),
       ListTile(
           leading: const Text("Distance:   "),
           title: _distanceMenu()

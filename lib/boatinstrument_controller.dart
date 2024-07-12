@@ -84,6 +84,8 @@ class BoatInstrumentController {
   bool get darkMode => _settings!.darkMode;
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
+  bool get pageTimerOnStart => _settings!.pageTimerOnStart;
+  int get pageChangeSeconds => _settings!.pageChangeSeconds;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   int get m2nmThreshold => _settings!.m2nmThreshold;
   SpeedUnits get speedUnits => _settings!.speedUnits;
@@ -226,13 +228,13 @@ class BoatInstrumentController {
     });
   }
 
-  int nextPageNum(int currentPage) {
+  int nextPageNum(int currentPage, {bool alwaysRotate = false}) {
     if(_settings!.pages.isEmpty) {
       _settings?.pages = [_Page._newPage()];
       return 0;
     }
     ++currentPage;
-    if(_settings!.wrapPages) {
+    if(alwaysRotate || _settings!.wrapPages) {
       return currentPage %= _settings!.pages.length;
     }
     return (currentPage >= _settings!.pages.length) ? _settings!.pages.length-1 : currentPage;
