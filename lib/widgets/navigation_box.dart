@@ -35,8 +35,7 @@ class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
 
   @override
   double convert(double value) {
-    // Not used as we always use meters in the processUpdates method.
-    throw UnimplementedError();
+    return value;
   }
 
   @override

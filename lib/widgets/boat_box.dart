@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -16,7 +18,7 @@ class SpeedThroughWaterBox extends SpeedBox {
 }
 
 class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
-  const AttitudeRollGaugeBox(config, {super.key}) : super(config, 'Roll', GaugeOrientation.down, 'navigation.attitude', minValue: -45, maxValue: 45, mirror: true, angle: true);
+  const AttitudeRollGaugeBox(config, {super.key}) : super(config, 'Roll', GaugeOrientation.down, 'navigation.attitude', minValue: -pi/4, maxValue: pi/4, mirror: true, angle: true);
 
   static String sid = 'attitude-roll';
   @override

@@ -156,12 +156,12 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _SemiGaugePainter(context, o, widget.mirror, widget.minValue!, widget.maxValue!)
+          painter: _SemiGaugePainter(context, o, widget.mirror, widget.convert(widget.minValue!), widget.convert(widget.maxValue!))
       )
     ];
 
-    if(displayValue != null) {
-      double angle = ((pi/(widget.maxValue! - widget.minValue!)) * (displayValue! - widget.minValue!)) - pi/2;
+    if(value != null) {
+      double angle = ((pi/(widget.maxValue! - widget.minValue!)) * (value! - widget.minValue!)) - pi/2;
       if(widget.mirror) {
         angle = (pi*2)-angle;
       }
@@ -181,10 +181,11 @@ final double circularGaugeOffset = deg2Rad(20);
 class _CircularGaugePainter extends CustomPainter {
   final BuildContext _context;
   final double _minValue;
-  final double _maxValue;
-  final double _step;
+  final int _minDisplay;
+  final int _maxDisplay;
+  final int _displayStep;
 
-  _CircularGaugePainter(this._context, this._minValue, this._maxValue, this._step);
+  _CircularGaugePainter(this._context, this._minValue, this._minDisplay, this._maxDisplay, this._displayStep);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -200,27 +201,28 @@ class _CircularGaugePainter extends CustomPainter {
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
       paint.strokeWidth = 20.0;
-      double width = 0.02;
+      const double width = 0.02;
 
-      double steps = (_maxValue - _minValue) / _step;
+      double steps = (_maxDisplay - _minValue) / _displayStep;
       double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
+      double convertOffset = (_minDisplay - _minValue) * angleStep;
 
-      for (double i = 0; i <= steps; ++i) {
+      for (int i = 0; i <= steps; ++i) {
 
         canvas.drawArc(
             const Offset(10.0, 10.0) & Size(size - 20.0, size - 20.0),
-            (i*angleStep) + (pi / 2) + circularGaugeOffset - (width / 2), width, false, paint);
+            (i*angleStep) + (pi / 2) + circularGaugeOffset + convertOffset - (width / 2), width, false, paint);
 
         tp.text = TextSpan(
-            text: (i*_step).toInt().toString(),
+            text: (i*_displayStep+_minDisplay).toString(),
             style: Theme
                 .of(_context)
                 .textTheme
                 .bodyMedium);
         tp.layout();
 
-        double x = cos((i*angleStep) + (pi / 2) + circularGaugeOffset) * (size / 2 - 40.0);
-        double y = sin((i*angleStep) + (pi / 2) + circularGaugeOffset) * (size / 2 - 40.0);
+        double x = cos((i*angleStep) + (pi / 2) + circularGaugeOffset + convertOffset) * (size / 2 - 40.0);
+        double y = sin((i*angleStep) + (pi / 2) + circularGaugeOffset + convertOffset) * (size / 2 - 40.0);
 
         canvas.save();
         canvas.translate(size / 2, size / 2);
@@ -276,6 +278,21 @@ abstract class DoubleValueCircularGaugeBox extends DoubleValueBox {
 }
 
 class _DoubleValueCircularGaugeBoxState extends DoubleValueBoxState<DoubleValueCircularGaugeBox> {
+  int _minDisplay = 0;
+  int _maxDisplay = 0;
+  int _displayStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _minDisplay = widget.convert(widget.minValue!).ceil();
+    _maxDisplay = widget.convert(widget.maxValue!).floor();
+    _displayStep = widget.convert(widget.step).round();
+    int range = _maxDisplay - _minDisplay;
+    while(range % _displayStep != 0) {
+      --_displayStep;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +302,7 @@ class _DoubleValueCircularGaugeBoxState extends DoubleValueBoxState<DoubleValueC
       Positioned(top: 0, right: 0, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _CircularGaugePainter(context, widget.minValue!, widget.maxValue!, widget.step)
+          painter: _CircularGaugePainter(context, widget.convert(widget.minValue!), _minDisplay, _maxDisplay, _displayStep)
       )
     ];
 
@@ -293,7 +310,7 @@ class _DoubleValueCircularGaugeBoxState extends DoubleValueBoxState<DoubleValueC
       double steps = widget.maxValue! - widget.minValue!;
       double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
 
-      double angle = angleStep * displayValue!;
+      double angle = angleStep * (value! - widget.minValue!);
 
       stack.add(CustomPaint(
           size: Size.infinite,
@@ -372,7 +389,7 @@ class _DoubleValueBarGaugeBoxState extends DoubleValueBoxState<DoubleValueBarGau
       Expanded(child: Padding(padding: const EdgeInsets.all(pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _BarGaugePainter(context, widget.minValue!, widget.maxValue!, widget.step, displayValue)
+          painter: _BarGaugePainter(context, widget.convert(widget.minValue!), widget.convert(widget.maxValue!), widget.convert(widget.step), displayValue)
       )))),
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
     ]);

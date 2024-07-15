@@ -272,22 +272,22 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
       try {
         double next = widget.extractValue(updates[0]);
 
-        if ((widget.minValue != null && next < widget.minValue!) ||
-            (widget.maxValue != null && next > widget.maxValue!)) {
+        if(widget.smoothing) {
+          if (widget.angle) {
+            value = averageAngle(value ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+          } else {
+            value = averageDouble(value ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+          }
+        } else {
+          value = next;
+        }
+
+        if ((widget.minValue != null && value! < widget.minValue!) ||
+            (widget.maxValue != null && value! > widget.maxValue!)) {
           displayValue = null;
         } else {
-          if(widget.smoothing) {
-            if (widget.angle) {
-              value = averageAngle(value ?? next, next,
-                  smooth: widget.config.controller.valueSmoothing);
-            } else {
-              value = averageDouble(value ?? next, next,
-                  smooth: widget.config.controller.valueSmoothing);
-            }
-          } else {
-            value = next;
-          }
-
           displayValue = widget.convert(value!);
         }
       } catch (e) {
