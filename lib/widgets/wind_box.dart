@@ -198,3 +198,21 @@ class _SettingsState extends State<_WindDirectionSettingsWidget> {
     ]);
   }
 }
+
+class WindAngleApparentBox extends DoubleValueBox {
+  static const String sid = 'wind-apparent-angle';
+  @override
+  String get id => sid;
+
+  const WindAngleApparentBox(config, {super.key}) : super(config, 'AWA', 'environment.wind.angleApparent', angle: true, relativeAngle: true);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value).toDouble();
+  }
+
+  @override
+  String units(double value) {
+    return 'deg';
+  }
+}

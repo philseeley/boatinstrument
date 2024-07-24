@@ -41,6 +41,7 @@ List<BoxDetails> boxDetails = [
   BoxDetails(NextPointDistanceTimeToGo.sid, 'Next Point TTG', (config) {return NextPointDistanceTimeToGo(config, key: UniqueKey());}),
   BoxDetails(AttitudeRollGaugeBox.sid, 'Roll Gauge', (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorDeltaBox.sid, 'XTE Delta', (config) {return CrossTrackErrorDeltaBox(config, key: UniqueKey());}),
+  BoxDetails(WindAngleApparentBox.sid, 'Apparent Wind Angle', (config) {return WindAngleApparentBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -91,6 +92,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AttitudeRollGaugeBox.sid)]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
+        _widgetMenuEntry(WindAngleApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
         _widgetMenuEntry(WindDirectionTrueBox.sid),
         _widgetMenuEntry(WindSpeedTrueBeaufortBox.sid),

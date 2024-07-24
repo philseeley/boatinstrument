@@ -215,9 +215,10 @@ abstract class DoubleValueBox extends BoxWidget {
   final double? minValue;
   final double? maxValue;
   final bool angle;
+  final bool relativeAngle;
   final bool smoothing;
 
-  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.smoothing = true, super.key});
+  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, super.key});
 
   @override
   State<DoubleValueBox> createState() => DoubleValueBoxState();
@@ -275,7 +276,8 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
         if(widget.smoothing) {
           if (widget.angle) {
             value = averageAngle(value ?? next, next,
-                smooth: widget.config.controller.valueSmoothing);
+                smooth: widget.config.controller.valueSmoothing,
+                relative: widget.relativeAngle);
           } else {
             value = averageDouble(value ?? next, next,
                 smooth: widget.config.controller.valueSmoothing);
