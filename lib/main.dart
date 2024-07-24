@@ -147,12 +147,14 @@ class _MainPageState extends State<MainPage> {
       _rotatePages = !_rotatePages;
     });
 
-    _rotatePages ? _startPageTimer() : _stopPageTimer();
+    _startPageTimer();
   }
 
   void _startPageTimer() {
     _stopPageTimer();
-    _pageTimer = Timer(Duration(seconds: _controller.pageChangeSeconds), _rotatePage);
+    if(_rotatePages) {
+      _pageTimer = Timer(Duration(seconds: _controller.pageChangeSeconds), _rotatePage);
+    }
   }
 
   void _stopPageTimer() {
@@ -185,12 +187,12 @@ class _MainPageState extends State<MainPage> {
       }
     });
 
-    if(_rotatePages) {
-      _startPageTimer();
-    }
+    _startPageTimer();
   }
 
   void _movePage (DragEndDetails details) {
+    _startPageTimer();
+
     if(details.primaryVelocity != 0.0) {
       int newPage = 0;
       if (details.primaryVelocity! > 0.0) {
@@ -207,6 +209,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _displayAppBar (DragEndDetails details) async {
+    _startPageTimer();
+
     if(details.primaryVelocity != null) {
       bool showAppBar = false;
       if(details.primaryVelocity! > 0.0) {
