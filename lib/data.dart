@@ -2,7 +2,7 @@ part of 'boatinstrument_controller.dart';
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
-String val2PS(num val) => val < 0 ? 'P' : 'S';
+String val2PS(num val) => val < 0 ? 'P' : (val > 0) ? 'S' : '';
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);
@@ -383,6 +383,19 @@ enum TemperatureUnits {
   const TemperatureUnits(this.displayName, this.unit);
 }
 
+enum PortStarboardColors {
+  none('None', Colors.black, Colors.white), // These are just placeholders and not used.
+  redGreen('Red/Green', Colors.red, Colors.green),
+  redBlue('Red/Blue', Colors.red, Colors.blue),
+  orangeYellow('Orange/Yellow', Colors.orange, Colors.yellow);
+
+  final String displayName;
+  final Color portColor;
+  final Color starboardColor;
+
+  const PortStarboardColors(this.displayName, this.portColor, this.starboardColor);
+}
+
 @JsonSerializable()
 class _Settings {
   int version;
@@ -404,6 +417,7 @@ class _Settings {
   SpeedUnits windSpeedUnits;
   DepthUnits depthUnits;
   TemperatureUnits temperatureUnits;
+  PortStarboardColors portStarboardColors;
   late List<_Page> pages;
   late Map<String, dynamic> boxSettings;
 
@@ -431,6 +445,7 @@ class _Settings {
     this.windSpeedUnits = SpeedUnits.kts,
     this.depthUnits = DepthUnits.m,
     this.temperatureUnits = TemperatureUnits.c,
+    this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
     widgetSettings
   }) : boxSettings = widgetSettings??{} {

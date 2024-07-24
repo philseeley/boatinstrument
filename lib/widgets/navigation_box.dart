@@ -13,7 +13,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2, smoothing: false);
+  const CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2, smoothing: false, portStarboard: true);
 
   @override
   double convert(double value) {

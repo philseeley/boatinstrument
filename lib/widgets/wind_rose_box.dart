@@ -33,11 +33,12 @@ class _Settings {
 }
 
 class _RosePainter extends CustomPainter {
+  final BoatInstrumentController _controller;
   final BuildContext _context;
   final _Settings _settings;
   final WindRoseType _type;
 
-  _RosePainter(this._context, this._settings, this._type);
+  _RosePainter(this._controller, this._context, this._settings, this._type);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -55,9 +56,9 @@ class _RosePainter extends CustomPainter {
     if(_type == WindRoseType.closeHaul) {
       multi = 2;
     }
-    paint..strokeWidth = 20.0..color = Colors.green;
+    paint..strokeWidth = 20.0..color = _controller.val2PSColor(_context, 1, none: Colors.grey);
     canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad((20*multi).toInt())-(pi/2), deg2Rad((40*multi).toInt()), false, paint);
-    paint.color = Colors.red;
+    paint.color = _controller.val2PSColor(_context, -1, none: Colors.grey);
     canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad((-20*multi).toInt())-(pi/2), deg2Rad((-40*multi).toInt()), false, paint);
     paint.color = fg;
 
@@ -228,7 +229,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     }
 
     List<Widget> stack = [
-      CustomPaint(size: Size.infinite, painter: _RosePainter(context, widget._settings, _displayType))
+      CustomPaint(size: Size.infinite, painter: _RosePainter(widget.config.controller, context, widget._settings, _displayType))
     ];
 
     if(_windAngleTrue != null) {

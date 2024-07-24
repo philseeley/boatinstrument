@@ -52,11 +52,12 @@ class _RudderAngleSettings {
 }
 
 class _RudderAnglePainter extends CustomPainter {
+  final BoatInstrumentController _controller;
   final BuildContext _context;
   final _RudderAngleSettings _settings;
   final double? _rudderAngle;
 
-  _RudderAnglePainter(this._context, this._settings, this._rudderAngle);
+  _RudderAnglePainter(this._controller, this._context, this._settings, this._rudderAngle);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -65,7 +66,7 @@ class _RudderAnglePainter extends CustomPainter {
     Paint paint = Paint()..style = PaintingStyle.fill;
 
     if(_rudderAngle != null) {
-      paint.color = (_rudderAngle < 0) ? Colors.red : Colors.green;
+      paint.color = _controller.val2PSColor(_context, _rudderAngle);
 
       canvas.drawRect(Rect.fromLTWH(
           max, 0, max / (_settings.maxAngle / rad2Deg(_rudderAngle)),
@@ -144,6 +145,7 @@ class _RudderAngleBoxState extends DoubleValueBoxState<RudderAngleBox> {
             child: CustomPaint(
                 size: Size.infinite,
                 painter: _RudderAnglePainter(
+                    widget.config.controller,
                     context,
                     widget._settings,
                     displayValue)

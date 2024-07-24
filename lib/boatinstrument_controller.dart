@@ -94,6 +94,13 @@ class BoatInstrumentController {
   TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
   int get numOfPages => _settings!.pages.length;
 
+  Color val2PSColor(BuildContext context, num val, {Color? none}) {
+    if(_settings!.portStarboardColors == PortStarboardColors.none) {
+      return none??Theme.of(context).colorScheme.onSurface;
+    }
+    return val < 0 ? _settings!.portStarboardColors.portColor : (val > 0) ? _settings!.portStarboardColors.starboardColor : Theme.of(context).colorScheme.onSurface;
+  }
+
   loadSettings() async {
     try {
       _settings = await _Settings.load();

@@ -204,7 +204,7 @@ class WindAngleApparentBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const WindAngleApparentBox(config, {super.key}) : super(config, 'AWA', 'environment.wind.angleApparent', angle: true, relativeAngle: true);
+  const WindAngleApparentBox(config, {super.key}) : super(config, 'AWA', 'environment.wind.angleApparent', minLen: 3, precision: 0, angle: true, relativeAngle: true, portStarboard: true);
 
   @override
   double convert(double value) {

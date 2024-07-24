@@ -217,8 +217,9 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool angle;
   final bool relativeAngle;
   final bool smoothing;
+  final bool portStarboard;
 
-  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, super.key});
+  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, this.portStarboard = false, super.key});
 
   @override
   State<DoubleValueBox> createState() => DoubleValueBoxState();
@@ -250,7 +251,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
 
     String valueText = (displayValue == null) ?
       '-' :
-      fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', displayValue!);
+      fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', widget.portStarboard ? displayValue!.abs() : displayValue!);
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
@@ -260,9 +261,11 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} ${widget.units(value??0)}', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(valueText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
+      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
+          child: Text(valueText, textScaler: TextScaler.noScaling,
+              style: style.copyWith(fontSize: fontSize, color: widget.portStarboard ? widget.config.controller.val2PSColor(context, displayValue??0) : null)))))
     ]);
   }
 

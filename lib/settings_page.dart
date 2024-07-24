@@ -221,6 +221,10 @@ class _SettingsState extends State<SettingsPage> {
           title: _temperatureMenu()
       ),
       ListTile(
+          leading: const Text("Port/Starboard Colours:"),
+          title: _portStarboardColorsMenu()
+      ),
+      ListTile(
           leading: const Text("Signalk Server:"),
           title: TextFormField(
               initialValue: settings.signalkServer,
@@ -363,6 +367,26 @@ class _SettingsState extends State<SettingsPage> {
       dropdownMenuEntries: l,
       onSelected: (value) {
         widget._controller._settings?.temperatureUnits = value!;
+      },
+    );
+
+    return menu;
+  }
+
+  DropdownMenu _portStarboardColorsMenu() {
+    List<DropdownMenuEntry<PortStarboardColors>> l = [];
+    for(var v in PortStarboardColors.values) {
+      l.add(DropdownMenuEntry<PortStarboardColors>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<PortStarboardColors>(
+      initialSelection: widget._controller._settings?.portStarboardColors,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.portStarboardColors = value!;
       },
     );
 
