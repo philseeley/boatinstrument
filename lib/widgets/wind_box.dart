@@ -12,7 +12,7 @@ class WindSpeedTrueBeaufortBox extends DoubleValueBox {
   const WindSpeedTrueBeaufortBox(config, {super.key}) : super(config, 'True Wind', 'environment.wind.speedTrue');
 
   @override
-  DoubleValueBoxState createState() => _WindSpeedTrueBeaufortBoxState();
+  DoubleValueBoxState<WindSpeedTrueBeaufortBox> createState() => _WindSpeedTrueBeaufortBoxState();
 
   static String sid = 'wind-speed-true-beaufort';
   @override
@@ -29,7 +29,7 @@ class WindSpeedTrueBeaufortBox extends DoubleValueBox {
   }
 }
 
-class _WindSpeedTrueBeaufortBoxState extends DoubleValueBoxState {
+class _WindSpeedTrueBeaufortBoxState extends DoubleValueBoxState<WindSpeedTrueBeaufortBox> {
 
   @override
   Widget build(BuildContext context) {
@@ -93,15 +93,15 @@ class _WindDirectionSettings {
   _WindDirectionSettings({this.cardinalPrimary = true});
 }
 
-class WindDirectionTrueBox extends BoxWidget {
+class WindDirectionTrueBox extends DoubleValueBox {
   late final _WindDirectionSettings _settings;
 
-  WindDirectionTrueBox(super.config, {super.key})  {
+  WindDirectionTrueBox(config, {super.key}) : super(config, 'TWD', 'environment.wind.directionTrue', angle: true) {
     _settings = _$WindDirectionSettingsFromJson(config.settings);
   }
 
   @override
-  State<WindDirectionTrueBox> createState() => _WindDirectionTrueBoxState();
+  DoubleValueBoxState<WindDirectionTrueBox> createState() => _WindDirectionTrueBoxState();
 
   static String sid = 'wind-direction-true';
   @override
@@ -114,21 +114,23 @@ class WindDirectionTrueBox extends BoxWidget {
   BoxSettingsWidget getPerBoxSettingsWidget() {
     return _WindDirectionSettingsWidget(_settings);
   }
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    throw UnimplementedError();
+  }
 }
 
-class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
+class _WindDirectionTrueBoxState extends DoubleValueBoxState<WindDirectionTrueBox> {
   static const List<String> _cardinalDirections = [
     'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S',
     'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N'
   ];
-
-  double? _direction;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'environment.wind.directionTrue'});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,14 +138,14 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
     const double pad = 5.0;
 
     if(widget.config.editMode) {
-      _direction = deg2Rad(123);
+      displayValue = deg2Rad(123);
     }
 
-    String direction = (_direction == null) ?
-    '-' : fmt.format('{:${3}d}', rad2Deg(_direction));
+    String direction = (displayValue == null) ?
+    '-' : fmt.format('{:${3}d}', rad2Deg(displayValue));
 
     const f = (2*pi)/16;
-    String cardinal = (_direction == null) ? '-' : _cardinalDirections[((_direction!+(f/2))/f).toInt()];
+    String cardinal = (displayValue == null) ? '-' : _cardinalDirections[((displayValue!+(f/2))/f).toInt()];
 
     String primaryText = direction;
     String subText = cardinal;
@@ -157,30 +159,11 @@ class _WindDirectionTrueBoxState extends State<WindDirectionTrueBox> {
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('TWD deg $subText', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} deg $subText', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(primaryText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
     ]);
-  }
-
-  _processData(List<Update>? updates) {
-    if(updates == null) {
-      _direction = null;
-    } else {
-      try {
-        double next = (updates[0].value as num).toDouble();
-
-        _direction = averageAngle(_direction ?? next, next,
-            smooth: widget.config.controller.valueSmoothing);
-      } catch (e) {
-        widget.config.controller.l.e("Error converting $updates", error: e);
-      }
-    }
-
-    if(mounted) {
-      setState(() {});
-    }
   }
 }
 
