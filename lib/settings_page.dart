@@ -224,29 +224,32 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Port/Starboard Colours:"),
           title: _portStarboardColorsMenu()
       ),
+      const ListTile(
+          title: Text("Signalk:"),
+      ),
       ListTile(
-          leading: const Text("Signalk Server:"),
+          leading: const Text("Server:"),
           title: TextFormField(
               initialValue: settings.signalkServer,
               onChanged: (value) => settings.signalkServer = value)
       ),
       ListTile(
-          leading: const Text("Signalk Subscription Min Period:"),
+          leading: const Text("Subscription Min Period:"),
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.signalkMinPeriod.toString(),
               onChanged: (value) => settings.signalkMinPeriod = int.parse(value)),
-          trailing: const Text('milliseconds')
+          trailing: const Text('ms')
       ),
       ListTile(
-          leading: const Text("Signalk Connection Timeout:"),
+          leading: const Text("Connection Timeout:"),
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.signalkConnectionTimeout.toString(),
               onChanged: (value) => settings.signalkConnectionTimeout = int.parse(value)),
-          trailing: const Text('milliseconds')
+          trailing: const Text('ms')
       ),
       ListTile(
           leading: const Text("Data Timeout:"),
@@ -255,7 +258,7 @@ class _SettingsState extends State<SettingsPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.dataTimeout.toString(),
               onChanged: (value) => settings.dataTimeout = int.parse(value)),
-          trailing: const Text('milliseconds')
+          trailing: const Text('ms')
       ),
     ];
 
