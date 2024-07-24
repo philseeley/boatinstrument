@@ -198,7 +198,7 @@ class _SettingsState extends State<SettingsPage> {
             divisions: 900,
             value: settings.m2nmThreshold.toDouble(),
             label: "${settings.m2nmThreshold.toInt()}",
-            onChanged: (double value) {
+            onChanged: settings.distanceUnits != DistanceUnits.nmM ? null : (double value) {
               setState(() {
                 settings.m2nmThreshold = value.toInt();
               });
@@ -286,7 +286,9 @@ class _SettingsState extends State<SettingsPage> {
       initialSelection: widget._controller._settings?.distanceUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
-        widget._controller._settings?.distanceUnits = value!;
+        setState(() {
+          widget._controller._settings?.distanceUnits = value!;
+        });
       },
     );
 
