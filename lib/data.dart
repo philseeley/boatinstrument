@@ -192,7 +192,7 @@ class _HelpBoxState extends State<HelpBox> {
   _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-          return _HelpPage(widget.config.controller);
+          return _HelpPage();
          })
     );
   }

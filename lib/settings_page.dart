@@ -401,7 +401,7 @@ class _SettingsState extends State<SettingsPage> {
   _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _HelpPage(widget._controller);
+      return _HelpPage();
     })
     );
   }
