@@ -8,11 +8,9 @@ part 'date_time_box.g.dart';
 @JsonSerializable()
 class _Settings {
   String dateFormat;
-  String timeFormat;
 
   _Settings({
-    this.dateFormat = 'yyyy-MM-dd',
-    this.timeFormat = 'HH:mm:ss'
+    this.dateFormat = 'yyyy-MM-dd'
   });
 }
 
@@ -21,11 +19,13 @@ class _PerBoxSettings {
   bool showDate;
   bool showTime;
   bool utc;
+  String timeFormat;
 
   _PerBoxSettings({
     this.showDate = true,
     this.showTime = true,
-    this.utc = false
+    this.utc = false,
+    this.timeFormat = 'HH:mm:ss'
   });
 }
 
@@ -61,6 +61,9 @@ class DateTimeBox extends BoxWidget {
   BoxSettingsWidget getPerBoxSettingsWidget() {
     return _PerBoxSettingsWidget(_perBoxSettings);
   }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const Text('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
 }
 
 class _DateTimeBoxState extends State<DateTimeBox> {
@@ -101,7 +104,7 @@ class _DateTimeBoxState extends State<DateTimeBox> {
           ++lines;
           dateTimeString += '\n';
         }
-        dateTimeString += DateFormat(_settings.timeFormat).format(dt);
+        dateTimeString += DateFormat(perBoxSettings.timeFormat).format(dt);
       }
     }
 
@@ -160,12 +163,6 @@ class _SettingsState extends State<_SettingsWidget> {
               initialValue: s.dateFormat,
               onChanged: (value) => s.dateFormat = value)
       ),
-      ListTile(
-          leading: const Text('Time Format:'),
-          title: TextFormField(
-              initialValue: s.timeFormat,
-              onChanged: (value) => s.timeFormat = value)
-      ),
     ]);
   }
 }
@@ -211,6 +208,12 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
               s.utc = value;
             });
           }),
+      ListTile(
+          leading: const Text('Time Format:'),
+          title: TextFormField(
+              initialValue: s.timeFormat,
+              onChanged: (value) => s.timeFormat = value)
+      ),
     ]);
   }
 }
