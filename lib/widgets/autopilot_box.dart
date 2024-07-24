@@ -280,33 +280,27 @@ class AutoPilotStatusBox extends BoxWidget {
   const AutoPilotStatusBox(super.config, {super.key});
 
   @override
-  State<AutoPilotStatusBox> createState() => _AutoPilotDisplayState();
+  State<AutoPilotStatusBox> createState() => _AutoPilotStatusState();
 
   @override
   String get id => sid;
 }
 
-class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
+class _AutoPilotStatusState extends State<AutoPilotStatusBox> {
   AutopilotState? _autopilotState;
-  double? _courseOverGroundTrue;
   double? _targetWindAngleApparent;
-  double? _windAngleApparent;
   double? _targetHeadingTrue;
   double? _targetHeadingMagnetic;
   double? _magneticVariation;
   String? _waypoint;
-  double? _crossTrackError;
 
   @override
   void initState() {
     super.initState();
     widget.config.controller.configure(widget, onUpdate: _processData, paths: {
       "steering.autopilot.state",
-      "navigation.courseOverGroundTrue",
       "steering.autopilot.target.windAngleApparent",
-      "environment.wind.angleApparent",
       "navigation.currentRoute.waypoints",
-      "navigation.courseGreatCircle.crossTrackError",
       "steering.autopilot.target.headingTrue",
       "steering.autopilot.target.headingMagnetic",
       "navigation.magneticVariation",
@@ -318,7 +312,7 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
     TextStyle s = const TextStyle(fontSize: 20);
 
     List<Widget> pilot = [
-      Text("Pilot", style: s),
+      Text("Autopilot", style: s),
       Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: s),
     ];
 
@@ -345,24 +339,12 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
         break;
     }
 
-    List<Widget> actual = [
-      Text("Actual", style: s),
-      Text("COG: ${_courseOverGroundTrue == null ? '' : rad2Deg(_courseOverGroundTrue)}", style: s),
-      Text("AWA: ${_windAngleApparent == null ? '' : rad2Deg(_windAngleApparent!.abs())} ${val2PS(_windAngleApparent??0)}", style: s),
-    ];
-
-    if((_autopilotState??AutopilotState.standby) == AutopilotState.route) {
-      if(_crossTrackError != null) {
-        actual.add(Text("XTE: ${convertDistance(widget.config.controller, _crossTrackError!.abs()).toStringAsFixed(2)}${distanceUnits(widget.config.controller, _crossTrackError!)} ${val2PS(_crossTrackError!)}", style: s));
-      }
-    }
-
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Column(children: pilot),
-        Column(children: actual)
-      ]),
-    ]);
+    return Padding(padding: const EdgeInsets.all(5.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: pilot));
+    // return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+    //   Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
+    //     Column(children: pilot)
+    //   ]),
+    // ]);
   }
 
   _processData(List<Update>? updates) {
@@ -375,27 +357,11 @@ class _AutoPilotDisplayState extends State<AutoPilotStatusBox> {
             case 'steering.autopilot.state':
               _autopilotState = AutopilotState.values.byName(u.value);
               break;
-            case 'navigation.courseOverGroundTrue':
-              double cogLatest = (u.value as num).toDouble();
-              _courseOverGroundTrue = averageAngle(
-                  _courseOverGroundTrue ?? cogLatest, cogLatest,
-                  smooth: widget.config.controller.valueSmoothing);
-              break;
             case 'steering.autopilot.target.windAngleApparent':
               _targetWindAngleApparent = (u.value as num).toDouble();
               break;
-            case 'environment.wind.angleApparent':
-              double waa = (u.value as num).toDouble();
-              _windAngleApparent = averageAngle(
-                  _windAngleApparent ?? waa, waa,
-                  smooth: widget.config.controller.valueSmoothing,
-                  relative: true);
-              break;
             case 'navigation.currentRoute.waypoints':
               _waypoint = u.value[1]['name'];
-              break;
-            case 'navigation.courseGreatCircle.crossTrackError':
-              _crossTrackError = (u.value as num).toDouble();
               break;
             case 'steering.autopilot.target.headingTrue':
               _targetHeadingTrue = (u.value as num).toDouble();
