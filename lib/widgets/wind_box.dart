@@ -7,26 +7,29 @@ import 'double_value_box.dart';
 
 part 'wind_box.g.dart';
 
-class WindSpeedTrueBeaufortBox extends BoxWidget {
+class WindSpeedTrueBeaufortBox extends DoubleValueBox {
 
-  const WindSpeedTrueBeaufortBox(super.config, {super.key});
+  const WindSpeedTrueBeaufortBox(config, {super.key}) : super(config, 'True Wind', 'environment.wind.speedTrue');
 
   @override
-  State<WindSpeedTrueBeaufortBox> createState() => _WindSpeedTrueBeaufortBoxState();
+  DoubleValueBoxState createState() => _WindSpeedTrueBeaufortBoxState();
 
   static String sid = 'wind-speed-true-beaufort';
   @override
   String get id => sid;
-}
-
-class _WindSpeedTrueBeaufortBoxState extends State<WindSpeedTrueBeaufortBox> {
-  double? _windSpeedTrue;
 
   @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'environment.wind.speedTrue'});
+  double convert(double value) {
+    return value;
   }
+
+  @override
+  String units(double value) {
+    throw UnimplementedError();
+  }
+}
+
+class _WindSpeedTrueBeaufortBoxState extends DoubleValueBoxState {
 
   @override
   Widget build(BuildContext context) {
@@ -34,37 +37,21 @@ class _WindSpeedTrueBeaufortBoxState extends State<WindSpeedTrueBeaufortBox> {
     const double pad = 5.0;
 
     if(widget.config.editMode) {
-      _windSpeedTrue = 12.3;
+      displayValue = 12.3;
     }
 
-    String force = (_windSpeedTrue == null) ? '-' : 'F${pow(_windSpeedTrue!/0.836, 1.0/1.5).round()}';
+    String force = (displayValue == null) ? '-' : 'F${pow(displayValue!/0.836, 1.0/1.5).round()}';
 
     double fontSize = maxFontSize(force, style,
         widget.config.constraints.maxHeight - style.fontSize! - (3 * pad),
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('True Wind', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text(widget.title, style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(force, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
     ]);
-  }
-
-  _processData(List<Update>? updates) {
-    if(updates == null) {
-      _windSpeedTrue = null;
-    } else {
-      try {
-        _windSpeedTrue = (updates[0].value as num).toDouble();
-      } catch (e) {
-        widget.config.controller.l.e("Error converting $updates", error: e);
-      }
-    }
-
-    if(mounted) {
-      setState(() {});
-    }
   }
 }
 
