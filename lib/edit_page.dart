@@ -152,7 +152,7 @@ class _EditPageState extends State<_EditPage> {
             }
 
             if(bi == 0) {
-              nButtons.add(IconButton(tooltip: 'Row Above', onPressed: () {_addRow(column, ri);}, icon: const Icon(Icons.arrow_circle_up_outlined, color: Colors.green)));
+              nButtons.add(IconButton(tooltip: 'Row Above', onPressed: () {_addRow(column, ri);}, icon: const Icon(Icons.arrow_circle_up_outlined, color: Colors.yellow)));
             }
 
             if(bi == row.boxes.length-1) {
@@ -168,7 +168,7 @@ class _EditPageState extends State<_EditPage> {
             }
 
             if(ri == column.rows.length-1 && bi == 0) {
-              sButtons.add(IconButton(tooltip: 'Row Below', onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.green)));
+              sButtons.add(IconButton(tooltip: 'Row Below', onPressed: () {_addRow(column, ri, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.yellow)));
             }
 
             LayoutBuilder layoutBoxWidget = LayoutBuilder(builder: (context, constraints) {
@@ -221,7 +221,7 @@ class _EditPageState extends State<_EditPage> {
           rowsPercent.add(row.percentage);
         }
 
-        columns.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, column.rows);}, isHorizontalSeparator: true, separatorColor: Colors.green, separatorSize: 16, percentages: rowsPercent, children: rows));
+        columns.add(ResizableWidget(onResized: (infoList) {_onResize(infoList, column.rows);}, isHorizontalSeparator: true, separatorColor: Colors.yellow, separatorSize: 16, percentages: rowsPercent, children: rows));
         columnsPercent.add(column.percentage);
       }
 
