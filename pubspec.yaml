@@ -51,6 +51,7 @@ dependencies:
   screen_brightness:
   flutter_email_sender:
   intl:
+#  great_circle_distance_calculator:
 
 dev_dependencies:
   flutter_test:

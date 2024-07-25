@@ -1,6 +1,7 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
+// import 'package:great_circle_distance_calculator/great_circle_distance_calculator.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'double_value_box.dart';
@@ -160,25 +161,24 @@ class NextPointVelocityMadeGoodBox extends SpeedBox {
   const NextPointVelocityMadeGoodBox(config, {super.key}) : super(config, 'WPT VMG', 'navigation.courseGreatCircle.nextPoint.velocityMadeGood');
 }
 
-class NextPointDistanceTimeToGo extends BoxWidget {
+abstract class TimeToGoBox extends BoxWidget {
+  final String _title;
+  final Set<String> _paths;
 
-  const NextPointDistanceTimeToGo(super.config, {super.key});
+  const TimeToGoBox(super.config, this._title, this._paths, {super.key});
 
   @override
-  State<NextPointDistanceTimeToGo> createState() => _NextPointDistanceTimeToGoState();
+  State<TimeToGoBox> createState() => TimeToGoBoxState();
 
-  static String sid = 'navigation-next-point-time-to-go';
-  @override
-  String get id => sid;
 }
 
-class _NextPointDistanceTimeToGoState extends State<NextPointDistanceTimeToGo> {
+class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
   int? _timeToGo;
 
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.courseGreatCircle.nextPoint.timeToGo'});
+    widget.config.controller.configure(widget, onUpdate: processData, paths: widget._paths);
   }
 
   @override
@@ -222,14 +222,14 @@ class _NextPointDistanceTimeToGoState extends State<NextPointDistanceTimeToGo> {
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('WPT TTG $etaString', style: style))]),
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget._title} TTG $etaString', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(ttgString, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
     ]);
   }
 
-  _processData(List<Update>? updates) {
+  processData(List<Update>? updates) {
     if(updates == null) {
       _timeToGo = null;
     } else {
@@ -245,6 +245,78 @@ class _NextPointDistanceTimeToGoState extends State<NextPointDistanceTimeToGo> {
     }
   }
 }
+
+class WaypointTimeToGoBox extends TimeToGoBox {
+
+  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.courseGreatCircle.nextPoint.timeToGo'});
+
+  static String sid = 'navigation-next-point-time-to-go';
+  @override
+  String get id => sid;
+}
+
+//TODO the route seen by signalk is never more that 3 points for some reason.
+// class RouteTimeToGoBox extends TimeToGoBox {
+//
+//   RouteTimeToGoBox(config, {super.key}) :
+//         super(config, 'RTE', {
+//           'navigation.courseGreatCircle.nextPoint.timeToGo',
+//           'navigation.currentRoute.waypoints',
+//           'navigation.courseGreatCircle.nextPoint.velocityMadeGood'
+//         });
+//
+//   static String sid = 'navigation-route-time-to-go';
+//   @override
+//   String get id => sid;
+//
+//   @override
+//   State<TimeToGoBox> createState() => _RouteTimeToGoBoxState();
+// }
+//
+// class _RouteTimeToGoBoxState extends TimeToGoBoxState<RouteTimeToGoBox> {
+//   int _waypointTTG = 0;
+//   double _waypointVMG = 0.0;
+//   double _routeDistance = 0.0;
+//
+//   @override
+//   processData(List<Update>? updates) {
+//     if(updates == null) {
+//       _timeToGo = null;
+//     } else {
+//       for (Update u in updates) {
+//         try {
+//           switch (u.path) {
+//             case 'navigation.courseGreatCircle.nextPoint.timeToGo':
+//               _waypointTTG = (u.value as num).toInt();
+//               break;
+//             case 'navigation.currentRoute.waypoints':
+//               for(int i=1; i<(u.value as List).length-1; ++i) {
+//                 var gcd = GreatCircleDistance.fromDegrees(
+//                     latitude1: u.value[i]['position']['value']['latitude'],
+//                     longitude1: u.value[i]['position']['value']['longitude'],
+//                     latitude2: u.value[i+1]['position']['value']['latitude'],
+//                     longitude2: u.value[i+1]['position']['value']['longitude']);
+//
+//                 _routeDistance = gcd.haversineDistance();
+//               }
+//               break;
+//             case 'navigation.courseGreatCircle.nextPoint.velocityMadeGood':
+//               _waypointVMG = (u.value as num).toDouble();
+//               break;
+//           }
+//           //TODO Something like this when all the sections of the route are known.
+//           _timeToGo = _routeDistance~/_waypointVMG + _waypointTTG;
+//         } catch (e) {
+//           widget.config.controller.l.e("Error converting $u", error: e);
+//         }
+//       }
+//     }
+//
+//     if(mounted) {
+//       setState(() {});
+//     }
+//   }
+// }
 
 @JsonSerializable()
 class _PositionSettings {
