@@ -5,6 +5,33 @@ import 'package:flutter/material.dart';
 
 import 'double_value_box.dart';
 
+abstract class DoubleValueGaugeBox extends DoubleValueBox {
+  final double step;
+
+  const DoubleValueGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, this.step = 1, super.key});
+
+  @override
+  DoubleValueGaugeBoxState createState() => DoubleValueGaugeBoxState();
+}
+
+class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValueBoxState<T> {
+  int _minDisplay = 0;
+  int _maxDisplay = 0;
+  int _displayStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _minDisplay = widget.convert(widget.minValue!).ceil();
+    _maxDisplay = widget.convert(widget.maxValue!).floor();
+    _displayStep = widget.convert(widget.step).round();
+    int range = _maxDisplay - _minDisplay;
+    while (range % _displayStep != 0) {
+      --_displayStep;
+    }
+  }
+}
+
 enum GaugeOrientation {
   down(0, 0.0, -0.5, null, 0, 0, null, null, 0, null, 0),
   left(pi/2, 0.0, 0.0, 0, null, 0, null, null, 0, 0, null),
@@ -268,32 +295,15 @@ class _CircularGaugeNeedlePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-abstract class DoubleValueCircularGaugeBox extends DoubleValueBox {
-  final double step;
+abstract class DoubleValueCircularGaugeBox extends DoubleValueGaugeBox {
 
-  const DoubleValueCircularGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required this.step, super.key});
+  const DoubleValueCircularGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required super.step, super.key});
 
   @override
-  DoubleValueBoxState<DoubleValueCircularGaugeBox> createState() => _DoubleValueCircularGaugeBoxState();
+  DoubleValueCircularGaugeBoxState createState() => DoubleValueCircularGaugeBoxState();
 }
 
-class _DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> extends DoubleValueBoxState<T> {
-  int _minDisplay = 0;
-  int _maxDisplay = 0;
-  int _displayStep = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _minDisplay = widget.convert(widget.minValue!).ceil();
-    _maxDisplay = widget.convert(widget.maxValue!).floor();
-    _displayStep = widget.convert(widget.step).round();
-    int range = _maxDisplay - _minDisplay;
-    while(range % _displayStep != 0) {
-      --_displayStep;
-    }
-  }
-
+class DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> extends DoubleValueGaugeBoxState<T> {
   @override
   Widget build(BuildContext context) {
 
@@ -324,9 +334,9 @@ class _DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> e
 
 class _BarGaugePainter extends CustomPainter {
   final BuildContext _context;
-  final double _minValue;
-  final double _maxValue;
-  final double _step;
+  final int _minValue;
+  final int _maxValue;
+  final int _step;
   final double? _value;
 
   _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._value);
@@ -343,7 +353,7 @@ class _BarGaugePainter extends CustomPainter {
 
     if(_value != null) {
       double step = h/(_maxValue - _minValue);
-      canvas.drawRect(Rect.fromLTRB(35, h-(step*_value), w, h), paint);
+      canvas.drawRect(Rect.fromLTRB(35, h-(step*(_value-_minValue)), w, h), paint);
     }
 
     paint.color = theme.colorScheme.onSurface;
@@ -371,16 +381,15 @@ class _BarGaugePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-abstract class DoubleValueBarGaugeBox extends DoubleValueBox {
-  final double step;
+abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
 
-  const DoubleValueBarGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required this.step, super.key});
+  const DoubleValueBarGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required super.step, super.key});
 
   @override
-  State<DoubleValueBarGaugeBox> createState() => _DoubleValueBarGaugeBoxState();
+  DoubleValueBarGaugeBoxState createState() => DoubleValueBarGaugeBoxState();
 }
 
-class _DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends DoubleValueBoxState<T> {
+class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends DoubleValueGaugeBoxState<T> {
   @override
   Widget build(BuildContext context) {
     const double pad = 5.0;
@@ -389,7 +398,7 @@ class _DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Dou
       Expanded(child: Padding(padding: const EdgeInsets.all(pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _BarGaugePainter(context, widget.convert(widget.minValue!), widget.convert(widget.maxValue!), widget.convert(widget.step), displayValue)
+          painter: _BarGaugePainter(context, _minDisplay, _maxDisplay, _displayStep, displayValue)
       )))),
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
     ]);
