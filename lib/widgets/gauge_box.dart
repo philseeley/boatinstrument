@@ -277,7 +277,7 @@ abstract class DoubleValueCircularGaugeBox extends DoubleValueBox {
   DoubleValueBoxState<DoubleValueCircularGaugeBox> createState() => _DoubleValueCircularGaugeBoxState();
 }
 
-class _DoubleValueCircularGaugeBoxState extends DoubleValueBoxState<DoubleValueCircularGaugeBox> {
+class _DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> extends DoubleValueBoxState<T> {
   int _minDisplay = 0;
   int _maxDisplay = 0;
   int _displayStep = 0;
@@ -380,7 +380,7 @@ abstract class DoubleValueBarGaugeBox extends DoubleValueBox {
   State<DoubleValueBarGaugeBox> createState() => _DoubleValueBarGaugeBoxState();
 }
 
-class _DoubleValueBarGaugeBoxState extends DoubleValueBoxState<DoubleValueBarGaugeBox> {
+class _DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends DoubleValueBoxState<T> {
   @override
   Widget build(BuildContext context) {
     const double pad = 5.0;
