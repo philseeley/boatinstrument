@@ -8,7 +8,7 @@ import 'double_value_box.dart';
 abstract class DoubleValueGaugeBox extends DoubleValueBox {
   final double step;
 
-  const DoubleValueGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, this.step = 1, super.key});
+  const DoubleValueGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, super.angle, this.step = 1, super.key});
 
   @override
   DoubleValueGaugeBoxState createState() => DoubleValueGaugeBoxState();
@@ -59,8 +59,8 @@ class _SemiGaugePainter extends CustomPainter {
   final BuildContext _context;
   final GaugeOrientation _orientation;
   final bool _mirror;
-  final double _minValue;
-  final double _maxValue;
+  final int _minValue;
+  final int _maxValue;
 
   _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue);
 
@@ -162,17 +162,17 @@ class _SemiGaugeNeedlePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
-abstract class DoubleValueSemiGaugeBox extends DoubleValueBox {
+abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
   final GaugeOrientation orientation;
   final bool mirror;
 
-  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {super.smoothing, super.minValue = 0, required super.maxValue, this.mirror = false, super.angle, super.key});
+  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {super.minValue = 0, required super.maxValue, super.angle, this.mirror = false, super.key});
 
   @override
-  DoubleValueSemiGaugeBoxState<DoubleValueSemiGaugeBox> createState() => DoubleValueSemiGaugeBoxState();
+  DoubleValueSemiGaugeBoxState createState() => DoubleValueSemiGaugeBoxState();
 }
 
-class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends DoubleValueBoxState<T> {
+class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends DoubleValueGaugeBoxState<T> {
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +183,7 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _SemiGaugePainter(context, o, widget.mirror, widget.convert(widget.minValue!), widget.convert(widget.maxValue!))
+          painter: _SemiGaugePainter(context, o, widget.mirror, _minDisplay, _maxDisplay)
       )
     ];
 
