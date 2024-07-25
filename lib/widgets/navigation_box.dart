@@ -48,21 +48,23 @@ class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
 }
 
 class _CrossTrackErrorDeltaBoxState extends DoubleValueSemiGaugeBoxState<CrossTrackErrorDeltaBox> {
-  double _lastValue = 0;
+  double? _lastValue;
 
   @override
   Widget build(BuildContext context) {
     if(value != null) {
-      double diff = value! - _lastValue;
+      double diff = value! - (_lastValue??value!);
       _lastValue = value!;
       if (diff < widget.minValue! || diff > widget.maxValue!) {
-        displayValue = null;
+        value = displayValue = null;
       }
       else {
-        displayValue = diff;
+        value = displayValue = diff;
       }
     }
-    return super.build(context);
+    Widget w = super.build(context);
+    value = _lastValue;
+    return w;
   }
 
   // We override this because we don't want to check min and max as the gauge needs these to
