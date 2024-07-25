@@ -106,7 +106,7 @@ class _RudderAnglePainter extends CustomPainter {
 class RudderAngleBox extends DoubleValueBox {
   late final _RudderAngleSettings _settings;
 
-  RudderAngleBox(config, {super.key}) : super(config, '', 'steering.rudderAngle') {
+  RudderAngleBox(config, {super.key}) : super(config, '', 'steering.rudderAngle', smoothing: false) {
     _settings = _$RudderAngleSettingsFromJson(config.settings);
   }
 
