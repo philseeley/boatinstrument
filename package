@@ -31,9 +31,10 @@ case ${type} in
     tar czf ${package_dir}/${name}-${type}-${cpu}.tgz boatinstrument.app
     ;;
   flutterpi)
-    #flutter build $type
-    #cpu=$(uname -m)
-    #cd build/macos/Build/Products/Release/
-    #tar czf ${package_dir}/${name}-${type}-${cpu}.tgz boatinstrument.app
+    flutter pub get
+    flutterpi_tool build --arch=arm64 --cpu=pi4 --release
+    cd build/
+    mv flutter_assets boatinstrument
+    tar czf ${package_dir}/${name}-${type}.tgz boatinstrument
     ;;
 esac
