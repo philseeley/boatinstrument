@@ -1,0 +1,39 @@
+#!/bin/bash
+
+type=$1; shift
+
+name=boatinstrument-$(awk '/^version:/ {print $2}' pubspec.yaml)
+
+mkdir -p packages
+package_dir=$(pwd)/packages
+
+case ${type} in
+  apk)
+    flutter build $type
+    cp build/app/outputs/flutter-apk/app-release.apk ${package_dir}/${name}.apk
+    ;;
+  ios)
+    flutter build $type
+    cd build/ios/iphoneos/
+    tar czf ${package_dir}/${name}-${type}.tgz Runner.app
+    ;;
+  linux)
+    flutter build $type
+    cpu=$(uname -m)
+    cd build/linux/${cpu:0:1}*/release
+    mv bundle boatinstrument
+    tar czf ${package_dir}/${name}-${type}-${cpu}.tgz boatinstrument
+    ;;
+  macos)
+    flutter build $type
+    cpu=$(uname -m)
+    cd build/macos/Build/Products/Release/
+    tar czf ${package_dir}/${name}-${type}-${cpu}.tgz boatinstrument.app
+    ;;
+  flutterpi)
+    #flutter build $type
+    #cpu=$(uname -m)
+    #cd build/macos/Build/Products/Release/
+    #tar czf ${package_dir}/${name}-${type}-${cpu}.tgz boatinstrument.app
+    ;;
+esac
