@@ -2,7 +2,7 @@
 
 A Boat Instrument for displaying data in fully configurable Boxes. The data is received via a subscription to a SignalK server.
 
-<video src="media/demo.mov" width="400" controls></video>
+[<img src="media/youtube.png" width="200">](https://youtu.be/muNMslGeSYQ)
 
 # OS Support
 The Boat Instrument is built on the Flutter framework and therefore runs on all Flutter supported platforms. It has been mainly tested on an Android Tablet, but all the following screenshots show it functioning on other platforms.
