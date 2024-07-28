@@ -12,10 +12,9 @@ case ${type} in
     flutter build $type
     cp build/app/outputs/flutter-apk/app-release.apk ${package_dir}/${name}.apk
     ;;
-  ios)
+  ipa)
     flutter build $type
-    cd build/ios/iphoneos/
-    tar czf ${package_dir}/${name}-${type}.tgz Runner.app
+    cp build/ios/ipa/boatinstrument.ipa ${package_dir}/${name}.ipa
     ;;
   linux)
     flutter build $type
