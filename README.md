@@ -1,6 +1,53 @@
 # Boat Instrument
 
-A Boat Instrument for displaying data in fully configurable Boxes.
+A Boat Instrument for displaying data in fully configurable Boxes. The data is received via a subscription to a SignalK server.
+
+# OS Support
+The Boat Instrument is built on the Flutter framework and therefore runs on all Flutter supported platforms.
+
+## Android
+Phone:
+
+<img src="media/android-phone.png" width="200">
+
+Tablet:
+
+<img src="media/android-tablet.jpeg" width="400">
+
+Tablet tiled:
+
+<img src="media/android-tablet-tiled.jpeg" width="400">
+
+## iPhone
+
+<img src="media/iphone.jpeg" width="200">
+
+## Linux
+Fedora:
+
+<img src="media/fedora.jpg" width="400">
+
+Raspberry Pi 4 - X-Windows:
+
+**Note:** Screenshot taken via VNC on a tablet.
+
+<img src="media/raspberry-pi-vnc.jpeg" width="400">
+
+Raspberry PI 4 - Flutter-Pi:
+
+**Note:** very early version showing working on an HDMI monitor without X-Windows.
+
+<img src="media/raspberry-pi-flutter-pi.jpeg" width="400">
+
+## MacOS
+Ventura:
+
+<img src="media/macos.png" width="400">
+
+## Windows
+Windows 10:
+
+<img src="media/windows.png" width="400">
 
 # Adding New Boxes
 
@@ -84,7 +131,7 @@ Boxes can have Box type and/or Box instance settings. The
 Box that has both Box Type and per-Box settings.
 
 If the new Box is to display a single value, consider subclassing the
-[DoubleValueBox](lib/widgets/double_value_box.dart).
+[DoubleValueBox](lib/widgets/double_value_box.dart). There are also base classes for Circular, Semi-Circular and Bar Gauges, see [gauge_box.dart](lib/widgets/gauge_box.dart).
 
 For Boxes with settings, the JSON serialising code should be generated with:
 ```shell
