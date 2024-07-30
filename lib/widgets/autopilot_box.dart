@@ -41,7 +41,7 @@ class _AutopilotControlPerBoxSettings {
 
   _AutopilotControlPerBoxSettings({
     this.enableLock = true,
-    this.lockSeconds = 3,
+    this.lockSeconds = 5,
   });
 }
 
@@ -398,7 +398,7 @@ class _AutopilotControlPerBoxSettingsState extends State<_AutopilotControlPerBox
         leading: const Text("Lock Timeout:"),
         title: Slider(
             min: 2.0,
-            max: 60.0,
+            max: 120.0,
             divisions: 58,
             value: s.lockSeconds.toDouble(),
             label: "${s.lockSeconds.toInt()}s",
