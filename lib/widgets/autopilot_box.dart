@@ -24,37 +24,44 @@ enum AutopilotState {
 }
 
 @JsonSerializable()
-class _Settings {
-  bool enableLock;
-  int lockSeconds;
+class _AutopilotControlSettings {
   String clientID;
   String authToken;
 
-  _Settings({
-    this.enableLock = true,
-    this.lockSeconds = 3,
+  _AutopilotControlSettings({
     clientID,
     this.authToken = ''
   }) : clientID = clientID??'boatinstrument-autopilot-${customAlphabet('0123456789', 4)}';
 }
 
-class AutoPilotControlBox extends BoxWidget {
+@JsonSerializable()
+class _AutopilotControlPerBoxSettings {
+  bool enableLock;
+  int lockSeconds;
 
-  const AutoPilotControlBox(super.config, {super.key});
+  _AutopilotControlPerBoxSettings({
+    this.enableLock = true,
+    this.lockSeconds = 3,
+  });
+}
 
-  @override
-  State<AutoPilotControlBox> createState() => _AutoPilotControlState();
+abstract class AutopilotControlBox extends BoxWidget {
+  late final _AutopilotControlPerBoxSettings _perBoxSettings;
 
   static const String sid = 'autopilot-control';
   @override
   String get id => sid;
+
+  AutopilotControlBox(super.config, {super.key}) {
+    _perBoxSettings = _$AutopilotControlPerBoxSettingsFromJson(config.settings);
+  }
 
   @override
   bool get hasSettings => true;
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _SettingsWidget(super.config.controller, _$SettingsFromJson(json));
+    return _AutopilotControlSettingsWidget(super.config.controller, _$AutopilotControlSettingsFromJson(json));
   }
 
   @override
@@ -63,22 +70,30 @@ class AutoPilotControlBox extends BoxWidget {
 To be able to control the autopilot, the device must be given read/write permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-autopilot-helm". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
   }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _AutopilotControlPerBoxSettingsWidget(_perBoxSettings);
+  }
 }
 
-class _AutoPilotControlState extends State<AutoPilotControlBox> {
-  _Settings _settings = _Settings();
+abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends State<T> {
+  _AutopilotControlSettings _settings = _AutopilotControlSettings();
   bool _locked = true;
   Timer? _lockTimer;
 
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget.config.controller.configure(widget));
+    _settings = _$AutopilotControlSettingsFromJson(widget.config.controller.configure(widget));
   }
 
   _sendCommand(String path, String params) async {
 
-    if(_settings.enableLock) {
+    if(widget._perBoxSettings.enableLock) {
       _unlock();
     }
 
@@ -107,22 +122,6 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
     }
   }
 
-  _adjustHeading(int direction) async {
-    await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
-  }
-
-  _autoTack(String direction) async {
-    if(await widget.config.controller.askToConfirm(context, 'Tack to "$direction"?')) {
-      await _sendCommand("steering/autopilot/actions/tack", '{"value": "$direction"}');
-    }
-  }
-
-  _setState(AutopilotState state) async {
-    if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
-      await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
-    }
-  }
-
   _unlock() {
     if(_locked) {
       setState(() {
@@ -132,18 +131,95 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
 
     _lockTimer?.cancel();
 
-    _lockTimer =  Timer(Duration(seconds: _settings.lockSeconds), () {
-      setState(() {
-        _locked = true;
-      });
+    _lockTimer =  Timer(Duration(seconds: widget._perBoxSettings.lockSeconds), () {
+      if(mounted) {
+        setState(() {
+          _locked = true;
+        });
+      }
     });
+  }
+
+}
+
+class AutopilotStateControlBox extends AutopilotControlBox {
+
+  AutopilotStateControlBox(super.config, {super.key});
+
+  @override
+  AutopilotControlBoxState<AutopilotStateControlBox> createState() => _AutopilotStateControlBoxState();
+
+  static const String sid = 'autopilot-control-state';
+}
+
+class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotStateControlBox> {
+
+  _setState(AutopilotState state) async {
+    if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
+      await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
 
+    bool disabled = widget._perBoxSettings.enableLock && _locked;
+
+    List<Widget> stateButtons = [];
+    for(AutopilotState state in AutopilotState.values) {
+      stateButtons.add(ElevatedButton(
+        onPressed: disabled ? null : () {_setState(state);},
+        child: Text(state.displayName),
+      ));
+    }
+
+    List<Widget> buttons = [Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons)];
+    if(disabled) {
+      buttons.add(Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
+        text: "Unlock",
+        outerColor: Colors.grey,
+        onSubmit: () { return _unlock();},
+      ))));
+    }
+
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(alignment: Alignment.center, children:  buttons)]);
+  }
+}
+
+abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
+
+  AutopilotHeadingControlBox(super.config, {super.key});
+}
+
+abstract class _AutopilotHeadingControlBoxState<T extends AutopilotHeadingControlBox> extends AutopilotControlBoxState<T> {
+
+  _adjustHeading(int direction) async {
+    await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
+  }
+
+  _autoTack(String direction) async {
+    if(await widget.config.controller.askToConfirm(context, 'Tack to "$direction"?')) {
+      await _sendCommand("steering/autopilot/actions/tack", '{"value": "$direction"}');
+    }
+  }
+}
+
+class AutopilotHeadingControlHorizontalBox extends AutopilotHeadingControlBox {
+  AutopilotHeadingControlHorizontalBox(super.config, {super.key});
+
+  @override
+  AutopilotControlBoxState<AutopilotHeadingControlHorizontalBox> createState() => _AutopilotHeadingControlHorizontalBoxState();
+
+  static const String sid = 'autopilot-control-heading-horizontal';
+}
+
+class _AutopilotHeadingControlHorizontalBoxState extends _AutopilotHeadingControlBoxState<AutopilotHeadingControlHorizontalBox> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    bool disabled = widget._perBoxSettings.enableLock && _locked;
     List<Row> controlButtons = [];
-    bool disabled = _settings.enableLock && _locked;
 
     controlButtons.add(const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -156,7 +232,7 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
           Text('Tack'),
         ]
     ));
-    //TODO Button beep
+
     controlButtons.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -168,19 +244,10 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
           IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward)),
         ]
     ));
-    List<Widget> stateButtons = [];
-    for(AutopilotState state in AutopilotState.values) {
-      stateButtons.add(ElevatedButton(
-          onPressed: disabled ? null : () {_setState(state);},
-          child: Text(state.displayName),
-      ));
-    }
-    controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons));
-    //TODO would a separate Lock slider for state and numbered/adjusting buttons be better?
-    //TODO Or separate these into two Boxes, but then how would the settings work??
+
     List<Widget> buttons = [Column(children: controlButtons)];
-    if(_settings.enableLock && _locked) {
-      buttons.add(Center(child: Padding(padding: const EdgeInsets.all(20),child: SlideAction(
+    if(disabled) {
+      buttons.add(Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
         text: "Unlock",
         outerColor: Colors.grey,
         onSubmit: () { return _unlock();},
@@ -191,49 +258,74 @@ class _AutoPilotControlState extends State<AutoPilotControlBox> {
   }
 }
 
-class _SettingsWidget extends BoxSettingsWidget {
-  final BoatInstrumentController _controller;
-  final _Settings _settings;
-
-  const _SettingsWidget(this._controller, this._settings);
+class AutopilotHeadingControlVerticalBox extends AutopilotHeadingControlBox {
+  AutopilotHeadingControlVerticalBox(super.config, {super.key});
 
   @override
-  createState() => _SettingsState();
+  AutopilotControlBoxState<AutopilotHeadingControlVerticalBox> createState() => _AutopilotHeadingControlVerticalBoxState();
 
-  @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$SettingsToJson(_settings);
-  }
+  static const String sid = 'autopilot-control-heading-vertical';
 }
 
-class _SettingsState extends State<_SettingsWidget> {
+class _AutopilotHeadingControlVerticalBoxState extends _AutopilotHeadingControlBoxState<AutopilotHeadingControlVerticalBox> {
 
   @override
   Widget build(BuildContext context) {
-    _Settings s = widget._settings;
+
+    bool disabled = widget._perBoxSettings.enableLock && _locked;
+    List<Row> controlButtons = [];
+
+    controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
+      const Text('1'),
+      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right))
+    ]));
+    controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
+      const Text('10'),
+      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right))
+    ]));
+    controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
+      const Text('Tack'),
+      IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward))
+    ]));
+
+    List<Widget> buttons = [Column(children: controlButtons)];
+    if(disabled) {
+      buttons.add(Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
+        text: "Unlock",
+        outerColor: Colors.grey,
+        onSubmit: () { return _unlock();},
+      ))));
+    }
+
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(alignment: Alignment.center, children:  buttons)]);
+  }
+}
+
+class _AutopilotControlSettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
+  final _AutopilotControlSettings _settings;
+
+  const _AutopilotControlSettingsWidget(this._controller, this._settings);
+
+  @override
+  createState() => _AutopilotControlSettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$AutopilotControlSettingsToJson(_settings);
+  }
+}
+
+class _AutopilotControlSettingsState extends State<_AutopilotControlSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _AutopilotControlSettings s = widget._settings;
 
     List<Widget> list = [
-      SwitchListTile(title: const Text("Enable Control Lock:"),
-          value: s.enableLock,
-          onChanged: (bool value) {
-            setState(() {
-              s.enableLock = value;
-            });
-          }),
-      ListTile(
-        leading: const Text("Lock Timeout:"),
-        title: Slider(
-            min: 2.0,
-            max: 60.0,
-            divisions: 58,
-            value: s.lockSeconds.toDouble(),
-            label: "${s.lockSeconds.toInt()}s",
-            onChanged: (double value) {
-              setState(() {
-                s.lockSeconds = value.toInt();
-              });
-            }),
-      ),
       ListTile(
           leading: const Text("Client ID:"),
           title: TextFormField(
@@ -274,19 +366,67 @@ class _SettingsState extends State<_SettingsWidget> {
   }
 }
 
-class AutoPilotStatusBox extends BoxWidget {
-  static const String sid = 'autopilot-display';
+class _AutopilotControlPerBoxSettingsWidget extends BoxSettingsWidget {
+  final _AutopilotControlPerBoxSettings _settings;
 
-  const AutoPilotStatusBox(super.config, {super.key});
+  const _AutopilotControlPerBoxSettingsWidget(this._settings);
 
   @override
-  State<AutoPilotStatusBox> createState() => _AutoPilotStatusState();
+  createState() => _AutopilotControlPerBoxSettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$AutopilotControlPerBoxSettingsToJson(_settings);
+  }
+}
+
+class _AutopilotControlPerBoxSettingsState extends State<_AutopilotControlPerBoxSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _AutopilotControlPerBoxSettings s = widget._settings;
+
+    List<Widget> list = [
+      SwitchListTile(title: const Text("Enable Control Lock:"),
+          value: s.enableLock,
+          onChanged: (bool value) {
+            setState(() {
+              s.enableLock = value;
+            });
+          }),
+      ListTile(
+        leading: const Text("Lock Timeout:"),
+        title: Slider(
+            min: 2.0,
+            max: 60.0,
+            divisions: 58,
+            value: s.lockSeconds.toDouble(),
+            label: "${s.lockSeconds.toInt()}s",
+            onChanged: (double value) {
+              setState(() {
+                s.lockSeconds = value.toInt();
+              });
+            }),
+      ),
+    ];
+
+    return ListView(children: list);
+  }
+}
+
+class AutopilotStatusBox extends BoxWidget {
+  static const String sid = 'autopilot-display';
+
+  const AutopilotStatusBox(super.config, {super.key});
+
+  @override
+  State<AutopilotStatusBox> createState() => _AutopilotStatusState();
 
   @override
   String get id => sid;
 }
 
-class _AutoPilotStatusState extends State<AutoPilotStatusBox> {
+class _AutopilotStatusState extends State<AutopilotStatusBox> {
   AutopilotState? _autopilotState;
   double? _targetWindAngleApparent;
   double? _targetHeadingTrue;
@@ -340,11 +480,6 @@ class _AutoPilotStatusState extends State<AutoPilotStatusBox> {
     }
 
     return Padding(padding: const EdgeInsets.all(5.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: pilot));
-    // return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-    //   Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
-    //     Column(children: pilot)
-    //   ]),
-    // ]);
   }
 
   _processData(List<Update>? updates) {

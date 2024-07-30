@@ -6,16 +6,30 @@ part of 'autopilot_box.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      enableLock: json['enableLock'] as bool? ?? true,
-      lockSeconds: (json['lockSeconds'] as num?)?.toInt() ?? 3,
+_AutopilotControlSettings _$AutopilotControlSettingsFromJson(
+        Map<String, dynamic> json) =>
+    _AutopilotControlSettings(
       clientID: json['clientID'],
       authToken: json['authToken'] as String? ?? '',
     );
 
-Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
-      'enableLock': instance.enableLock,
-      'lockSeconds': instance.lockSeconds,
+Map<String, dynamic> _$AutopilotControlSettingsToJson(
+        _AutopilotControlSettings instance) =>
+    <String, dynamic>{
       'clientID': instance.clientID,
       'authToken': instance.authToken,
+    };
+
+_AutopilotControlPerBoxSettings _$AutopilotControlPerBoxSettingsFromJson(
+        Map<String, dynamic> json) =>
+    _AutopilotControlPerBoxSettings(
+      enableLock: json['enableLock'] as bool? ?? true,
+      lockSeconds: (json['lockSeconds'] as num?)?.toInt() ?? 3,
+    );
+
+Map<String, dynamic> _$AutopilotControlPerBoxSettingsToJson(
+        _AutopilotControlPerBoxSettings instance) =>
+    <String, dynamic>{
+      'enableLock': instance.enableLock,
+      'lockSeconds': instance.lockSeconds,
     };
