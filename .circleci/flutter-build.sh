@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Publishing"
+echo "Building using Flutter"
 
 set -x
 
