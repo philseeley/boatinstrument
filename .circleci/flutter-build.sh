@@ -19,17 +19,12 @@ if [ "$LMARCH" == 'armhf' ]; then
 fi
 
 git clone --depth 1 --branch 3.22.3 https://github.com/flutter/flutter
-#cd flutter
-#git clean -xfd
-#git pull
-#cd ..
 
 export PATH="$PATH:`pwd`/flutter/bin"
 
 if [ "$LMARCH" == 'armhf' ]; then
-  #apt-get -q -y install libarchive-dev 
   flutter doctor -v || true
-  rm -rf `pwd`/flutter/bin/cache/dart-sdk/
+  #rm -rf `pwd`/flutter/bin/cache/dart-sdk/
   mkdir -p `pwd`/flutter/bin/cache/dart-sdk/
   cp -r `pwd`/dart-sdk/* `pwd`/flutter/bin/cache/dart-sdk/
   file `pwd`/flutter/bin/cache/dart-sdk/bin/dart
