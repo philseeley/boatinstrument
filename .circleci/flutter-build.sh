@@ -11,10 +11,9 @@ export PATH="$PATH:`pwd`/flutter/bin"
 flutter doctor
 
 cd ..
-flutter build linux --release
-
-ls -ltr build/linux/*/release/bundle/*
+#flutter build linux --release
 
 chmod +x ./package
 ./package linux
 
+ls -ltr build/linux/*/release/bundle/*
