@@ -13,7 +13,5 @@ echo curl -X POST \
     -H '"Accept: application/vnd.github.v3+json"' \
     '"https://uploads.github.com/repos/bareboat-necessities/lysmarine_gen/releases/54202060/assets?name='$(basename $FILE)'"' >> upload.command
 
-cat upload.command
-
 # TODO:
-#cat upload.command | xargs -0 -L 1 -I CMD -P 1 bash -c CMD
+#`upload.command` 
