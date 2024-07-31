@@ -4,8 +4,10 @@ echo "Building using Flutter"
 
 set -x
 
-if [[ armhf = "$PKG_ARCH" ]]
-then
+LMARCH="$(dpkg --print-architecture)"
+export LMARCH
+  
+if [ "$LMARCH" == 'armhf' ]; then
   # Install dart from .deb
   apt-get -q -y install apt-transport-https
   wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
