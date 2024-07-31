@@ -10,3 +10,7 @@ export PATH="$PATH:`pwd`/flutter/bin"
 
 flutter doctor
 
+cd ..
+flutter build linux --release
+
+
