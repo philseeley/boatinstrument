@@ -10,7 +10,7 @@ export LMARCH
 if [ "$LMARCH" == 'armhf' ]; then
   # Install dart 
   #wget https://gsdview.appspot.com/dart-archive/channels/dev/release/latest/sdk/dartsdk-linux-arm-release.zip
-  wget https://gsdview.appspot.com/dart-archive/channels/dev/release/3.4.0-260.0.dev/sdk/dartsdk-linux-arm-release.zip
+  wget https://gsdview.appspot.com/dart-archive/channels/dev/release/3.5.0-311.0.dev/sdk/dartsdk-linux-arm-release.zip
   unzip dartsdk-linux-arm-release.zip
   ./dart-sdk/bin/dart --version
   export PATH="$PATH:`pwd`/dart-sdk/bin"
