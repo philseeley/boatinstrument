@@ -28,7 +28,6 @@ if [ "$LMARCH" == 'armhf' ]; then
   mkdir -p `pwd`/flutter/bin/cache/dart-sdk/
   cp -r `pwd`/dart-sdk/* `pwd`/flutter/bin/cache/dart-sdk/
   file `pwd`/flutter/bin/cache/dart-sdk/bin/dart
-  ls -l  `pwd`/flutter/bin/cache/artifacts/engine/
 else
   flutter doctor -v
 fi
