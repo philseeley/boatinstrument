@@ -31,7 +31,6 @@ docker exec --privileged -ti $DOCKER_CONTAINER_ID apt-get -y install apt-transpo
 docker exec --privileged -ti $DOCKER_CONTAINER_ID apt-get -y install dpkg-dev debhelper devscripts equivs pkg-config apt-utils fakeroot clang cmake ninja-build \
   libgtk-3-dev libgtk-3-0 libblkid1 liblzma5 liblzma-dev libstdc++-12-dev 
 
-# TODO
 docker exec --privileged -ti "$DOCKER_CONTAINER_ID" /bin/bash -xec \
   "cd ci-source/.circleci; chmod -v u+w *.sh; /bin/bash -xe ./flutter-build.sh $PKG_ARCH"
 
