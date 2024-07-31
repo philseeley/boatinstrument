@@ -16,7 +16,7 @@ if [ "$LMARCH" == 'armhf' ]; then
   export PATH="$PATH:`pwd`/dart-sdk/bin"
 fi
 
-git clone --depth 1 --branch 3.22.3 https://github.com/flutter/flutter
+git clone --depth 1 --branch 3.19.6 https://github.com/flutter/flutter
 #cd flutter
 #git clean -xfd
 #git pull
