@@ -63,4 +63,3 @@ workflows:
     jobs:
       - build-debian-bookworm-arm64
       - build-debian-bookworm-amd64
-      - build-debian-bookworm-arm32
