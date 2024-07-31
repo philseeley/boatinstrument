@@ -14,3 +14,7 @@ cd ..
 flutter build linux --release
 
 ls -ltr build/linux/*/release/bundle/*
+
+chmod +x ./package
+./package linux
+
