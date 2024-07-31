@@ -4,16 +4,19 @@ echo "Building using Flutter"
 
 set -x
 
-# Install dart from .deb
-apt-get -q -y install apt-transport-https
-wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
-  | sudo gpg  --dearmor -o /usr/share/keyrings/dart.gpg
-echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=armhf] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' \
-  | sudo tee /etc/apt/sources.list.d/dart_stable.list
-#sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
-#sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
-apt-get -q -y update
-apt-get -q -y install dart
+if [[ armhf = "$PKG_ARCH" ]]
+then
+  # Install dart from .deb
+  apt-get -q -y install apt-transport-https
+  wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub \
+    | sudo gpg  --dearmor -o /usr/share/keyrings/dart.gpg
+  echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=armhf] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' \
+    | sudo tee /etc/apt/sources.list.d/dart_stable.list
+  #sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
+  #sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
+  apt-get -q -y update
+  apt-get -q -y install dart
+fi
 
 
 git clone https://github.com/flutter/flutter.git -b stable
