@@ -14,4 +14,6 @@ echo curl -X POST \
     '"https://uploads.github.com/repos/bareboat-necessities/lysmarine_gen/releases/54202060/assets?name='$(basename $FILE)'"' >> upload.command
 
 cat upload.command
-cat upload.command | xargs -0 -L 1 -I CMD -P 1 bash -c CMD
+
+# TODO:
+#cat upload.command | xargs -0 -L 1 -I CMD -P 1 bash -c CMD
