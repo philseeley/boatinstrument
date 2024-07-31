@@ -31,6 +31,8 @@ docker exec --privileged -ti $DOCKER_CONTAINER_ID apt-get -y install apt-transpo
 docker exec --privileged -ti $DOCKER_CONTAINER_ID apt-get -y install dpkg-dev debhelper devscripts equivs pkg-config apt-utils fakeroot
 
 # TODO
+docker exec --privileged -ti "$DOCKER_CONTAINER_ID" /bin/bash -xec \
+  "cd ci-source/.circleci; chmod -v u+w *.sh; /bin/bash -xe ./flutter-build.sh $PKG_ARCH"
 
 echo "Stopping"
 docker ps -a
