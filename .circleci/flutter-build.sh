@@ -25,7 +25,9 @@ cd ..
 
 export PATH="$PATH:`pwd`/flutter/bin"
 
-flutter doctor
+if [ "$LMARCH" != 'armhf' ]; then
+  flutter doctor
+fi
 
 cd ..
 
