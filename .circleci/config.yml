@@ -1,0 +1,70 @@
+---
+version: 2.1
+orbs:
+  cloudsmith: cloudsmith/cloudsmith@1.0.5
+executors:
+  boot-linux:
+    machine:
+      resource_class: large
+      image: ubuntu-2204:2024.01.2
+  boot-linux-arm:
+    machine:
+      resource_class: arm.large
+      image: ubuntu-2204:2024.01.2
+commands:
+  git-checkout:
+    steps:
+      - checkout
+  build-n-publish-debian:
+    steps:
+      - run: sudo apt-get -y install debhelper
+      - run: chmod a+x .circleci/*.sh
+      - run:
+          command: |
+            .circleci/build-debian.sh
+          no_output_timeout: 30m
+      - cloudsmith/ensure-api-key
+      - cloudsmith/install-cli
+      - run: .circleci/publish-cloudsmith.sh deb bbn-projects/bbn-repo ${PKG_DISTRO}/${PKG_RELEASE}
+  do-all:
+    steps:
+      - git-checkout
+      - build-n-publish-debian
+jobs:
+  build-debian-bookworm-arm64:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm64v8/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=arm64
+      - EMU=off
+    steps:
+      - do-all
+  build-debian-bookworm-arm32:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm32v7/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - EMU=off
+    steps:
+      - do-all
+  build-debian-bookworm-amd64:
+    executor: boot-linux
+    environment:
+      - DOCKER_IMAGE=amd64/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+    steps:
+      - do-all
+workflows:
+  version: 2
+  build_all:
+    jobs:
+      - build-debian-bookworm-arm64
+      - build-debian-bookworm-amd64
+      - build-debian-bookworm-arm32
