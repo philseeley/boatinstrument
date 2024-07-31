@@ -24,6 +24,7 @@ cd ..
 export PATH="$PATH:`pwd`/flutter/bin"
 
 if [ "$LMARCH" == 'armhf' ]; then
+  apt-get -q -y libarchive-dev 
   flutter doctor || true
   mkdir -p `pwd`/flutter/bin/cache/dart-sdk/
   cp -r `pwd`/dart-sdk/* `pwd`/flutter/bin/cache/dart-sdk/
