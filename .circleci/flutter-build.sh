@@ -35,8 +35,11 @@ fi
 
 cd ..
 
-chmod +x ./package
-./package linux
+flutter build linux
+cpu=$LMARCH
+cd build/linux/${cpu:0:1}*/release
+mv bundle boatinstrument
+tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument
 
 ls -ltr build/linux/*/release/boatinstrument/*
 pwd
