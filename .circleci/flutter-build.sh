@@ -17,10 +17,10 @@ if [ "$LMARCH" == 'armhf' ]; then
 fi
 
 git clone --depth 1 --branch 3.22.3 https://github.com/flutter/flutter
-cd flutter
-git clean -xfd
-git pull
-cd ..
+#cd flutter
+#git clean -xfd
+#git pull
+#cd ..
 
 export PATH="$PATH:`pwd`/flutter/bin"
 
