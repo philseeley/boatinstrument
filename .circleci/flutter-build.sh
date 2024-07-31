@@ -24,10 +24,10 @@ cd ..
 export PATH="$PATH:`pwd`/flutter/bin"
 
 if [ "$LMARCH" == 'armhf' ]; then
-  cp -r `pwd`/dart-sdk `pwd`/flutter/bin/cache/
+  cp -r `pwd`/dart-sdk/ `pwd`/flutter/bin/cache/
+else
+  flutter doctor
 fi
-
-flutter doctor
 
 cd ..
 
