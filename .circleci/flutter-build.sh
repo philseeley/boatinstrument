@@ -2,6 +2,8 @@
 
 echo "Building using Flutter"
 
+echo "To match flutter and dart versions see: https://docs.flutter.dev/release/archive"
+
 set -x
 
 LMARCH="$(dpkg --print-architecture)"
