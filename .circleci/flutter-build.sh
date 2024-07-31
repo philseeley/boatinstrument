@@ -12,13 +12,13 @@ export LMARCH
 if [ "$LMARCH" == 'armhf' ]; then
   # Install dart 
   #wget https://gsdview.appspot.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-linux-arm-release.zip
-  wget https://gsdview.appspot.com/dart-archive/channels/stable/release/3.4.1/sdk/dartsdk-linux-arm-release.zip
+  wget https://gsdview.appspot.com/dart-archive/channels/stable/release/3.4.0/sdk/dartsdk-linux-arm-release.zip
   unzip dartsdk-linux-arm-release.zip
   ./dart-sdk/bin/dart --version
   export PATH="$PATH:`pwd`/dart-sdk/bin"
 fi
 
-git clone --depth 1 --branch 3.22.1 https://github.com/flutter/flutter
+git clone --depth 1 --branch 3.22.0 https://github.com/flutter/flutter
 
 export PATH="$PATH:`pwd`/flutter/bin"
 
