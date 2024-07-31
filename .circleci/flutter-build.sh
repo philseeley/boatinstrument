@@ -31,7 +31,7 @@ if [ "$LMARCH" == 'armhf' ]; then
   cp -r `pwd`/dart-sdk/* `pwd`/flutter/bin/cache/dart-sdk/
   file `pwd`/flutter/bin/cache/dart-sdk/bin/dart
 else
-  flutter doctor
+  flutter doctor -v
 fi
 
 cd ..
