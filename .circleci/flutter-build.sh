@@ -13,4 +13,4 @@ flutter doctor
 cd ..
 flutter build linux --release
 
-ls -ltr build/linux/arm64/release/bundle/*
+ls -ltr build/linux/*/release/bundle/*
