@@ -13,14 +13,6 @@ echo "DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H $DOCKER_SOCK -s overlay2\"" | sud
 sudo service docker restart
 sleep 5;
 
-if [ "$EMU" = "on" ]; then
-  if [ "$CONTAINER_DISTRO" = "raspbian" ]; then
-      docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  else
-      docker run --rm --privileged --cap-add=ALL --security-opt="seccomp=unconfined" multiarch/qemu-user-static --reset --credential yes --persistent yes
-  fi
-fi
-
 WORK_DIR=$(pwd):/ci-source
 
 docker run --privileged --cap-add=ALL --security-opt="seccomp=unconfined" -d -ti -e "container=docker"  -v $WORK_DIR:rw $DOCKER_IMAGE /bin/bash
