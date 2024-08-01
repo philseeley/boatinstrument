@@ -71,50 +71,6 @@ jobs:
       - APP_TYPE=flutterpi_arm32
     steps:
       - do-all
-  build-apk_arm64:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm64v8/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=arm64
-      - APP_TYPE=apk
-    steps:
-      - do-all
-  build-ipa_arm64:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm64v8/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=arm64
-      - APP_TYPE=ipa
-    steps:
-      - do-all
-  build-macos-arm64:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm64v8/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=arm64
-      - APP_TYPE=macos
-    steps:
-      - do-all
-  build-macos-amd64:
-    executor: boot-linux
-    environment:
-      - DOCKER_IMAGE=amd64/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=amd64
-      - APP_TYPE=macos
-    steps:
-      - do-all
 workflows:
   version: 2
   build_all:
@@ -123,7 +79,4 @@ workflows:
       - build-debian-bookworm-amd64
       - build-flutterpi_arm32
       - build-flutterpi_arm64
-      - build-apk_arm64
-      - build-ipa_arm64
-      - build-macos-arm64
-      - build-macos-amd64
+
