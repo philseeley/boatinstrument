@@ -38,10 +38,12 @@ class _AutopilotControlSettings {
 class _AutopilotControlPerBoxSettings {
   bool enableLock;
   int lockSeconds;
+  bool showLabels;
 
   _AutopilotControlPerBoxSettings({
     this.enableLock = true,
     this.lockSeconds = 5,
+    this.showLabels = true
   });
 }
 
@@ -167,9 +169,14 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
 
     List<Widget> stateButtons = [];
     for(AutopilotState state in AutopilotState.values) {
-      stateButtons.add(ElevatedButton(
+      Color c = (widget.config.controller.portStarboardColors == PortStarboardColors.none)
+          ? Colors.grey
+            : (state == AutopilotState.standby)
+            ? widget.config.controller.portStarboardColors.portColor
+            : widget.config.controller.portStarboardColors.starboardColor;
+      stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: c),
         onPressed: disabled ? null : () {_setState(state);},
-        child: Text(state.displayName),
+        child: Text(widget._perBoxSettings.showLabels ? state.displayName : state.displayName.substring(0, 1)),
       ));
     }
 
@@ -221,17 +228,19 @@ class _AutopilotHeadingControlHorizontalBoxState extends _AutopilotHeadingContro
     bool disabled = widget._perBoxSettings.enableLock && _locked;
     List<Row> controlButtons = [];
 
-    controlButtons.add(const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text('Tack'),
-          Text(' 10  '),
-          Text(' 1  '),
-          Text('  1 '),
-          Text('  10 '),
-          Text('Tack'),
-        ]
-    ));
+    if(widget._perBoxSettings.showLabels) {
+      controlButtons.add(const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('Tack'),
+            Text(' 10  '),
+            Text(' 1  '),
+            Text('  1 '),
+            Text('  10 '),
+            Text('Tack'),
+          ]
+      ));
+    }
 
     controlButtons.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -277,17 +286,17 @@ class _AutopilotHeadingControlVerticalBoxState extends _AutopilotHeadingControlB
 
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
-      const Text('1'),
+      Text(widget._perBoxSettings.showLabels ? '1' : ''),
       IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right))
     ]));
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
-      const Text('10'),
+      Text(widget._perBoxSettings.showLabels ? '10' : ''),
       IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right))
     ]));
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
-      const Text('Tack'),
+      Text(widget._perBoxSettings.showLabels ? 'Tack' : ''),
       IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward))
     ]));
 
@@ -408,6 +417,13 @@ class _AutopilotControlPerBoxSettingsState extends State<_AutopilotControlPerBox
               });
             }),
       ),
+      SwitchListTile(title: const Text("Show Labels:"),
+          value: s.showLabels,
+          onChanged: (bool value) {
+            setState(() {
+              s.showLabels = value;
+            });
+          }),
     ];
 
     return ListView(children: list);

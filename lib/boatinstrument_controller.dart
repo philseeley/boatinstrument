@@ -92,6 +92,7 @@ class BoatInstrumentController {
   SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;
   DepthUnits get depthUnits => _settings!.depthUnits;
   TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
+  PortStarboardColors get portStarboardColors => _settings!.portStarboardColors;
   int get numOfPages => _settings!.pages.length;
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
