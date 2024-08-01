@@ -1,49 +1,71 @@
 #!/usr/bin/env bash
 
 echo "Building using Flutter"
-
 echo "To match flutter and dart versions see: https://docs.flutter.dev/release/archive"
 
 set -x
 
 LMARCH="$(dpkg --print-architecture)"
 export LMARCH
-  
-if [ "$LMARCH" == 'armhf' ]; then
-  # Install dart 
-  #wget https://gsdview.appspot.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-linux-arm-release.zip
-  wget https://gsdview.appspot.com/dart-archive/channels/stable/release/3.4.4/sdk/dartsdk-linux-arm-release.zip
-  unzip dartsdk-linux-arm-release.zip
-  ./dart-sdk/bin/dart --version
-  export PATH="$PATH:`pwd`/dart-sdk/bin"
-fi
 
 git clone --depth 1 --branch 3.22.3 https://github.com/flutter/flutter
 
 export PATH="$PATH:`pwd`/flutter/bin"
 
-if [ "$LMARCH" == 'armhf' ]; then
-  flutter doctor -v || true
-  rm -rf `pwd`/flutter/bin/cache/dart-sdk/
-  mkdir -p `pwd`/flutter/bin/cache/dart-sdk/
-  cp -r `pwd`/dart-sdk/* `pwd`/flutter/bin/cache/dart-sdk/
-  file `pwd`/flutter/bin/cache/dart-sdk/bin/dart
-else
-  flutter doctor -v
-fi
+flutter doctor -v
 
 cd ..
 
-chmod +x ./package
-./package linux
+type=$1; shift
+name=boatinstrument-$(awk '/^version:/ {print $2}' pubspec.yaml)
 
-ls -ltr build/linux/*/release/boatinstrument/*
-pwd
-ls -ltr packages/*
+mkdir -p packages
+package_dir=$(pwd)/packages
 
-flutter pub global activate flutterpi_tool
-export PATH="$PATH":"$HOME/.pub-cache/bin"
-flutter pub get
-flutterpi_tool build --arch=arm64 --cpu=pi4 --release
+case ${type} in
+  apk)
+    flutter build $type
+    cp build/app/outputs/flutter-apk/app-release.apk "${package_dir}"/${name}.apk
+    ;;
+  ipa)
+    flutter build $type
+    cp build/ios/ipa/boatinstrument.ipa "${package_dir}"/${name}.ipa
+    ;;
+  linux)
+    flutter build $type
+    cpu=$(uname -m)
+    cd build/linux/${cpu:0:1}*/release
+    mv bundle boatinstrument
+    tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument
+    ;;
+  macos)
+    flutter build $type
+    cpu=$(uname -m)
+    cd build/macos/Build/Products/Release/
+    tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument.app
+    ;;
+  flutterpi_arm64)
+    flutter pub global activate flutterpi_tool
+    export PATH="$PATH":"$HOME/.pub-cache/bin"
+    flutter pub get
+    flutterpi_tool build --arch=arm64 --cpu=pi4 --release
+    cd build/
+    mv flutter_assets boatinstrument
+    tar czf "${package_dir}"/${name}-${type}.tgz boatinstrument
+    ;;
+  flutterpi_arm32)
+    flutter pub global activate flutterpi_tool
+    export PATH="$PATH":"$HOME/.pub-cache/bin"
+    flutter pub get
+    flutterpi_tool build --release
+    cd build/
+    mv flutter_assets boatinstrument
+    tar czf "${package_dir}"/${name}-${type}.tgz boatinstrument
+    ;;
+  *)
+    echo "Unknown type '$type'"
+esac
+
+
 
 
