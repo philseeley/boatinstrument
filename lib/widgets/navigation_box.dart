@@ -122,7 +122,7 @@ class HeadingBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const HeadingBox(config, {super.key}) : super(config, 'Heading', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
+  const HeadingBox(config, {super.key}) : super(config, 'HDG', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
 
   @override
   double convert(double value) {
@@ -140,7 +140,7 @@ class NextPointDistanceBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Distance', 'navigation.courseGreatCircle.nextPoint.distance', precision: 2);
+  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Dist', 'navigation.courseGreatCircle.nextPoint.distance', precision: 2);
 
   @override
   double convert(double value) {
