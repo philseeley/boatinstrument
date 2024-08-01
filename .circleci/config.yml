@@ -58,6 +58,8 @@ jobs:
       - PKG_DISTRO=debian
       - PKG_ARCH=arm64
       - APP_TYPE=flutterpi_arm64
+    steps:
+      - do-all
   build-flutterpi_arm32:
     executor: boot-linux-arm
     environment:
