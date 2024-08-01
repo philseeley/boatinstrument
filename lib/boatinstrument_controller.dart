@@ -125,13 +125,14 @@ class BoatInstrumentController {
 
   // Each Box MUST call this in the Widget's State initState(), even if not subscribing to any Signalk data.
   // If there are Box type settings they will be returned.
-  Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, Set<String> paths = const {}}) {
+  Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, Set<String> paths = const {}, bool dataTimeout = true}) {
     bool configured = true;
 
     for(_WidgetData wd in _widgetData) {
       if(wd.widget == widget) {
         wd.onUpdate = onUpdate;
         wd.paths = paths;
+        wd.dataTimeout = dataTimeout;
         wd.configured = true;
       } else if(!wd.configured) {
         configured = false;
@@ -351,7 +352,7 @@ class BoatInstrumentController {
   _processData(data) {
     _networkTimeout();
 
-    DateTime now = DateTime.now();
+    DateTime now = DateTime.now().toUtc();
 
     dynamic d = json.decode(data);
 
@@ -362,30 +363,33 @@ class BoatInstrumentController {
       }
 
       for (dynamic u in d['updates']) {
-        for (dynamic v in u['values']) {
-          try {
-            String path = v['path'];
+        try {
+          if (u['\$source'] == 'defaults' || now.difference(DateTime.parse(u['timestamp'])) <=
+              Duration(milliseconds: _settings!.dataTimeout)) {
+            for (dynamic v in u['values']) {
+              String path = v['path'];
 
-            for(_WidgetData wd in _widgetData) {
-              for(String p in wd.paths) {
-                if(path == p) {
-                  wd.updates.add(Update(path, v['value']));
-                  wd.lastUpdate = now;
+              for (_WidgetData wd in _widgetData) {
+                for (String p in wd.paths) {
+                  if (path == p) {
+                    wd.updates.add(Update(path, v['value']));
+                    wd.lastUpdate = now;
+                  }
                 }
               }
             }
-          } catch (e) {
-            l.e("Error converting $v", error: e);
           }
+        } catch (e) {
+          l.e("Error converting $u", error: e);
         }
+      }
 
-        for(_WidgetData wd in _widgetData) {
-          if(wd.onUpdate != null) {
-            if(wd.updates.isNotEmpty) {
-              wd.onUpdate!(wd.updates);
-            } else if(now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
-              wd.onUpdate!(null);
-            }
+      for(_WidgetData wd in _widgetData) {
+        if(wd.onUpdate != null) {
+          if(wd.updates.isNotEmpty) {
+            wd.onUpdate!(wd.updates);
+          } else if(wd.dataTimeout && now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
+            wd.onUpdate!(null);
           }
         }
       }

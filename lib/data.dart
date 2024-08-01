@@ -232,6 +232,7 @@ class _WidgetData {
   DateTime lastUpdate = DateTime.now();
   OnUpdate? onUpdate;
   Set<String> paths = {};
+  bool dataTimeout = true;
   List<Update> updates = [];
 
   _WidgetData(this.widget);
