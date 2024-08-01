@@ -35,17 +35,6 @@ jobs:
       - PKG_RELEASE=bookworm
       - PKG_DISTRO=debian
       - PKG_ARCH=arm64
-      - EMU=off
-    steps:
-      - do-all
-  build-debian-bookworm-arm32:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm32v7/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - EMU=off
     steps:
       - do-all
   build-debian-bookworm-amd64:
@@ -55,6 +44,7 @@ jobs:
       - CONTAINER_DISTRO=debian:bookworm
       - PKG_RELEASE=bookworm
       - PKG_DISTRO=debian
+      - PKG_ARCH=amd64
     steps:
       - do-all
 workflows:
