@@ -23,26 +23,12 @@ mkdir -p packages
 package_dir=$(pwd)/packages
 
 case ${type} in
-  apk)
-    flutter build $type
-    cp build/app/outputs/flutter-apk/app-release.apk "${package_dir}"/${name}.apk
-    ;;
-  ipa)
-    flutter build $type
-    cp build/ios/ipa/boatinstrument.ipa "${package_dir}"/${name}.ipa
-    ;;
   linux)
     flutter build $type
     cpu=$(uname -m)
     cd build/linux/${cpu:0:1}*/release
     mv bundle boatinstrument
     tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument
-    ;;
-  macos)
-    flutter build $type
-    cpu=$(uname -m)
-    cd build/macos/Build/Products/Release/
-    tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument.app
     ;;
   flutterpi_arm64)
     flutter pub global activate flutterpi_tool
