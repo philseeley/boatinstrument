@@ -9,6 +9,9 @@ executors:
     machine:
       resource_class: arm.large
       image: ubuntu-2204:2024.01.2
+  boot-android:
+      machine:
+        image: android:2024.04.1     # see: https://circleci.com/developer/machine/image/android
 commands:
   git-checkout:
     steps:
