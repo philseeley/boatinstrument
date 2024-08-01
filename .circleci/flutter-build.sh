@@ -41,3 +41,5 @@ ls -ltr build/linux/*/release/boatinstrument/*
 pwd
 ls -ltr packages/*
 
+flutter pub global activate flutterpi_tool
+
