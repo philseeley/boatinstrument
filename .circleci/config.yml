@@ -1,5 +1,10 @@
 ---
 version: 2.1
+orbs:
+  flutter-orb: circleci/flutter@2.0.4         # see: https://circleci.com/developer/orbs/orb/circleci/flutter
+  android: circleci/android@2.5.0             # see: https://circleci.com/developer/orbs/orb/circleci/android
+  macos: circleci/macos@2.5.2                 # see: https://circleci.com/developer/orbs/orb/circleci/macos
+
 executors:   # see: https://circleci.com/docs/sample-config/
   boot-linux:
     machine:
