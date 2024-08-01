@@ -12,6 +12,11 @@ executors:
   boot-android:
     machine:
       image: android:2024.04.1     # see: https://circleci.com/developer/machine/image/android
+  boot-windows:
+    machine:
+      image: windows-server-2022-gui:2024.04.1     # see: https://circleci.com/developer/machine/image/windows-server-2022-gui
+      resource_class: windows.medium
+      shell: powershell.exe -ExecutionPolicy Bypass
 commands:
   git-checkout:
     steps:
