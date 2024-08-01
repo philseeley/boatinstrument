@@ -35,6 +35,7 @@ jobs:
       - PKG_RELEASE=bookworm
       - PKG_DISTRO=debian
       - PKG_ARCH=arm64
+      - APP_TYPE=linux
     steps:
       - do-all
   build-debian-bookworm-amd64:
@@ -45,6 +46,27 @@ jobs:
       - PKG_RELEASE=bookworm
       - PKG_DISTRO=debian
       - PKG_ARCH=amd64
+      - APP_TYPE=linux
+    steps:
+      - do-all
+  build-flutterpi_arm64:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm64v8/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=arm64
+      - APP_TYPE=flutterpi_arm64
+  build-flutterpi_arm32:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm64v8/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=arm32
+      - APP_TYPE=flutterpi_arm32
     steps:
       - do-all
 workflows:
@@ -53,3 +75,5 @@ workflows:
     jobs:
       - build-debian-bookworm-arm64
       - build-debian-bookworm-amd64
+      - build-flutterpi_arm32
+      - build-flutterpi_arm64
