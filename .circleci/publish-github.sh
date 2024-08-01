@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# generate personal github token
+# generate personal github token here: https://github.com/settings/tokens/new
 # and set it as GITHUB_TOKEN environment variable in your circleCI project settings
 
 echo "Publishing to github release"
