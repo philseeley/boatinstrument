@@ -24,7 +24,7 @@ docker exec --privileged -ti $DOCKER_CONTAINER_ID apt-get -y install dpkg-dev de
   libgtk-3-dev libgtk-3-0 libblkid1 liblzma5 liblzma-dev libstdc++-12-dev 
 
 docker exec --privileged -ti "$DOCKER_CONTAINER_ID" /bin/bash -xec \
-  "cd ci-source/.circleci; chmod -v u+w *.sh; /bin/bash -xe ./flutter-build.sh $PKG_ARCH"
+  "cd ci-source/.circleci; chmod -v u+w *.sh; /bin/bash -xe ./flutter-build.sh $APP_TYPE"
 
 echo "Stopping"
 docker ps -a
