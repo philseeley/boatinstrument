@@ -1,6 +1,6 @@
 ---
 version: 2.1
-executors:
+executors:   # see: https://circleci.com/docs/sample-config/
   boot-linux:
     machine:
       resource_class: large
