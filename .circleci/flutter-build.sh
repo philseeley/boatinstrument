@@ -42,6 +42,7 @@ pwd
 ls -ltr packages/*
 
 flutter pub global activate flutterpi_tool
+export PATH="$PATH":"$HOME/.pub-cache/bin"
 flutter pub get
 flutterpi_tool build --arch=arm64 --cpu=pi4 --release
 
