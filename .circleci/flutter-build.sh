@@ -48,20 +48,6 @@ case ${type} in
     mv flutter_assets boatinstrument
     tar czf "${package_dir}"/${name}-${type}.tgz boatinstrument
     ;;
-  apk)
-    flutter build $type
-    cp build/app/outputs/flutter-apk/app-release.apk "${package_dir}"/${name}.apk
-    ;;
-  ipa)
-    flutter build $type
-    cp build/ios/ipa/boatinstrument.ipa "${package_dir}"/${name}.ipa
-    ;;
-  macos)
-    flutter build $type
-    cpu=$(uname -m)
-    cd build/macos/Build/Products/Release/
-    tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument.app
-    ;;
   *)
     echo "Unknown type '$type'"
 esac
