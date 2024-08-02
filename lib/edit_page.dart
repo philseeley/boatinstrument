@@ -13,38 +13,38 @@ class _EditPage extends StatefulWidget {
   State<_EditPage> createState() => _EditPageState();
 }
 
-List<BoxDetails> boxDetails = [
+final List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
-  BoxDetails(DepthBox.sid, 'Depth', (config) {return DepthBox(config, key: UniqueKey());}),
+  BoxDetails(DepthBelowSurfaceBox.sid, 'Depth Below Surface', (config) {return DepthBelowSurfaceBox(config, key: UniqueKey());}),
   BoxDetails(SpeedThroughWaterBox.sid, 'Speed Through Water', (config) {return SpeedThroughWaterBox(config, key: UniqueKey());}),
   BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (config) {return SpeedOverGroundBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (config) {return WindSpeedApparentBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedTrueBox.sid, 'Wind Speed True', (config) {return WindSpeedTrueBox(config, key: UniqueKey());}),
   BoxDetails(WindDirectionTrueBox.sid, 'Wind Direction True', (config) {return WindDirectionTrueBox(config, key: UniqueKey());}),
-  BoxDetails(WindRoseBox.sid, 'Wind Rose', (config) {return WindRoseBox(config, key: UniqueKey());}),
+  BoxDetails(WindRoseBox.sid, 'Wind Rose (G)', (config) {return WindRoseBox(config, key: UniqueKey());}),
   BoxDetails(PositionBox.sid, 'Position', (config) {return PositionBox(config, key: UniqueKey());}),
   BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', (config) {return CourseOverGroundBox(config, key: UniqueKey());}),
-  BoxDetails(WaterTemperatureBox.sid, 'Sea Temperature', (config) {return WaterTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(WaterTemperatureBox.sid, 'Water Temperature', (config) {return WaterTemperatureBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStatusBox.sid, 'Autopilot Status', (config) {return AutopilotStatusBox(config, key: UniqueKey());}),
-  BoxDetails(AutopilotStateControlHorizontalBox.sid, 'Autopilot State Control-H', (config) {return AutopilotStateControlHorizontalBox(config, key: UniqueKey());}),
-  BoxDetails(AutopilotStateControlVerticalBox.sid, 'Autopilot State Control-V', (config) {return AutopilotStateControlVerticalBox(config, key: UniqueKey());}),
-  BoxDetails(AutopilotHeadingControlHorizontalBox.sid, 'AP Heading Control-H', (config) {return AutopilotHeadingControlHorizontalBox(config, key: UniqueKey());}),
-  BoxDetails(AutopilotHeadingControlVerticalBox.sid, 'AP Heading Control-V', (config) {return AutopilotHeadingControlVerticalBox(config, key: UniqueKey());}),
+  BoxDetails(AutopilotStateControlHorizontalBox.sid, 'AP State Ctrl-H', (config) {return AutopilotStateControlHorizontalBox(config, key: UniqueKey());}),
+  BoxDetails(AutopilotStateControlVerticalBox.sid, 'AP State Ctrl-V', (config) {return AutopilotStateControlVerticalBox(config, key: UniqueKey());}),
+  BoxDetails(AutopilotHeadingControlHorizontalBox.sid, 'AP Heading Ctrl-H', (config) {return AutopilotHeadingControlHorizontalBox(config, key: UniqueKey());}),
+  BoxDetails(AutopilotHeadingControlVerticalBox.sid, 'AP Heading Ctrl-V', (config) {return AutopilotHeadingControlVerticalBox(config, key: UniqueKey());}),
   BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, 'Rudder Angle', (config) {return RudderAngleBox(config, key: UniqueKey());}),
-  BoxDetails(CustomDoubleValueBox.sid, 'Custom Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(CustomDoubleValueBox.sid, 'Decimal Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
-  BoxDetails(WindSpeedTrueBeaufortBox.sid, 'True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
+  BoxDetails(WindSpeedTrueBeaufortBox.sid, 'Wind True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
   BoxDetails(SetAndDriftBox.sid, 'Set & Drift', (config) {return SetAndDriftBox(config, key: UniqueKey());}),
   BoxDetails(HeadingBox.sid, 'Heading', (config) {return HeadingBox(config, key: UniqueKey());}),
   BoxDetails(NextPointDistanceBox.sid, 'Next Point Distance', (config) {return NextPointDistanceBox(config, key: UniqueKey());}),
   BoxDetails(NextPointVelocityMadeGoodBox.sid, 'Next Point VMG', (config) {return NextPointVelocityMadeGoodBox(config, key: UniqueKey());}),
   BoxDetails(WaypointTimeToGoBox.sid, 'Next Point TTG', (config) {return WaypointTimeToGoBox(config, key: UniqueKey());}),
   // BoxDetails(RouteTimeToGoBox.sid, 'Route TTG', (config) {return RouteTimeToGoBox(config, key: UniqueKey());}),
-  BoxDetails(AttitudeRollGaugeBox.sid, 'Roll Gauge', (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
-  BoxDetails(CrossTrackErrorDeltaBox.sid, 'XTE Delta', (config) {return CrossTrackErrorDeltaBox(config, key: UniqueKey());}),
+  BoxDetails(AttitudeRollGaugeBox.sid, 'Roll (G)', (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
+  BoxDetails(CrossTrackErrorDeltaBox.sid, 'XTE Delta (G)', (config) {return CrossTrackErrorDeltaBox(config, key: UniqueKey());}),
   BoxDetails(WindAngleApparentBox.sid, 'Apparent Wind Angle', (config) {return WindAngleApparentBox(config, key: UniqueKey());}),
 ];
 
@@ -77,7 +77,7 @@ class _EditPageState extends State<_EditPage> {
     List<PopupMenuEntry<BoxDetails>> popupMenuEntries = [
       _widgetMenuEntry(BlankBox.sid),
       _widgetSubMenuEntry(box, 'Environment', [
-        _widgetMenuEntry(DepthBox.sid),
+        _widgetMenuEntry(DepthBelowSurfaceBox.sid),
         _widgetMenuEntry(SetAndDriftBox.sid),
         _widgetMenuEntry(WaterTemperatureBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [

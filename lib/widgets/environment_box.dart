@@ -3,12 +3,12 @@ import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'double_value_box.dart';
 
-class DepthBox extends DoubleValueBox {
-  static const String sid = 'depth';
+class DepthBelowSurfaceBox extends DoubleValueBox {
+  static const String sid = 'environment-depth-belowSurface';
   @override
   String get id => sid;
 
-  const DepthBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0, smoothing: false);
+  const DepthBelowSurfaceBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0, smoothing: false);
 
   @override
   double convert(double value) {
@@ -29,7 +29,7 @@ class DepthBox extends DoubleValueBox {
 }
 
 class WaterTemperatureBox extends DoubleValueBox {
-  static const String sid = 'sea-temperature';
+  static const String sid = 'environment-water-temperature';
   @override
   String get id => sid;
 
@@ -58,7 +58,7 @@ class SetAndDriftBox extends BoxWidget {
   @override
   State<SetAndDriftBox> createState() => _SetAndDriftBoxState();
 
-  static String sid = 'set-and-drift';
+  static String sid = 'environment-set-and-drift';
   @override
   String get id => sid;
 }

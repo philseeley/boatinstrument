@@ -450,7 +450,7 @@ class _AutopilotControlPerBoxSettingsState extends State<_AutopilotControlPerBox
 }
 
 class AutopilotStatusBox extends BoxWidget {
-  static const String sid = 'autopilot-display';
+  static const String sid = 'autopilot-status';
 
   const AutopilotStatusBox(super.config, {super.key});
 

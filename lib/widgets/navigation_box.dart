@@ -92,7 +92,7 @@ class _CrossTrackErrorDeltaBoxState extends DoubleValueSemiGaugeBoxState<CrossTr
 }
 
 class CourseOverGroundBox extends DoubleValueBox {
-  static const String sid = 'course-over-ground';
+  static const String sid = 'navigation-course-over-ground';
   @override
   String get id => sid;
 
@@ -110,7 +110,7 @@ class CourseOverGroundBox extends DoubleValueBox {
 }
 
 class SpeedOverGroundBox extends SpeedBox {
-  static const String sid = 'speed-over-ground';
+  static const String sid = 'navigation-speed-over-ground';
   @override
   String get id => sid;
 
@@ -118,7 +118,7 @@ class SpeedOverGroundBox extends SpeedBox {
 }
 
 class HeadingBox extends DoubleValueBox {
-  static const String sid = 'heading';
+  static const String sid = 'navigation-heading-true';
   @override
   String get id => sid;
 
@@ -336,7 +336,7 @@ class PositionBox extends BoxWidget {
   @override
   State<PositionBox> createState() => _PositionBoxState();
 
-  static String sid = 'position';
+  static String sid = 'navigation-position';
   @override
   String get id => sid;
 

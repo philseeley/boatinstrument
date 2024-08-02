@@ -10,7 +10,7 @@ import 'gauge_box.dart';
 part 'boat_box.g.dart';
 
 class SpeedThroughWaterBox extends SpeedBox {
-  static const String sid = 'speed-through-water';
+  static const String sid = 'boat-speed-through-water';
   @override
   String get id => sid;
 
@@ -20,7 +20,7 @@ class SpeedThroughWaterBox extends SpeedBox {
 class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
   const AttitudeRollGaugeBox(config, {super.key}) : super(config, 'Roll', GaugeOrientation.down, 'navigation.attitude', minValue: -pi/4, maxValue: pi/4, mirror: true, angle: true);
 
-  static String sid = 'attitude-roll';
+  static String sid = 'boat-attitude-roll';
   @override
   String get id => sid;
 
@@ -113,7 +113,7 @@ class RudderAngleBox extends DoubleValueBox {
   @override
   State<RudderAngleBox> createState() => _RudderAngleBoxState();
 
-  static String sid = 'rudder-angle';
+  static String sid = 'boat-rudder-angle';
   @override
   String get id => sid;
 
