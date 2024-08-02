@@ -144,14 +144,13 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
 
 }
 
-class AutopilotStateControlBox extends AutopilotControlBox {
+abstract class AutopilotStateControlBox extends AutopilotControlBox {
+  final bool vertical;
 
-  AutopilotStateControlBox(super.config, {super.key});
+  AutopilotStateControlBox(super.config, this.vertical, {super.key});
 
   @override
   AutopilotControlBoxState<AutopilotStateControlBox> createState() => _AutopilotStateControlBoxState();
-
-  static const String sid = 'autopilot-control-state';
 }
 
 class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotStateControlBox> {
@@ -180,7 +179,13 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
       ));
     }
 
-    List<Widget> buttons = [Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons)];
+    List<Widget> buttons = [];
+    if(widget.vertical) {
+      buttons.add(Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: stateButtons));
+    } else {
+      buttons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: stateButtons));
+    }
+
     if(disabled) {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
         text: "Unlock",
@@ -189,8 +194,22 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
       ))));
     }
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(alignment: Alignment.center, children:  buttons)]);
+    return Stack(alignment: Alignment.center, children: buttons);
   }
+}
+
+class AutopilotStateControlHorizontalBox extends AutopilotStateControlBox {
+
+  static const String sid = 'autopilot-control-state-horizontal';
+
+  AutopilotStateControlHorizontalBox(config, {super.key}) : super(config, false);
+}
+
+class AutopilotStateControlVerticalBox extends AutopilotStateControlBox {
+
+  static const String sid = 'autopilot-control-state-vertical';
+
+  AutopilotStateControlVerticalBox(config, {super.key}) : super(config, true);
 }
 
 abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
