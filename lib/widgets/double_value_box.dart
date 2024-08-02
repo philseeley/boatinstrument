@@ -218,8 +218,9 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool relativeAngle;
   final bool smoothing;
   final bool portStarboard;
+  final bool dataTimeout;
 
-  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, this.portStarboard = false, super.key});
+  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, this.portStarboard = false, this.dataTimeout = true, super.key});
 
   @override
   State<DoubleValueBox> createState() => DoubleValueBoxState();
@@ -240,7 +241,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: processUpdates, paths: { widget.path });
+    widget.config.controller.configure(widget, onUpdate: processUpdates, paths: { widget.path }, dataTimeout: widget.dataTimeout);
   }
 
   @override
