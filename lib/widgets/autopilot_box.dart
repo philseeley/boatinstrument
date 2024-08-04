@@ -172,12 +172,9 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
 
     List<Widget> stateButtons = [];
     for(AutopilotState state in AutopilotState.values) {
-      Color c = (widget.config.controller.portStarboardColors == PortStarboardColors.none)
-          ? Colors.grey
-            : (state == AutopilotState.standby)
-            ? widget.config.controller.portStarboardColors.portColor
-            : widget.config.controller.portStarboardColors.starboardColor;
-      stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: c),
+      Color fc = Theme.of(context).colorScheme.onSurface;
+      Color bc = widget.config.controller.val2PSColor(context, state == AutopilotState.standby?-1:1, none: Colors.grey);
+      stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
         onPressed: disabled ? null : () {_setState(state);},
         child: Text(widget._perBoxSettings.showLabels ? state.displayName : state.displayName.substring(0, 1)),
       ));
