@@ -95,6 +95,10 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
 
   _sendCommand(String path, String params) async {
 
+    if(widget.config.editMode) {
+      return;
+    }
+
     if(widget._perBoxSettings.enableLock) {
       _unlock();
     }
