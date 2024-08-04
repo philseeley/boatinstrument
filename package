@@ -7,6 +7,8 @@ name=boatinstrument-$(awk '/^version:/ {print $2}' pubspec.yaml)
 mkdir -p packages
 package_dir=$(pwd)/packages
 
+dart run build_runner build --delete-conflicting-outputs
+
 case ${type} in
   apk)
     flutter build $type
