@@ -95,6 +95,10 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
 
   _sendCommand(String path, String params) async {
 
+    if(widget.config.editMode) {
+      return;
+    }
+
     if(widget._perBoxSettings.enableLock) {
       _unlock();
     }
@@ -144,14 +148,13 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
 
 }
 
-class AutopilotStateControlBox extends AutopilotControlBox {
+abstract class AutopilotStateControlBox extends AutopilotControlBox {
+  final bool vertical;
 
-  AutopilotStateControlBox(super.config, {super.key});
+  AutopilotStateControlBox(super.config, this.vertical, {super.key});
 
   @override
   AutopilotControlBoxState<AutopilotStateControlBox> createState() => _AutopilotStateControlBoxState();
-
-  static const String sid = 'autopilot-control-state';
 }
 
 class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotStateControlBox> {
@@ -169,18 +172,21 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
 
     List<Widget> stateButtons = [];
     for(AutopilotState state in AutopilotState.values) {
-      Color c = (widget.config.controller.portStarboardColors == PortStarboardColors.none)
-          ? Colors.grey
-            : (state == AutopilotState.standby)
-            ? widget.config.controller.portStarboardColors.portColor
-            : widget.config.controller.portStarboardColors.starboardColor;
-      stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: c),
+      Color fc = Theme.of(context).colorScheme.onSurface;
+      Color bc = widget.config.controller.val2PSColor(context, state == AutopilotState.standby?-1:1, none: Colors.grey);
+      stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
         onPressed: disabled ? null : () {_setState(state);},
         child: Text(widget._perBoxSettings.showLabels ? state.displayName : state.displayName.substring(0, 1)),
       ));
     }
 
-    List<Widget> buttons = [Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,children: stateButtons)];
+    List<Widget> buttons = [];
+    if(widget.vertical) {
+      buttons.add(Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: stateButtons));
+    } else {
+      buttons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: stateButtons));
+    }
+
     if(disabled) {
       buttons.add(Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
         text: "Unlock",
@@ -189,8 +195,22 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
       ))));
     }
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(alignment: Alignment.center, children:  buttons)]);
+    return Stack(alignment: Alignment.center, children: buttons);
   }
+}
+
+class AutopilotStateControlHorizontalBox extends AutopilotStateControlBox {
+
+  static const String sid = 'autopilot-control-state-horizontal';
+
+  AutopilotStateControlHorizontalBox(config, {super.key}) : super(config, false);
+}
+
+class AutopilotStateControlVerticalBox extends AutopilotStateControlBox {
+
+  static const String sid = 'autopilot-control-state-vertical';
+
+  AutopilotStateControlVerticalBox(config, {super.key}) : super(config, true);
 }
 
 abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
@@ -431,7 +451,7 @@ class _AutopilotControlPerBoxSettingsState extends State<_AutopilotControlPerBox
 }
 
 class AutopilotStatusBox extends BoxWidget {
-  static const String sid = 'autopilot-display';
+  static const String sid = 'autopilot-status';
 
   const AutopilotStatusBox(super.config, {super.key});
 
