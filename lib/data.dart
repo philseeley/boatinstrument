@@ -401,6 +401,7 @@ enum PortStarboardColors {
 class _Settings {
   int version;
   int valueSmoothing;
+  bool discoverServer;
   String signalkServer;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
@@ -429,6 +430,7 @@ class _Settings {
   _Settings({
     this.version = 0,
     this.valueSmoothing = 1,
+    this.discoverServer = true,
     this.signalkServer = 'openplotter.local:3000',
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,

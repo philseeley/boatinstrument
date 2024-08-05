@@ -227,9 +227,16 @@ class _SettingsState extends State<SettingsPage> {
       const ListTile(
           title: Text("Signalk:"),
       ),
+      SwitchListTile(title: const Text("Auto Discover:"),
+          value: settings.discoverServer,
+          onChanged: (bool value) {
+            setState(() {
+              settings.discoverServer = value;
+            });
+          }),
       ListTile(
           leading: const Text("Server:"),
-          title: TextFormField(
+          title: TextFormField(enabled: !settings.discoverServer,
               initialValue: settings.signalkServer,
               onChanged: (value) => settings.signalkServer = value)
       ),

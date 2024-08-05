@@ -52,6 +52,7 @@ dependencies:
   flutter_email_sender:
   intl:
 #  great_circle_distance_calculator:
+  multicast_dns:
 
 dev_dependencies:
   flutter_test:

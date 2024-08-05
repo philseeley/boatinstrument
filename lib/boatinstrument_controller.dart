@@ -12,7 +12,9 @@ import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
+import 'package:multicast_dns/multicast_dns.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:share_plus/share_plus.dart';
@@ -73,13 +75,16 @@ class CircularLogger extends Logger {
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
   _Settings? _settings;
+  Uri _httpApiUri = Uri();
+  Uri _wsUri = Uri();
   final List<_WidgetData> _widgetData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
 
   bool get ready => _settings != null;
 
-  String get signalkServer => _settings!.signalkServer;
+  Uri get httpApiUri => _httpApiUri;
+  Uri get wsUri => _wsUri;
   int get valueSmoothing => _settings!.valueSmoothing;
   bool get darkMode => _settings!.darkMode;
   bool get brightnessControl => _settings!.brightnessControl;
@@ -260,11 +265,51 @@ class BoatInstrumentController {
     return '${pageNum+1}/${_settings!.pages.length} ${_settings!.pages[pageNum].name}';
   }
 
+  _discoverServices() async {
+    try {
+      String server = _settings!.signalkServer;
+
+      if (_settings!.discoverServer) {
+        final MDnsClient client = MDnsClient();
+
+        await client.start();
+        bool found = false;
+        try {
+          await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(
+              ResourceRecordQuery.serverPointer('_signalk-http._tcp.local'))) {
+            await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
+                ResourceRecordQuery.service(ptr.domainName))) {
+              server = '${srv.target}:${srv.port}';
+              found = true;
+              break;
+            }
+            if (found) {
+              break;
+            }
+          }
+        } finally {
+          client.stop();
+        }
+      }
+      Uri uri = Uri.http(server, '/signalk');
+
+      http.Response response = await http.get(uri);
+      dynamic data = json.decode(response.body);
+      dynamic endPoints = data['endpoints']['v1'];
+
+      _httpApiUri = Uri.parse(endPoints['signalk-http']);
+      _wsUri = Uri.parse(endPoints['signalk-ws']);
+    } catch(e) {
+      l.e('Error discovering services', error: e);
+    }
+  }
+
   connect() async {
     _networkTimeout();
+    await _discoverServices();
 
     try {
-      l.i("Connecting to: $signalkServer");
+      l.i("Connecting to: $wsUri");
 
       for(_WidgetData wd in _widgetData) {
         if(wd.onUpdate != null) {
@@ -274,9 +319,7 @@ class BoatInstrumentController {
 
       _channel?.sink.close();
 
-      _channel = WebSocketChannel.connect(
-        Uri.parse('ws://$signalkServer/signalk/v1/stream?subscribe=none'),
-      );
+      _channel = WebSocketChannel.connect(wsUri);
 
       await _channel?.ready;
 
@@ -292,7 +335,7 @@ class BoatInstrumentController {
 
       _subscribe();
 
-      l.i("Connected to: $signalkServer");
+      l.i("Connected to: $wsUri");
     } catch (e) {
       l.e('Error connecting WebSocket', error: e);
     }
