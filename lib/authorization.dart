@@ -19,8 +19,9 @@ class SignalKAuthorization {
     _onError = onError;
 
     try {
-      Uri uri = Uri.http(
-          _controller.signalkServer, '/signalk/v1/access/requests');
+      // The path of the signalk-http endpoint has a 'api/' at the end that the access request does not want.
+      Uri uri = _controller.httpApiUri.replace(
+        path: '${_controller.httpApiUri.path.substring(0, _controller.httpApiUri.path.length-4)}access/requests');
 
       http.Response response = await http.post(
           uri,
@@ -47,7 +48,7 @@ class SignalKAuthorization {
 
   void _checkAuthRequestResponse() async {
     try {
-      Uri uri = Uri.http(_controller.signalkServer, _authRequestHREF!);
+      Uri uri = _controller.httpApiUri.replace(path: _authRequestHREF!);
 
       http.Response response = await http.get(
         uri,

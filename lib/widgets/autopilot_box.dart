@@ -104,9 +104,8 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     }
 
     try {
-      Uri uri = Uri.http(
-          widget.config.controller.signalkServer,
-          '/signalk/v1/api/vessels/self/$path');
+      Uri uri = widget.config.controller.httpApiUri.replace(
+          path: '${widget.config.controller.httpApiUri.path}vessels/self/$path');
 
       http.Response response = await http.put(
           uri,

@@ -9,7 +9,6 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-//TODO do we want different pages for landscape and portrait?
 void main() {
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: const NavApp()));
 }

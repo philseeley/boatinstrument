@@ -69,6 +69,7 @@ Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       version: (json['version'] as num?)?.toInt() ?? 0,
       valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
+      discoverServer: json['discoverServer'] as bool? ?? true,
       signalkServer:
           json['signalkServer'] as String? ?? 'openplotter.local:3000',
       signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 500,
@@ -110,6 +111,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
       'valueSmoothing': instance.valueSmoothing,
+      'discoverServer': instance.discoverServer,
       'signalkServer': instance.signalkServer,
       'signalkMinPeriod': instance.signalkMinPeriod,
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
