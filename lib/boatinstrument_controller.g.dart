@@ -70,8 +70,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       version: (json['version'] as num?)?.toInt() ?? 0,
       valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
       discoverServer: json['discoverServer'] as bool? ?? true,
-      signalkServer:
-          json['signalkServer'] as String? ?? 'openplotter.local:3000',
+      signalkServer: json['signalkServer'] as String? ?? '',
       signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 500,
       signalkConnectionTimeout:
           (json['signalkConnectionTimeout'] as num?)?.toInt() ?? 20000,
