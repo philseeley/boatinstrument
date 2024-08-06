@@ -120,6 +120,30 @@ class _MainPageState extends State<MainPage> {
       body: GestureDetector(
         onHorizontalDragEnd: _movePage,
         onVerticalDragEnd: _displayAppBar,
+        onHorizontalDragStart: (details) {
+          print('onHorizontalDragStart with $details');
+        },
+        onHorizontalDragUpdate: (details) {
+          print('onHorizontalDragUpdate with $details');
+        },
+        onHorizontalDragCancel: () {
+          print('onHorizontalDragCancel');
+        },
+        onHorizontalDragDown: (details) {
+          print('onHorizontalDragDown with $details');
+        },
+        onVerticalDragStart: (details) {
+          print('onVerticalDragStart with $details');
+        },
+        onVerticalDragUpdate: (details) {
+          print('onVerticalDragUpdate with $details');
+        },
+        onVerticalDragCancel: () {
+          print('onVerticalDragCancel');
+        },
+        onVerticalDragDown: (details) {
+          print('onVerticalDragDown with $details');
+        },
         child: _controller.buildPage(_pageNum),
       ),
     ); //DragGestureRecognizer
@@ -190,6 +214,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _movePage (DragEndDetails details) {
+    print('_movePage called with $details');
     _startPageTimer();
 
     if(details.primaryVelocity != 0.0) {
@@ -208,6 +233,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _displayAppBar (DragEndDetails details) async {
+    print('_displayAppBar called with $details');
+
     _startPageTimer();
 
     if(details.primaryVelocity != null) {
