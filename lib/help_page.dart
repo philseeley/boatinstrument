@@ -24,7 +24,7 @@ The sizes of the Page elements can be adjusted by dragging the coloured Box bord
 
 Swiping up or pressing the back button hides the top bar.
 
-If "Auto Discovery" of your SignalK server does not work, enter your server's hostname/IP and port number.''')]))),
+For "Auto Discovery" of your SignalK server, mDNS must be turned on in your server's settings. If discovery does not work, enter your server's hostname/IP and port number.''')]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness')),
       const ListTile(leading: Icon(Icons.timer_outlined), title: Text('Toggles the Auto-Page rotation')),
