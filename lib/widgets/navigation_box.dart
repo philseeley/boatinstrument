@@ -14,7 +14,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.courseGreatCircle.crossTrackError', precision: 2, smoothing: false, portStarboard: true);
+  const CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.*.crossTrackError', precision: 2, smoothing: false, portStarboard: true);
 
   @override
   double convert(double value) {
@@ -32,7 +32,7 @@ class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  const CrossTrackErrorDeltaBox(config, {super.key}) : super(config, 'XTE', GaugeOrientation.up, 'navigation.courseGreatCircle.crossTrackError', minValue: -2, maxValue: 2);
+  const CrossTrackErrorDeltaBox(config, {super.key}) : super(config, 'XTE', GaugeOrientation.up, 'navigation.*.crossTrackError', minValue: -2, maxValue: 2);
 
   @override
   double convert(double value) {
@@ -140,7 +140,7 @@ class NextPointDistanceBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Dist', 'navigation.courseGreatCircle.nextPoint.distance', precision: 2);
+  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Dist', 'navigation.*.nextPoint.distance', precision: 2);
 
   @override
   double convert(double value) {
@@ -158,7 +158,7 @@ class NextPointVelocityMadeGoodBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const NextPointVelocityMadeGoodBox(config, {super.key}) : super(config, 'WPT VMG', 'navigation.courseGreatCircle.nextPoint.velocityMadeGood');
+  const NextPointVelocityMadeGoodBox(config, {super.key}) : super(config, 'WPT VMG', 'navigation.*.nextPoint.velocityMadeGood');
 }
 
 abstract class TimeToGoBox extends BoxWidget {
@@ -248,7 +248,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
 
 class WaypointTimeToGoBox extends TimeToGoBox {
 
-  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.courseGreatCircle.nextPoint.timeToGo'});
+  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
 
   static String sid = 'navigation-next-point-time-to-go';
   @override
