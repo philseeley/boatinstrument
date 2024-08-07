@@ -413,7 +413,10 @@ class BoatInstrumentController {
 
               for (_WidgetData wd in _widgetData) {
                 for (String p in wd.paths) {
-                  if (path == p) {
+                  // Need to escape all the '.'s and make a wildcard character for any '*'s., otherwise
+                  // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
+                  RegExp r = RegExp(p.replaceAll('.', '\\.').replaceAll('*', '.*'));
+                  if (r.hasMatch(path)) {
                     wd.updates.add(Update(path, v['value']));
                     wd.lastUpdate = now;
                   }
