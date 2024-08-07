@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as m;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class _MainPageState extends State<MainPage> {
   int _brightness = _brightnessMax;
   bool _rotatePages = false;
   Timer? _pageTimer;
+  Offset _panStart = Offset.zero;
 
   final BoatInstrumentController _controller = BoatInstrumentController();
   int _pageNum = 0;
@@ -118,8 +120,21 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: appBar,
       body: GestureDetector(
-        onHorizontalDragEnd: _movePage,
-        onVerticalDragEnd: _displayAppBar,
+        onPanStart: (details) {
+          _panStart = details.localPosition;
+        },
+        onPanEnd: (details) {
+          Offset diff = details.localPosition - _panStart;
+          double max = m.max(diff.dx.abs(), diff.dy.abs());
+          if(max < 100) {
+            return;
+          }
+          if(diff.dx.abs() > diff.dy.abs()) {
+            _movePage(diff.dx);
+          } else {
+            _displayAppBar(diff.dy);
+          }
+        },
         child: _controller.buildPage(_pageNum),
       ),
     ); //DragGestureRecognizer
@@ -189,38 +204,34 @@ class _MainPageState extends State<MainPage> {
     _startPageTimer();
   }
 
-  void _movePage (DragEndDetails details) {
+  void _movePage (double direction) {
     _startPageTimer();
 
-    if(details.primaryVelocity != 0.0) {
-      int newPage = 0;
-      if (details.primaryVelocity! > 0.0) {
-        newPage = _controller.prevPageNum(_pageNum);
-      } else {
-        newPage = _controller.nextPageNum(_pageNum);
-      }
-      if(newPage != _pageNum) {
-        setState(() {
-          _pageNum = newPage;
-        });
-      }
+    int newPage = 0;
+    if (direction > 0.0) {
+      newPage = _controller.prevPageNum(_pageNum);
+    } else {
+      newPage = _controller.nextPageNum(_pageNum);
+    }
+    if(newPage != _pageNum) {
+      setState(() {
+        _pageNum = newPage;
+      });
     }
   }
 
-  void _displayAppBar (DragEndDetails details) async {
+  void _displayAppBar (double direction) async {
     _startPageTimer();
 
-    if(details.primaryVelocity != null) {
-      bool showAppBar = false;
-      if(details.primaryVelocity! > 0.0) {
-        showAppBar = true;
-      }
+    bool showAppBar = false;
+    if(direction > 0.0) {
+      showAppBar = true;
+    }
 
-      if(_showAppBar != showAppBar) {
-        setState(() {
-          _showAppBar = showAppBar;
-        });
-      }
+    if(_showAppBar != showAppBar) {
+      setState(() {
+        _showAppBar = showAppBar;
+      });
     }
   }
 }

@@ -237,6 +237,7 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
           leading: const Text("Server:"),
           title: TextFormField(enabled: !settings.discoverServer,
+              decoration: const InputDecoration(hintText: 'mypi.local:3000'),
               initialValue: settings.signalkServer,
               onChanged: (value) => settings.signalkServer = value)
       ),
