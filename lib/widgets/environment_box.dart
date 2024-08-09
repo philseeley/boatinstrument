@@ -37,12 +37,7 @@ class WaterTemperatureBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    switch (config.controller.temperatureUnits) {
-      case TemperatureUnits.c:
-        return value - 273.15;
-      case TemperatureUnits.f:
-        return (value - 273.15) * 9/5 + 32;
-    }
+    return convertTemperature(config.controller, value);
   }
 
   @override
@@ -121,5 +116,41 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
     if(mounted) {
       setState(() {});
     }
+  }
+}
+
+class OutsideTemperatureBox extends DoubleValueBox {
+  static const String sid = 'environment-outside-temperature';
+  @override
+  String get id => sid;
+
+  const OutsideTemperatureBox(config, {super.key}) : super(config, 'Outside Temp', 'environment.outside.temperature');
+
+  @override
+  double convert(double value) {
+    return convertTemperature(config.controller, value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+}
+
+class OutsidePressureBox extends DoubleValueBox {
+  static const String sid = 'environment-outside-pressure';
+  @override
+  String get id => sid;
+
+  const OutsidePressureBox(config, {super.key}) : super(config, 'Pressure', 'environment.outside.pressure');
+
+  @override
+  double convert(double value) {
+    return convertPressure(config.controller, value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.pressureUnits.unit;
   }
 }

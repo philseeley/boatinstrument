@@ -221,6 +221,10 @@ class _SettingsState extends State<SettingsPage> {
           title: _temperatureMenu()
       ),
       ListTile(
+          leading: const Text("Pressure:"),
+          title: _pressureMenu()
+      ),
+      ListTile(
           leading: const Text("Port/Starboard Colours:"),
           title: _portStarboardColorsMenu()
       ),
@@ -380,6 +384,26 @@ class _SettingsState extends State<SettingsPage> {
       dropdownMenuEntries: l,
       onSelected: (value) {
         widget._controller._settings?.temperatureUnits = value!;
+      },
+    );
+
+    return menu;
+  }
+
+  DropdownMenu _pressureMenu() {
+    List<DropdownMenuEntry<PressureUnits>> l = [];
+    for(var v in PressureUnits.values) {
+      l.add(DropdownMenuEntry<PressureUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<PressureUnits>(
+      initialSelection: widget._controller._settings?.pressureUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.pressureUnits = value!;
       },
     );
 

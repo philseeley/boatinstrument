@@ -46,6 +46,9 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AttitudeRollGaugeBox.sid, 'Roll (G)', (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorDeltaBox.sid, 'XTE Delta (G)', (config) {return CrossTrackErrorDeltaBox(config, key: UniqueKey());}),
   BoxDetails(WindAngleApparentBox.sid, 'Apparent Wind Angle', (config) {return WindAngleApparentBox(config, key: UniqueKey());}),
+  BoxDetails(MagneticVariationBox.sid, 'Magnetic Variation', (config) {return MagneticVariationBox(config, key: UniqueKey());}),
+  BoxDetails(OutsideTemperatureBox.sid, 'Outside Temperature', (config) {return OutsideTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(OutsidePressureBox.sid, 'Outside Pressure', (config) {return OutsidePressureBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -79,7 +82,9 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Environment', [
         _widgetMenuEntry(DepthBelowSurfaceBox.sid),
         _widgetMenuEntry(SetAndDriftBox.sid),
-        _widgetMenuEntry(WaterTemperatureBox.sid)]),
+        _widgetMenuEntry(WaterTemperatureBox.sid),
+        _widgetMenuEntry(OutsideTemperatureBox.sid),
+        _widgetMenuEntry(OutsidePressureBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
@@ -90,7 +95,8 @@ class _EditPageState extends State<_EditPage> {
         // _widgetMenuEntry(RouteTimeToGoBox.sid),
         _widgetMenuEntry(CrossTrackErrorBox.sid),
         _widgetMenuEntry(CrossTrackErrorDeltaBox.sid),
-        _widgetMenuEntry(PositionBox.sid)]),
+        _widgetMenuEntry(PositionBox.sid),
+        _widgetMenuEntry(MagneticVariationBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedThroughWaterBox.sid),
         _widgetMenuEntry(RudderAngleBox.sid),

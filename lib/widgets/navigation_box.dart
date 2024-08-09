@@ -105,7 +105,7 @@ class CourseOverGroundBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'deg';
+    return degreesUnits;
   }
 }
 
@@ -131,7 +131,7 @@ class HeadingBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'deg';
+    return degreesUnits;
   }
 }
 
@@ -443,5 +443,23 @@ class _PositionSettingsState extends State<_PositionSettingsWidget> {
     ];
 
     return ListView(children: list);
+  }
+}
+
+class MagneticVariationBox extends DoubleValueBox {
+  static const String sid = 'navigation-magnetic-variation';
+  @override
+  String get id => sid;
+
+  const MagneticVariationBox(config, {super.key}) : super(config, 'Mag Var', 'navigation.magneticVariation', precision: 0, smoothing: false);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value).toDouble();
+  }
+
+  @override
+  String units(double value) {
+    return degreesUnits;
   }
 }
