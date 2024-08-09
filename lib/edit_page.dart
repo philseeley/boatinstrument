@@ -49,6 +49,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(MagneticVariationBox.sid, 'Magnetic Variation', (config) {return MagneticVariationBox(config, key: UniqueKey());}),
   BoxDetails(OutsideTemperatureBox.sid, 'Outside Temperature', (config) {return OutsideTemperatureBox(config, key: UniqueKey());}),
   BoxDetails(OutsidePressureBox.sid, 'Outside Pressure', (config) {return OutsidePressureBox(config, key: UniqueKey());}),
+  BoxDetails(SunlightBox.sid, 'Sunlight', (config) {return SunlightBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -84,7 +85,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(SetAndDriftBox.sid),
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
-        _widgetMenuEntry(OutsidePressureBox.sid)]),
+        _widgetMenuEntry(OutsidePressureBox.sid),
+        _widgetMenuEntry(SunlightBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),

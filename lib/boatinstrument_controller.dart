@@ -408,8 +408,11 @@ class BoatInstrumentController {
 
       for (dynamic u in d['updates']) {
         try {
-          if (u['\$source'] == 'defaults' || now.difference(DateTime.parse(u['timestamp'])) <=
-              Duration(milliseconds: _settings!.dataTimeout)) {
+          String source = u[r'$source'];
+          if (source == 'defaults' ||
+              source == 'derived-data' ||
+              now.difference(DateTime.parse(u['timestamp'])) <=
+                  Duration(milliseconds: _settings!.dataTimeout)) {
             for (dynamic v in u['values']) {
               String path = v['path'];
 

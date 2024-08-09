@@ -125,7 +125,7 @@ abstract class BoxWidget extends StatefulWidget {
   // This should be overridden to return a static and unique string.
   // The static string is used to identify the Box class prior to instantiation.
   // e.g.
-  //   static String sid = 'my-value';
+  //   static const String sid = 'my-value';
   //   @override
   //   String get id => sid;
   String get id;
