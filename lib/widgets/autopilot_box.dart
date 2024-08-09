@@ -472,14 +472,14 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: [
       "steering.autopilot.state",
       "steering.autopilot.target.windAngleApparent",
       "navigation.currentRoute.waypoints",
       "steering.autopilot.target.headingTrue",
       "steering.autopilot.target.headingMagnetic",
       "navigation.magneticVariation",
-    });
+    ]);
   }
 
   @override

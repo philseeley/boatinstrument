@@ -66,7 +66,7 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'environment.current'});
+    widget.config.controller.configure(widget, onUpdate: _processData, paths: ['environment.current']);
   }
 
   @override

@@ -250,15 +250,14 @@ class Update {
 typedef OnUpdate = Function(List<Update>? updates);
 
 class _WidgetData {
-  Widget widget;
-  bool configured = false;
+  final OnUpdate? onUpdate;
+  final List<String> paths;
+  final bool dataTimeout;
+  List<RegExp> regExpPaths = [];
   DateTime lastUpdate = DateTime.now();
-  OnUpdate? onUpdate;
-  Set<String> paths = {};
-  bool dataTimeout = true;
   List<Update> updates = [];
 
-  _WidgetData(this.widget);
+  _WidgetData(this.onUpdate, this.paths, this.dataTimeout);
 }
 
 class _Resizable {

@@ -163,7 +163,7 @@ class NextPointVelocityMadeGoodBox extends SpeedBox {
 
 abstract class TimeToGoBox extends BoxWidget {
   final String _title;
-  final Set<String> _paths;
+  final List<String> _paths;
 
   const TimeToGoBox(super.config, this._title, this._paths, {super.key});
 
@@ -248,7 +248,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
 
 class WaypointTimeToGoBox extends TimeToGoBox {
 
-  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
+  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', ['navigation.*.nextPoint.timeToGo']);
 
   static String sid = 'navigation-next-point-time-to-go';
   @override
@@ -361,7 +361,7 @@ class _PositionBoxState extends State<PositionBox> {
   @override
   void initState() {
     super.initState();
-    _settings = _$PositionSettingsFromJson(widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'}));
+    _settings = _$PositionSettingsFromJson(widget.config.controller.configure(widget, onUpdate: _processData, paths: ['navigation.position']));
     _llf = LatLongFormatter('${_settings.latFormat}\n${_settings.lonFormat}');
   }
 
