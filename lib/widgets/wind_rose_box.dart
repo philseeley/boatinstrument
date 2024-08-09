@@ -203,7 +203,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: [
+    widget.config.controller.configure(_processData, [
       'environment.wind.angleApparent',
       'environment.wind.angleTrueWater'
     ]);

@@ -241,7 +241,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: processUpdates, paths: [widget.path], dataTimeout: widget.dataTimeout);
+    widget.config.controller.configure(processUpdates, [widget.path], dataTimeout: widget.dataTimeout);
   }
 
   @override

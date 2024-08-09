@@ -374,7 +374,7 @@ class _EditPageState extends State<_EditPage> {
   }
 
   _showSettingsPage (BoxWidget boxWidget) async {
-    BoxSettingsWidget boxSettingsWidget =  boxWidget.getSettingsWidget(widget._controller.getBoxSettings(boxWidget.id))!;
+    BoxSettingsWidget boxSettingsWidget =  boxWidget.getSettingsWidget(widget._controller.getBoxSettingsJson(boxWidget.id))!;
 
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {

@@ -174,13 +174,6 @@ class BlankBox extends BoxWidget {
 }
 
 class _BlankBoxState extends State<BlankBox> {
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -200,13 +193,6 @@ class HelpBox extends BoxWidget {
 }
 
 class _HelpBoxState extends State<HelpBox> {
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
@@ -250,7 +236,7 @@ class Update {
 typedef OnUpdate = Function(List<Update>? updates);
 
 class _WidgetData {
-  final OnUpdate? onUpdate;
+  final OnUpdate onUpdate;
   final List<String> paths;
   final bool dataTimeout;
   List<RegExp> regExpPaths = [];

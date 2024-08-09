@@ -119,17 +119,18 @@ class BoatInstrumentController {
     }
   }
 
-  Map<String, dynamic> getBoxSettings(String boxID) {
-    return _settings?.boxSettings[boxID]??{};
-  }
-
   void clear() {
     _widgetData.clear();
     _unsubscribe();
   }
 
+  // Call this in the Widget's State initState() to get common Box settings.
+  Map<String, dynamic> getBoxSettingsJson(String boxID) {
+    return _settings?.boxSettings[boxID]??{};
+  }
+
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, List<String> paths = const [], bool dataTimeout = true}) {
+  void configure(OnUpdate onUpdate, List<String> paths, {bool dataTimeout = true}) {
     _WidgetData wd = _WidgetData(onUpdate, paths, dataTimeout);
     _widgetData.add(wd);
 
@@ -141,8 +142,6 @@ class BoatInstrumentController {
     }
 
     _subscribe(wd.paths.toList());
-
-    return getBoxSettings(widget.id);
   }
 
   void save() {
@@ -307,9 +306,7 @@ class BoatInstrumentController {
       l.i("Connecting to: $wsUri");
 
       for(_WidgetData wd in _widgetData) {
-        if(wd.onUpdate != null) {
-          wd.onUpdate!(null);
-        }
+        wd.onUpdate(null);
       }
 
       _channel?.sink.close();
@@ -432,12 +429,10 @@ class BoatInstrumentController {
       }
 
       for(_WidgetData wd in _widgetData) {
-        if(wd.onUpdate != null) {
-          if(wd.updates.isNotEmpty) {
-            wd.onUpdate!(wd.updates);
-          } else if(wd.dataTimeout && now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
-            wd.onUpdate!(null);
-          }
+        if(wd.updates.isNotEmpty) {
+          wd.onUpdate(wd.updates);
+        } else if(wd.dataTimeout && now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
+          wd.onUpdate(null);
         }
       }
     }

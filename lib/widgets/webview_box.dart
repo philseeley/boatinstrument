@@ -42,13 +42,6 @@ class WebViewBox extends BoxWidget {
 }
 
 class _WebViewBoxState extends State<WebViewBox> {
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget);
-  }
-
   @override
   Widget build(BuildContext context) {
     if(Platform.isMacOS) {

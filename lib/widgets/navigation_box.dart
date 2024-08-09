@@ -178,7 +178,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: processData, paths: widget._paths);
+    widget.config.controller.configure(processData, widget._paths);
   }
 
   @override
@@ -361,7 +361,8 @@ class _PositionBoxState extends State<PositionBox> {
   @override
   void initState() {
     super.initState();
-    _settings = _$PositionSettingsFromJson(widget.config.controller.configure(widget, onUpdate: _processData, paths: ['navigation.position']));
+    _settings = _$PositionSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    widget.config.controller.configure(_processData, ['navigation.position']);
     _llf = LatLongFormatter('${_settings.latFormat}\n${_settings.lonFormat}');
   }
 
