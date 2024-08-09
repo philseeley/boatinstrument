@@ -98,6 +98,9 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       temperatureUnits: $enumDecodeNullable(
               _$TemperatureUnitsEnumMap, json['temperatureUnits']) ??
           TemperatureUnits.c,
+      pressureUnits:
+          $enumDecodeNullable(_$PressureUnitsEnumMap, json['pressureUnits']) ??
+              PressureUnits.millibar,
       portStarboardColors: $enumDecodeNullable(
               _$PortStarboardColorsEnumMap, json['portStarboardColors']) ??
           PortStarboardColors.redGreen,
@@ -128,6 +131,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'windSpeedUnits': _$SpeedUnitsEnumMap[instance.windSpeedUnits]!,
       'depthUnits': _$DepthUnitsEnumMap[instance.depthUnits]!,
       'temperatureUnits': _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
+      'pressureUnits': _$PressureUnitsEnumMap[instance.pressureUnits]!,
       'portStarboardColors':
           _$PortStarboardColorsEnumMap[instance.portStarboardColors]!,
       'pages': instance.pages,
@@ -158,6 +162,13 @@ const _$DepthUnitsEnumMap = {
 const _$TemperatureUnitsEnumMap = {
   TemperatureUnits.c: 'c',
   TemperatureUnits.f: 'f',
+};
+
+const _$PressureUnitsEnumMap = {
+  PressureUnits.pascal: 'pascal',
+  PressureUnits.millibar: 'millibar',
+  PressureUnits.atmosphere: 'atmosphere',
+  PressureUnits.mercury: 'mercury',
 };
 
 const _$PortStarboardColorsEnumMap = {

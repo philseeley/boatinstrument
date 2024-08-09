@@ -98,19 +98,19 @@ class _MainPageState extends State<MainPage> {
 
     _controller.clear();
 
-    List<Widget> actions = [
-      IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
-      IconButton(icon: Icon(_rotatePages ? Icons.timer_outlined : Icons.timer_off_outlined), onPressed:  _togglePageTimer),
-    ];
-
-    if(_controller.brightnessControl) {
-      actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
-    }
-
-    actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
-
     AppBar? appBar;
     if(_showAppBar) {
+      List<Widget> actions = [
+        IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
+        IconButton(icon: Icon(_rotatePages ? Icons.timer_outlined : Icons.timer_off_outlined), onPressed:  _togglePageTimer),
+      ];
+
+      if(_controller.brightnessControl) {
+        actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
+      }
+
+      actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
+
       appBar = AppBar(
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
         title: Text(_controller.pageName(_pageNum)),

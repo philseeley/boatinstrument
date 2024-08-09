@@ -36,7 +36,7 @@ class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
 
   @override
   String units(double value) {
-    return 'deg';
+    return degreesUnits;
   }
 }
 

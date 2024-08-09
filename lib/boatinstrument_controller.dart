@@ -97,6 +97,7 @@ class BoatInstrumentController {
   SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;
   DepthUnits get depthUnits => _settings!.depthUnits;
   TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
+  PressureUnits get pressureUnits => _settings!.pressureUnits;
   int get numOfPages => _settings!.pages.length;
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
@@ -118,36 +119,29 @@ class BoatInstrumentController {
     }
   }
 
-  Widget addWidget(Widget widget) {
-    _widgetData.add(_WidgetData(widget));
-    return widget;
+  void clear() {
+    _widgetData.clear();
+    _unsubscribe();
   }
 
-  Map<String, dynamic> getBoxSettings(String boxID) {
+  // Call this in the Widget's State initState() to get common Box settings.
+  Map<String, dynamic> getBoxSettingsJson(String boxID) {
     return _settings?.boxSettings[boxID]??{};
   }
 
-  // Each Box MUST call this in the Widget's State initState(), even if not subscribing to any Signalk data.
-  // If there are Box type settings they will be returned.
-  Map<String, dynamic> configure(BoxWidget widget, {OnUpdate? onUpdate, Set<String> paths = const {}, bool dataTimeout = true}) {
-    bool configured = true;
+  // Call this in the Widget's State initState() to subscribe to Signalk data.
+  void configure(OnUpdate onUpdate, List<String> paths, {bool dataTimeout = true}) {
+    _WidgetData wd = _WidgetData(onUpdate, paths, dataTimeout);
+    _widgetData.add(wd);
 
-    for(_WidgetData wd in _widgetData) {
-      if(wd.widget == widget) {
-        wd.onUpdate = onUpdate;
-        wd.paths = paths;
-        wd.dataTimeout = dataTimeout;
-        wd.configured = true;
-      } else if(!wd.configured) {
-        configured = false;
-      }
+    for(String path in wd.paths) {
+      // Need to escape all the '.'s and make a wildcard character for any '*'s, otherwise
+      // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
+      wd.regExpPaths.add(
+          RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
     }
 
-    if(configured) {
-      _subscribe();
-    }
-
-    return getBoxSettings(widget.id);
+    _subscribe(wd.paths.toList());
   }
 
   void save() {
@@ -192,7 +186,7 @@ class BoatInstrumentController {
                 position: DecorationPosition.foreground,
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 2)),
                 child: LayoutBuilder(builder: (context, constraints) {
-                  return addWidget(getBoxDetails(box.id).build(BoxWidgetConfig(this, box.settings, constraints, false)));
+                  return getBoxDetails(box.id).build(BoxWidgetConfig(this, box.settings, constraints, false));
                 }))));
       }
       return Row(children: widgets);
@@ -312,9 +306,7 @@ class BoatInstrumentController {
       l.i("Connecting to: $wsUri");
 
       for(_WidgetData wd in _widgetData) {
-        if(wd.onUpdate != null) {
-          wd.onUpdate!(null);
-        }
+        wd.onUpdate(null);
       }
 
       _channel?.sink.close();
@@ -333,7 +325,7 @@ class BoatInstrumentController {
           }
       );
 
-      _subscribe();
+      _subscribeAll();
 
       l.i("Connected to: $wsUri");
     } catch (e) {
@@ -341,30 +333,7 @@ class BoatInstrumentController {
     }
   }
 
-  void clear() {
-    _widgetData.clear();
-  }
-
-  void _subscribe() {
-    List<Map<String, String>> subscribe = [];
-    Set<String> paths = {};
-
-    // Find all the unique paths.
-    for(_WidgetData wd in _widgetData) {
-      for(String path in wd.paths) {
-        paths.add(path);
-      }
-    }
-
-    for(String path in paths) {
-      subscribe.add({
-        "path": path,
-        "policy": 'instant',
-        "minPeriod": _settings!.signalkMinPeriod.toString()
-        });
-    }
-
-    // Unsubscribe from all updates first.
+  void _unsubscribe() {
     _channel?.sink.add(
       jsonEncode(
           {
@@ -375,7 +344,17 @@ class BoatInstrumentController {
           }
       ),
     );
+  }
 
+  Map<String, String> _subscribeJson(String path) {
+    return {
+      "path": path,
+      "policy": 'instant',
+      "minPeriod": _settings!.signalkMinPeriod.toString()
+    };
+  }
+
+  void _sendSubscribe(List<Map<String, String>> subscribe) {
     _channel?.sink.add(
       jsonEncode(
         {
@@ -384,6 +363,29 @@ class BoatInstrumentController {
         },
       ),
     );
+  }
+
+  void _subscribe(List<String> paths) {
+    List<Map<String, String>> subscribe = [];
+
+    for(String path in paths) {
+      subscribe.add(_subscribeJson(path));
+    }
+
+    _sendSubscribe(subscribe);
+  }
+
+  void _subscribeAll() {
+    List<String> paths = [];
+
+    // Find all the unique paths.
+    for(_WidgetData wd in _widgetData) {
+      paths.addAll(wd.paths);
+    }
+
+    _unsubscribe();
+
+    _subscribe(paths);
   }
 
   void _networkTimeout () {
@@ -406,16 +408,16 @@ class BoatInstrumentController {
 
       for (dynamic u in d['updates']) {
         try {
-          if (u['\$source'] == 'defaults' || now.difference(DateTime.parse(u['timestamp'])) <=
-              Duration(milliseconds: _settings!.dataTimeout)) {
+          String source = u[r'$source'];
+          if (source == 'defaults' ||
+              source == 'derived-data' ||
+              now.difference(DateTime.parse(u['timestamp'])) <=
+                  Duration(milliseconds: _settings!.dataTimeout)) {
             for (dynamic v in u['values']) {
               String path = v['path'];
 
               for (_WidgetData wd in _widgetData) {
-                for (String p in wd.paths) {
-                  // Need to escape all the '.'s and make a wildcard character for any '*'s., otherwise
-                  // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
-                  RegExp r = RegExp(p.replaceAll('.', '\\.').replaceAll('*', '.*'));
+                for (RegExp r in wd.regExpPaths) {
                   if (r.hasMatch(path)) {
                     wd.updates.add(Update(path, v['value']));
                     wd.lastUpdate = now;
@@ -430,12 +432,10 @@ class BoatInstrumentController {
       }
 
       for(_WidgetData wd in _widgetData) {
-        if(wd.onUpdate != null) {
-          if(wd.updates.isNotEmpty) {
-            wd.onUpdate!(wd.updates);
-          } else if(wd.dataTimeout && now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
-            wd.onUpdate!(null);
-          }
+        if(wd.updates.isNotEmpty) {
+          wd.onUpdate(wd.updates);
+        } else if(wd.dataTimeout && now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
+          wd.onUpdate(null);
         }
       }
     }

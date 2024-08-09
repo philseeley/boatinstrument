@@ -105,7 +105,7 @@ class CourseOverGroundBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'deg';
+    return degreesUnits;
   }
 }
 
@@ -131,7 +131,7 @@ class HeadingBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'deg';
+    return degreesUnits;
   }
 }
 
@@ -163,7 +163,7 @@ class NextPointVelocityMadeGoodBox extends SpeedBox {
 
 abstract class TimeToGoBox extends BoxWidget {
   final String _title;
-  final Set<String> _paths;
+  final List<String> _paths;
 
   const TimeToGoBox(super.config, this._title, this._paths, {super.key});
 
@@ -178,7 +178,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: processData, paths: widget._paths);
+    widget.config.controller.configure(processData, widget._paths);
   }
 
   @override
@@ -248,7 +248,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
 
 class WaypointTimeToGoBox extends TimeToGoBox {
 
-  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
+  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', ['navigation.*.nextPoint.timeToGo']);
 
   static String sid = 'navigation-next-point-time-to-go';
   @override
@@ -361,7 +361,8 @@ class _PositionBoxState extends State<PositionBox> {
   @override
   void initState() {
     super.initState();
-    _settings = _$PositionSettingsFromJson(widget.config.controller.configure(widget, onUpdate: _processData, paths: {'navigation.position'}));
+    _settings = _$PositionSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    widget.config.controller.configure(_processData, ['navigation.position']);
     _llf = LatLongFormatter('${_settings.latFormat}\n${_settings.lonFormat}');
   }
 
@@ -443,5 +444,23 @@ class _PositionSettingsState extends State<_PositionSettingsWidget> {
     ];
 
     return ListView(children: list);
+  }
+}
+
+class MagneticVariationBox extends DoubleValueBox {
+  static const String sid = 'navigation-magnetic-variation';
+  @override
+  String get id => sid;
+
+  const MagneticVariationBox(config, {super.key}) : super(config, 'Mag Var', 'navigation.magneticVariation', precision: 0, smoothing: false);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value).toDouble();
+  }
+
+  @override
+  String units(double value) {
+    return degreesUnits;
   }
 }

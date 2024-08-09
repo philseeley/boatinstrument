@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'double_value_box.dart';
@@ -37,12 +38,7 @@ class WaterTemperatureBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    switch (config.controller.temperatureUnits) {
-      case TemperatureUnits.c:
-        return value - 273.15;
-      case TemperatureUnits.f:
-        return (value - 273.15) * 9/5 + 32;
-    }
+    return convertTemperature(config.controller, value);
   }
 
   @override
@@ -71,7 +67,7 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'environment.current'});
+    widget.config.controller.configure(_processData, ['environment.current']);
   }
 
   @override
@@ -96,7 +92,6 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
       Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Set&Drift deg-${widget.config.controller.speedUnits.unit}', style: style))]),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
-
     ]);
   }
 
@@ -115,6 +110,135 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
         _displayDrift = convertSpeed(widget.config.controller.speedUnits, _drift!);
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
+  }
+}
+
+class OutsideTemperatureBox extends DoubleValueBox {
+  static const String sid = 'environment-outside-temperature';
+  @override
+  String get id => sid;
+
+  const OutsideTemperatureBox(config, {super.key}) : super(config, 'Outside Temp', 'environment.outside.temperature');
+
+  @override
+  double convert(double value) {
+    return convertTemperature(config.controller, value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+}
+
+class OutsidePressureBox extends DoubleValueBox {
+  static const String sid = 'environment-outside-pressure';
+  @override
+  String get id => sid;
+
+  const OutsidePressureBox(config, {super.key}) : super(config, 'Pressure', 'environment.outside.pressure');
+
+  @override
+  double convert(double value) {
+    return convertPressure(config.controller, value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.pressureUnits.unit;
+  }
+}
+
+class SunlightBox extends BoxWidget {
+  static const String sid = 'environment-sun';
+  @override
+  String get id => sid;
+
+  const SunlightBox(super.config, {super.key});
+
+  @override
+  State<SunlightBox> createState() => _SunlightBox();
+}
+
+class _SunlightBox extends State<SunlightBox> {
+  DateTime? _rise, _set, _dawn, _dusk, _nauticalDawn, _nauticalDusk, _solarNoon;
+  final fmt = DateFormat('HH:mm');
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure(_onUpdate, ['environment.sunlight.times.*'], dataTimeout: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+    const double pad = 5.0;
+
+    if(widget.config.editMode) {
+      _rise = _set = _dawn = _dusk = _nauticalDawn = _nauticalDusk = _solarNoon = DateTime.now();
+    }
+
+    String text =
+'''Rise:     ${(_rise == null) ? '-' : fmt.format(_rise!)}
+Set:      ${(_set == null) ? '-' : fmt.format(_set!)}
+Dawn:     ${(_dawn == null) ? '-' : fmt.format(_dawn!)}
+Dusk:     ${(_dusk == null) ? '-' : fmt.format(_dusk!)}
+Naut Dwn: ${(_nauticalDawn == null) ? '-' : fmt.format(_nauticalDawn!)}
+Naut Dsk: ${(_nauticalDusk == null) ? '-' : fmt.format(_nauticalDusk!)}
+Sol Noon: ${(_solarNoon == null) ? '-' : fmt.format(_solarNoon!)}''';
+
+    double fontSize = maxFontSize(text, style,
+        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 7,
+        widget.config.constraints.maxWidth - (2 * pad));
+
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Sunlight', style: style))]),
+      // We need to disable the device text scaling as this interferes with our text scaling.
+      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
+    ]);
+  }
+
+  void _onUpdate(List<Update>? updates) {
+    if(updates == null) {
+      _rise = _set = _dawn = _dusk = _nauticalDawn = _nauticalDusk = _solarNoon = null;
+    } else {
+      for (Update u in updates) {
+        try {
+          DateTime dt = DateTime.parse(u.value).toLocal();
+
+          switch (u.path) {
+            case 'environment.sunlight.times.sunrise':
+              _rise = dt;
+              break;
+            case 'environment.sunlight.times.sunset':
+              _set = dt;
+              break;
+            case 'environment.sunlight.times.dawn':
+              _dawn = dt;
+              break;
+            case 'environment.sunlight.times.dusk':
+              _dusk = dt;
+              break;
+            case 'environment.sunlight.times.nauticalDawn':
+              _nauticalDawn = dt;
+              break;
+            case 'environment.sunlight.times.nauticalDusk':
+              _nauticalDusk = dt;
+              break;
+            case 'environment.sunlight.times.solarNoon':
+              _solarNoon = dt;
+              break;
+          }
+        } catch (e) {
+          widget.config.controller.l.e("Error converting $u", error: e);
+        }
       }
     }
 

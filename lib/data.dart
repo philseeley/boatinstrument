@@ -3,6 +3,7 @@ part of 'boatinstrument_controller.dart';
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 String val2PS(num val) => val < 0 ? 'P' : (val > 0) ? 'S' : '';
+String degreesUnits = 'deg';
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);
@@ -85,6 +86,28 @@ double convertSpeed(SpeedUnits units, double speed) {
   }
 }
 
+double convertTemperature(BoatInstrumentController controller, double value) {
+  switch (controller.temperatureUnits) {
+    case TemperatureUnits.c:
+      return value - 273.15;
+    case TemperatureUnits.f:
+      return (value - 273.15) * 9/5 + 32;
+  }
+}
+
+double convertPressure(BoatInstrumentController controller, double value) {
+  switch (controller.pressureUnits) {
+    case PressureUnits.pascal:
+      return value;
+    case PressureUnits.millibar:
+      return value * 0.01;
+    case PressureUnits.atmosphere:
+      return value * 9.869233e-06;
+    case PressureUnits.mercury:
+      return value * 0.007501;
+  }
+}
+
 class BoxWidgetConfig {
   final BoatInstrumentController controller;
   final Map<String, dynamic> settings;
@@ -102,7 +125,7 @@ abstract class BoxWidget extends StatefulWidget {
   // This should be overridden to return a static and unique string.
   // The static string is used to identify the Box class prior to instantiation.
   // e.g.
-  //   static String sid = 'my-value';
+  //   static const String sid = 'my-value';
   //   @override
   //   String get id => sid;
   String get id;
@@ -151,13 +174,6 @@ class BlankBox extends BoxWidget {
 }
 
 class _BlankBoxState extends State<BlankBox> {
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -177,13 +193,6 @@ class HelpBox extends BoxWidget {
 }
 
 class _HelpBoxState extends State<HelpBox> {
-
-  @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure(widget);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
@@ -227,15 +236,14 @@ class Update {
 typedef OnUpdate = Function(List<Update>? updates);
 
 class _WidgetData {
-  Widget widget;
-  bool configured = false;
+  final OnUpdate onUpdate;
+  final List<String> paths;
+  final bool dataTimeout;
+  List<RegExp> regExpPaths = [];
   DateTime lastUpdate = DateTime.now();
-  OnUpdate? onUpdate;
-  Set<String> paths = {};
-  bool dataTimeout = true;
   List<Update> updates = [];
 
-  _WidgetData(this.widget);
+  _WidgetData(this.onUpdate, this.paths, this.dataTimeout);
 }
 
 class _Resizable {
@@ -384,6 +392,18 @@ enum TemperatureUnits {
   const TemperatureUnits(this.displayName, this.unit);
 }
 
+enum PressureUnits {
+  pascal('Pascal', 'Pa'),
+  millibar('Millibars', 'mb'),
+  atmosphere('Atmosphere', 'Atm'),
+  mercury('MM Mercury', 'mmHg');
+
+  final String displayName;
+  final String unit;
+
+  const PressureUnits(this.displayName, this.unit);
+}
+
 enum PortStarboardColors {
   none('None', Colors.black, Colors.white), // These are just placeholders and not used.
   redGreen('Red/Green', Colors.red, Colors.green),
@@ -419,6 +439,7 @@ class _Settings {
   SpeedUnits windSpeedUnits;
   DepthUnits depthUnits;
   TemperatureUnits temperatureUnits;
+  PressureUnits pressureUnits;
   PortStarboardColors portStarboardColors;
   late List<_Page> pages;
   late Map<String, dynamic> boxSettings;
@@ -448,6 +469,7 @@ class _Settings {
     this.windSpeedUnits = SpeedUnits.kts,
     this.depthUnits = DepthUnits.m,
     this.temperatureUnits = TemperatureUnits.c,
+    this.pressureUnits = PressureUnits.millibar,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
     widgetSettings
