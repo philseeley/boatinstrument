@@ -5,6 +5,7 @@ import 'dart:math' as m;
 
 import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
+import 'package:boatinstrument/widgets/custom_box.dart';
 import 'package:boatinstrument/widgets/date_time_box.dart';
 import 'package:boatinstrument/widgets/environment_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';

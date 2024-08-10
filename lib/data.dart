@@ -234,6 +234,11 @@ class Update {
   final dynamic value;
 
   Update(this.path, this.value);
+
+  @override
+  String toString() {
+    return 'path: $path, value: $value';
+  }
 }
 
 typedef OnUpdate = Function(List<Update>? updates);

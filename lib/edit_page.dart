@@ -51,6 +51,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsidePressureBox.sid, 'Outside Pressure', (config) {return OutsidePressureBox(config, key: UniqueKey());}),
   BoxDetails(SunlightBox.sid, 'Sunlight', (config) {return SunlightBox(config, key: UniqueKey());}),
   BoxDetails(MoonBox.sid, 'Moon', (config) {return MoonBox(config, key: UniqueKey());}),
+  BoxDetails(DebugBox.sid, 'Debug', (config) {return DebugBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -122,7 +123,8 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
-        _widgetMenuEntry(CustomDoubleValueBox.sid)]),
+        _widgetMenuEntry(CustomDoubleValueBox.sid),
+        _widgetMenuEntry(DebugBox.sid)]),
     ];
 
     return popupMenuEntries;
