@@ -53,6 +53,7 @@ dependencies:
   intl:
 #  great_circle_distance_calculator:
   multicast_dns:
+  moon_phase_plus:
 
 dev_dependencies:
   flutter_test:
