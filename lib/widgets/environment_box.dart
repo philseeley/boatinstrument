@@ -198,10 +198,10 @@ Sol Noon: ${(_solarNoon == null) ? '-' : fmt.format(_solarNoon!)}''';
         (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 7,
         widget.config.constraints.maxWidth - (2 * pad));
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Sunlight', style: style))]),
+    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Sunlight', style: style)])),
       // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
+      Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize))]))
     ]);
   }
 
