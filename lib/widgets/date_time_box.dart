@@ -6,22 +6,22 @@ import 'package:json_annotation/json_annotation.dart';
 part 'date_time_box.g.dart';
 
 @JsonSerializable()
-class _Settings {
+class _DateTimeSettings {
   String dateFormat;
 
-  _Settings({
+  _DateTimeSettings({
     this.dateFormat = 'yyyy-MM-dd'
   });
 }
 
 @JsonSerializable()
-class _PerBoxSettings {
+class _DateTimePerBoxSettings {
   bool showDate;
   bool showTime;
   bool utc;
   String timeFormat;
 
-  _PerBoxSettings({
+  _DateTimePerBoxSettings({
     this.showDate = true,
     this.showTime = true,
     this.utc = false,
@@ -30,10 +30,10 @@ class _PerBoxSettings {
 }
 
 class DateTimeBox extends BoxWidget {
-  late final _PerBoxSettings _perBoxSettings;
+  late final _DateTimePerBoxSettings _perBoxSettings;
 
   DateTimeBox(super.config, {super.key})  {
-    _perBoxSettings = _$PerBoxSettingsFromJson(config.settings);
+    _perBoxSettings = _$DateTimePerBoxSettingsFromJson(config.settings);
   }
 
   @override
@@ -48,7 +48,7 @@ class DateTimeBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _SettingsWidget(_$SettingsFromJson(json));
+    return _SettingsWidget(_$DateTimeSettingsFromJson(json));
   }
 
   @override
@@ -67,19 +67,19 @@ class DateTimeBox extends BoxWidget {
 }
 
 class _DateTimeBoxState extends State<DateTimeBox> {
-  _Settings _settings = _Settings();
+  _DateTimeSettings _settings = _DateTimeSettings();
   DateTime? _dateTime;
 
   @override
   void initState() {
     super.initState();
-    _settings = _$SettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    _settings = _$DateTimeSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(_processData, ['navigation.datetime']);
   }
 
   @override
   Widget build(BuildContext context) {
-    _PerBoxSettings perBoxSettings = widget._perBoxSettings;
+    _DateTimePerBoxSettings perBoxSettings = widget._perBoxSettings;
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
@@ -137,13 +137,13 @@ class _DateTimeBoxState extends State<DateTimeBox> {
 }
 
 class _SettingsWidget extends BoxSettingsWidget {
-  final _Settings _settings;
+  final _DateTimeSettings _settings;
 
   const _SettingsWidget(this._settings);
 
   @override
   Map<String, dynamic> getSettingsJson() {
-    return _$SettingsToJson(_settings);
+    return _$DateTimeSettingsToJson(_settings);
   }
 
   @override
@@ -154,7 +154,7 @@ class _SettingsState extends State<_SettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _Settings s = widget._settings;
+    _DateTimeSettings s = widget._settings;
 
     return ListView(children: [
       ListTile(
@@ -166,14 +166,15 @@ class _SettingsState extends State<_SettingsWidget> {
     ]);
   }
 }
+
 class _PerBoxSettingsWidget extends BoxSettingsWidget {
-  final _PerBoxSettings _perBoxSettings;
+  final _DateTimePerBoxSettings _perBoxSettings;
 
   const _PerBoxSettingsWidget(this._perBoxSettings);
 
   @override
   Map<String, dynamic> getSettingsJson() {
-    return _$PerBoxSettingsToJson(_perBoxSettings);
+    return _$DateTimePerBoxSettingsToJson(_perBoxSettings);
   }
 
   @override
@@ -184,7 +185,7 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _PerBoxSettings s = widget._perBoxSettings;
+    _DateTimePerBoxSettings s = widget._perBoxSettings;
 
     return ListView(children: [
       SwitchListTile(title: const Text('Show Date:'),

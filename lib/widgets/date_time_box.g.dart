@@ -6,23 +6,27 @@ part of 'date_time_box.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
+_DateTimeSettings _$DateTimeSettingsFromJson(Map<String, dynamic> json) =>
+    _DateTimeSettings(
       dateFormat: json['dateFormat'] as String? ?? 'yyyy-MM-dd',
     );
 
-Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
+Map<String, dynamic> _$DateTimeSettingsToJson(_DateTimeSettings instance) =>
+    <String, dynamic>{
       'dateFormat': instance.dateFormat,
     };
 
-_PerBoxSettings _$PerBoxSettingsFromJson(Map<String, dynamic> json) =>
-    _PerBoxSettings(
+_DateTimePerBoxSettings _$DateTimePerBoxSettingsFromJson(
+        Map<String, dynamic> json) =>
+    _DateTimePerBoxSettings(
       showDate: json['showDate'] as bool? ?? true,
       showTime: json['showTime'] as bool? ?? true,
       utc: json['utc'] as bool? ?? false,
       timeFormat: json['timeFormat'] as String? ?? 'HH:mm:ss',
     );
 
-Map<String, dynamic> _$PerBoxSettingsToJson(_PerBoxSettings instance) =>
+Map<String, dynamic> _$DateTimePerBoxSettingsToJson(
+        _DateTimePerBoxSettings instance) =>
     <String, dynamic>{
       'showDate': instance.showDate,
       'showTime': instance.showTime,
