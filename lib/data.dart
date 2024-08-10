@@ -148,6 +148,9 @@ abstract class BoxWidget extends StatefulWidget {
     return null;
   }
 
+  // Provide any non-obvious help for the Box.
+  Widget? getHelp() => null;
+
   // If the Settings are not obvious, these should return help Widgets.
   // This would normally be a simple Text Widget.
   Widget? getSettingsHelp() => null;

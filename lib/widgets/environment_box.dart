@@ -163,6 +163,9 @@ class SunlightBox extends BoxWidget {
   const SunlightBox(super.config, {super.key});
 
   @override
+  Widget? getHelp() => const Text('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.sunlight.times.*" is enabled.');
+
+  @override
   State<SunlightBox> createState() => _SunlightBox();
 }
 
