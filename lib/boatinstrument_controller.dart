@@ -141,7 +141,7 @@ class BoatInstrumentController {
           RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
     }
 
-    _subscribe(wd.paths.toList());
+    _subscribe(wd.paths);
   }
 
   void save() {
@@ -311,7 +311,7 @@ class BoatInstrumentController {
 
       _channel?.sink.close();
 
-      _channel = WebSocketChannel.connect(wsUri);
+      _channel = WebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'));
 
       await _channel?.ready;
 
