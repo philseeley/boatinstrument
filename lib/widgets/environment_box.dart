@@ -355,6 +355,7 @@ class MoonBox extends CelestialBox {
 class _MoonBox extends State<MoonBox> {
 
   DateTime? _rise, _set;
+  double? _fraction;
   String? _phaseName;
 
   @override
@@ -376,9 +377,9 @@ class _MoonBox extends State<MoonBox> {
     }
 
     String text =
-    '''Rise: ${(_rise == null) ? '-' : fmt.format(_rise!)}
-Set:  ${(_set == null) ? '-' : fmt.format(_set!)}
-Phase:
+'''Rise:  ${(_rise == null) ? '-' : fmt.format(_rise!)}
+Set:   ${(_set == null) ? '-' : fmt.format(_set!)}
+Phase: ${(_fraction == null) ? '-' : (_fraction!*100).toInt()}%
 ${(_phaseName == null) ? '-' : _phaseName}''';
 
     double fontSize = maxFontSize(text, style,
@@ -412,6 +413,9 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
               break;
             case 'environment.moon.times.set':
               _set = DateTime.parse(u.value).toLocal();
+              break;
+            case 'environment.moon.fraction':
+              _fraction = (u.value as num).toDouble();
               break;
             case 'environment.moon.phaseName':
               _phaseName = u.value;
