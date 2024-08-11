@@ -47,7 +47,7 @@ dependencies:
   share_plus:
   file_picker:
   provider:
-  flutter_inappwebview: ^6.0.0
+  flutter_inappwebview:
   screen_brightness:
   flutter_email_sender:
   intl:
