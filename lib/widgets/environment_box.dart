@@ -257,13 +257,13 @@ class _SunlightBox extends State<SunlightBox> {
     }
 
     String text =
-'''Rise:     ${(_rise == null) ? '-' : fmt.format(_rise!)}
-Set:      ${(_set == null) ? '-' : fmt.format(_set!)}
+'''Naut Dwn: ${(_nauticalDawn == null) ? '-' : fmt.format(_nauticalDawn!)}
 Dawn:     ${(_dawn == null) ? '-' : fmt.format(_dawn!)}
+Rise:     ${(_rise == null) ? '-' : fmt.format(_rise!)}
+Sol Noon: ${(_solarNoon == null) ? '-' : fmt.format(_solarNoon!)}
+Set:      ${(_set == null) ? '-' : fmt.format(_set!)}
 Dusk:     ${(_dusk == null) ? '-' : fmt.format(_dusk!)}
-Naut Dwn: ${(_nauticalDawn == null) ? '-' : fmt.format(_nauticalDawn!)}
-Naut Dsk: ${(_nauticalDusk == null) ? '-' : fmt.format(_nauticalDusk!)}
-Sol Noon: ${(_solarNoon == null) ? '-' : fmt.format(_solarNoon!)}''';
+Naut Dsk: ${(_nauticalDusk == null) ? '-' : fmt.format(_nauticalDusk!)}''';
 
     double fontSize = maxFontSize(text, style,
         (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 7,
