@@ -54,6 +54,7 @@ dependencies:
 #  great_circle_distance_calculator:
   multicast_dns:
   moon_phase_plus:
+  audioplayers:
 
 dev_dependencies:
   flutter_test:

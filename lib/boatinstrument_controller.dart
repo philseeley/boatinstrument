@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math' as m;
 
 import 'package:boatinstrument/theme_provider.dart';
+import 'package:boatinstrument/widgets/anchor_box.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
 import 'package:boatinstrument/widgets/custom_box.dart';
 import 'package:boatinstrument/widgets/date_time_box.dart';
@@ -149,8 +150,12 @@ class BoatInstrumentController {
     _settings?._save();
   }
 
-  void showMessage(BuildContext context, String msg, {bool error = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: (error) ? Colors.orange : null, content: Text(msg)));
+  void showMessage(BuildContext context, String msg, {bool error = false, int millisecondsDuration = 4000}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            backgroundColor: (error) ? Colors.orange : null,
+            duration: Duration(milliseconds: millisecondsDuration),
+            content: Text(msg)));
   }
 
   Future<bool> askToConfirm(BuildContext context, String question, {bool alwaysAsk = false}) async {

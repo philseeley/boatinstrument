@@ -52,6 +52,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(SunlightBox.sid, 'Sunlight', (config) {return SunlightBox(config, key: UniqueKey());}),
   BoxDetails(MoonBox.sid, 'Moon', (config) {return MoonBox(config, key: UniqueKey());}),
   BoxDetails(DebugBox.sid, 'Debug', (config) {return DebugBox(config, key: UniqueKey());}),
+  BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -122,6 +123,7 @@ class _EditPageState extends State<_EditPage> {
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
+      _widgetMenuEntry(AnchorAlarmBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid),
         _widgetMenuEntry(DebugBox.sid)]),
