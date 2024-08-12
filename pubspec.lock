@@ -512,6 +512,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  moon_phase_plus:
+    dependency: "direct main"
+    description:
+      name: moon_phase_plus
+      sha256: d9c29efb2feed41a608dc43eecd21d1f3cd8366090a5e2730471ba9cf89f2d30
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1+6"
   multicast_dns:
     dependency: "direct main"
     description:

@@ -50,6 +50,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsideTemperatureBox.sid, 'Outside Temperature', (config) {return OutsideTemperatureBox(config, key: UniqueKey());}),
   BoxDetails(OutsidePressureBox.sid, 'Outside Pressure', (config) {return OutsidePressureBox(config, key: UniqueKey());}),
   BoxDetails(SunlightBox.sid, 'Sunlight', (config) {return SunlightBox(config, key: UniqueKey());}),
+  BoxDetails(MoonBox.sid, 'Moon', (config) {return MoonBox(config, key: UniqueKey());}),
+  BoxDetails(DebugBox.sid, 'Debug', (config) {return DebugBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -86,7 +88,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
         _widgetMenuEntry(OutsidePressureBox.sid),
-        _widgetMenuEntry(SunlightBox.sid)]),
+        _widgetMenuEntry(SunlightBox.sid),
+        _widgetMenuEntry(MoonBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
@@ -120,7 +123,8 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
-        _widgetMenuEntry(CustomDoubleValueBox.sid)]),
+        _widgetMenuEntry(CustomDoubleValueBox.sid),
+        _widgetMenuEntry(DebugBox.sid)]),
     ];
 
     return popupMenuEntries;
@@ -212,6 +216,11 @@ class _EditPageState extends State<_EditPage> {
             BoxWidget editBoxWidget = getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0), true));
 
             List<Widget> settingsButtons = [];
+            Widget? helpWidget = editBoxWidget.getHelp();
+            if(helpWidget != null) {
+              settingsButtons.add(IconButton(onPressed: () {_showHelpPage(helpWidget);}, icon: const Icon(Icons.help)));
+            }
+
             if(editBoxWidget.hasSettings) {
               settingsButtons.add(IconButton(tooltip: 'Settings', onPressed: () {_showSettingsPage(editBoxWidget);}, icon: const Icon(Icons.settings)));
             }
@@ -403,6 +412,14 @@ class _EditPageState extends State<_EditPage> {
 
     setState(() {});
   }
+
+  _showHelpPage (Widget helpWidget) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _BoxHelpPage(helpWidget);
+    }));
+  }
+
 }
 
 class _BoxSettingsPage extends StatefulWidget {

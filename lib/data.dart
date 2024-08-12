@@ -148,6 +148,9 @@ abstract class BoxWidget extends StatefulWidget {
     return null;
   }
 
+  // Provide any non-obvious help for the Box.
+  Widget? getHelp() => null;
+
   // If the Settings are not obvious, these should return help Widgets.
   // This would normally be a simple Text Widget.
   Widget? getSettingsHelp() => null;
@@ -231,6 +234,11 @@ class Update {
   final dynamic value;
 
   Update(this.path, this.value);
+
+  @override
+  String toString() {
+    return 'path: $path, value: $value';
+  }
 }
 
 typedef OnUpdate = Function(List<Update>? updates);
