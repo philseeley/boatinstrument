@@ -373,6 +373,7 @@ class _MoonBox extends State<MoonBox> {
 
     if(widget.config.editMode) {
       _rise = _set = DateTime.now();
+      _fraction = 1.0;
       _phaseName = 'Full';
     }
 
