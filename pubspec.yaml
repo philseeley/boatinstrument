@@ -55,6 +55,7 @@ dependencies:
   multicast_dns:
   moon_phase_plus:
   audioplayers:
+  latlong2:
 
 dev_dependencies:
   flutter_test:
