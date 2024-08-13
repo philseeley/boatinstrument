@@ -117,6 +117,17 @@ class BoxWidgetConfig {
   BoxWidgetConfig(this.controller, this.settings, this.constraints, this.editMode);
 }
 
+class HelpTextWidget extends StatelessWidget {
+  final String _text;
+
+  const HelpTextWidget(this._text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(children: [ListTile(title: Text(_text))],);
+  }
+}
+
 abstract class BoxWidget extends StatefulWidget {
   final BoxWidgetConfig config;
 
@@ -148,8 +159,13 @@ abstract class BoxWidget extends StatefulWidget {
     return null;
   }
 
-  // Provide any non-obvious help for the Box.
-  Widget? getHelp() => null;
+  // Provide any non-obvious help for the Box or its Settings. This could be a
+  // ListView with Icons, but for a simple text String you can wrap this in a
+  // HelpTextWidget:
+  // e.g.
+  //   @override
+  //    Widget? getHelp(BuildContext context) => const HelpTextWidget('My simple help.');
+  Widget? getHelp(BuildContext context) => null;
 
   // If the Settings are not obvious, these should return help Widgets.
   // This would normally be a simple Text Widget.

@@ -110,11 +110,32 @@ class AnchorAlarmBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() {//TODO
-    return const Text('''Ensure the signalk-anchoralarm-plugin plugin is installed and configured on signalk.
-To be able to set the Anchor Alarm, the device must be given admin permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
-The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-anchor-alarm-helm". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
+  Widget? getHelp(BuildContext context) {
+    return ListView(children: [
+      ListTile(title: RichText(text: TextSpan(style: Theme.of(context).textTheme.bodyMedium, children: const [
+        TextSpan(text: '''Ensure the signalk-anchoralarm-plugin is installed and configured on signalk.
+
+When you drop your anchor press the '''),
+        WidgetSpan(child: Icon(Icons.anchor)),
+        TextSpan(text: ''' button. Then payout your chain/rode. Once dug-in, press the '''),
+        WidgetSpan(child: Icon(Icons.highlight_off)),
+        TextSpan(text: ''' button to set the alarm radius. The "Alarm Radius Fudge Factor" setting in the signalk-anchoralarm-plugin gets added to your current distance from the anchor.
+
+Once set, the anchor position can be moved by unlocking and dragging the anchor.''')]))),
+      const ListTile(leading: Icon(Icons.notifications_outlined), title: Text('Mutes the alarm')),
+      const ListTile(leading: Icon(Icons.anchor), title: Text('Marks the anchor at the current boat position')),
+      const ListTile(leading: Icon(Icons.lock), title: Text('Locks/Unlocks the ability to move or set the anchor')),
+      const ListTile(leading: Icon(Icons.highlight_off), title: Text('Sets the alarm radius to the current boat position')),
+      const ListTile(leading: Icon(Icons.remove), title: Text('Decreases the alarm radius by 5m')),
+      const ListTile(leading: Icon(Icons.add), title: Text('Increases the alarm radius by 5m')),
+    ]);
   }
+
+  @override
+  Widget? getSettingsHelp() => const HelpTextWidget('''To be able to set the Anchor Alarm, the device must be given "admin" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+
+The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-anchor-alarm-helm". Or the ID can be set to the same value for all instruments to share the same authorisation.
+''');
 
   @override
   State<StatefulWidget> createState() => _AnchorState();

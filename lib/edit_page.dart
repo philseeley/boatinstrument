@@ -218,7 +218,7 @@ class _EditPageState extends State<_EditPage> {
             BoxWidget editBoxWidget = getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0), true));
 
             List<Widget> settingsButtons = [];
-            Widget? helpWidget = editBoxWidget.getHelp();
+            Widget? helpWidget = editBoxWidget.getHelp(context);
             if(helpWidget != null) {
               settingsButtons.add(IconButton(onPressed: () {_showHelpPage(helpWidget);}, icon: const Icon(Icons.help)));
             }
@@ -477,7 +477,7 @@ class _BoxHelpState extends State<_BoxHelpPage> {
         appBar: AppBar(
           title: const Text('Help'),
         ),
-        body: ListView(children: [ListTile(title: widget._helpWidget)])
+        body: widget._helpWidget,
     );
   }
 }

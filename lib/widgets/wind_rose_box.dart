@@ -189,9 +189,7 @@ class WindRoseBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() {
-    return const Text('''The Switch Button allow you to cycle through the Wind Rose types from the display.''');
-  }
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('''The Switch Button allow you to cycle through the Wind Rose types from the display.''');
 }
 
 class _WindRoseBoxState extends State<WindRoseBox> {
