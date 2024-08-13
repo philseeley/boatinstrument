@@ -369,7 +369,6 @@ class _AnchorState extends State<AnchorAlarmBox> {
                 if (_positions.length > _settings.recordPoints) {
                   _positions.removeRange(0, _settings.recordPoints ~/ 10);
                 }
-                print(_positions.length);
               }
               break;
             case 'navigation.anchor.position':
