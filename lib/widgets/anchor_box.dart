@@ -75,6 +75,7 @@ class _AnchorPainter extends CustomPainter {
               color: currentColor));
       tp.layout();
       tp.paint(canvas, Offset(-tp.size.width / 2, -tp.size.height / 2));
+      canvas.drawLine(Offset.zero, Offset(-size, 0), paint);
       canvas.restore();
     }
 
@@ -133,7 +134,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     widget.config.controller.configure(_onUpdate, [
       'navigation.anchor.*',
       'notifications.navigation.anchor']);
-    player.setSource(AssetSource('alarm.wav'));
+    player.setSource(AssetSource('anchor-alarm.wav'));
   }
 
   @override
