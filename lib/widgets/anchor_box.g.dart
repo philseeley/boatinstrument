@@ -10,6 +10,8 @@ _AnchorAlarmSettings _$AnchorAlarmSettingsFromJson(Map<String, dynamic> json) =>
     _AnchorAlarmSettings(
       clientID: json['clientID'],
       authToken: json['authToken'] as String? ?? '',
+      recordSeconds: (json['recordSeconds'] as num?)?.toInt() ?? 10,
+      recordPoints: (json['recordPoints'] as num?)?.toInt() ?? 1000,
     );
 
 Map<String, dynamic> _$AnchorAlarmSettingsToJson(
@@ -17,4 +19,6 @@ Map<String, dynamic> _$AnchorAlarmSettingsToJson(
     <String, dynamic>{
       'clientID': instance.clientID,
       'authToken': instance.authToken,
+      'recordSeconds': instance.recordSeconds,
+      'recordPoints': instance.recordPoints,
     };

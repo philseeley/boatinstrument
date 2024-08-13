@@ -403,6 +403,7 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
     List<Widget> stack = [];
     if(widget._perBoxSettings.showMoon) {
       double min = m.min(widget.config.constraints.maxWidth, widget.config.constraints.maxHeight)-(2*pad);
+      //TODO the MoonWidget is heavyweight and I think we could do something more efficient.
       stack.add(Center(child: RepaintBoundary(child: MoonWidget(date: DateTime.now(), size: min, resolution: min*min))));
     }
 

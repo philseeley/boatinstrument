@@ -18,10 +18,14 @@ part 'anchor_box.g.dart';
 class _AnchorAlarmSettings {
   String clientID;
   String authToken;
+  int recordSeconds;
+  int recordPoints;
 
   _AnchorAlarmSettings({
     clientID,
-    this.authToken = ''
+    this.authToken = '',
+    this.recordSeconds = 10,
+    this.recordPoints = 1000
   }) : clientID = clientID??'boatinstrument-anchor-alarm-${customAlphabet('0123456789', 4)}';
 }
 
@@ -32,8 +36,10 @@ class _AnchorPainter extends CustomPainter {
   final int _currentRadius;
   final double? _bearingTrue;
   final double _apparentBearing;
+  final ll.LatLng? _anchorPosition;
+  final List<ll.LatLng> _positions;
 
-  const _AnchorPainter(this._controller, this._context, this._maxRadius, this._currentRadius, this._bearingTrue, this._apparentBearing);
+  const _AnchorPainter(this._controller, this._context, this._maxRadius, this._currentRadius, this._bearingTrue, this._apparentBearing, this._anchorPosition, this._positions);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -87,6 +93,20 @@ class _AnchorPainter extends CustomPainter {
       tp.paint(canvas, Offset(-tp.size.width / 2, -tp.size.height / 2));
       canvas.drawLine(Offset.zero, Offset(-size, 0), paint);
       canvas.restore();
+    }
+
+    if(_anchorPosition != null && _maxRadius != null) {
+      paint.color = Colors.blue;
+      for(ll.LatLng p in _positions) {
+        double d = const ll.Distance().distance(_anchorPosition!, p);
+        double b = deg2Rad(const ll.Distance().bearing(_anchorPosition!, p).toInt());
+        canvas.save();
+        canvas.translate(size, size);
+        canvas.rotate(b - m.pi);
+        canvas.translate(0, d / (_maxRadius!) * size);
+        canvas.drawCircle(Offset.zero, 1, paint);
+        canvas.restore();
+      }
     }
   }
 
@@ -155,12 +175,15 @@ class _AnchorState extends State<AnchorAlarmBox> {
   Offset _startDragOffset = Offset.zero;
   Timer? _lockTimer;
   AudioPlayer player = AudioPlayer();
+  static final List<ll.LatLng> _positions = [];
+  DateTime _lastPositionTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(_onUpdate, [
+      'navigation.position',
       'navigation.anchor.*',
       'notifications.navigation.anchor']);
     player.setSource(AssetSource('anchor-alarm.wav'));
@@ -198,7 +221,15 @@ class _AnchorState extends State<AnchorAlarmBox> {
       col.add(Expanded(
           child: GestureDetector(onPanDown: _unlocked ? _startDrag : null, onPanEnd: _unlocked ? _stopDrag : null,
               child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
-                painter: _AnchorPainter(widget.config.controller, context, _maxRadius, _currentRadius!, _bearingTrue, _apparentBearing??0))))),
+                painter: _AnchorPainter(
+                    widget.config.controller,
+                    context,
+                    _maxRadius,
+                    _currentRadius!,
+                    _bearingTrue,
+                    _apparentBearing??0,
+                    _anchorPosition,
+                    _positions))))),
       );
     }
     return Padding(padding: const EdgeInsets.all(5), child: Column(children: col));
@@ -326,6 +357,21 @@ class _AnchorState extends State<AnchorAlarmBox> {
       for (Update u in updates) {
         try {
           switch (u.path) {
+            case 'navigation.position':
+              DateTime now = DateTime.now();
+              if(now.difference(_lastPositionTime) >= Duration(seconds: _settings.recordSeconds)) {
+                _lastPositionTime = now;
+
+                _positions.add(ll.LatLng(
+                    (u.value['latitude'] as num).toDouble(),
+                    (u.value['longitude'] as num).toDouble()));
+
+                if (_positions.length > _settings.recordPoints) {
+                  _positions.removeRange(0, _settings.recordPoints ~/ 10);
+                }
+                print(_positions.length);
+              }
+              break;
             case 'navigation.anchor.position':
               _anchorPosition = ll.LatLng((u.value['latitude'] as num).toDouble(), (u.value['longitude'] as num).toDouble());
               break;
@@ -387,6 +433,38 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
     _AnchorAlarmSettings s = widget._settings;
 
     List<Widget> list = [
+      ListTile(
+        leading: const Text("Record Period:"),
+        title: Slider(
+            min: 1,
+            max: 60,
+            divisions: 6,
+            value: s.recordSeconds.toDouble(),
+            label: "${s.recordSeconds}",
+            onChanged: (double value) {
+              setState(() {
+                s.recordSeconds = value.toInt();
+              });
+            }),
+        trailing: const Text('sec'),
+      ),
+      ListTile(
+        leading: const Text("Record Points:"),
+        title: Slider(
+            min: 100,
+            max: 10000,
+            divisions: 99,
+            value: s.recordPoints.toDouble(),
+            label: "${s.recordPoints}",
+            onChanged: (double value) {
+              setState(() {
+                s.recordPoints = value.toInt();
+              });
+            }),
+      ),
+      ListTile(
+        title: Text('Records for ${(s.recordSeconds*s.recordPoints/60/60).toStringAsFixed(2)} hours'),
+      ),
       ListTile(
           leading: const Text("Client ID:"),
           title: TextFormField(
