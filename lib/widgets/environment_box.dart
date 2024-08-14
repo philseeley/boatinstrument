@@ -190,7 +190,7 @@ abstract class CelestialBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const Text('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
+  Widget? getSettingsHelp() => const HelpTextWidget('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
 }
 
 class _CelestialSettingsWidget extends BoxSettingsWidget {
@@ -230,14 +230,22 @@ class SunlightBox extends CelestialBox {
   SunlightBox(super.config, {super.key});
 
   @override
-  Widget? getHelp() => const Text('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.sunlight.times.*" is enabled.');
+  Widget? getHelp(BuildContext context) => const HelpTextWidget('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.sunlight.times.*" is enabled.');
 
   @override
   State<SunlightBox> createState() => _SunlightBox();
 }
 
+class _Time {
+  final String name;
+  final DateTime time;
+
+  const _Time(this.name, this.time);
+}
+
 class _SunlightBox extends State<SunlightBox> {
-  DateTime? _rise, _set, _dawn, _dusk, _nauticalDawn, _nauticalDusk, _solarNoon;
+  static const int _numTimes = 7;
+  List<_Time?> _times = List.filled(_numTimes, null);
 
   @override
   void initState() {
@@ -248,63 +256,68 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
+    final now = DateTime.now().toLocal();
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
 
     if(widget.config.editMode) {
-      _rise = _set = _dawn = _dusk = _nauticalDawn = _nauticalDusk = _solarNoon = DateTime.now();
+      _times = List.filled(_numTimes, _Time('Time:    ', now));
     }
 
-    String text =
-'''Rise:     ${(_rise == null) ? '-' : fmt.format(_rise!)}
-Set:      ${(_set == null) ? '-' : fmt.format(_set!)}
-Dawn:     ${(_dawn == null) ? '-' : fmt.format(_dawn!)}
-Dusk:     ${(_dusk == null) ? '-' : fmt.format(_dusk!)}
-Naut Dwn: ${(_nauticalDawn == null) ? '-' : fmt.format(_nauticalDawn!)}
-Naut Dsk: ${(_nauticalDusk == null) ? '-' : fmt.format(_nauticalDusk!)}
-Sol Noon: ${(_solarNoon == null) ? '-' : fmt.format(_solarNoon!)}''';
-
-    double fontSize = maxFontSize(text, style,
-        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 7,
+    String textSample = "'Time:    ' ${fmt.format(now)}";
+    double fontSize = maxFontSize(textSample, style,
+        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / _numTimes,
         widget.config.constraints.maxWidth - (2 * pad));
 
+    List<Widget> timeWidgets = [];
+    for(int i = 0; i<_times.length; ++i) {
+      _Time? t = _times[i];
+      // We need to disable the device text scaling as this interferes with our text scaling.
+      if(t == null) {
+        timeWidgets.add(Text('-', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
+      } else {
+        TextDecoration? d;
+        if(i < _times.length-1 && now.compareTo(t.time) >= 0 && now.compareTo(_times[i+1]?.time??now) < 0) {
+          d = TextDecoration.underline;
+        }
+        timeWidgets.add(Text('${t.name} ${fmt.format(t.time)}', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize, decoration: d)));
+      }
+    }
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Sunlight', style: style)])),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize))]))
-    ]);
+      Padding(padding: const EdgeInsets.all(pad), child: Column(children: timeWidgets))]);
   }
 
   void _onUpdate(List<Update>? updates) {
     if(updates == null) {
-      _rise = _set = _dawn = _dusk = _nauticalDawn = _nauticalDusk = _solarNoon = null;
+      _times = List.filled(_numTimes, null);
     } else {
       for (Update u in updates) {
         try {
           DateTime dt = DateTime.parse(u.value).toLocal();
 
           switch (u.path) {
-            case 'environment.sunlight.times.sunrise':
-              _rise = dt;
-              break;
-            case 'environment.sunlight.times.sunset':
-              _set = dt;
+            case 'environment.sunlight.times.nauticalDawn':
+              _times[0] = _Time('Naut Dwn:', dt);
               break;
             case 'environment.sunlight.times.dawn':
-              _dawn = dt;
+              _times[1] = _Time('Dawn:    ', dt);
               break;
-            case 'environment.sunlight.times.dusk':
-              _dusk = dt;
-              break;
-            case 'environment.sunlight.times.nauticalDawn':
-              _nauticalDawn = dt;
-              break;
-            case 'environment.sunlight.times.nauticalDusk':
-              _nauticalDusk = dt;
+            case 'environment.sunlight.times.sunrise':
+              _times[2] = _Time('Rise:    ', dt);
               break;
             case 'environment.sunlight.times.solarNoon':
-              _solarNoon = dt;
+              _times[3] = _Time('Sol Noon:', dt);
+              break;
+            case 'environment.sunlight.times.sunset':
+              _times[4] = _Time('Set:     ', dt);
+              break;
+            case 'environment.sunlight.times.dusk':
+              _times[5] = _Time('Dusk:    ', dt);
+              break;
+            case 'environment.sunlight.times.nauticalDusk':
+              _times[6] = _Time('Naut Dsk:', dt);
               break;
           }
         } catch (e) {
@@ -338,7 +351,7 @@ class MoonBox extends CelestialBox {
   }
 
   @override
-  Widget? getHelp() => const Text('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.moon.*" is enabled.');
+  Widget? getHelp(BuildContext context) => const HelpTextWidget('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.moon.*" is enabled.');
 
   @override
   bool get hasPerBoxSettings => true;
@@ -355,6 +368,7 @@ class MoonBox extends CelestialBox {
 class _MoonBox extends State<MoonBox> {
 
   DateTime? _rise, _set;
+  double? _fraction;
   String? _phaseName;
 
   @override
@@ -372,13 +386,14 @@ class _MoonBox extends State<MoonBox> {
 
     if(widget.config.editMode) {
       _rise = _set = DateTime.now();
+      _fraction = 1.0;
       _phaseName = 'Full';
     }
 
     String text =
-    '''Rise: ${(_rise == null) ? '-' : fmt.format(_rise!)}
-Set:  ${(_set == null) ? '-' : fmt.format(_set!)}
-Phase:
+'''Rise:  ${(_rise == null) ? '-' : fmt.format(_rise!)}
+Set:   ${(_set == null) ? '-' : fmt.format(_set!)}
+Phase: ${(_fraction == null) ? '-' : (_fraction!*100).toInt()}%
 ${(_phaseName == null) ? '-' : _phaseName}''';
 
     double fontSize = maxFontSize(text, style,
@@ -388,6 +403,7 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
     List<Widget> stack = [];
     if(widget._perBoxSettings.showMoon) {
       double min = m.min(widget.config.constraints.maxWidth, widget.config.constraints.maxHeight)-(2*pad);
+      //TODO the MoonWidget is heavyweight and I think we could do something more efficient.
       stack.add(Center(child: RepaintBoundary(child: MoonWidget(date: DateTime.now(), size: min, resolution: min*min))));
     }
 
@@ -402,7 +418,7 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
 
   void _onUpdate(List<Update>? updates) {
     if(updates == null) {
-      _rise = _set = _phaseName = null;
+      _rise = _set = _fraction = _phaseName = null;
     } else {
       for (Update u in updates) {
         try {
@@ -412,6 +428,9 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
               break;
             case 'environment.moon.times.set':
               _set = DateTime.parse(u.value).toLocal();
+              break;
+            case 'environment.moon.fraction':
+              _fraction = (u.value as num).toDouble();
               break;
             case 'environment.moon.phaseName':
               _phaseName = u.value;
