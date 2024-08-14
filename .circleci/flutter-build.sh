@@ -24,7 +24,7 @@ package_dir=$(pwd)/packages
 
 case ${type} in
   linux)
-    flutter build $type
+    flutter build -v $type
     cpu=$(uname -m)
     cd build/linux/${cpu:0:1}*/release
     mv bundle boatinstrument
