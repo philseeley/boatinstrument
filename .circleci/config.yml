@@ -7,7 +7,7 @@ workflows:
   build:
     jobs:
       - install-flutter
-      #- build
+      - build
 
 jobs:
   install-flutter:
@@ -17,6 +17,7 @@ jobs:
     steps:
       - run:
           command: Invoke-WebRequest https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.24.0-stable.zip -OutFile C:\Users\circleci\project\flutter.zip
+          no_output_timeout: 30m
       - run:
           command: Expand-Archive -Path C:\Users\circleci\project\flutter.zip -Destination C:\Users\circleci\project\
       - run:
@@ -24,25 +25,13 @@ jobs:
   build:
     executor:
       name: win/default
-    working_directory: C:\Users\circleci\project\HelloWorld
+    working_directory: C:\Users\circleci\project\boatinstrument
+    environment:
+      - Path=C:\Users\circleci\flutter\bin;%Path%
     steps:
       - checkout:
           path: C:\Users\circleci\project
-      - restore_cache:
-          keys:
-            - dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
       - run:
-          name: "Install project dependencies"
-          command: dotnet.exe restore
-      - save_cache:
-          paths:
-            - C:\Users\circleci\project\HelloWorld\.nuget\packages
-          key: dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
-      - run:
-          name: "Run Build step"
-          command: dotnet.exe publish -c Release -r win10-x64
-      - run:
-          name: "Test the executable"
-          command: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
-      - store_artifacts:
-          path: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
+          command: flutter build windows
+#      - store_artifacts:
+#          path: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
