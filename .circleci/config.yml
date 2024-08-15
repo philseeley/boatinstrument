@@ -92,7 +92,7 @@ workflows:
   build_all:
     jobs:
       - build-debian-bookworm-arm64
-      - build-debian-bookworm-amd64
-      - build-flutterpi_arm32
-      - build-flutterpi_arm64
+      #- build-debian-bookworm-amd64
+      #- build-flutterpi_arm32
+      #- build-flutterpi_arm64
 
