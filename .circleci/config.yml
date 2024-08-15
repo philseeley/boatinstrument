@@ -1,116 +1,48 @@
----
 version: 2.1
-orbs:
-  flutter-orb: circleci/flutter@2.0.4         # see: https://circleci.com/developer/orbs/orb/circleci/flutter
-  android: circleci/android@2.5.0             # see: https://circleci.com/developer/orbs/orb/circleci/android
-  macos: circleci/macos@2.5.2                 # see: https://circleci.com/developer/orbs/orb/circleci/macos
-  win: circleci/windows@5.0.0
 
-executors:   # see: https://circleci.com/docs/sample-config/
-  boot-linux:
-    machine:
-      resource_class: large
-      image: ubuntu-2204:2024.01.2
-  boot-linux-arm:
-    machine:
-      resource_class: arm.large
-      image: ubuntu-2204:2024.01.2
-  boot-android:
-    machine:
-      image: android:2024.04.1     # see: https://circleci.com/developer/machine/image/android
-  boot-windows:
-    machine:
-      image: windows-server-2022-gui:2024.04.1     # see: https://circleci.com/developer/machine/image/windows-server-2022-gui
-      resource_class: windows.medium
-      shell: powershell.exe -ExecutionPolicy Bypass
-  boot-macos:
-    macos:                           # see: https://circleci.com/docs/using-macos/
-      xcode: 14.2.0
-    resource_class: macos.m1.medium.gen1
-commands:
-  git-checkout:
-    steps:
-      - checkout
-  build-n-publish-debian:
-    steps:
-      - run: sudo apt-get -y install debhelper
-      - run: chmod a+x .circleci/*.sh
-      - run:
-          command: |
-            .circleci/build-debian.sh
-          no_output_timeout: 30m
-  build-windows:
-    steps:
-      - run:
-  do-all:
-    steps:
-      - git-checkout
-      - build-n-publish-debian
+orbs:
+  win: circleci/windows@2.4.0
+
+workflows:
+  build:
+    jobs:
+      - install-flutter
+      #- build
+
 jobs:
-  build-debian-bookworm-arm64:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm64v8/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=arm64
-      - APP_TYPE=linux
-    steps:
-      - do-all
-  build-debian-bookworm-amd64:
-    executor: boot-linux
-    environment:
-      - DOCKER_IMAGE=amd64/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=amd64
-      - APP_TYPE=linux
-    steps:
-      - do-all
-  build-flutterpi_arm64:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm64v8/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=arm64
-      - APP_TYPE=flutterpi_arm64
-    steps:
-      - do-all
-  build-flutterpi_arm32:
-    executor: boot-linux-arm
-    environment:
-      - DOCKER_IMAGE=arm64v8/debian:bookworm
-      - CONTAINER_DISTRO=debian:bookworm
-      - PKG_RELEASE=bookworm
-      - PKG_DISTRO=debian
-      - PKG_ARCH=arm32
-      - APP_TYPE=flutterpi_arm32
-    steps:
-      - do-all
-  build-windows:
+  install-flutter:
     executor:
       name: win/default
+    working_directory: C:\Users\circleci\project\flutter
     steps:
-      - checkout:
-          path: C:\Users\circleci\project
       - run:
           command: Invoke-WebRequest https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.24.0-stable.zip -OutFile C:\Users\circleci\project\flutter.zip
       - run:
           command: Expand-Archive -Path C:\Users\circleci\project\flutter.zip -Destination C:\Users\circleci\project\
-      - working_directory: C:\Users\circleci\project
       - run:
-          command: flutter\flutter doctor
-workflows:
-  version: 2
-  build_all:
-    jobs:
-      - build-windows
-      # - build-debian-bookworm-arm64
-      #- build-debian-bookworm-amd64
-      #- build-flutterpi_arm32
-      #- build-flutterpi_arm64
-
+          command: flutter doctor
+  build:
+    executor:
+      name: win/default
+    working_directory: C:\Users\circleci\project\HelloWorld
+    steps:
+      - checkout:
+          path: C:\Users\circleci\project
+      - restore_cache:
+          keys:
+            - dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
+      - run:
+          name: "Install project dependencies"
+          command: dotnet.exe restore
+      - save_cache:
+          paths:
+            - C:\Users\circleci\project\HelloWorld\.nuget\packages
+          key: dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
+      - run:
+          name: "Run Build step"
+          command: dotnet.exe publish -c Release -r win10-x64
+      - run:
+          name: "Test the executable"
+          command: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
+      - store_artifacts:
+          path: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
