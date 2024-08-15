@@ -7,7 +7,7 @@ workflows:
   build:
     jobs:
       - install-flutter
-      - build
+#      - build
 
 jobs:
   install-flutter:
@@ -27,11 +27,15 @@ jobs:
       name: win/default
     working_directory: C:\Users\circleci\project\boatinstrument
     environment:
-      - Path=C:\Users\circleci\flutter\bin;%Path%
+#      - Path=C:\Users\circleci\flutter\bin;%Path%
+      - PATH=c:/Users/circleci/flutter/bin:%PATH%
     steps:
       - checkout:
           path: C:\Users\circleci\project
       - run:
+          command: New-Item $Profile.CurrentUserAllHosts -Force Add-Content -Path $Profile.CurrentUserAllHosts -Value '$env:PATH = "C:\Users\circleci\flutter\bin;$env:PATH"'
+      - run:
           command: flutter build windows
+          shell: bash.exe
 #      - store_artifacts:
 #          path: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
