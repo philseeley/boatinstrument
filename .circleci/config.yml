@@ -4,6 +4,7 @@ orbs:
   flutter-orb: circleci/flutter@2.0.4         # see: https://circleci.com/developer/orbs/orb/circleci/flutter
   android: circleci/android@2.5.0             # see: https://circleci.com/developer/orbs/orb/circleci/android
   macos: circleci/macos@2.5.2                 # see: https://circleci.com/developer/orbs/orb/circleci/macos
+  win: circleci/windows@5.0.0
 
 executors:   # see: https://circleci.com/docs/sample-config/
   boot-linux:
@@ -38,6 +39,9 @@ commands:
           command: |
             .circleci/build-debian.sh
           no_output_timeout: 30m
+  build-windows:
+    steps:
+      - run:
   do-all:
     steps:
       - git-checkout
@@ -87,11 +91,24 @@ jobs:
       - APP_TYPE=flutterpi_arm32
     steps:
       - do-all
+  build-windows:
+    executor: win/default
+    steps:
+      - checkout
+      - run:
+          command: Invoke-WebRequest https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.24.0-stable.zip -OutFile c:\flutter.zip
+      - run:
+          command: Expand-Archive -Path c:\flutter.zip -Destination c:\
+      - run:
+          command: |
+            cd c:\flutter
+            flutter doctor
 workflows:
   version: 2
   build_all:
     jobs:
-      - build-debian-bookworm-arm64
+      - build-windows
+      # - build-debian-bookworm-arm64
       #- build-debian-bookworm-amd64
       #- build-flutterpi_arm32
       #- build-flutterpi_arm64
