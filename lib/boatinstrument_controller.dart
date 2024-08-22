@@ -16,7 +16,7 @@ import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'package:multicast_dns/multicast_dns.dart';
+import 'package:bonsoir/bonsoir.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:share_plus/share_plus.dart';
@@ -270,25 +270,20 @@ class BoatInstrumentController {
       String server = _settings!.signalkServer;
 
       if (_settings!.discoverServer) {
-        final MDnsClient client = MDnsClient();
-
-        await client.start();
-        bool found = false;
+        BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
+        await discovery.ready;
+        discovery.start();
         try {
-          await for (PtrResourceRecord ptr in client.lookup<PtrResourceRecord>(
-              ResourceRecordQuery.serverPointer('_signalk-http._tcp.local'))) {
-            await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
-                ResourceRecordQuery.service(ptr.domainName))) {
-              server = '${srv.target}:${srv.port}';
-              found = true;
+          await for(BonsoirDiscoveryEvent e in discovery.eventStream!) {
+            if (e.type == BonsoirDiscoveryEventType.discoveryServiceFound) {
+              e.service!.resolve(discovery.serviceResolver); // Should be called when the user wants to connect to this service.
+            } else if (e.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
+              ResolvedBonsoirService r = e.service as ResolvedBonsoirService;
+              server = '${r.host}:${r.port}';
               break;
-            }
-            if (found) {
-              break;
-            }
-          }
+            }          }
         } finally {
-          client.stop();
+          discovery.stop();
         }
       }
       Uri uri = Uri.http(server, '/signalk');
