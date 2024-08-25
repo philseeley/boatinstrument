@@ -247,7 +247,7 @@ class _SettingsState extends State<SettingsPage> {
       ),
       ListTile(
           leading: const Text("Port:"),
-          title: TextFormField(
+          title: TextFormField(enabled: !settings.discoverServer,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.signalkPort.toString(),
