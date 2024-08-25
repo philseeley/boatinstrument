@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>To auto discover your SignalK Server.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_signalk-http._tcp</string>
+	</array>
 </dict>
 </plist>

@@ -239,11 +239,20 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       ListTile(
-          leading: const Text("Server:"),
+          leading: const Text("Host:"),
           title: TextFormField(enabled: !settings.discoverServer,
-              decoration: const InputDecoration(hintText: 'mypi.local:3000'),
-              initialValue: settings.signalkServer,
-              onChanged: (value) => settings.signalkServer = value)
+              decoration: const InputDecoration(hintText: 'mypi.local'),
+              initialValue: settings.signalkHost,
+              onChanged: (value) => settings.signalkHost = value)
+      ),
+      ListTile(
+          leading: const Text("Port:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: settings.signalkPort.toString(),
+              onChanged: (value) => settings.signalkPort = int.parse(value)),
+          trailing: const Text('ms')
       ),
       ListTile(
           leading: const Text("Subscription Min Period:"),
