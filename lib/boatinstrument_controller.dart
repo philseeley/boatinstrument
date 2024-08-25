@@ -267,7 +267,8 @@ class BoatInstrumentController {
 
   _discoverServices() async {
     try {
-      String server = _settings!.signalkServer;
+      String host = _settings!.signalkHost;
+      int port = _settings!.signalkPort;
 
       if (_settings!.discoverServer) {
         BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
@@ -276,17 +277,18 @@ class BoatInstrumentController {
         try {
           await for(BonsoirDiscoveryEvent e in discovery.eventStream!) {
             if (e.type == BonsoirDiscoveryEventType.discoveryServiceFound) {
-              e.service!.resolve(discovery.serviceResolver); // Should be called when the user wants to connect to this service.
+              e.service!.resolve(discovery.serviceResolver);
             } else if (e.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
               ResolvedBonsoirService r = e.service as ResolvedBonsoirService;
-              server = '${r.host}:${r.port}';
+              host = r.host!;
+              port = r.port;
               break;
             }          }
         } finally {
           discovery.stop();
         }
       }
-      Uri uri = Uri.http(server, '/signalk');
+      Uri uri = Uri(scheme: 'http', host: host, port: port, path: '/signalk');
 
       http.Response response = await http.get(uri);
       dynamic data = json.decode(response.body);
