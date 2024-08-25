@@ -53,7 +53,6 @@ dependencies:
   intl:
 #  great_circle_distance_calculator:
   bonsoir:
-  moon_phase_plus:
   audioplayers:
   latlong2:
 
