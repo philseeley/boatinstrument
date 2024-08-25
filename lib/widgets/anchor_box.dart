@@ -208,11 +208,11 @@ class _AnchorState extends State<AnchorAlarmBox> {
     List<Widget> col = [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         IconButton(onPressed: _toggleAlarm, icon: Icon(_silenceAlarm ? Icons.notifications_off_outlined : Icons.notifications_outlined, color: dropColor)),
+        IconButton(onPressed: _maxRadius == null ? null : _toggleMove, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
         IconButton(onPressed: _maxRadius == null ? _drop : null, icon: Icon(Icons.anchor, color: dropColor)),
-        IconButton(onPressed: _toggleMove, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
-        IconButton(onPressed: _unlocked ? _setRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
-        IconButton(onPressed: () {_changeRadius(-5);}, icon: Icon(Icons.remove, color: dropColor)),
-        IconButton(onPressed: () {_changeRadius(5);}, icon: Icon(Icons.add, color: dropColor)),
+        IconButton(onPressed: (_unlocked && _currentRadius != null) ? _setRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
+        IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(-5);}, icon: Icon(Icons.remove, color: dropColor)),
+        IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(5);}, icon: Icon(Icons.add, color: dropColor)),
         IconButton(onPressed: _unlocked ? _raise : null, icon: Stack(children: [Icon(Icons.anchor, color: raiseColor), Icon(Icons.close, color: raiseColor)])),
       ]),
     ];
@@ -295,7 +295,11 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _changeRadius(int amount) {
-    _sendCommand('setRadius', '{"radius": ${(_maxRadius??0)+amount}}');
+    int newRadius = _maxRadius!+amount;
+
+    if(newRadius > _currentRadius!) {
+      _sendCommand('setRadius', '{"radius": $newRadius}');
+    }
   }
 
   void _raise() async {
