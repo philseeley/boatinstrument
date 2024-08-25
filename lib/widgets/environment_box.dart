@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moon_phase_plus/moon_phase_plus.dart';
 import 'double_value_box.dart';
 
 part 'environment_box.g.dart';
@@ -341,6 +340,43 @@ class _MoonPerBoxSettings {
   });
 }
 
+class _MoonPainter extends CustomPainter {
+  final double _fraction;
+
+  const _MoonPainter(this._fraction);
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+
+    double size = m.min(canvasSize.width, canvasSize.height);
+
+    Paint paint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.yellow;
+
+    double left = size*_fraction;
+    double right = size-(left*2);
+    double end = -m.pi;
+
+    if(_fraction > 0.5) {
+      left = size*(1.0-_fraction);
+      right = size-(2*left);
+      end = m.pi;
+    }
+
+    Path sunlight = Path()
+      ..addArc(Rect.fromLTWH(0, 0, size, size), -m.pi/2, m.pi)
+      ..addArc(Rect.fromLTWH(left, 0, right, size), m.pi/2, end);
+
+    canvas.drawPath(sunlight, paint);
+    paint.style = PaintingStyle.stroke;
+    canvas.drawCircle(Offset(size/2, size/2), size/2, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
 class MoonBox extends CelestialBox {
   static const String sid = 'environment-moon';
 
@@ -402,9 +438,8 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
 
     List<Widget> stack = [];
     if(widget._perBoxSettings.showMoon) {
-      double min = m.min(widget.config.constraints.maxWidth, widget.config.constraints.maxHeight)-(2*pad);
-      //TODO the MoonWidget is heavyweight and I think we could do something more efficient.
-      stack.add(Center(child: RepaintBoundary(child: MoonWidget(date: DateTime.now(), size: min, resolution: min*min))));
+      stack.add(Padding(padding: const EdgeInsets.all(pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
+          painter: _MoonPainter(_fraction??0)))));
     }
 
     stack.add(Column(mainAxisAlignment: MainAxisAlignment.start, children: [
