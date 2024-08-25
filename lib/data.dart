@@ -446,7 +446,8 @@ class _Settings {
   int version;
   int valueSmoothing;
   bool discoverServer;
-  String signalkServer;
+  String signalkHost;
+  int signalkPort;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
   int dataTimeout;
@@ -476,7 +477,8 @@ class _Settings {
     this.version = 0,
     this.valueSmoothing = 1,
     this.discoverServer = true,
-    this.signalkServer = '',
+    this.signalkHost = '',
+    this.signalkPort = 3000,
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
     this.dataTimeout = 10000,
