@@ -283,7 +283,8 @@ class BoatInstrumentController {
               host = r.host!;
               port = r.port;
               break;
-            }          }
+            }
+          }
         } finally {
           discovery.stop();
         }
