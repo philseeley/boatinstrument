@@ -45,7 +45,7 @@ class _AnchorPainter extends CustomPainter {
   void paint(Canvas canvas, Size canvasSize) {
     Color maxColor = _controller.val2PSColor(_context, -1, none: Colors.grey);
     Color currentColor = _controller.val2PSColor(_context, 1, none: Colors.grey);
-    TextStyle th = Theme.of(_context).textTheme.bodyMedium!;
+    TextStyle th = Theme.of(_context).textTheme.bodyLarge!;
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
 
     double size = m.min(canvasSize.width, canvasSize.height) /2;
