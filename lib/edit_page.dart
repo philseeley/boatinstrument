@@ -182,7 +182,7 @@ class _EditPageState extends State<_EditPage> {
             }
 
             if(pri == (widget._editPage.pageRows.length-1) && ci == 0 && ri == (column.rows.length-1) && bi == 0) {
-              sButtons.add(IconButton(tooltip: 'Page Row Below', onPressed: () {_addPageRow(widget._editPage, ci, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.red)));
+              sButtons.add(IconButton(tooltip: 'Page Row Below', onPressed: () {_addPageRow(widget._editPage, pri, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.red)));
             }
 
             if(ci == pageRow.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
