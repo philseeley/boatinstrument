@@ -295,10 +295,10 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _changeRadius(int amount) {
-    int newRadius = _maxRadius!+amount;
+    int newMaxRadius = _maxRadius!+amount;
 
-    if(newRadius > _currentRadius!) {
-      _sendCommand('setRadius', '{"radius": $newRadius}');
+    if(newMaxRadius > _currentRadius! || amount > 0) {
+      _sendCommand('setRadius', '{"radius": $newMaxRadius}');
     }
   }
 
