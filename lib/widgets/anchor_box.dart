@@ -201,16 +201,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
     Color dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
     Color raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
 
-    if(_currentRadius != null && _maxRadius == null) {
-      _toggleMove(allowed: true);
-    }
-
     List<Widget> col = [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         IconButton(onPressed: _toggleAlarm, icon: Icon(_silenceAlarm ? Icons.notifications_off_outlined : Icons.notifications_outlined, color: dropColor)),
-        IconButton(onPressed: _maxRadius == null ? null : _toggleMove, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
+        IconButton(onPressed: _toggleLocked, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
         IconButton(onPressed: _maxRadius == null ? _drop : null, icon: Icon(Icons.anchor, color: dropColor)),
-        IconButton(onPressed: (_unlocked && _currentRadius != null) ? _setRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
+        IconButton(onPressed: (_currentRadius != null && _maxRadius == null) ? _setMaxRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
         IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(-5);}, icon: Icon(Icons.remove, color: dropColor)),
         IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(5);}, icon: Icon(Icons.add, color: dropColor)),
         IconButton(onPressed: _unlocked ? _raise : null, icon: Stack(children: [Icon(Icons.anchor, color: raiseColor), Icon(Icons.close, color: raiseColor)])),
@@ -256,9 +252,9 @@ class _AnchorState extends State<AnchorAlarmBox> {
         '{"position": {"latitude": ${newPosition.latitude}, "longitude": ${newPosition.longitude}}}');
   }
 
-  void _toggleMove ({bool? allowed}) {
+  void _toggleLocked () {
     setState(() {
-      _unlocked = allowed??!_unlocked;
+      _unlocked = !_unlocked;
     });
     _setLockTimer();
   }
@@ -289,7 +285,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _sendCommand('dropAnchor', '');
   }
 
-  void _setRadius() {
+  void _setMaxRadius() {
     _setLockTimer();
     _sendCommand('setRadius', '');
   }
