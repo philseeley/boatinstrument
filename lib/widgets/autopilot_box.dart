@@ -89,6 +89,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
   void initState() {
     super.initState();
     _settings = _$AutopilotControlSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    widget.config.controller.configure();
   }
 
   _sendCommand(String path, String params) async {
@@ -470,14 +471,14 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(_processData, [
+    widget.config.controller.configure(onUpdate: _processData, paths: {
       "steering.autopilot.state",
       "steering.autopilot.target.windAngleApparent",
       "navigation.currentRoute.waypoints",
       "steering.autopilot.target.headingTrue",
       "steering.autopilot.target.headingMagnetic",
       "navigation.magneticVariation",
-    ]);
+    });
   }
 
   @override

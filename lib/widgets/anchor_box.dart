@@ -182,10 +182,10 @@ class _AnchorState extends State<AnchorAlarmBox> {
   void initState() {
     super.initState();
     _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
-    widget.config.controller.configure(_onUpdate, [
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {
       'navigation.position',
       'navigation.anchor.*',
-      'notifications.navigation.anchor']);
+      'notifications.navigation.anchor'});
     player.setSource(AssetSource('anchor-alarm.wav'));
   }
 

@@ -72,7 +72,7 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(_processData, ['environment.current']);
+    widget.config.controller.configure(onUpdate: _processData, paths: {'environment.current'});
   }
 
   @override
@@ -249,7 +249,7 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(_onUpdate, ['environment.sunlight.times.*'], dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataTimeout: false);
   }
 
   @override
@@ -410,7 +410,7 @@ class _MoonBox extends State<MoonBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(_onUpdate, ['environment.moon.*'], dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataTimeout: false);
   }
 
   @override
