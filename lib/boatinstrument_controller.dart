@@ -134,8 +134,8 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure({OnUpdate? onUpdate, Set<String>? paths, bool dataTimeout = true, bool box = true}) {
-    if(!box) {
+  void configure({OnUpdate? onUpdate, Set<String>? paths, bool dataTimeout = true, bool isBox = true}) {
+    if(!isBox) {
       ++_boxesOnPage;
     }
 
@@ -149,7 +149,7 @@ class BoatInstrumentController {
           RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
     }
 
-    if(box) {
+    if(isBox) {
       _subscribe();
     }
   }
@@ -236,18 +236,20 @@ class BoatInstrumentController {
   Widget buildPage(int pageNum) {
     _Page page = _settings!.pages[pageNum];
 
-    // We need to calculate the total number of boxes on the page so that we
-    // know when tha last one calls configure(). As we're using LayoutBuilders
-    // this will be after buildPage() returns.
-    for(var pageRow in page.pageRows) {
-      for (var column in pageRow.columns) {
-        for (var row in column.rows) {
-          _boxesOnPage += row.boxes.length;
+    return LayoutBuilder(builder: (context, constraints) {
+      clear();
+
+      // We need to calculate the total number of boxes on the page so that we
+      // know when tha last one calls configure(). As we're using LayoutBuilders
+      // this will be after buildPage() returns.
+      for(var pageRow in page.pageRows) {
+        for (var column in pageRow.columns) {
+          for (var row in column.rows) {
+            _boxesOnPage += row.boxes.length;
+          }
         }
       }
-    }
 
-    return LayoutBuilder(builder: (context, constraints) {
       List<Widget> widgets = [];
       for(var pageRow in page.pageRows) {
         widgets.add(SizedBox(

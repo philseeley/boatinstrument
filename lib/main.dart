@@ -96,8 +96,6 @@ class _MainPageState extends State<MainPage> {
 
     WakelockPlus.toggle(enable: _controller.keepAwake);
 
-    _controller.clear();
-
     AppBar? appBar;
     if(_showAppBar) {
       List<Widget> actions = [
