@@ -79,7 +79,8 @@ class BoatInstrumentController {
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
-  final List<_WidgetData> _widgetData = [];
+  int _boxesOnPage = 0;
+  final List<_BoxData> _boxData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
 
@@ -122,8 +123,9 @@ class BoatInstrumentController {
   }
 
   void clear() {
-    _widgetData.clear();
     _unsubscribe();
+    _boxesOnPage = 0;
+    _boxData.clear();
   }
 
   // Call this in the Widget's State initState() to get common Box settings.
@@ -132,18 +134,24 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure(OnUpdate onUpdate, List<String> paths, {bool dataTimeout = true}) {
-    _WidgetData wd = _WidgetData(onUpdate, paths, dataTimeout);
-    _widgetData.add(wd);
+  void configure({OnUpdate? onUpdate, Set<String>? paths, bool dataTimeout = true, bool box = true}) {
+    if(!box) {
+      ++_boxesOnPage;
+    }
 
-    for(String path in wd.paths) {
+    _BoxData bd = _BoxData(onUpdate, paths??{}, dataTimeout);
+    _boxData.add(bd);
+
+    for(String path in bd.paths) {
       // Need to escape all the '.'s and make a wildcard character for any '*'s, otherwise
       // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
-      wd.regExpPaths.add(
+      bd.regExpPaths.add(
           RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
     }
 
-    _subscribe(wd.paths);
+    if(box) {
+      _subscribe();
+    }
   }
 
   void save() {
@@ -228,6 +236,17 @@ class BoatInstrumentController {
   Widget buildPage(int pageNum) {
     _Page page = _settings!.pages[pageNum];
 
+    // We need to calculate the total number of boxes on the page so that we
+    // know when tha last one calls configure(). As we're using LayoutBuilders
+    // this will be after buildPage() returns.
+    for(var pageRow in page.pageRows) {
+      for (var column in pageRow.columns) {
+        for (var row in column.rows) {
+          _boxesOnPage += row.boxes.length;
+        }
+      }
+    }
+
     return LayoutBuilder(builder: (context, constraints) {
       List<Widget> widgets = [];
       for(var pageRow in page.pageRows) {
@@ -303,15 +322,17 @@ class BoatInstrumentController {
   }
 
   connect() async {
-    _networkTimeout();
-    await _discoverServices();
-
     try {
-      l.i("Connecting to: $wsUri");
-
-      for(_WidgetData wd in _widgetData) {
-        wd.onUpdate(null);
+      for(_BoxData bd in _boxData) {
+        if(bd.onUpdate != null) {
+          bd.onUpdate!(null);
+        }
       }
+
+      _networkTimeout();
+      await _discoverServices();
+
+      l.i("Connecting to: $wsUri");
 
       _channel?.sink.close();
 
@@ -329,7 +350,7 @@ class BoatInstrumentController {
           }
       );
 
-      _subscribeAll();
+      _subscribe();
 
       l.i("Connected to: $wsUri");
     } catch (e) {
@@ -350,46 +371,36 @@ class BoatInstrumentController {
     );
   }
 
-  Map<String, String> _subscribeJson(String path) {
-    return {
-      "path": path,
-      "policy": 'instant',
-      "minPeriod": _settings!.signalkMinPeriod.toString()
-    };
-  }
+  void _subscribe() {
+    if(_boxData.length == _boxesOnPage) {
+      Set<String> paths = {};
 
-  void _sendSubscribe(List<Map<String, String>> subscribe) {
-    _channel?.sink.add(
-      jsonEncode(
-        {
-          "context": "vessels.self",
-          "subscribe": subscribe
-        },
-      ),
-    );
-  }
+      // Find all the unique paths.
+      for (_BoxData bd in _boxData) {
+        paths.addAll(bd.paths);
+      }
 
-  void _subscribe(List<String> paths) {
-    List<Map<String, String>> subscribe = [];
+      _unsubscribe();
 
-    for(String path in paths) {
-      subscribe.add(_subscribeJson(path));
+      List<Map<String, String>> subscribe = [];
+
+      for(String path in paths) {
+        subscribe.add({
+          "path": path,
+          "policy": 'instant',
+          "minPeriod": _settings!.signalkMinPeriod.toString()
+        });
+      }
+
+      _channel?.sink.add(
+        jsonEncode(
+          {
+            "context": "vessels.self",
+            "subscribe": subscribe
+          },
+        ),
+      );
     }
-
-    _sendSubscribe(subscribe);
-  }
-
-  void _subscribeAll() {
-    List<String> paths = [];
-
-    // Find all the unique paths.
-    for(_WidgetData wd in _widgetData) {
-      paths.addAll(wd.paths);
-    }
-
-    _unsubscribe();
-
-    _subscribe(paths);
   }
 
   void _networkTimeout () {
@@ -406,8 +417,8 @@ class BoatInstrumentController {
 
     // We can get a status message on initial connection, which we ignore.
     if(d['updates'] != null) {
-      for(_WidgetData wd in _widgetData) {
-        wd.updates.clear();
+      for(_BoxData bd in _boxData) {
+        bd.updates.clear();
       }
 
       for (dynamic u in d['updates']) {
@@ -420,11 +431,11 @@ class BoatInstrumentController {
             for (dynamic v in u['values']) {
               String path = v['path'];
 
-              for (_WidgetData wd in _widgetData) {
-                for (RegExp r in wd.regExpPaths) {
+              for (_BoxData bd in _boxData) {
+                for (RegExp r in bd.regExpPaths) {
                   if (r.hasMatch(path)) {
-                    wd.updates.add(Update(path, v['value']));
-                    wd.lastUpdate = now;
+                    bd.updates.add(Update(path, v['value']));
+                    bd.lastUpdate = now;
                   }
                 }
               }
@@ -435,11 +446,14 @@ class BoatInstrumentController {
         }
       }
 
-      for(_WidgetData wd in _widgetData) {
-        if(wd.updates.isNotEmpty) {
-          wd.onUpdate(wd.updates);
-        } else if(wd.dataTimeout && now.difference(wd.lastUpdate) > Duration(milliseconds: _settings!.dataTimeout)) {
-          wd.onUpdate(null);
+      for(_BoxData bd in _boxData) {
+        if(bd.onUpdate != null) {
+          if (bd.updates.isNotEmpty) {
+            bd.onUpdate!(bd.updates);
+          } else if (bd.dataTimeout && now.difference(bd.lastUpdate) >
+              Duration(milliseconds: _settings!.dataTimeout)) {
+            bd.onUpdate!(null);
+          }
         }
       }
     }

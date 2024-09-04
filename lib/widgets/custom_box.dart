@@ -44,7 +44,7 @@ class _DebugBoxState extends State<DebugBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(_onUpdate, [widget._settings.path]);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {widget._settings.path});
   }
 
   @override

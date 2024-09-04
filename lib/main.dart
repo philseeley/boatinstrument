@@ -137,7 +137,7 @@ class _MainPageState extends State<MainPage> {
         },
         child: _controller.buildPage(_pageNum),
       ),
-    ); //DragGestureRecognizer
+    );
   }
 
   void _setBrightness() {

@@ -235,9 +235,9 @@ class BoxDetails {
 }
 
 BoxDetails getBoxDetails(String id) {
-  for(BoxDetails wd in boxDetails) {
-    if(wd.id == id) {
-      return wd;
+  for(BoxDetails bd in boxDetails) {
+    if(bd.id == id) {
+      return bd;
     }
   }
 
@@ -259,15 +259,15 @@ class Update {
 
 typedef OnUpdate = Function(List<Update>? updates);
 
-class _WidgetData {
-  final OnUpdate onUpdate;
-  final List<String> paths;
+class _BoxData {
+  final OnUpdate? onUpdate;
+  final Set<String> paths;
   final bool dataTimeout;
   List<RegExp> regExpPaths = [];
   DateTime lastUpdate = DateTime.now();
   List<Update> updates = [];
 
-  _WidgetData(this.onUpdate, this.paths, this.dataTimeout);
+  _BoxData(this.onUpdate, this.paths, this.dataTimeout);
 }
 
 class _Resizable {

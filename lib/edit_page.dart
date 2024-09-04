@@ -58,8 +58,8 @@ final List<BoxDetails> boxDetails = [
 class _EditPageState extends State<_EditPage> {
 
   PopupMenuItem<BoxDetails> _widgetMenuEntry(String id) {
-    BoxDetails wd = getBoxDetails(id);
-    return PopupMenuItem<BoxDetails>(value: wd, child: Text(wd.description));
+    BoxDetails bd = getBoxDetails(id);
+    return PopupMenuItem<BoxDetails>(value: bd, child: Text(bd.description));
   }
 
   PopupMenuItem<BoxDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<BoxDetails>> subMenuEntries) {
