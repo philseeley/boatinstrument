@@ -68,7 +68,7 @@ class _MainPageState extends State<MainPage> {
 
   _configure () async {
     await _controller.loadSettings();
-    _controller.connect();
+    await _controller.connect();
 
     _themeProvider.setDarkMode(_controller.darkMode);
 

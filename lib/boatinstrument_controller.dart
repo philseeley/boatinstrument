@@ -295,6 +295,7 @@ class BoatInstrumentController {
         BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
         await discovery.ready;
         discovery.start();
+        Timer t = Timer(const Duration(seconds: 10), () {discovery.stop();});
         try {
           await for(BonsoirDiscoveryEvent e in discovery.eventStream!) {
             if (e.type == BonsoirDiscoveryEventType.discoveryServiceFound) {
@@ -304,12 +305,17 @@ class BoatInstrumentController {
               host = r.host!;
               port = r.port;
               break;
+            } else if (e.type == BonsoirDiscoveryEventType.discoveryStopped) {
+              // This should only happen if the Timer expires.
+              throw Exception('Service discovery failed');
             }
           }
         } finally {
+          t.cancel();
           discovery.stop();
         }
       }
+
       Uri uri = Uri(scheme: 'http', host: host, port: port, path: '/signalk');
 
       http.Response response = await http.get(uri);
@@ -320,6 +326,7 @@ class BoatInstrumentController {
       _wsUri = Uri.parse(endPoints['signalk-ws']);
     } catch(e) {
       l.e('Error discovering services', error: e);
+      rethrow;
     }
   }
 
