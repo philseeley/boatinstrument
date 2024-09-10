@@ -291,6 +291,13 @@ class BoatInstrumentController {
           NotificationState state = NotificationState.values.byName(
               u.value['state']);
 
+          bool playSound = false;
+          dynamic method = u.value['method'];
+          for(String m in method) {
+            if(m == 'sound') {
+              playSound = true;
+            }
+          }
           if (state == NotificationState.normal) {
             _showNotifications = true;
             _audioPlayer.stop();
@@ -310,7 +317,7 @@ class BoatInstrumentController {
                 context, u.value['message'], error: state.error,
                 action: action);
 
-            if (state.soundFile != null) {
+            if (playSound && state.soundFile != null) {
               _audioPlayer.play(AssetSource(state.soundFile!));
             }
           }
