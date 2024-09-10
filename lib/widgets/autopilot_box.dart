@@ -541,10 +541,6 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
             case 'navigation.magneticVariation':
               _magneticVariation = (u.value as num).toDouble();
               break;
-            case 'notifications.autopilot.*': //TODO this this need to be a regex or something.
-              widget.config.controller.showMessage(
-                  context, u.value, error: true);
-              break;
           }
         } catch (e) {
           widget.config.controller.l.e("Error converting $u", error: e);
