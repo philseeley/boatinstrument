@@ -520,6 +520,7 @@ class BoatInstrumentController {
           } else if (bd.dataTimeout && now.difference(bd.lastUpdate) >
               Duration(milliseconds: _settings!.dataTimeout)) {
             bd.onUpdate!(null);
+            bd.lastUpdate = now;
           }
         }
       }
