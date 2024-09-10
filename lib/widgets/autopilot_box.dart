@@ -483,13 +483,10 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle s = const TextStyle(fontSize: 20);
+    const double pad = 5.0;
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
-    List<Widget> pilot = [
-      Text("Autopilot", style: s),
-      Text("State: ${_autopilotState?.displayName ?? 'No State'}", style: s),
-    ];
-
+    String target = '';
     switch(_autopilotState) {
       case null:
       case AutopilotState.standby:
@@ -501,19 +498,31 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
           headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
         }
         if(headingTrue != null) {
-          pilot.add(Text("HDG: ${rad2Deg(headingTrue)}", style: s));
+          target = 'HDG: ${rad2Deg(headingTrue)}';
         }
         break;
       case AutopilotState.route:
-        pilot.add(Text("WPT: $_waypoint", style: s));
+        target = 'WPT: $_waypoint';
         break;
       case AutopilotState.wind:
         int targetWindAngleApparent = rad2Deg(_targetWindAngleApparent);
-        pilot.add(Text("AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}", style: s));
+        target = 'AWA: ${targetWindAngleApparent.abs()} ${val2PS(targetWindAngleApparent)}';
         break;
     }
 
-    return Padding(padding: const EdgeInsets.all(5.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: pilot));
+    String text = 'State: ${_autopilotState?.displayName ?? '-'}\n$target';
+
+    double fontSize = maxFontSize(text, style,
+        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
+        widget.config.constraints.maxWidth - (2 * pad));
+
+    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Autopilot', style: style))]),
+      // We need to disable the device text scaling as this interferes with our text scaling.
+      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
+          child: Text(text, textScaler: TextScaler.noScaling,
+              style: style.copyWith(fontSize: fontSize)))))
+    ]);
   }
 
   _processData(List<Update>? updates) {
