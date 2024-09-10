@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/anchor_box.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
@@ -74,6 +75,20 @@ class CircularLogger extends Logger {
             }));
 }
 
+//TODO better sound clips.
+enum NotificationState {
+  normal(false, null),
+  alert(false, 'alert.mp3'),
+  warn(false, 'warning.mp3'),
+  alarm(true, 'alarm.mp3'),
+  emergency(true, 'emergency.wav');
+
+  final bool error;
+  final String? soundFile;
+
+  const NotificationState(this.error, this.soundFile);
+}
+
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
   _Settings? _settings;
@@ -83,6 +98,8 @@ class BoatInstrumentController {
   final List<_BoxData> _boxData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _showNotifications = true;
 
   bool get ready => _settings != null;
 
@@ -158,11 +175,12 @@ class BoatInstrumentController {
     _settings?._save();
   }
 
-  void showMessage(BuildContext context, String msg, {bool error = false, int millisecondsDuration = 4000}) {
+  void showMessage(BuildContext context, String msg, {bool error = false, int millisecondsDuration = 4000, SnackBarAction? action}) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             backgroundColor: (error) ? Colors.orange : null,
             duration: Duration(milliseconds: millisecondsDuration),
+            action: action,
             content: Text(msg)));
   }
 
@@ -239,6 +257,8 @@ class BoatInstrumentController {
     return LayoutBuilder(builder: (context, constraints) {
       clear();
 
+      configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, dataTimeout: true, isBox: false);
+
       // We need to calculate the total number of boxes on the page so that we
       // know when tha last one calls configure(). As we're using LayoutBuilders
       // this will be after buildPage() returns.
@@ -260,6 +280,45 @@ class BoatInstrumentController {
 
       return Column(children: widgets);
     });
+  }
+
+  _onNotification(BuildContext context, List<Update>? updates) {
+    if (updates == null) {
+      _showNotifications = true;
+    } else {
+      for(Update u in updates) {
+        try {
+          NotificationState state = NotificationState.values.byName(
+              u.value['state']);
+
+          if (state == NotificationState.normal) {
+            _showNotifications = true;
+            _audioPlayer.stop();
+          }
+
+          if (_showNotifications) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+
+            SnackBarAction? action;
+            if (state != NotificationState.normal) {
+              action = SnackBarAction(label: 'Mute', onPressed: () {
+                _showNotifications = false;
+                _audioPlayer.stop();
+              });
+            }
+            showMessage(
+                context, u.value['message'], error: state.error,
+                action: action);
+
+            if (state.soundFile != null) {
+              _audioPlayer.play(AssetSource(state.soundFile!));
+            }
+          }
+        } catch(e) {
+          l.e('Error handling notification $u', error: e);
+        }
+      }
+    }
   }
 
   int nextPageNum(int currentPage, {bool alwaysRotate = false}) {
@@ -439,7 +498,6 @@ class BoatInstrumentController {
                   Duration(milliseconds: _settings!.dataTimeout)) {
             for (dynamic v in u['values']) {
               String path = v['path'];
-
               for (_BoxData bd in _boxData) {
                 for (RegExp r in bd.regExpPaths) {
                   if (r.hasMatch(path)) {

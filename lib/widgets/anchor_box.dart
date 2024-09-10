@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as m;
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
@@ -162,19 +161,15 @@ The Client ID can be set to reflect the instrument's location, e.g. "boatinstrum
 }
 
 class _AnchorState extends State<AnchorAlarmBox> {
-  static const emergencyState = 'emergency';
-
   late final _AnchorAlarmSettings _settings;
   ll.LatLng? _anchorPosition;
   int? _maxRadius;
   int? _currentRadius;
   double? _bearingTrue;
   double? _apparentBearing;
-  bool _silenceAlarm = false;
   bool _unlocked = false;
   Offset _startDragOffset = Offset.zero;
   Timer? _lockTimer;
-  AudioPlayer player = AudioPlayer();
   static final List<ll.LatLng> _positions = [];
   DateTime _lastPositionTime = DateTime.now();
 
@@ -184,9 +179,8 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {
       'navigation.position',
-      'navigation.anchor.*',
-      'notifications.navigation.anchor'});
-    player.setSource(AssetSource('anchor-alarm.wav'));
+      'navigation.anchor.*'
+    });
   }
 
   @override
@@ -203,7 +197,6 @@ class _AnchorState extends State<AnchorAlarmBox> {
 
     List<Widget> col = [
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        IconButton(onPressed: _toggleAlarm, icon: Icon(_silenceAlarm ? Icons.notifications_off_outlined : Icons.notifications_outlined, color: dropColor)),
         IconButton(onPressed: _toggleLocked, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
         IconButton(onPressed: _maxRadius == null ? _drop : null, icon: Icon(Icons.anchor, color: dropColor)),
         IconButton(onPressed: (_currentRadius != null && _maxRadius == null) ? _setMaxRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
@@ -271,16 +264,6 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
   }
 
-  void _toggleAlarm () {
-    setState(() {
-      _silenceAlarm = !_silenceAlarm;
-    });
-    if(_silenceAlarm) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      player.stop();
-    }
-  }
-
   void _drop() {
     _sendCommand('dropAnchor', '');
   }
@@ -336,20 +319,6 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
   }
 
-  void _alarm(String state, bool emergency) {
-    if (!_silenceAlarm || !emergency) {
-      if (emergency) {
-        player.resume();
-      } else {
-        player.stop();
-      }
-      widget.config.controller.showMessage(context,
-          'Anchor Alarm: $state',
-          millisecondsDuration: emergency ? 500 : 4000,
-          error: emergency);
-    }
-  }
-
   void _onUpdate(List<Update>? updates) {
     if(updates == null) {
       _maxRadius = _currentRadius = _bearingTrue = _apparentBearing = null;
@@ -378,7 +347,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
               try {
                 _maxRadius = (u.value as num).round();
               } catch (_){
-                //TODO this only happens if the Anchor Alarm webapp is used.
+                // This only happens if the Anchor Alarm webapp is used.
                 _maxRadius = int.parse(u.value as String);
               }
               break;
@@ -392,10 +361,6 @@ class _AnchorState extends State<AnchorAlarmBox> {
               break;
             case 'navigation.anchor.apparentBearing':
               _apparentBearing = (u.value as num).toDouble();
-              break;
-            case 'notifications.navigation.anchor':
-              String state = u.value['state'];
-              _alarm(state, state == emergencyState);
               break;
           }
         } catch (e) {
