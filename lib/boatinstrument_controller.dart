@@ -110,7 +110,6 @@ class BoatInstrumentController {
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
   bool get pageTimerOnStart => _settings!.pageTimerOnStart;
-  int get pageChangeSeconds => _settings!.pageChangeSeconds;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   int get m2nmThreshold => _settings!.m2nmThreshold;
   SpeedUnits get speedUnits => _settings!.speedUnits;
@@ -328,13 +327,13 @@ class BoatInstrumentController {
     }
   }
 
-  int nextPageNum(int currentPage, {bool alwaysRotate = false}) {
+  int nextPageNum(int currentPage) {
     if(_settings!.pages.isEmpty) {
       _settings?.pages = [_Page._newPage()];
       return 0;
     }
     ++currentPage;
-    if(alwaysRotate || _settings!.wrapPages) {
+    if(_settings!.wrapPages) {
       return currentPage %= _settings!.pages.length;
     }
     return (currentPage >= _settings!.pages.length) ? _settings!.pages.length-1 : currentPage;
@@ -346,6 +345,24 @@ class BoatInstrumentController {
       return currentPage %= _settings!.pages.length;
     }
     return (currentPage < 0) ? 0 : currentPage;
+  }
+
+  (int, int?) rotatePageNum(int currentPage) {
+    if(_settings!.pages.isEmpty) {
+      _settings?.pages = [_Page._newPage()];
+      return (0, null);
+    }
+    int i = 0;
+    do {
+      ++currentPage;
+      currentPage %= _settings!.pages.length;
+      int? timeout = _settings!.pages[currentPage].timeout;
+      if(timeout != null) {
+        return (currentPage, timeout);
+      }
+    } while (++i < _settings!.pages.length);
+    // There are no pages with timeouts.
+    return (0, null);
   }
 
   String pageName(int pageNum) {

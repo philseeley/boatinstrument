@@ -27,7 +27,7 @@ Swiping up or pressing the back button hides the top bar.
 For "Auto Discovery" of your SignalK server, mDNS must be turned on in your server's settings. If discovery does not work, enter your server's hostname/IP and port number.''')]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness')),
-      const ListTile(leading: Icon(Icons.timer_outlined), title: Text('Toggles the Auto-Page rotation')),
+      const ListTile(leading: Icon(Icons.sync_alt), title: Text('Toggles the Auto-Page rotation. Set the per-page delays in the page list. Pages without delays are not shown')),
       const ListTile(leading: Icon(Icons.copy), title: Text('Copy/Clone a Page')),
       const ListTile(leading: Icon(Icons.share), title: Text('Shares/Exports the Settings')),
       const ListTile(leading: Icon(Icons.file_open), title: Text('Imports Settings from a file')),

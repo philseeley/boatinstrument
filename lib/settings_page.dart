@@ -25,6 +25,12 @@ class _EditPagesState extends State<EditPagesPage> {
               initialValue: page.name,
               onChanged: (value) => page.name = value),
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(width: 30, child: TextFormField(
+                decoration: const InputDecoration(label: Icon(Icons.timer_outlined)),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                initialValue: (page.timeout??'').toString(),
+                onChanged: (value) => page.timeout = int.tryParse(value))),
             IconButton(icon: const Icon(Icons.copy), onPressed: () {_copyPage(p, page);}),
             IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);}),
             ReorderableDragStartListener(index: p, child: const Icon(Icons.drag_handle))
@@ -172,20 +178,6 @@ class _SettingsState extends State<SettingsPage> {
               settings.pageTimerOnStart = value;
             });
           }),
-      ListTile(
-        leading: const Text("Rotate Page Delay:"),
-        title: Slider(
-            min: 3,
-            max: 120,
-            divisions: 118,
-            value: settings.pageChangeSeconds.toDouble(),
-            label: "${settings.pageChangeSeconds}",
-            onChanged: (double value) {
-              setState(() {
-                settings.pageChangeSeconds = value.toInt();
-              });
-            }),
-      ),
       ListTile(
           leading: const Text("Distance:   "),
           title: _distanceMenu()

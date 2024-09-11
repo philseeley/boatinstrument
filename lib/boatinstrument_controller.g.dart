@@ -56,6 +56,7 @@ Map<String, dynamic> _$PageRowToJson(_PageRow instance) => <String, dynamic>{
 
 _Page _$PageFromJson(Map<String, dynamic> json) => _Page(
       json['name'] as String,
+      (json['timeout'] as num?)?.toInt(),
       (json['pageRows'] as List<dynamic>)
           .map((e) => _PageRow.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -63,6 +64,7 @@ _Page _$PageFromJson(Map<String, dynamic> json) => _Page(
 
 Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
       'name': instance.name,
+      'timeout': instance.timeout,
       'pageRows': instance.pageRows,
     };
 
@@ -82,7 +84,6 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       keepAwake: json['keepAwake'] as bool? ?? false,
       autoConfirmActions: json['autoConfirmActions'] as bool? ?? false,
       pageTimerOnStart: json['pageTimerOnStart'] as bool? ?? false,
-      pageChangeSeconds: (json['pageChangeSeconds'] as num?)?.toInt() ?? 20,
       distanceUnits:
           $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
               DistanceUnits.nm,
@@ -126,7 +127,6 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,
       'pageTimerOnStart': instance.pageTimerOnStart,
-      'pageChangeSeconds': instance.pageChangeSeconds,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
       'm2nmThreshold': instance.m2nmThreshold,
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,

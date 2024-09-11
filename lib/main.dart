@@ -58,6 +58,7 @@ class _MainPageState extends State<MainPage> {
 
   final BoatInstrumentController _controller = BoatInstrumentController();
   int _pageNum = 0;
+  int? _pageTimeout = 0;
 
   @override
   void initState() {
@@ -100,7 +101,7 @@ class _MainPageState extends State<MainPage> {
     if(_showAppBar) {
       List<Widget> actions = [
         IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
-        IconButton(icon: Icon(_rotatePages ? Icons.timer_outlined : Icons.timer_off_outlined), onPressed:  _togglePageTimer),
+        IconButton(icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
       ];
 
       if(_controller.brightnessControl) {
@@ -159,13 +160,23 @@ class _MainPageState extends State<MainPage> {
       _rotatePages = !_rotatePages;
     });
 
+    if(_rotatePages) {
+      // Initially get it going.
+      _pageTimeout = _pageTimeout??0;
+    }
+
     _startPageTimer();
   }
 
   void _startPageTimer() {
     _stopPageTimer();
+
+    if(_pageTimeout == null) {
+      _rotatePages = false;
+    }
+
     if(_rotatePages) {
-      _pageTimer = Timer(Duration(seconds: _controller.pageChangeSeconds), _rotatePage);
+      _pageTimer = Timer(Duration(seconds: _pageTimeout!), _rotatePage);
     }
   }
 
@@ -175,8 +186,12 @@ class _MainPageState extends State<MainPage> {
   }
 
   _rotatePage() {
+    int pageNum;
+    int? timeout;
     setState(() {
-      _pageNum = _controller.nextPageNum(_pageNum, alwaysRotate: true);
+      (pageNum, timeout) = _controller.rotatePageNum(_pageNum);
+      _pageNum = pageNum;
+      _pageTimeout = timeout;
     });
 
     _startPageTimer();
