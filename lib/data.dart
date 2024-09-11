@@ -350,19 +350,20 @@ class _PageRow extends _Resizable {
 @JsonSerializable()
 class _Page {
   String name;
+  int? timeout;
   List<_PageRow> pageRows;
 
-  _Page(this.name, this.pageRows);
+  _Page(this.name, this.timeout, this.pageRows);
 
   factory _Page.fromJson(Map<String, dynamic> json) =>
       _$PageFromJson(json);
 
   Map<String, dynamic> toJson() => _$PageToJson(this);
 
-  static _Page _newPage() => _Page('Page Name', [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
+  static _Page _newPage() => _Page('Page Name', null, [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
 
   _Page clone() {
-    _Page clone = _Page('$name - copy', []);
+    _Page clone = _Page('$name - copy', null, []);
 
     for(_PageRow pr in pageRows) {
       _PageRow epr = _PageRow([], pr.percentage);
@@ -471,7 +472,6 @@ class _Settings {
   bool keepAwake;
   bool autoConfirmActions;
   bool pageTimerOnStart;
-  int pageChangeSeconds;
   DistanceUnits distanceUnits;
   int m2nmThreshold;
   SpeedUnits speedUnits;
@@ -502,7 +502,6 @@ class _Settings {
     this.keepAwake = false,
     this.autoConfirmActions = false,
     this.pageTimerOnStart = false,
-    this.pageChangeSeconds = 20,
     this.distanceUnits = DistanceUnits.nm,
     this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,
