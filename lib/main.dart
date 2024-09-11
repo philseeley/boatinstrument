@@ -85,7 +85,9 @@ class _MainPageState extends State<MainPage> {
       _togglePageTimer();
     }
 
-    setState(() {});
+    setState(() {
+      _controller.setupNotificationHandlers(context);
+    });
   }
 
   @override

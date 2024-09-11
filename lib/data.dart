@@ -240,6 +240,13 @@ class _HelpBoxState extends State<HelpBox> {
   }
 }
 
+abstract class NotificationHandler {
+  final BuildContext context;
+  final BoatInstrumentController controller;
+
+  NotificationHandler(this.context, this.controller);
+}
+
 class BoxDetails {
   final String id;
   final String description;
@@ -273,15 +280,20 @@ class Update {
 
 typedef OnUpdate = Function(List<Update>? updates);
 
-class _BoxData {
+class _CallbackData {
   final OnUpdate? onUpdate;
   final Set<String> paths;
-  final bool dataTimeout;
   List<RegExp> regExpPaths = [];
-  DateTime lastUpdate = DateTime.now();
   List<Update> updates = [];
 
-  _BoxData(this.onUpdate, this.paths, this.dataTimeout);
+  _CallbackData(this.onUpdate, this.paths);
+}
+
+class _BoxData extends _CallbackData {
+  final bool dataTimeout;
+  DateTime lastUpdate = DateTime.now();
+
+  _BoxData(super.onUpdate, super.paths, this.dataTimeout);
 }
 
 class _Resizable {

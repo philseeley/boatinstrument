@@ -96,6 +96,7 @@ class BoatInstrumentController {
   Uri _wsUri = Uri();
   int _boxesOnPage = 0;
   final List<_BoxData> _boxData = [];
+  final List<_CallbackData> _callbackData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -168,6 +169,19 @@ class BoatInstrumentController {
 
     if(isBox) {
       _subscribe();
+    }
+  }
+
+  // Call this in the Widget's State initState() to subscribe to Signalk data.
+  void configureNotification(OnUpdate onNotification, Set<String> paths) {
+    _CallbackData cd = _CallbackData(onNotification, paths);
+    _callbackData.add(cd);
+
+    for(String path in cd.paths) {
+      // Need to escape all the '.'s and make a wildcard character for any '*'s, otherwise
+      // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
+      cd.regExpPaths.add(
+          RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
     }
   }
 
@@ -282,10 +296,15 @@ class BoatInstrumentController {
     });
   }
 
-  _onNotification(BuildContext context, List<Update>? updates) {
+  void _onNotification(BuildContext context, List<Update>? updates) {
+    print('CALLED with: $updates');
     if (updates == null) {
       _showNotifications = true;
     } else {
+      for(var cd in _callbackData) {
+        cd.updates.clear();
+      }
+
       for(Update u in updates) {
         try {
           NotificationState state = NotificationState.values.byName(
@@ -303,22 +322,49 @@ class BoatInstrumentController {
             _audioPlayer.stop();
           }
 
+          String message = u.value['message'];
+
+          for (var cd in _callbackData) {
+            print('CHECKING match with ${cd.paths}');
+            for (RegExp r in cd.regExpPaths) {
+              if (r.hasMatch(u.path)) {
+                print('ADDING NOTIFICATION TO CALLBACK LIST ${u.path}');
+                cd.updates.add(Update(u.path, message));
+              }
+            }
+          }
+
+          bool handled = false;
+          for (var cd in _callbackData) {
+            if (cd.updates.isNotEmpty) {
+              handled = true;
+            }
+          }
+
           if (_showNotifications) {
             ScaffoldMessenger.of(context).clearSnackBars();
 
-            SnackBarAction? action;
-            if (state != NotificationState.normal) {
-              action = SnackBarAction(label: 'Mute', onPressed: () {
-                _showNotifications = false;
-                _audioPlayer.stop();
-              });
-            }
-            showMessage(
-                context, u.value['message'], error: state.error,
-                action: action);
+            if (!handled) {
+              SnackBarAction? action;
+              if (state != NotificationState.normal) {
+                action = SnackBarAction(label: 'Mute', onPressed: () {
+                  _showNotifications = false;
+                  _audioPlayer.stop();
+                });
+              }
+              showMessage(
+                  context, message, error: state.error,
+                  action: action);
 
-            if (playSound && state.soundFile != null) {
-              _audioPlayer.play(AssetSource(state.soundFile!));
+              if (playSound && state.soundFile != null) {
+                _audioPlayer.play(AssetSource(state.soundFile!));
+              }
+            } else {
+              for (var cd in _callbackData) {
+                if (cd.updates.isNotEmpty) {
+                  cd.onUpdate!(cd.updates);
+                }
+              }
             }
           }
         } catch(e) {
@@ -532,5 +578,9 @@ class BoatInstrumentController {
         }
       }
     }
+  }
+
+  void setupNotificationHandlers(BuildContext context) {
+    AutopilotNotificationHandler(context, this);
   }
 }

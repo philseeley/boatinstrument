@@ -47,6 +47,31 @@ class _AutopilotControlPerBoxSettings {
   });
 }
 
+Future<http.Response> _executeCommand(
+    BoatInstrumentController controller,
+    _AutopilotControlSettings settings,
+    String path, String params) async {
+  try {
+    Uri uri = controller.httpApiUri.replace(
+        path: '${controller.httpApiUri.path}vessels/self/$path');
+
+    http.Response response = await http.put(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "application/json",
+          "Authorization": "Bearer ${settings.authToken}"
+        },
+        body: params
+    );
+
+    return response;
+  } catch (e) {
+    controller.l.e('Error Sending to WebSocket', error: e);
+    rethrow;
+  }
+}
+
 abstract class AutopilotControlBox extends BoxWidget {
   late final _AutopilotControlPerBoxSettings _perBoxSettings;
 
@@ -103,18 +128,22 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     }
 
     try {
-      Uri uri = widget.config.controller.httpApiUri.replace(
-          path: '${widget.config.controller.httpApiUri.path}vessels/self/$path');
-
-      http.Response response = await http.put(
-          uri,
-          headers: {
-            "Content-Type": "application/json",
-            "accept": "application/json",
-            "Authorization": "Bearer ${_settings.authToken}"
-          },
-          body: params
-      );
+      http.Response response = await _executeCommand(
+          widget.config.controller,
+          _settings,
+          path, params);
+      // Uri uri = widget.config.controller.httpApiUri.replace(
+      //     path: '${widget.config.controller.httpApiUri.path}vessels/self/$path');
+      //
+      // http.Response response = await http.put(
+      //     uri,
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       "accept": "application/json",
+      //       "Authorization": "Bearer ${_settings.authToken}"
+      //     },
+      //     body: params
+      // );
 
       if(response.statusCode != HttpStatus.ok) {
         if(mounted) {
@@ -559,6 +588,47 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
 
     if(mounted) {
       setState(() {});
+    }
+  }
+}
+
+class AutopilotNotificationHandler extends NotificationHandler {
+  _AutopilotControlSettings _settings = _AutopilotControlSettings();
+
+  AutopilotNotificationHandler(super.context, super._controller) {
+    controller.configureNotification(_onNotification, {
+      'notifications.chartplotter.WPArrival',
+      'notifications.autopilot.PilotRouteComplete'});
+    print('GETTING ${AutopilotControlBox.sid} settings');
+    _settings = _$AutopilotControlSettingsFromJson(controller.getBoxSettingsJson(AutopilotControlBox.sid));
+    print('got ${_settings.authToken}');
+
+  }
+
+  void _onNotification(List<Update>? notifications) async {
+    for(var n in notifications!) {
+      switch(n.path) {
+        case 'notifications.chartplotter.WPArrival':
+          if(await controller.askToConfirm(context, '${n.value}\nAdvance Waypoint')) {
+            print('ADVANCE WAYPOINT');
+            await _executeCommand(
+                controller,
+                _settings,
+                'steering/autopilot/state', '{"value": "${AutopilotState.route.name}"}');
+
+          }
+          break;
+        case 'notifications.autopilot.PilotRouteComplete':
+          if(await controller.askToConfirm(context, '${n.value}\nSet to "${AutopilotState.auto.displayName}"')) {
+            print('SET AUTO');
+            await _executeCommand(
+                controller,
+                _settings,
+                'steering/autopilot/state', '{"value": "${AutopilotState.auto.name}"}');
+
+          }
+          break;
+      }
     }
   }
 }
