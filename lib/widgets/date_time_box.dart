@@ -74,7 +74,7 @@ class _DateTimeBoxState extends State<DateTimeBox> {
   void initState() {
     super.initState();
     _settings = _$DateTimeSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
-    widget.config.controller.configure(_processData, ['navigation.datetime']);
+    widget.config.controller.configure(onUpdate: _processData, paths: {'navigation.datetime'});
   }
 
   @override

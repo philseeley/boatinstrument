@@ -81,7 +81,7 @@ class _MyNewBoxState extends State<MyNewBox> {
     super.initState();
     // Configure the controller to request updates to the Signalk path(s) you require.
     // Note: this MUST be called even if not subscribing to any Signalk data
-    widget.config.controller.configure(widget, onUpdate: _processData, paths: {'signalk.path.for.data'});
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'signalk.path.for.data'});
   }
 
   @override
@@ -94,7 +94,7 @@ class _MyNewBoxState extends State<MyNewBox> {
 
   // This will be called with updates to the Signalk paths you've asked for.
   // This simple case only asks for one path, so it assumes that's what's sent.
-  _processData(List<Update>? updates) {
+  _onUpdate(List<Update>? updates) {
     if(updates == null) {
       _myValue = null;
     } else {

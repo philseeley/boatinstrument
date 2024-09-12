@@ -193,6 +193,13 @@ class BlankBox extends BoxWidget {
 }
 
 class _BlankBoxState extends State<BlankBox> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -212,6 +219,13 @@ class HelpBox extends BoxWidget {
 }
 
 class _HelpBoxState extends State<HelpBox> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
@@ -235,9 +249,9 @@ class BoxDetails {
 }
 
 BoxDetails getBoxDetails(String id) {
-  for(BoxDetails wd in boxDetails) {
-    if(wd.id == id) {
-      return wd;
+  for(BoxDetails bd in boxDetails) {
+    if(bd.id == id) {
+      return bd;
     }
   }
 
@@ -259,15 +273,15 @@ class Update {
 
 typedef OnUpdate = Function(List<Update>? updates);
 
-class _WidgetData {
-  final OnUpdate onUpdate;
-  final List<String> paths;
+class _BoxData {
+  final OnUpdate? onUpdate;
+  final Set<String> paths;
   final bool dataTimeout;
   List<RegExp> regExpPaths = [];
   DateTime lastUpdate = DateTime.now();
   List<Update> updates = [];
 
-  _WidgetData(this.onUpdate, this.paths, this.dataTimeout);
+  _BoxData(this.onUpdate, this.paths, this.dataTimeout);
 }
 
 class _Resizable {
@@ -336,19 +350,20 @@ class _PageRow extends _Resizable {
 @JsonSerializable()
 class _Page {
   String name;
+  int? timeout;
   List<_PageRow> pageRows;
 
-  _Page(this.name, this.pageRows);
+  _Page(this.name, this.timeout, this.pageRows);
 
   factory _Page.fromJson(Map<String, dynamic> json) =>
       _$PageFromJson(json);
 
   Map<String, dynamic> toJson() => _$PageToJson(this);
 
-  static _Page _newPage() => _Page('Page Name', [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
+  static _Page _newPage() => _Page('Page Name', null, [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
 
   _Page clone() {
-    _Page clone = _Page('$name - copy', []);
+    _Page clone = _Page('$name - copy', null, []);
 
     for(_PageRow pr in pageRows) {
       _PageRow epr = _PageRow([], pr.percentage);
@@ -457,7 +472,6 @@ class _Settings {
   bool keepAwake;
   bool autoConfirmActions;
   bool pageTimerOnStart;
-  int pageChangeSeconds;
   DistanceUnits distanceUnits;
   int m2nmThreshold;
   SpeedUnits speedUnits;
@@ -488,7 +502,6 @@ class _Settings {
     this.keepAwake = false,
     this.autoConfirmActions = false,
     this.pageTimerOnStart = false,
-    this.pageChangeSeconds = 20,
     this.distanceUnits = DistanceUnits.nm,
     this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,

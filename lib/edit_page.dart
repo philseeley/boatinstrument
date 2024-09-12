@@ -15,7 +15,7 @@ class _EditPage extends StatefulWidget {
 
 final List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
-  BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}), // This is the default Box.
+  BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}),
   BoxDetails(DepthBelowSurfaceBox.sid, 'Depth Below Surface', (config) {return DepthBelowSurfaceBox(config, key: UniqueKey());}),
   BoxDetails(SpeedThroughWaterBox.sid, 'Speed Through Water', (config) {return SpeedThroughWaterBox(config, key: UniqueKey());}),
   BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (config) {return SpeedOverGroundBox(config, key: UniqueKey());}),
@@ -58,8 +58,8 @@ final List<BoxDetails> boxDetails = [
 class _EditPageState extends State<_EditPage> {
 
   PopupMenuItem<BoxDetails> _widgetMenuEntry(String id) {
-    BoxDetails wd = getBoxDetails(id);
-    return PopupMenuItem<BoxDetails>(value: wd, child: Text(wd.description));
+    BoxDetails bd = getBoxDetails(id);
+    return PopupMenuItem<BoxDetails>(value: bd, child: Text(bd.description));
   }
 
   PopupMenuItem<BoxDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<BoxDetails>> subMenuEntries) {
@@ -182,7 +182,7 @@ class _EditPageState extends State<_EditPage> {
             }
 
             if(pri == (widget._editPage.pageRows.length-1) && ci == 0 && ri == (column.rows.length-1) && bi == 0) {
-              sButtons.add(IconButton(tooltip: 'Page Row Below', onPressed: () {_addPageRow(widget._editPage, ci, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.red)));
+              sButtons.add(IconButton(tooltip: 'Page Row Below', onPressed: () {_addPageRow(widget._editPage, pri, after: true);}, icon: const Icon(Icons.arrow_circle_down_outlined, color: Colors.red)));
             }
 
             if(ci == pageRow.columns.length-1 && ri == 0 && bi == row.boxes.length-1) {
