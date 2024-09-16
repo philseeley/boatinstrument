@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:boatinstrument/widgets/double_value_box.dart';
+import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/services.dart';
@@ -47,6 +49,111 @@ class CustomDoubleValueBox extends DoubleValueBox {
   }
 
   static String sid = 'custom-double-value';
+  @override
+  String get id => sid;
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _SettingsWidget(config, _settings);
+  }
+
+  @override
+  double convert(double value) {
+    return value * _multiplier;
+  }
+
+  @override
+  String units(double value) {
+    return _unitsString;
+  }
+}
+
+class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
+  final _CustomSettings _settings;
+  final String _unitsString;
+  final double _multiplier;
+
+  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.angle, super.key});
+
+  factory CustomDoubleValueSemiGaugeBox.fromSettings(config, {key}) {
+    _CustomSettings s = _$CustomSettingsFromJson(config.settings);
+    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, key: key);
+  }
+
+  static String sid = 'custom-gauge-semi';
+  @override
+  String get id => sid;
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _SettingsWidget(config, _settings);
+  }
+
+  @override
+  double convert(double value) {
+    return value * _multiplier;
+  }
+
+  @override
+  String units(double value) {
+    return _unitsString;
+  }
+}
+
+class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
+  final _CustomSettings _settings;
+  final String _unitsString;
+  final double _multiplier;
+
+  const CustomDoubleValueCircularGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.key});
+
+  factory CustomDoubleValueCircularGaugeBox.fromSettings(config, {key}) {
+    _CustomSettings s = _$CustomSettingsFromJson(config.settings);
+    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: 1, key: key);
+  }
+
+  static String sid = 'custom-gauge-circular';
+  @override
+  String get id => sid;
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _SettingsWidget(config, _settings);
+  }
+
+  @override
+  double convert(double value) {
+    return value * _multiplier;
+  }
+
+  @override
+  String units(double value) {
+    return _unitsString;
+  }
+}
+
+class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
+  final _CustomSettings _settings;
+  final String _unitsString;
+  final double _multiplier;
+
+  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.key});
+
+  factory CustomDoubleValueBarGaugeBox.fromSettings(config, {key}) {
+    _CustomSettings s = _$CustomSettingsFromJson(config.settings);
+    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: 1, key: key);
+  }
+
+  static String sid = 'custom-gauge-bar';
   @override
   String get id => sid;
 
@@ -161,16 +268,7 @@ class _SettingsState extends State<_SettingsWidget> {
     _CustomSettings s = widget._settings;
 
     final Email email = Email(
-      body:
-'''Title: ${s.title}
-Path: ${s.path}
-Precision: ${s.precision}
-Min Length: ${s.minLen}
-Min Value: ${s.minValue}
-Max Value: ${s.maxValue}
-Is Angle: ${s.angle}
-Units: ${s.units}
-Multiplier: ${s.multiplier}''',
+      body: json.encode(_$CustomSettingsToJson(widget._settings)),
       subject: 'Boat Instrument Custom Box Settings',
       recipients: ['feedback@wheretofly.info'],
       isHTML: false,
