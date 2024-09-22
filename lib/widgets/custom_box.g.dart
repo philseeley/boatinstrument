@@ -17,6 +17,7 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       angle: json['angle'] as bool? ?? false,
       units: json['units'] as String? ?? 'units',
       multiplier: (json['multiplier'] as num?)?.toDouble() ?? 1,
+      step: (json['step'] as num?)?.toDouble() ?? 1,
     );
 
 Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
@@ -30,6 +31,7 @@ Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
       'angle': instance.angle,
       'units': instance.units,
       'multiplier': instance.multiplier,
+      'step': instance.step,
     };
 
 _DebugSettings _$DebugSettingsFromJson(Map<String, dynamic> json) =>

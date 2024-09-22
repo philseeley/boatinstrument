@@ -24,11 +24,8 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
     super.initState();
     _minDisplay = widget.convert(widget.minValue!).ceil();
     _maxDisplay = widget.convert(widget.maxValue!).floor();
-    _displayStep = widget.convert(widget.step).round();
-    int range = _maxDisplay - _minDisplay;
-    while (range % _displayStep != 0) {
-      --_displayStep;
-    }
+    double steps = (widget.maxValue! - widget.minValue!)/widget.step;
+     _displayStep = ((_maxDisplay - _minDisplay)/steps).round();
   }
 }
 
