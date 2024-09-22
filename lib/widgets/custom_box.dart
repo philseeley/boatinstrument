@@ -23,6 +23,7 @@ class _CustomSettings {
   bool angle;
   String units;
   double multiplier;
+  double step;
 
   _CustomSettings({
     this.title = 'title',
@@ -33,7 +34,8 @@ class _CustomSettings {
     this.maxValue = 100,
     this.angle = false,
     this.units = 'units',
-    this.multiplier = 1
+    this.multiplier = 1,
+    this.step = 1
   });
 }
 
@@ -116,7 +118,7 @@ class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
 
   factory CustomDoubleValueCircularGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: 1, key: key);
+    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, key: key);
   }
 
   static String sid = 'custom-gauge-circular';
@@ -151,7 +153,7 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
 
   factory CustomDoubleValueBarGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: 1, key: key);
+    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, key: key);
   }
 
   static String sid = 'custom-gauge-bar';
@@ -254,6 +256,12 @@ class _SettingsState extends State<_SettingsWidget> {
         title: TextFormField(
             initialValue: s.maxValue.toString(),
             onChanged: (value) => s.maxValue = double.parse(value)),
+      ),
+      ListTile(
+        leading: const Text("Step:"),
+        title: TextFormField(
+            initialValue: s.step.toString(),
+            onChanged: (value) => s.step = double.parse(value)),
       ),
       SwitchListTile(title: const Text("Is Angle:"),
           value: s.angle,
