@@ -74,7 +74,6 @@ class CircularLogger extends Logger {
             }));
 }
 
-//TODO better sound clips.
 enum NotificationState {
   normal(false, null),
   alert(false, 'alert.mp3'),
