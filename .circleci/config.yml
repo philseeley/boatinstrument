@@ -25,7 +25,7 @@ jobs:
       #     command: Expand-Archive -Path C:\Users\circleci\project\flutter.zip -Destination C:\Users\circleci\project\
       - run:
           # command: flutter doctor
-          command: echo %PATH%
+          command: echo $PATH
           shell: bash.exe
 
   build:
