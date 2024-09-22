@@ -18,13 +18,14 @@ jobs:
 #      - Path=C:\Users\circleci\flutter\bin;%Path%
       - PATH=c:/Users/circleci/flutter/bin:%PATH%
     steps:
+      # - run:
+      #     command: Invoke-WebRequest https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.24.0-stable.zip -OutFile C:\Users\circleci\project\flutter.zip
+      #     no_output_timeout: 30m
+      # - run:
+      #     command: Expand-Archive -Path C:\Users\circleci\project\flutter.zip -Destination C:\Users\circleci\project\
       - run:
-          command: Invoke-WebRequest https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.24.0-stable.zip -OutFile C:\Users\circleci\project\flutter.zip
-          no_output_timeout: 30m
-      - run:
-          command: Expand-Archive -Path C:\Users\circleci\project\flutter.zip -Destination C:\Users\circleci\project\
-      - run:
-          command: flutter doctor
+          # command: flutter doctor
+          command: echo %PATH%
           shell: bash.exe
 
   build:
