@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../boatinstrument_controller.dart';
 
@@ -200,7 +201,7 @@ class _SettingsState extends State<_SettingsWidget> {
     return ListView(children: [
       ListTile(
         leading: IconButton(onPressed: _emailSettings, icon: const Icon(Icons.email)),
-        title: const Text("Please email your setting to the developers for permanent inclusion."),
+        title: const Text("Custom Boxes are experimental, so please press the email button to send your setting to the developers(feedback@wheretofly.info), or raise an issue for permanent inclusion."),
       ),
       ListTile(
         leading: const Text("Title:"),
@@ -265,10 +266,10 @@ class _SettingsState extends State<_SettingsWidget> {
   }
 
   void _emailSettings() async {
-    _CustomSettings s = widget._settings;
+    String settings = json.encode(_$CustomSettingsToJson(widget._settings));
 
     final Email email = Email(
-      body: json.encode(_$CustomSettingsToJson(widget._settings)),
+      body: settings,
       subject: 'Boat Instrument Custom Box Settings',
       recipients: ['feedback@wheretofly.info'],
       isHTML: false,
@@ -284,6 +285,8 @@ class _SettingsState extends State<_SettingsWidget> {
         }
       }
       widget._config.controller.l.e('Error Sending Email', error: e);
+    } on MissingPluginException {
+      await Share.share(settings, subject: 'Boat Instrument Custom Box Settings');
     } catch (e) {
       widget._config.controller.l.e('Error Sending Email', error: e);
     }
