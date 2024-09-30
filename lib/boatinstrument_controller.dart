@@ -399,7 +399,7 @@ class BoatInstrumentController {
 
       Uri uri = Uri(scheme: 'http', host: host, port: port, path: '/signalk');
 
-      http.Response response = await http.get(uri);
+      http.Response response = await http.get(uri).timeout(const Duration(seconds: 10));
       dynamic data = json.decode(response.body);
       dynamic endPoints = data['endpoints']['v1'];
 
