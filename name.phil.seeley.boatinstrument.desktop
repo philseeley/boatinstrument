@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Boat Instrument
+Exec=/usr/share/boatinstrument/boatinstrument
+Icon=/usr/share/boatinstrument/data/flutter_assets/assets/icon.png
+Type=Application
+Categories=Utility
+StartupWMClass=boatinstrument
