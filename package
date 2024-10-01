@@ -10,7 +10,7 @@ date=$(date +"%a, %d %b %Y %T %z")
 prepackage () (
   post=$1; shift
   rm -rf debian
-  mkdir -p debian/DEBIAN debian/usr/share/applications debian/usr/share/doc/${name}${post}
+  mkdir -p debian/DEBIAN debian/usr/share/doc/${name}${post}
 )
 
 package () (
@@ -33,14 +33,20 @@ package () (
 
 mkdir -p packages
 
+# ================================ Linux ====================================
 flutter build linux
 prepackage
+mkdir -p debian/usr/share/applications
 mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
 cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
 package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
 
+# ================================ flutter-pi ====================================
 flutterpi_tool build --release ${pi_opts}
 post=-flutter-pi
 prepackage ${post}
+mkdir -p debian/usr/lib/systemd/system
 mv build/flutter_assets debian/usr/share/${name}${post}
+cp debian-postinst debian/DEBIAN/postinst
+cp boatinstrument-flutter-pi.service debian/usr/lib/systemd/system
 package ${post} libdrm2, libgbm1, libinput10, libxkbcommon0, libegl1, libgles2, libgl1-mesa-dri
