@@ -4,7 +4,7 @@ name=boatinstrument
 version=$(awk -F '[ :+]*' '/^version:/ {print $2}' pubspec.yaml)
 arch=$(uname -m)
 [ ${arch} == 'x86_64' ] && { arch=amd64; pi_opts="--arch=x64"; }
-[ ${arch} == 'arm64' ] && { pi_opts="--arch=arm64 --cpu=pi4"; }
+[ ${arch} == 'aarch64' ] && { arch=arm64; pi_opts="--arch=arm64 --cpu=pi4"; }
 date=$(date +"%a, %d %b %Y %T %z")
 
 prepackage () (
