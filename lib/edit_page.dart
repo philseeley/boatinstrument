@@ -34,6 +34,9 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(WebViewBox.sid, 'Web Page', (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, 'Rudder Angle', (config) {return RudderAngleBox(config, key: UniqueKey());}),
   BoxDetails(CustomDoubleValueBox.sid, 'Decimal Value', (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(CustomDoubleValueSemiGaugeBox.sid, 'Semi Gauge', (config) {return CustomDoubleValueSemiGaugeBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(CustomDoubleValueCircularGaugeBox.sid, 'Circular Gauge', (config) {return CustomDoubleValueCircularGaugeBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(CustomDoubleValueBarGaugeBox.sid, 'Bar Gauge', (config) {return CustomDoubleValueBarGaugeBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(DateTimeBox.sid, 'Date/Time', (config) {return DateTimeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorBox.sid, 'Cross Track Error', (config) {return CrossTrackErrorBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedTrueBeaufortBox.sid, 'Wind True Beaufort', (config) {return WindSpeedTrueBeaufortBox(config, key: UniqueKey());}),
@@ -126,6 +129,9 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(AnchorAlarmBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid),
+        _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid),
+        _widgetMenuEntry(CustomDoubleValueCircularGaugeBox.sid),
+        _widgetMenuEntry(CustomDoubleValueBarGaugeBox.sid),
         _widgetMenuEntry(DebugBox.sid)]),
     ];
 

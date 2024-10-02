@@ -29,7 +29,6 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
 import 'package:boatinstrument/widgets/autopilot_box.dart';
-import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'log_display.dart';
@@ -75,7 +74,6 @@ class CircularLogger extends Logger {
             }));
 }
 
-//TODO better sound clips.
 enum NotificationState {
   normal(false, null),
   alert(false, 'alert.mp3'),
@@ -401,7 +399,7 @@ class BoatInstrumentController {
 
       Uri uri = Uri(scheme: 'http', host: host, port: port, path: '/signalk');
 
-      http.Response response = await http.get(uri);
+      http.Response response = await http.get(uri).timeout(const Duration(seconds: 10));
       dynamic data = json.decode(response.body);
       dynamic endPoints = data['endpoints']['v1'];
 

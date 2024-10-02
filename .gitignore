@@ -44,3 +44,4 @@ app.*.map.json
 
 # Built binay packages
 /packages/
+/debian/

@@ -1,43 +1,52 @@
 #!/bin/bash
 
-type=$1; shift
+name=boatinstrument
+version=$(awk -F '[ :+]*' '/^version:/ {print $2}' pubspec.yaml)
+arch=$(uname -m)
+[ ${arch} == 'x86_64' ] && { arch=amd64; pi_opts="--arch=x64"; }
+[ ${arch} == 'aarch64' ] && { arch=arm64; pi_opts="--arch=arm64 --cpu=pi4"; }
+date=$(date +"%a, %d %b %Y %T %z")
 
-name=boatinstrument-$(awk '/^version:/ {print $2}' pubspec.yaml)
+prepackage () (
+  post=$1; shift
+  rm -rf debian
+  mkdir -p debian/DEBIAN debian/usr/share/doc/${name}${post}
+)
+
+package () (
+  post=$1; shift
+  deps=$@
+
+  m4 -D__VERSION__=$version -D__DATE__="$date" -D__POST__=${post} changelog.m4 > debian/usr/share/doc/${name}${post}/changelog
+
+  cp debian/usr/share/doc/${name}${post}/changelog debian/usr/share/doc/${name}${post}/changelog.Debian
+  cp copyright debian/usr/share/doc/${name}${post}
+
+  gzip --force --best debian/usr/share/doc/${name}${post}/changelog*
+
+  size=$(du -s debian | awk '{print $1}')
+
+  m4 -D__VERSION__=$version -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
+
+  fakeroot dpkg-deb --build debian packages
+)
 
 mkdir -p packages
-package_dir=$(pwd)/packages
 
-dart run build_runner build --delete-conflicting-outputs
+# ================================ Linux ====================================
+flutter build linux
+prepackage
+mkdir -p debian/usr/share/applications
+mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
+cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
+package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
 
-case ${type} in
-  apk)
-    flutter build $type
-    cp build/app/outputs/flutter-apk/app-release.apk "${package_dir}"/${name}.apk
-    ;;
-  ipa)
-    flutter build $type
-    cp build/ios/ipa/boatinstrument.ipa "${package_dir}"/${name}.ipa
-    ;;
-  linux)
-    flutter build $type
-    cpu=$(uname -m)
-    cd build/linux/${cpu:0:1}*/release
-    mv bundle boatinstrument
-    tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument
-    ;;
-  macos)
-    flutter build $type
-    cpu=$(uname -m)
-    cd build/macos/Build/Products/Release/
-    tar czf "${package_dir}"/${name}-${type}-${cpu}.tgz boatinstrument.app
-    ;;
-  flutterpi)
-    flutter pub get
-    flutterpi_tool build --arch=arm64 --cpu=pi4 --release
-    cd build/
-    mv flutter_assets boatinstrument
-    tar czf "${package_dir}"/${name}-${type}.tgz boatinstrument
-    ;;
-  *)
-    echo "Unknown type '$type'"
-esac
+# ================================ flutter-pi ====================================
+flutterpi_tool build --release ${pi_opts}
+post=-flutter-pi
+prepackage ${post}
+mkdir -p debian/usr/lib/systemd/system
+mv build/flutter_assets debian/usr/share/${name}${post}
+cp debian-postinst debian/DEBIAN/postinst
+cp boatinstrument-flutter-pi.service debian/usr/lib/systemd/system
+package ${post} libdrm2, libgbm1, libinput10, libxkbcommon0, libegl1, libgles2, libgl1-mesa-dri

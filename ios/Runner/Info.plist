@@ -51,5 +51,7 @@
 	<array>
 		<string>_signalk-http._tcp</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Required to export/backup settings</string>
 </dict>
 </plist>

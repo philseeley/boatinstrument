@@ -11,4 +11,4 @@ PRODUCT_NAME = boatinstrument
 PRODUCT_BUNDLE_IDENTIFIER = name.seeley.phil.boatinstrument
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2024 name.seeley.phil. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2024 Phil Seeley. All rights reserved.
