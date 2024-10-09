@@ -207,6 +207,8 @@ class _MainPageState extends State<MainPage> {
 
     _controller.save();
 
+    _controller.connect();
+
     setState(() {
       _showAppBar = false;
       if(_pageNum >= _controller.numOfPages) {
