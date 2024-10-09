@@ -9,12 +9,9 @@ import 'double_value_box.dart';
 
 part 'environment_box.g.dart';
 
-class DepthBelowSurfaceBox extends DoubleValueBox {
-  static const String sid = 'environment-depth-belowSurface';
-  @override
-  String get id => sid;
+abstract class DepthBox extends DoubleValueBox {
 
-  const DepthBelowSurfaceBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface', maxValue: 1000.0, smoothing: false);
+  const DepthBox(super.config, super.title, super.path, {super.key}) : super(maxValue: 1000.0, smoothing: false);
 
   @override
   double convert(double value) {
@@ -32,6 +29,30 @@ class DepthBelowSurfaceBox extends DoubleValueBox {
   String units(double value) {
     return config.controller.depthUnits.unit;
   }
+}
+
+class DepthBelowSurfaceBox extends DepthBox {
+  static const String sid = 'environment-depth-belowSurface';
+  @override
+  String get id => sid;
+
+  const DepthBelowSurfaceBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface');
+}
+
+class DepthBelowKeelBox extends DepthBox {
+  static const String sid = 'environment-depth-belowKeel';
+  @override
+  String get id => sid;
+
+  const DepthBelowKeelBox(config, {super.key}) : super(config, 'Depth below Keel', 'environment.depth.belowKeel');
+}
+
+class DepthBelowTransducerBox extends DepthBox {
+  static const String sid = 'environment-depth-belowTransducer';
+  @override
+  String get id => sid;
+
+  const DepthBelowTransducerBox(config, {super.key}) : super(config, 'Depth below Transducer', 'environment.depth.belowTransducer');
 }
 
 class WaterTemperatureBox extends DoubleValueBox {

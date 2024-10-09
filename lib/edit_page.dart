@@ -17,6 +17,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}),
   BoxDetails(DepthBelowSurfaceBox.sid, 'Depth Below Surface', (config) {return DepthBelowSurfaceBox(config, key: UniqueKey());}),
+  BoxDetails(DepthBelowKeelBox.sid, 'Depth Below Keel', (config) {return DepthBelowKeelBox(config, key: UniqueKey());}),
+  BoxDetails(DepthBelowTransducerBox.sid, 'Depth Below Transducer', (config) {return DepthBelowTransducerBox(config, key: UniqueKey());}),
   BoxDetails(SpeedThroughWaterBox.sid, 'Speed Through Water', (config) {return SpeedThroughWaterBox(config, key: UniqueKey());}),
   BoxDetails(SpeedOverGroundBox.sid, 'Speed Over Ground', (config) {return SpeedOverGroundBox(config, key: UniqueKey());}),
   BoxDetails(WindSpeedApparentBox.sid, 'Wind Speed Apparent', (config) {return WindSpeedApparentBox(config, key: UniqueKey());}),
@@ -88,6 +90,8 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(BlankBox.sid),
       _widgetSubMenuEntry(box, 'Environment', [
         _widgetMenuEntry(DepthBelowSurfaceBox.sid),
+        _widgetMenuEntry(DepthBelowKeelBox.sid),
+        _widgetMenuEntry(DepthBelowTransducerBox.sid),
         _widgetMenuEntry(SetAndDriftBox.sid),
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
