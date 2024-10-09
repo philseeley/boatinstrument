@@ -49,4 +49,4 @@ mkdir -p debian/usr/lib/systemd/system
 mv build/flutter_assets debian/usr/share/${name}${post}
 cp debian-postinst debian/DEBIAN/postinst
 cp boatinstrument-flutter-pi.service debian/usr/lib/systemd/system
-package ${post} libdrm2, libgbm1, libinput10, libxkbcommon0, libegl1, libgles2, libgl1-mesa-dri
+package ${post} libgl1-mesa-dri, flutter-pi
