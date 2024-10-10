@@ -1,0 +1,6 @@
+#!/bin/bash
+
+[ -f /boot/boatinstrument.json ] && mv /boot/boatinstrument.json /
+
+/usr/bin/flutter-pi --release /usr/share/boatinstrument-flutter-pi
+

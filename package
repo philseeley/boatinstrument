@@ -48,5 +48,6 @@ prepackage ${post}
 mkdir -p debian/usr/lib/systemd/system
 mv build/flutter_assets debian/usr/share/${name}${post}
 cp debian-postinst debian/DEBIAN/postinst
+cp boatinstrument-flutter-pi debian/usr/share/${name}${post}
 cp boatinstrument-flutter-pi.service debian/usr/lib/systemd/system
 package ${post} libgl1-mesa-dri, flutter-pi

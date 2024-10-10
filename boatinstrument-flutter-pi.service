@@ -5,7 +5,7 @@ Wants=avahi-daemon.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/flutter-pi --release /usr/share/boatinstrument-flutter-pi
+ExecStart=/usr/share/boatinstrument-flutter-pi/boatinstrument-flutter-pi
 
 [Install]
 WantedBy=multi-user.target
