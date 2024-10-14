@@ -6,6 +6,7 @@ arch=$(uname -m)
 [ ${arch} == 'x86_64' ] && { arch=amd64; pi_opts="--arch=x64"; }
 [ ${arch} == 'aarch64' ] && { arch=arm64; pi_opts="--arch=arm64 --cpu=pi4"; }
 date=$(date +"%a, %d %b %Y %T %z")
+. /etc/os-release
 
 prepackage () (
   post=$1; shift
@@ -26,7 +27,7 @@ package () (
 
   size=$(du -s debian | awk '{print $1}')
 
-  m4 -D__VERSION__=$version -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
+  m4 -D__VERSION__=$version -D__RELEASE__=$VERSION_ID -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
 
   fakeroot dpkg-deb --build debian packages
 )

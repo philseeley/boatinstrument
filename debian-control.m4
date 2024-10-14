@@ -1,5 +1,5 @@
 Package: boatinstrument`'__POST__
-Version: __VERSION__-0
+Version: __VERSION__-d`'__RELEASE__
 Section: utilities
 Priority: optional
 Architecture: __ARCH__
