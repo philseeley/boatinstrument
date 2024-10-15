@@ -37,6 +37,7 @@ mkdir -p packages
 # ================================ Linux ====================================
 flutter build linux
 prepackage
+cpu=$(uname -m)
 mkdir -p debian/usr/share/applications
 mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
 cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
