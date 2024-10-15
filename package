@@ -6,6 +6,7 @@ arch=$(uname -m)
 [ ${arch} == 'x86_64' ] && { arch=amd64; pi_opts="--arch=x64"; }
 [ ${arch} == 'aarch64' ] && { arch=arm64; pi_opts="--arch=arm64 --cpu=pi4"; }
 date=$(date +"%a, %d %b %Y %T %z")
+. /etc/os-release
 
 prepackage () (
   post=$1; shift
@@ -26,7 +27,7 @@ package () (
 
   size=$(du -s debian | awk '{print $1}')
 
-  m4 -D__VERSION__=$version -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
+  m4 -D__VERSION__=$version -D__RELEASE__=$VERSION_ID -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
 
   fakeroot dpkg-deb --build debian packages
 )
@@ -36,6 +37,7 @@ mkdir -p packages
 # ================================ Linux ====================================
 flutter build linux
 prepackage
+cpu=$(uname -m)
 mkdir -p debian/usr/share/applications
 mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
 cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
@@ -45,8 +47,9 @@ package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
 flutterpi_tool build --release ${pi_opts}
 post=-flutter-pi
 prepackage ${post}
-mkdir -p debian/usr/lib/systemd/system
+mkdir -p debian/etc/systemd/system/getty@tty1.service.d
 mv build/flutter_assets debian/usr/share/${name}${post}
 cp debian-postinst debian/DEBIAN/postinst
-cp boatinstrument-flutter-pi.service debian/usr/lib/systemd/system
-package ${post} libdrm2, libgbm1, libinput10, libxkbcommon0, libegl1, libgles2, libgl1-mesa-dri
+cp boatinstrument-flutter-pi debian/usr/share/${name}${post}
+cp boatinstrument-flutter-pi.getty debian/etc/systemd/system/getty@tty1.service.d/override.conf
+package ${post} libgl1-mesa-dri, flutter-pi

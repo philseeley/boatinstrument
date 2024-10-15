@@ -372,7 +372,11 @@ class BoatInstrumentController {
       String host = _settings!.signalkHost;
       int port = _settings!.signalkPort;
 
-      if (_settings!.discoverServer) {
+      if(_settings!.demoMode) {
+        host = 'demo.signalk.org';
+        port = 443;
+      }
+      else if(_settings!.discoverServer) {
         BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
         await discovery.ready;
         discovery.start();
@@ -397,7 +401,7 @@ class BoatInstrumentController {
         }
       }
 
-      Uri uri = Uri(scheme: 'http', host: host, port: port, path: '/signalk');
+      Uri uri = Uri(scheme: _settings!.demoMode ? 'https' : 'http', host: host, port: port, path: '/signalk');
 
       http.Response response = await http.get(uri).timeout(const Duration(seconds: 10));
       dynamic data = json.decode(response.body);
@@ -419,12 +423,13 @@ class BoatInstrumentController {
         }
       }
 
+      _channel?.sink.close();
+      _channel = null;
+
       _networkTimeout();
       await _discoverServices();
 
       l.i("Connecting to: $wsUri");
-
-      _channel?.sink.close();
 
       _channel = WebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'));
 
@@ -481,7 +486,6 @@ class BoatInstrumentController {
           "minPeriod": _settings!.signalkMinPeriod.toString()
         });
       }
-
       _channel?.sink.add(
         jsonEncode(
           {
@@ -514,7 +518,9 @@ class BoatInstrumentController {
       for (dynamic u in d['updates']) {
         try {
           String source = u[r'$source'];
-          if (source == 'defaults' ||
+          // Note: the demo server has old date/times.
+          if (_settings!.demoMode ||
+              source == 'defaults' ||
               source == 'derived-data' ||
               now.difference(DateTime.parse(u['timestamp'])) <=
                   Duration(milliseconds: _settings!.dataTimeout)) {

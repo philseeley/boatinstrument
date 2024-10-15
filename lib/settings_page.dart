@@ -225,27 +225,33 @@ class _SettingsState extends State<SettingsPage> {
       ),
       SwitchListTile(title: const Text("Auto Discover:"),
           value: settings.discoverServer,
-          onChanged: (bool value) {
+          onChanged: settings.demoMode ? null : (bool value) {
             setState(() {
               settings.discoverServer = value;
             });
           }),
       ListTile(
           leading: const Text("Host:"),
-          title: TextFormField(enabled: !settings.discoverServer,
+          title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
               decoration: const InputDecoration(hintText: 'mypi.local'),
               initialValue: settings.signalkHost,
               onChanged: (value) => settings.signalkHost = value)
       ),
       ListTile(
           leading: const Text("Port:"),
-          title: TextFormField(enabled: !settings.discoverServer,
+          title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.signalkPort.toString(),
               onChanged: (value) => settings.signalkPort = int.parse(value)),
-          trailing: const Text('ms')
       ),
+      SwitchListTile(title: const Text("Demo Mode:"),
+          value: settings.demoMode,
+          onChanged: (bool value) {
+            setState(() {
+              settings.demoMode = value;
+            });
+          }),
       ListTile(
           leading: const Text("Subscription Min Period:"),
           title: TextFormField(
