@@ -118,3 +118,9 @@ flutter:
     - family: Red Hat Mono
       fonts:
         - asset: fonts/RedHatMono-Regular.ttf
+
+msix_config:
+  display_name: Boat Instrument
+  publisher_display_name: Phil Seeley
+  identity_name: PhilSeeley.BoatInstrument
+  publisher: CN=4F8DE92B-051C-4FBD-9588-EF56D61221E6
