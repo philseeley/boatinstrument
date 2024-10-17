@@ -1,4 +1,4 @@
-Package: boatinstrument`'__POST__
+Package: __NAME__`'__POST__
 Version: __VERSION__-d`'__RELEASE__
 Section: utilities
 Priority: optional

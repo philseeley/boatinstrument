@@ -1,0 +1,4 @@
+[Service]
+ExecStart=
+ExecStart=/usr/share/boatinstrument-fpi/boatinstrument-fpi
+
