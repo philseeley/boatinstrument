@@ -8,11 +8,6 @@ arch=$(dpkg --print-architecture)
 
 [ ${arch} == 'amd64' ] && { pi_opts="--arch=x64"; }
 [ ${arch} == 'arm64' ] && { pi_opts="--arch=arm64"; }
-if [ $1 == 'arm' ]
-then
-  shift
-  pi_opts="--arch=arm"
-fi
 
 date=$(date +"%a, %d %b %Y %T %z")
 . /etc/os-release
