@@ -8,6 +8,12 @@ arch=$(dpkg --print-architecture)
 
 [ ${arch} == 'amd64' ] && { pi_opts="--arch=x64"; }
 [ ${arch} == 'arm64' ] && { pi_opts="--arch=arm64"; }
+if [ $1 == 'arm' ]
+then
+  shift
+  arch="armhf"
+  { pi_opts="--arch=arm"; }
+then
 
 date=$(date +"%a, %d %b %Y %T %z")
 . /etc/os-release
@@ -39,17 +45,21 @@ mkdir -p packages
 
 # ================================ Linux ====================================
 flutter build linux
-prepackage
-cpu=$(uname -m)
-mkdir -p debian/usr/share/applications
-mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
-cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
-package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
+
+if [ ${arch} != "armhf" ]
+then
+  prepackage
+  cpu=$(uname -m)
+  mkdir -p debian/usr/share/applications
+  mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
+  cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
+  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
+fi
 
 # ================================ fpi ======================================
 name=${name}-fpi
 
-for pi_cpu in "$@"
+for pi_cpu in $*
 do
   flutterpi_tool build --release ${pi_opts} --cpu ${pi_cpu}
   prepackage
