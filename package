@@ -13,7 +13,7 @@ then
   shift
   arch="armhf"
   { pi_opts="--arch=arm"; }
-then
+fi
 
 date=$(date +"%a, %d %b %Y %T %z")
 . /etc/os-release
