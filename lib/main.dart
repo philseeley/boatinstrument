@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:args/args.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -10,27 +11,36 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: const NavApp()));
+void main(List<String> args) {
+  runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
 
-class NavApp extends StatelessWidget {
+class BoatInstrumentApp extends StatelessWidget {
+  final List<String> args;
 
-  const NavApp({super.key});
+  const BoatInstrumentApp(this.args, {super.key});
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
+    const noAudio = 'noaudio';
+    final p = ArgParser()
+                ..addFlag(noAudio);
+
+    ArgResults r = p.parse(args);
+
     return MaterialApp(
-      home: const MainPage(),
+      home: MainPage(r[noAudio] as bool),
       theme:  Provider.of<ThemeProvider>(context).themeData
     );
   }
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final bool noAudio;
+
+  const MainPage(this.noAudio, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -56,14 +66,17 @@ class _MainPageState extends State<MainPage> {
   Timer? _pageTimer;
   Offset _panStart = Offset.zero;
 
-  final BoatInstrumentController _controller = BoatInstrumentController();
+  late final BoatInstrumentController _controller;
   int _pageNum = 0;
   int? _pageTimeout = 0;
 
   @override
   void initState() {
     super.initState();
+
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    _controller = BoatInstrumentController(widget.noAudio);
+
     _configure();
   }
 

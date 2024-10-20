@@ -89,6 +89,7 @@ enum NotificationState {
 
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
+  final bool noAudio;
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
@@ -96,8 +97,12 @@ class BoatInstrumentController {
   final List<_BoxData> _boxData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  AudioPlayer? _audioPlayer;
   bool _showNotifications = true;
+
+  BoatInstrumentController(this.noAudio) {
+    _audioPlayer = noAudio ? null : AudioPlayer();
+  }
 
   bool get ready => _settings != null;
 
@@ -297,7 +302,7 @@ class BoatInstrumentController {
           }
           if (state == NotificationState.normal) {
             _showNotifications = true;
-            _audioPlayer.stop();
+            _audioPlayer?.stop();
           }
 
           if (_showNotifications) {
@@ -307,7 +312,7 @@ class BoatInstrumentController {
             if (state != NotificationState.normal) {
               action = SnackBarAction(label: 'Mute', onPressed: () {
                 _showNotifications = false;
-                _audioPlayer.stop();
+                _audioPlayer?.stop();
               });
             }
             showMessage(
@@ -315,7 +320,7 @@ class BoatInstrumentController {
                 action: action);
 
             if (playSound && state.soundFile != null) {
-              _audioPlayer.play(AssetSource(state.soundFile!));
+              _audioPlayer?.play(AssetSource(state.soundFile!));
             }
           }
         } catch(e) {

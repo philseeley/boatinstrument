@@ -55,6 +55,7 @@ dependencies:
   bonsoir:
   audioplayers:
   latlong2:
+  args:
 
 dev_dependencies:
   flutter_test:
