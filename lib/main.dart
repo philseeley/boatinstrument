@@ -11,7 +11,9 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-void main(List<String> args) {
+void main() {
+  List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(new RegExp(r'\s+'));
+
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
 
