@@ -27,8 +27,10 @@ class BoatInstrumentApp extends StatelessWidget {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     const noAudio = 'noaudio';
+    const noBrightnesCtrl = 'nobrightctrl';
     final p = ArgParser()
-                ..addFlag(noAudio, negatable: false);
+                ..addFlag(noAudio, negatable: false)
+                ..addFlag(noBrightnesCtrl, negatable: false);
 
     try {
       ArgResults r = p.parse(args);
@@ -37,7 +39,9 @@ class BoatInstrumentApp extends StatelessWidget {
       }
 
       return MaterialApp(
-        home: MainPage(r.flag(noAudio)),
+        home: MainPage(
+          r.flag(noAudio),
+          r.flag(noBrightnesCtrl)),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
     } catch (e) {
@@ -50,8 +54,9 @@ class BoatInstrumentApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   final bool noAudio;
+  final bool noBrightnessControl;
 
-  const MainPage(this.noAudio, {super.key});
+  const MainPage(this.noAudio, this.noBrightnessControl, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -86,7 +91,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
 
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    _controller = BoatInstrumentController(widget.noAudio);
+    _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl);
 
     _configure();
   }

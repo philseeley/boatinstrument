@@ -89,7 +89,8 @@ enum NotificationState {
 
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
-  final bool noAudio;
+  final bool _noAudio;
+  final bool _noBrightnessControls;
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
@@ -100,8 +101,8 @@ class BoatInstrumentController {
   AudioPlayer? _audioPlayer;
   bool _showNotifications = true;
 
-  BoatInstrumentController(this.noAudio) {
-    _audioPlayer = noAudio ? null : AudioPlayer();
+  BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
+    _audioPlayer = _noAudio ? null : AudioPlayer();
   }
 
   bool get ready => _settings != null;
@@ -138,6 +139,10 @@ class BoatInstrumentController {
     } on Error catch(e) {
       l.e('Error loading Settings', error: e);
       _settings = _Settings();
+    }
+
+    if(_noBrightnessControls) {
+      _settings?.brightnessControl = false;
     }
   }
 

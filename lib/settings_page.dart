@@ -156,7 +156,7 @@ class _SettingsState extends State<SettingsPage> {
           }),
       SwitchListTile(title: const Text("Show Brightness Controls:"),
           value: settings.brightnessControl,
-          onChanged: (bool value) {
+          onChanged: widget._controller._noBrightnessControls ? null : (bool value) {
             setState(() {
               settings.brightnessControl = value;
               if(!value) {
