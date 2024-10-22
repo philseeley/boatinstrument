@@ -42,6 +42,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+/.vscode/
+
 # Built binay packages
 /packages/
 /debian/
