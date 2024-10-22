@@ -11,8 +11,8 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-void main() {
-  List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(new RegExp(r'\s+'));
+void main(List<String> cmdlineArgs) {
+  List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(RegExp(r'\s+')) + cmdlineArgs;
 
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
@@ -28,14 +28,23 @@ class BoatInstrumentApp extends StatelessWidget {
 
     const noAudio = 'noaudio';
     final p = ArgParser()
-                ..addFlag(noAudio);
+                ..addFlag(noAudio, negatable: false);
 
-    ArgResults r = p.parse(args);
+    try {
+      ArgResults r = p.parse(args);
+      if(r.rest.length > 1) {
+        throw const FormatException('Too many command line arguments given.');
+      }
 
-    return MaterialApp(
-      home: MainPage(r[noAudio] as bool),
-      theme:  Provider.of<ThemeProvider>(context).themeData
-    );
+      return MaterialApp(
+        home: MainPage(r.flag(noAudio)),
+        theme:  Provider.of<ThemeProvider>(context).themeData
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      debugPrint('Usage: boatinstrument ${p.usage}');
+      exit(1);
+    } 
   }
 }
 
