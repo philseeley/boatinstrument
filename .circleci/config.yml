@@ -34,6 +34,9 @@ commands:
           name: Checkout
           path: /home/build/boatinstrument
       - run:
+          name: Set ownership
+          command: chown -R build:build /home/build/boatinstrument
+      - run:
           name: Install dependancies
           command: |
             apt update
@@ -118,11 +121,32 @@ jobs:
 
 workflows:
   build:
+    filters:
+      branches:
+        only: release
     jobs:
-      - debian11-amd64
-      - debian11-arm64
-      - debian12-amd64
-      - debian12-arm64
-      - debian12-arm32-bi-fpi
-      - debian12-arm32-fpi
+      - debian11-amd64:
+          filters:
+            branches:
+              only: release
+      - debian11-arm64:
+          filters:
+            branches:
+              only: release
+      - debian12-amd64:
+          filters:
+            branches:
+              only: release
+      - debian12-arm64:
+          filters:
+            branches:
+              only: release
+      - debian12-arm32-bi-fpi:
+          filters:
+            branches:
+              only: release
+      - debian12-arm32-fpi:
+          filters:
+            branches:
+              only: release
 
