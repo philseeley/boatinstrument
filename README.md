@@ -4,6 +4,8 @@ A Boat Instrument for displaying data in fully configurable Boxes. The data is r
 
 [<img src="media/youtube.png" width="200">](https://youtu.be/muNMslGeSYQ)
 
+For first-time users see the [installation](install.md) instructions.
+
 # OS Support
 The Boat Instrument is built on the Flutter framework and therefore runs on all Flutter supported platforms. It has been mainly tested on an Android Tablet, but all the following screenshots show it functioning on other platforms.
 
@@ -29,9 +31,9 @@ Tablet tiled:
 <img src="media/iphone.jpeg" width="200">
 
 ## Linux
-Fedora:
+Debian:
 
-<img src="media/fedora.jpg" width="400">
+<img src="media/debian.png" width="400">
 
 Raspberry Pi 4 - X-Windows:
 
@@ -41,7 +43,7 @@ Raspberry Pi 4 - X-Windows:
 
 Raspberry PI 4 - Flutter-Pi:
 
-**Note:** very early version showing working on an HDMI monitor without X-Windows.
+**Note:** working on an HDMI monitor without X-Windows/Wayland.
 
 <img src="media/raspberry-pi-flutter-pi.jpeg" width="400">
 
@@ -51,7 +53,7 @@ Ventura:
 <img src="media/macos.png" width="400">
 
 ## Windows
-Windows 10:
+Windows 11:
 
 <img src="media/windows.png" width="400">
 
