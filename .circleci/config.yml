@@ -121,9 +121,9 @@ jobs:
 
 workflows:
   build:
-    filters:
-      branches:
-        only: release
+    # filters:
+    #   branches:
+    #     only: release
     jobs:
       - debian11-amd64:
           filters:
