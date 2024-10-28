@@ -89,6 +89,8 @@ enum NotificationState {
 
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
+  final bool _noAudio;
+  final bool _noBrightnessControls;
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
@@ -96,8 +98,12 @@ class BoatInstrumentController {
   final List<_BoxData> _boxData = [];
   WebSocketChannel? _channel;
   Timer? _networkTimer;
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  AudioPlayer? _audioPlayer;
   bool _showNotifications = true;
+
+  BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
+    _audioPlayer = _noAudio ? null : AudioPlayer();
+  }
 
   bool get ready => _settings != null;
 
@@ -133,6 +139,10 @@ class BoatInstrumentController {
     } on Error catch(e) {
       l.e('Error loading Settings', error: e);
       _settings = _Settings();
+    }
+
+    if(_noBrightnessControls) {
+      _settings?.brightnessControl = false;
     }
   }
 
@@ -297,7 +307,7 @@ class BoatInstrumentController {
           }
           if (state == NotificationState.normal) {
             _showNotifications = true;
-            _audioPlayer.stop();
+            _audioPlayer?.stop();
           }
 
           if (_showNotifications) {
@@ -307,7 +317,7 @@ class BoatInstrumentController {
             if (state != NotificationState.normal) {
               action = SnackBarAction(label: 'Mute', onPressed: () {
                 _showNotifications = false;
-                _audioPlayer.stop();
+                _audioPlayer?.stop();
               });
             }
             showMessage(
@@ -315,7 +325,7 @@ class BoatInstrumentController {
                 action: action);
 
             if (playSound && state.soundFile != null) {
-              _audioPlayer.play(AssetSource(state.soundFile!));
+              _audioPlayer?.play(AssetSource(state.soundFile!));
             }
           }
         } catch(e) {

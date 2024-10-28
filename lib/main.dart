@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:args/args.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -10,27 +11,52 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: const NavApp()));
+void main(List<String> cmdlineArgs) {
+  List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(RegExp(r'\s+')) + cmdlineArgs;
+
+  runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
 
-class NavApp extends StatelessWidget {
+class BoatInstrumentApp extends StatelessWidget {
+  final List<String> args;
 
-  const NavApp({super.key});
+  const BoatInstrumentApp(this.args, {super.key});
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-    return MaterialApp(
-      home: const MainPage(),
-      theme:  Provider.of<ThemeProvider>(context).themeData
-    );
+    const noAudio = 'noaudio';
+    const noBrightnesCtrl = 'nobrightctrl';
+    final p = ArgParser()
+                ..addFlag(noAudio, negatable: false)
+                ..addFlag(noBrightnesCtrl, negatable: false);
+
+    try {
+      ArgResults r = p.parse(args);
+      if(r.rest.length > 1) {
+        throw const FormatException('Too many command line arguments given.');
+      }
+
+      return MaterialApp(
+        home: MainPage(
+          r.flag(noAudio),
+          r.flag(noBrightnesCtrl)),
+        theme:  Provider.of<ThemeProvider>(context).themeData
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      debugPrint('Usage: boatinstrument ${p.usage}');
+      exit(1);
+    } 
   }
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final bool noAudio;
+  final bool noBrightnessControl;
+
+  const MainPage(this.noAudio, this.noBrightnessControl, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -56,14 +82,17 @@ class _MainPageState extends State<MainPage> {
   Timer? _pageTimer;
   Offset _panStart = Offset.zero;
 
-  final BoatInstrumentController _controller = BoatInstrumentController();
+  late final BoatInstrumentController _controller;
   int _pageNum = 0;
   int? _pageTimeout = 0;
 
   @override
   void initState() {
     super.initState();
+
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl);
+
     _configure();
   }
 

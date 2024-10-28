@@ -1,33 +1,42 @@
 #!/bin/bash
 
 name=boatinstrument
+
 version=$(awk -F '[ :+]*' '/^version:/ {print $2}' pubspec.yaml)
-arch=$(uname -m)
-[ ${arch} == 'x86_64' ] && { arch=amd64; pi_opts="--arch=x64"; }
-[ ${arch} == 'aarch64' ] && { arch=arm64; pi_opts="--arch=arm64 --cpu=pi4"; }
+
+arch=$(dpkg --print-architecture)
+
+[ ${arch} == 'amd64' ] && { pi_opts="--arch=x64"; }
+[ ${arch} == 'arm64' ] && { pi_opts="--arch=arm64"; }
+if [ $1 == 'arm' ]
+then
+  shift
+  arch="armhf"
+  { pi_opts="--arch=arm"; }
+fi
+
 date=$(date +"%a, %d %b %Y %T %z")
 . /etc/os-release
 
 prepackage () (
-  post=$1; shift
   rm -rf debian
-  mkdir -p debian/DEBIAN debian/usr/share/doc/${name}${post}
+  mkdir -p debian/DEBIAN debian/usr/share/doc/${name}
 )
 
 package () (
   post=$1; shift
   deps=$@
 
-  m4 -D__VERSION__=$version -D__DATE__="$date" -D__POST__=${post} changelog.m4 > debian/usr/share/doc/${name}${post}/changelog
+  m4 -D__NAME__=${name} -D__VERSION__=$version -D__DATE__="$date" changelog.m4 > debian/usr/share/doc/${name}/changelog
 
-  cp debian/usr/share/doc/${name}${post}/changelog debian/usr/share/doc/${name}${post}/changelog.Debian
-  cp copyright debian/usr/share/doc/${name}${post}
+  cp debian/usr/share/doc/${name}/changelog debian/usr/share/doc/${name}/changelog.Debian
+  cp copyright debian/usr/share/doc/${name}
 
-  gzip --force --best debian/usr/share/doc/${name}${post}/changelog*
+  gzip --force --best debian/usr/share/doc/${name}/changelog*
 
   size=$(du -s debian | awk '{print $1}')
 
-  m4 -D__VERSION__=$version -D__RELEASE__=$VERSION_ID -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
+  m4 -D__NAME__=${name} -D__VERSION__=$version -D__RELEASE__=$VERSION_ID -D__ARCH__=${arch} -D__DEPS__="${deps}" -D__POST__=${post} -D__SIZE__=${size} debian-control.m4 > debian/DEBIAN/control
 
   fakeroot dpkg-deb --build debian packages
 )
@@ -36,20 +45,27 @@ mkdir -p packages
 
 # ================================ Linux ====================================
 flutter build linux
-prepackage
-cpu=$(uname -m)
-mkdir -p debian/usr/share/applications
-mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
-cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
-package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
 
-# ================================ flutter-pi ====================================
-flutterpi_tool build --release ${pi_opts}
-post=-flutter-pi
-prepackage ${post}
-mkdir -p debian/etc/systemd/system/getty@tty1.service.d
-mv build/flutter_assets debian/usr/share/${name}${post}
-cp debian-postinst debian/DEBIAN/postinst
-cp boatinstrument-flutter-pi debian/usr/share/${name}${post}
-cp boatinstrument-flutter-pi.getty debian/etc/systemd/system/getty@tty1.service.d/override.conf
-package ${post} libgl1-mesa-dri, flutter-pi
+if [ ${arch} != "armhf" ]
+then
+  prepackage
+  cpu=$(uname -m)
+  mkdir -p debian/usr/share/applications
+  mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
+  cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
+  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
+fi
+
+# ================================ fpi ======================================
+name=${name}-fpi
+
+for pi_cpu in $*
+do
+  flutterpi_tool build --release ${pi_opts} --cpu ${pi_cpu}
+  prepackage
+  mkdir -p debian/etc/systemd/system/getty@tty1.service.d
+  mv build/flutter_assets debian/usr/share/${name}
+  cp boatinstrument-fpi debian/usr/share/${name}
+  cp boatinstrument-fpi.getty debian/etc/systemd/system/getty@tty1.service.d/override.conf
+  package -${pi_cpu} libgl1-mesa-dri, flutter-pi
+done

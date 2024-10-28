@@ -11,3 +11,5 @@ flutter build ios
 
 
 python3 -m json.tool /Users/admin//Library/Containers/name.seeley.phil.boatinstrument/Data/Documents/boatinstrument.json
+
+dart run msix:create --store

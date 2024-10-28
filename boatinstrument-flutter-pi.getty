@@ -1,4 +1,0 @@
-[Service]
-ExecStart=
-ExecStart=/usr/share/boatinstrument-flutter-pi/boatinstrument-flutter-pi
-
