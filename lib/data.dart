@@ -228,7 +228,10 @@ class _HelpBoxState extends State<HelpBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage));
+    return Column(children: [
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [const Text('Press for Help'), const Icon(Icons.east), IconButton(icon: const Icon(Icons.help), iconSize: 80.0, onPressed: _showHelpPage)]),
+      const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Swipe down'), Icon(Icons.south), Text('to setup pages\nand configure')])
+    ]);
   }
 
   _showHelpPage () async {
