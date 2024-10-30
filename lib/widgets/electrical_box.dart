@@ -17,11 +17,11 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  const VoltMeterBox(config, {super.key, super.minValue = 10, super.maxValue = 14, super.ranges = const [
+  const VoltMeterBox(config, {super.key, super.minValue = 10, super.maxValue = 15, super.ranges = const [
     GuageRange(10, 12, Colors.red),
     GuageRange(12, 13, Colors.orange),
-    GuageRange(13, 14, Colors.green)
-  ]}) : super(config, 'Battery', GaugeOrientation.up, 'fred');
+    GuageRange(13, 15, Colors.green)
+  ]}) : super(config, 'Battery', GaugeOrientation.up, '');
 
   @override
   double convert(double value) {
@@ -63,67 +63,11 @@ class _VoltMeterState extends DoubleValueSemiGaugeBoxState<VoltMeterBox> {
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      displayValue = 12.3;
+      value = displayValue = 12.3;
     }
-    // displayValue = 11;
-    value = 12.8;
+
     return super.build(context);
   }
-
-  // void _onUpdate(List<Update>? updates) {
-  //   if(updates == null) {
-  //     _maxRadius = _currentRadius = _bearingTrue = _apparentBearing = null;
-  //   } else {
-  //     for (Update u in updates) {
-  //       try {
-  //         switch (u.path) {
-  //           case 'navigation.position':
-  //             DateTime now = DateTime.now();
-  //             if(now.difference(_lastPositionTime) >= Duration(seconds: _settings.recordSeconds)) {
-  //               _lastPositionTime = now;
-
-  //               _positions.add(ll.LatLng(
-  //                   (u.value['latitude'] as num).toDouble(),
-  //                   (u.value['longitude'] as num).toDouble()));
-
-  //               if (_positions.length > _settings.recordPoints) {
-  //                 _positions.removeRange(0, _settings.recordPoints ~/ 10);
-  //               }
-  //             }
-  //             break;
-  //           case 'navigation.anchor.position':
-  //             _anchorPosition = ll.LatLng((u.value['latitude'] as num).toDouble(), (u.value['longitude'] as num).toDouble());
-  //             break;
-  //           case 'navigation.anchor.maxRadius':
-  //             try {
-  //               _maxRadius = (u.value as num).round();
-  //             } catch (_){
-  //               // This only happens if the Anchor Alarm webapp is used.
-  //               _maxRadius = int.parse(u.value as String);
-  //             }
-  //             break;
-  //           case 'navigation.anchor.currentRadius':
-  //             _currentRadius = (u.value as num).round();
-  //             // Make sure we have a radius to avoid div-by-zero error.
-  //             _currentRadius = _currentRadius == 0 ? 1 : _currentRadius;
-  //             break;
-  //           case 'navigation.anchor.bearingTrue':
-  //             _bearingTrue = (u.value as num).toDouble()-m.pi;
-  //             break;
-  //           case 'navigation.anchor.apparentBearing':
-  //             _apparentBearing = (u.value as num).toDouble();
-  //             break;
-  //         }
-  //       } catch (e) {
-  //         widget.config.controller.l.e("Error converting $u", error: e);
-  //       }
-  //     }
-  //   }
-
-  //   if(mounted) {
-  //     setState(() {});
-  //   }
-  // }
 }
 
 class _VoltMeterSettingsWidget extends BoxSettingsWidget {

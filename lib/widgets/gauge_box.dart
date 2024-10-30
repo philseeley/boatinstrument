@@ -76,9 +76,10 @@ class _SemiGaugePainter extends CustomPainter {
   final bool _mirror;
   final int _minValue;
   final int _maxValue;
+  final int _step;
   final List<GuageRange> _ranges;
 
-  _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue, this._ranges);
+  _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue, this._step, this._ranges);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -121,18 +122,18 @@ class _SemiGaugePainter extends CustomPainter {
     try {
       canvas.translate((base / 2) + base*_orientation._xm, (base / 2) + base*_orientation._ym);
 
-      double diff = range / 4;
-      for (int i = 0; i <= 4; ++i) {
-        String label = (_minValue + (diff*i)).toInt().toString();
+      double steps = range / _step;
+      double angleStep = pi/steps;
+
+      for (int i = 0; i <= steps; ++i) {
+        String label = (_minValue + (_step*i)).toInt().toString();
 
         tp.text = TextSpan(
             text: label,
             style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
         tp.layout();
 
-        double angle = (_mirror ? pi - pi/4*i : pi/4*i) + _orientation._rotation;
-        angle = i == 0 ? angle: angle;
-        angle = i == 4 ? angle: angle;
+        double angle = (_mirror ? pi - angleStep*i : angleStep*i) + _orientation._rotation;
         double x = cos(angle) * (base / 2 - 20.0);
         double y = sin(angle) * (base / 2 - 20.0);
 
@@ -194,7 +195,7 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
   final bool mirror;
 
   const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path,
-    {super.minValue = 0, required super.maxValue, super.angle, super.ranges,
+    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.ranges,
     this.mirror = false, super.key});
 
   @override
@@ -214,7 +215,7 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _SemiGaugePainter(context, o, widget.mirror, _minDisplay, _maxDisplay, _displayRanges)
+          painter: _SemiGaugePainter(context, o, widget.mirror, _minDisplay, _maxDisplay, _displayStep, _displayRanges)
       )
     ];
 

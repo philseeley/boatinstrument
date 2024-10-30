@@ -79,11 +79,11 @@ class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.angle, super.key});
+  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.step, super.angle, super.key});
 
   factory CustomDoubleValueSemiGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, key: key);
+    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, angle: s.angle, key: key);
   }
 
   static String sid = 'custom-gauge-semi';
