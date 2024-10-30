@@ -47,16 +47,11 @@ abstract class DoubleValueBox extends BoxWidget {
 class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
   double? value;
   double? displayValue;
-  bool configure;
-
-  DoubleValueBoxState({this.configure = true});
 
   @override
   void initState() {
     super.initState();
-    if(configure) {
-      widget.config.controller.configure(onUpdate: processUpdates, paths: {widget.path}, dataTimeout: widget.dataTimeout);
-    }
+    widget.config.controller.configure(onUpdate: processUpdates, paths: {widget.path}, dataTimeout: widget.dataTimeout);
   }
 
   @override

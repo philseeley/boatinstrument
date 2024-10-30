@@ -17,11 +17,21 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  const VoltMeterBox(config, {super.key, super.minValue = 10, super.maxValue = 15, super.ranges = const [
-    GuageRange(10, 12, Colors.red),
-    GuageRange(12, 13, Colors.orange),
-    GuageRange(13, 15, Colors.green)
-  ]}) : super(config, 'Battery', GaugeOrientation.up, '');
+  final _VoltMeterSettings _settings;
+
+  const VoltMeterBox._init(this._settings, config, path, {super.key, super.minValue, super.maxValue = 15, super.ranges}) :
+    super(config, 'Battery', GaugeOrientation.up, path);
+
+  factory VoltMeterBox.fromSettings(config, {key}) {
+    _VoltMeterSettings s = _$VoltMeterSettingsFromJson(config.settings);
+print(s.id);
+    return VoltMeterBox._init(s, config, 'electrical.batteries.${s.id}.voltage',
+      minValue: 10, maxValue: 15, key: key, ranges: const [
+        GuageRange(10, 12, Colors.red),
+        GuageRange(12, 13, Colors.orange),
+        GuageRange(13, 15, Colors.green)
+      ]);
+  }
 
   @override
   double convert(double value) {
@@ -34,11 +44,11 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  bool get hasSettings => true;
+  bool get hasPerBoxSettings => true;
 
   @override
-  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _VoltMeterSettingsWidget(_$VoltMeterSettingsFromJson(json));
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _VoltMeterSettingsWidget(_settings);
   }
 
   @override
@@ -49,16 +59,6 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
 }
 
 class _VoltMeterState extends DoubleValueSemiGaugeBoxState<VoltMeterBox> {
-  late final _VoltMeterSettings _settings;
-
-  _VoltMeterState() : super(configure: false);
-
-  @override
-  void initState() {
-    super.initState();
-    _settings = _$VoltMeterSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
-    widget.config.controller.configure(onUpdate: processUpdates, paths: { 'electrical.batteries.${_settings.id}.voltage' });
-  }
 
   @override
   Widget build(BuildContext context) {

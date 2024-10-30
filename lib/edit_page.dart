@@ -58,7 +58,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(MoonBox.sid, 'Moon', (config) {return MoonBox(config, key: UniqueKey());}),
   BoxDetails(DebugBox.sid, 'Debug', (config) {return DebugBox(config, key: UniqueKey());}),
   BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
-  BoxDetails(VoltMeterBox.sid, 'Volt Meter', (config) {return VoltMeterBox(config, key: UniqueKey());}),
+  BoxDetails(VoltMeterBox.sid, 'Volt Meter', (config) {return VoltMeterBox.fromSettings(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {

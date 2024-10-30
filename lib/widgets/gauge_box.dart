@@ -32,8 +32,6 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
   int _displayStep = 0;
   final List<GuageRange> _displayRanges = [];
 
-  DoubleValueGaugeBoxState({super.configure});
-
   @override
   void initState() {
     super.initState();
@@ -203,8 +201,6 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
 }
 
 class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends DoubleValueGaugeBoxState<T> {
-
-  DoubleValueSemiGaugeBoxState({super.configure});
 
   @override
   Widget build(BuildContext context) {
