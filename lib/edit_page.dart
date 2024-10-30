@@ -58,6 +58,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(MoonBox.sid, 'Moon', (config) {return MoonBox(config, key: UniqueKey());}),
   BoxDetails(DebugBox.sid, 'Debug', (config) {return DebugBox(config, key: UniqueKey());}),
   BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
+  BoxDetails(VoltMeterBox.sid, 'Volt Meter', (config) {return VoltMeterBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -127,6 +128,9 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AutopilotStateControlVerticalBox.sid),
         _widgetMenuEntry(AutopilotHeadingControlHorizontalBox.sid),
         _widgetMenuEntry(AutopilotHeadingControlVerticalBox.sid),
+        ]),
+      _widgetSubMenuEntry(box, 'Electrical', [
+        _widgetMenuEntry(VoltMeterBox.sid),
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),

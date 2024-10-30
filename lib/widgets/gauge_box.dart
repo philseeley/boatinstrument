@@ -5,10 +5,22 @@ import 'package:flutter/material.dart';
 
 import 'double_value_box.dart';
 
+class GuageRange {
+  final double min;
+  final double max;
+  final Color color;
+
+  const GuageRange(this.min, this.max, this.color);
+}
+
 abstract class DoubleValueGaugeBox extends DoubleValueBox {
   final double step;
+  final List<GuageRange> ranges;
 
-  const DoubleValueGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, super.angle, this.step = 1, super.key});
+  const DoubleValueGaugeBox(super.config, super.title, super.path,
+    {super.minValue = 0, required super.maxValue, super.angle,
+    this.step = 1, this.ranges = const [],
+    super.key});
 
   @override
   DoubleValueGaugeBoxState createState() => DoubleValueGaugeBoxState();
@@ -18,6 +30,9 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
   int _minDisplay = 0;
   int _maxDisplay = 0;
   int _displayStep = 0;
+  final List<GuageRange> _displayRanges = [];
+
+  DoubleValueGaugeBoxState({super.configure});
 
   @override
   void initState() {
@@ -26,6 +41,9 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
     _maxDisplay = widget.convert(widget.maxValue!).floor();
     double steps = (widget.maxValue! - widget.minValue!)/widget.step;
      _displayStep = ((_maxDisplay - _minDisplay)/steps).round();
+    for(GuageRange r in widget.ranges) {
+      _displayRanges.add(GuageRange(widget.convert(r.min), widget.convert(r.max), r.color));
+    }
   }
 }
 
@@ -58,8 +76,9 @@ class _SemiGaugePainter extends CustomPainter {
   final bool _mirror;
   final int _minValue;
   final int _maxValue;
+  final List<GuageRange> _ranges;
 
-  _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue);
+  _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue, this._ranges);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -85,13 +104,24 @@ class _SemiGaugePainter extends CustomPainter {
     canvas.translate(-base/2, -base/2);
 
     canvas.drawArc(Rect.fromLTWH(0, 0, base, base), 0.0, pi, true, paint);
+
+    paint.strokeWidth = 5;
+    int range = _maxValue - _minValue;
+
+    for(GuageRange r in _ranges) {
+      paint.color = r.color;
+      double start = pi*((r.min - _minValue)/range);
+      double end = (pi*((r.max - _minValue)/range)) - start;
+      canvas.drawArc(Rect.fromLTWH(0, 0, base, base), start, end, false, paint);
+    }
+
     canvas.restore();
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
       canvas.translate((base / 2) + base*_orientation._xm, (base / 2) + base*_orientation._ym);
 
-      double diff = (_maxValue - _minValue) / 4;
+      double diff = range / 4;
       for (int i = 0; i <= 4; ++i) {
         String label = (_minValue + (diff*i)).toInt().toString();
 
@@ -163,13 +193,17 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
   final GaugeOrientation orientation;
   final bool mirror;
 
-  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path, {super.minValue = 0, required super.maxValue, super.angle, this.mirror = false, super.key});
+  const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path,
+    {super.minValue = 0, required super.maxValue, super.angle, super.ranges,
+    this.mirror = false, super.key});
 
   @override
   DoubleValueSemiGaugeBoxState createState() => DoubleValueSemiGaugeBoxState();
 }
 
 class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends DoubleValueGaugeBoxState<T> {
+
+  DoubleValueSemiGaugeBoxState({super.configure});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +214,7 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _SemiGaugePainter(context, o, widget.mirror, _minDisplay, _maxDisplay)
+          painter: _SemiGaugePainter(context, o, widget.mirror, _minDisplay, _maxDisplay, _displayRanges)
       )
     ];
 
@@ -294,7 +328,9 @@ class _CircularGaugeNeedlePainter extends CustomPainter {
 
 abstract class DoubleValueCircularGaugeBox extends DoubleValueGaugeBox {
 
-  const DoubleValueCircularGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required super.step, super.key});
+  const DoubleValueCircularGaugeBox(super.config, super.title, super.path,
+    {super.minValue = 0, required super.maxValue, required super.step,
+    super.ranges, super.key});
 
   @override
   DoubleValueCircularGaugeBoxState createState() => DoubleValueCircularGaugeBoxState();
@@ -380,7 +416,9 @@ class _BarGaugePainter extends CustomPainter {
 
 abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
 
-  const DoubleValueBarGaugeBox(super.config, super.title, super.path, {super.minValue = 0, required super.maxValue, required super.step, super.key});
+  const DoubleValueBarGaugeBox(super.config, super.title, super.path,
+    {super.minValue = 0, required super.maxValue, required super.step,
+    super.ranges, super.key});
 
   @override
   DoubleValueBarGaugeBoxState createState() => DoubleValueBarGaugeBoxState();
