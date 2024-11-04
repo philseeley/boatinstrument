@@ -24,7 +24,7 @@ double  rpmK2Revolutions(double value) {
 }
 
 class EngineRPMBox extends DoubleValueCircularGaugeBox {
-  static const sid = 'engine-rpm';
+  static const sid = 'propulsion-rpm';
   @override
   String get id => sid;
 
@@ -72,7 +72,7 @@ class _EngineRPMState extends DoubleValueCircularGaugeBoxState<EngineRPMBox> {
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      value = displayValue = 12.3;
+      value = displayValue = 1230;
     }
 
     return super.build(context);
