@@ -80,7 +80,7 @@ class _EngineRPMState extends DoubleValueCircularGaugeBoxState<EngineRPMBox> {
   }
 }
 
-class EngineTempBox extends DoubleValueBarGaugeBox {
+class EngineTempBox extends DoubleValueSemiGaugeBox {
   static const sid = 'propulsion-temp';
   @override
   String get id => sid;
@@ -88,7 +88,7 @@ class EngineTempBox extends DoubleValueBarGaugeBox {
   final _EngineSettings _settings;
 
   const EngineTempBox._init(this._settings, config, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
-    super(config, 'Temp', path, step: 20);
+    super(config, 'Temp', GaugeOrientation.up, path, step: 20);
 
   factory EngineTempBox.fromSettings(config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
@@ -123,15 +123,16 @@ class EngineTempBox extends DoubleValueBarGaugeBox {
   Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.temperature" the ID is "port"');
 
   @override
-  DoubleValueBarGaugeBoxState<EngineTempBox> createState() => _EngineTempState();
+  DoubleValueSemiGaugeBoxState<EngineTempBox> createState() => _EngineTempState();
 }
 
-class _EngineTempState extends DoubleValueBarGaugeBoxState<EngineTempBox> {
+class _EngineTempState extends DoubleValueSemiGaugeBoxState<EngineTempBox> {
 
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      displayValue = convertTemperature(widget.config.controller, kelvinOffset+12.3);
+      value = kelvinOffset+12.3;
+      displayValue = convertTemperature(widget.config.controller, value!);
     }
 
     return super.build(context);
