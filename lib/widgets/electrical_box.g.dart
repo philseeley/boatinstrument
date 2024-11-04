@@ -6,12 +6,12 @@ part of 'electrical_box.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_VoltMeterSettings _$VoltMeterSettingsFromJson(Map<String, dynamic> json) =>
-    _VoltMeterSettings(
-      id: json['id'] ?? '',
+_ElectricalSettings _$ElectricalSettingsFromJson(Map<String, dynamic> json) =>
+    _ElectricalSettings(
+      id: json['id'] as String? ?? '',
     );
 
-Map<String, dynamic> _$VoltMeterSettingsToJson(_VoltMeterSettings instance) =>
+Map<String, dynamic> _$ElectricalSettingsToJson(_ElectricalSettings instance) =>
     <String, dynamic>{
       'id': instance.id,
     };

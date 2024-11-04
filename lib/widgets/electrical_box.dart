@@ -6,10 +6,10 @@ import 'package:json_annotation/json_annotation.dart';
 part 'electrical_box.g.dart';
 
 @JsonSerializable()
-class _VoltMeterSettings {
+class _ElectricalSettings {
   String id;
 
-  _VoltMeterSettings({this.id = ''});
+  _ElectricalSettings({this.id = ''});
 }
 
 class VoltMeterBox extends DoubleValueSemiGaugeBox {
@@ -17,13 +17,13 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  final _VoltMeterSettings _settings;
+  final _ElectricalSettings _settings;
 
-  const VoltMeterBox._init(this._settings, config, path, {super.key, super.minValue, super.maxValue = 15, super.ranges}) :
+  const VoltMeterBox._init(this._settings, config, path, {super.key, super.minValue, super.maxValue, super.ranges}) :
     super(config, 'Battery', GaugeOrientation.up, path);
 
   factory VoltMeterBox.fromSettings(config, {key}) {
-    _VoltMeterSettings s = _$VoltMeterSettingsFromJson(config.settings);
+    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
     return VoltMeterBox._init(s, config, 'electrical.batteries.${s.id}.voltage',
       minValue: 10, maxValue: 15, key: key, ranges: const [
@@ -71,7 +71,7 @@ class _VoltMeterState extends DoubleValueSemiGaugeBoxState<VoltMeterBox> {
 }
 
 class _VoltMeterSettingsWidget extends BoxSettingsWidget {
-  final _VoltMeterSettings _settings;
+  final _ElectricalSettings _settings;
 
   const _VoltMeterSettingsWidget(this._settings);
 
@@ -80,7 +80,7 @@ class _VoltMeterSettingsWidget extends BoxSettingsWidget {
 
   @override
   Map<String, dynamic> getSettingsJson() {
-    return _$VoltMeterSettingsToJson(_settings);
+    return _$ElectricalSettingsToJson(_settings);
   }
 }
 
@@ -88,7 +88,7 @@ class _AnchorAlarmSettingsState extends State<_VoltMeterSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _VoltMeterSettings s = widget._settings;
+    _ElectricalSettings s = widget._settings;
 
     List<Widget> list = [
       ListTile(
