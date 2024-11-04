@@ -24,7 +24,7 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
 
   factory VoltMeterBox.fromSettings(config, {key}) {
     _VoltMeterSettings s = _$VoltMeterSettingsFromJson(config.settings);
-print(s.id);
+
     return VoltMeterBox._init(s, config, 'electrical.batteries.${s.id}.voltage',
       minValue: 10, maxValue: 15, key: key, ranges: const [
         GuageRange(10, 12, Colors.red),

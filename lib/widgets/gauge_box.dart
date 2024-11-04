@@ -104,7 +104,7 @@ class _SemiGaugePainter extends CustomPainter {
 
     canvas.drawArc(Rect.fromLTWH(0, 0, base, base), 0.0, pi, true, paint);
 
-    paint.strokeWidth = 5;
+    paint.strokeWidth = 5.0;
     int range = _maxValue - _minValue;
 
     for(GuageRange r in _ranges) {
@@ -239,8 +239,9 @@ class _CircularGaugePainter extends CustomPainter {
   final int _minDisplay;
   final int _maxDisplay;
   final int _displayStep;
+  final List<GuageRange> _ranges;
 
-  _CircularGaugePainter(this._context, this._minValue, this._minDisplay, this._maxDisplay, this._displayStep);
+  _CircularGaugePainter(this._context, this._minValue, this._minDisplay, this._maxDisplay, this._displayStep, this._ranges);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -253,8 +254,19 @@ class _CircularGaugePainter extends CustomPainter {
 
     canvas.drawArc(Rect.fromLTWH(0, 0, size, size), pi/2+circularGaugeOffset, 2*pi-(circularGaugeOffset*2), false, paint);
 
+    paint.strokeWidth = 5.0;
+    int range = _maxDisplay - _minDisplay;
+    double displayRange = (pi-circularGaugeOffset)*2;
+    for(GuageRange r in _ranges) {
+      paint.color = r.color;
+      double start = displayRange*((r.min - _minValue)/range);
+      double end = (displayRange*((r.max - _minValue)/range)) - start;
+      canvas.drawArc(Rect.fromLTWH(0, 0, size, size), start+pi/2+circularGaugeOffset, end, false, paint);
+    }
+
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
+      paint.color = Theme.of(_context).colorScheme.onSurface;
       paint.strokeWidth = 20.0;
       const double width = 0.02;
 
@@ -342,7 +354,7 @@ class DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> ex
       Positioned(top: 0, right: 0, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _CircularGaugePainter(context, widget.convert(widget.minValue!), _minDisplay, _maxDisplay, _displayStep)
+          painter: _CircularGaugePainter(context, widget.convert(widget.minValue!), _minDisplay, _maxDisplay, _displayStep, _displayRanges)
       )
     ];
 
