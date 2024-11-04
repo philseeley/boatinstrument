@@ -10,9 +10,10 @@ part 'propulsion_box.g.dart';
 class _EngineSettings {
   String id;
   int maxRPM;
-  int redLine;
+  int rpmRedLine;
+  double maxTemp;
 
-  _EngineSettings({this.id = '', this.maxRPM = 4000, this.redLine = 3500});
+  _EngineSettings({this.id = '', this.maxRPM = 4000, this.rpmRedLine = 3500, this.maxTemp = kelvinOffset+120});
 }
 
 double  revolutions2RPMK(double value) {
@@ -38,7 +39,7 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
 
     return EngineRPMBox._init(s, config, 'propulsion.${s.id}.revolutions',
       maxValue: rpm2Revolutions(s.maxRPM.toDouble()), key: key, ranges: [
-        GuageRange(rpm2Revolutions(s.redLine.toDouble()), rpm2Revolutions(s.maxRPM.toDouble()), Colors.red)
+        GuageRange(rpm2Revolutions(s.rpmRedLine.toDouble()), rpm2Revolutions(s.maxRPM.toDouble()), Colors.red)
       ]);
   }
 
@@ -57,11 +58,11 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _EngineSettingsWidget(_settings);
+    return _EngineSettingsWidget(config.controller, _settings);
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.revolutions" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.revolutions" the ID is "port"');
 
   @override
   DoubleValueCircularGaugeBoxState<EngineRPMBox> createState() => _EngineRPMState();
@@ -79,13 +80,72 @@ class _EngineRPMState extends DoubleValueCircularGaugeBoxState<EngineRPMBox> {
   }
 }
 
-class _EngineSettingsWidget extends BoxSettingsWidget {
+class EngineTempBox extends DoubleValueBarGaugeBox {
+  static const sid = 'propulsion-temp';
+  @override
+  String get id => sid;
+
   final _EngineSettings _settings;
 
-  const _EngineSettingsWidget(this._settings);
+  const EngineTempBox._init(this._settings, config, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
+    super(config, 'Temp', path, step: 20);
+
+  factory EngineTempBox.fromSettings(config, {key}) {
+    _EngineSettings s = _$EngineSettingsFromJson(config.settings);
+
+    return EngineTempBox._init(s, config, 'propulsion.${s.id}.temperature',
+      minValue: kelvinOffset, maxValue: s.maxTemp, key: key, ranges: [
+        GuageRange(s.maxTemp-10, s.maxTemp, Colors.red),
+        GuageRange(kelvinOffset+10, s.maxTemp-10, Colors.green),
+        const GuageRange(kelvinOffset, kelvinOffset+10, Colors.orange)
+      ]);
+  }
 
   @override
-  createState() => _AnchorAlarmSettingsState();
+  double convert(double value) {
+    return convertTemperature(config.controller, value);
+  }
+  
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _EngineSettingsWidget(config.controller, _settings);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.temperature" the ID is "port"');
+
+  @override
+  DoubleValueBarGaugeBoxState<EngineTempBox> createState() => _EngineTempState();
+}
+
+class _EngineTempState extends DoubleValueBarGaugeBoxState<EngineTempBox> {
+
+  @override
+  Widget build(BuildContext context) {
+    if(widget.config.editMode) {
+      displayValue = convertTemperature(widget.config.controller, kelvinOffset+12.3);
+    }
+
+    return super.build(context);
+  }
+}
+
+class _EngineSettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
+  final _EngineSettings _settings;
+
+  const _EngineSettingsWidget(this._controller, this._settings);
+
+  @override
+  createState() => _EngineSettingsState();
 
   @override
   Map<String, dynamic> getSettingsJson() {
@@ -93,10 +153,11 @@ class _EngineSettingsWidget extends BoxSettingsWidget {
   }
 }
 
-class _AnchorAlarmSettingsState extends State<_EngineSettingsWidget> {
+class _EngineSettingsState extends State<_EngineSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    BoatInstrumentController c = widget._controller;
     _EngineSettings s = widget._settings;
 
     List<Widget> list = [
@@ -120,9 +181,18 @@ class _AnchorAlarmSettingsState extends State<_EngineSettingsWidget> {
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: s.redLine.toString(),
-              onChanged: (value) => s.redLine = int.parse(value)),
+              initialValue: s.rpmRedLine.toString(),
+              onChanged: (value) => s.rpmRedLine = int.parse(value)),
           trailing: const Text('rpm')
+      ),
+      ListTile(
+          leading: const Text("Max Temp:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: convertTemperature(c, s.maxTemp).toInt().toString(),
+              onChanged: (value) => s.maxTemp = invertTemperature(c, double.parse(value))),
+          trailing: Text(c.temperatureUnits.unit)
       ),
     ];
 

@@ -52,7 +52,7 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('For a path of "electrical.batteries.start.voltage" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.batteries.start.voltage" the ID is "start"');
 
   @override
   DoubleValueSemiGaugeBoxState<VoltMeterBox> createState() => _VoltMeterState();
@@ -76,7 +76,7 @@ class _VoltMeterSettingsWidget extends BoxSettingsWidget {
   const _VoltMeterSettingsWidget(this._settings);
 
   @override
-  createState() => _AnchorAlarmSettingsState();
+  createState() => _ElectricalSettingsState();
 
   @override
   Map<String, dynamic> getSettingsJson() {
@@ -84,7 +84,7 @@ class _VoltMeterSettingsWidget extends BoxSettingsWidget {
   }
 }
 
-class _AnchorAlarmSettingsState extends State<_VoltMeterSettingsWidget> {
+class _ElectricalSettingsState extends State<_VoltMeterSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {

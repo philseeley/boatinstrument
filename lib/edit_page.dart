@@ -60,6 +60,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
   BoxDetails(VoltMeterBox.sid, 'Volt Meter', (config) {return VoltMeterBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineRPMBox.sid, 'Engine RPM', (config) {return EngineRPMBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineTempBox.sid, 'Engine Temp', (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -135,6 +136,7 @@ class _EditPageState extends State<_EditPage> {
         ]),
       _widgetSubMenuEntry(box, 'Engine', [
         _widgetMenuEntry(EngineRPMBox.sid),
+        _widgetMenuEntry(EngineTempBox.sid),
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),

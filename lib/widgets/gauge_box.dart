@@ -379,9 +379,10 @@ class _BarGaugePainter extends CustomPainter {
   final int _minValue;
   final int _maxValue;
   final int _step;
+  final List<GuageRange> _ranges;
   final double? _value;
 
-  _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._value);
+  _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._ranges, this._value);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -390,11 +391,17 @@ class _BarGaugePainter extends CustomPainter {
     double h = canvasSize.height;
 
     Paint paint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = Colors.blue;
+      ..style = PaintingStyle.fill;
+
+    double step = h/(_maxValue - _minValue);
+
+    for(GuageRange r in _ranges) {
+      paint.color = r.color;
+      canvas.drawRect(Rect.fromLTRB(0, h-(step*(r.max-_minValue)), w, h-(step*(r.min - _minValue))), paint);
+    }
 
     if(_value != null) {
-      double step = h/(_maxValue - _minValue);
+      paint.color = Colors.blue;
       canvas.drawRect(Rect.fromLTRB(35, h-(step*(_value-_minValue)), w, h), paint);
     }
 
@@ -442,7 +449,7 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
       Expanded(child: Padding(padding: const EdgeInsets.all(pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _BarGaugePainter(context, _minDisplay, _maxDisplay, _displayStep, displayValue)
+          painter: _BarGaugePainter(context, _minDisplay, _maxDisplay, _displayStep, _displayRanges, displayValue)
       )))),
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
     ]);

@@ -88,12 +88,23 @@ double convertSpeed(SpeedUnits units, double speed) {
   }
 }
 
+const double kelvinOffset = 273.15;
+
 double convertTemperature(BoatInstrumentController controller, double value) {
   switch (controller.temperatureUnits) {
     case TemperatureUnits.c:
-      return value - 273.15;
+      return value - kelvinOffset;
     case TemperatureUnits.f:
-      return (value - 273.15) * 9/5 + 32;
+      return (value - kelvinOffset) * 9/5 + 32;
+  }
+}
+
+double invertTemperature(BoatInstrumentController controller, double value) {
+  switch (controller.temperatureUnits) {
+    case TemperatureUnits.c:
+      return value + kelvinOffset;
+    case TemperatureUnits.f:
+      return ((value - 32) * 5/9) + kelvinOffset;
   }
 }
 
