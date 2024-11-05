@@ -12,6 +12,7 @@ _EngineSettings _$EngineSettingsFromJson(Map<String, dynamic> json) =>
       maxRPM: (json['maxRPM'] as num?)?.toInt() ?? 4000,
       rpmRedLine: (json['rpmRedLine'] as num?)?.toInt() ?? 3500,
       maxTemp: (json['maxTemp'] as num?)?.toDouble() ?? kelvinOffset + 120,
+      maxOilPressure: (json['maxOilPressure'] as num?)?.toDouble() ?? 500000,
     );
 
 Map<String, dynamic> _$EngineSettingsToJson(_EngineSettings instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$EngineSettingsToJson(_EngineSettings instance) =>
       'maxRPM': instance.maxRPM,
       'rpmRedLine': instance.rpmRedLine,
       'maxTemp': instance.maxTemp,
+      'maxOilPressure': instance.maxOilPressure,
     };

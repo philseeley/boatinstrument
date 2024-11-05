@@ -61,6 +61,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(VoltMeterBox.sid, 'Volt Meter', (config) {return VoltMeterBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineRPMBox.sid, 'Engine RPM', (config) {return EngineRPMBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineTempBox.sid, 'Engine Temp', (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineOilPressureBox.sid, 'Engine Oil Pressure', (config) {return EngineOilPressureBox.fromSettings(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -137,6 +138,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Engine', [
         _widgetMenuEntry(EngineRPMBox.sid),
         _widgetMenuEntry(EngineTempBox.sid),
+        _widgetMenuEntry(EngineOilPressureBox.sid),
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),

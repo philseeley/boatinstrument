@@ -101,9 +101,12 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       temperatureUnits: $enumDecodeNullable(
               _$TemperatureUnitsEnumMap, json['temperatureUnits']) ??
           TemperatureUnits.c,
-      pressureUnits:
-          $enumDecodeNullable(_$PressureUnitsEnumMap, json['pressureUnits']) ??
-              PressureUnits.millibar,
+      airPressureUnits: $enumDecodeNullable(
+              _$AirPressureUnitsEnumMap, json['airPressureUnits']) ??
+          AirPressureUnits.millibar,
+      oilPressureUnits: $enumDecodeNullable(
+              _$OilPressureUnitsEnumMap, json['oilPressureUnits']) ??
+          OilPressureUnits.kpa,
       portStarboardColors: $enumDecodeNullable(
               _$PortStarboardColorsEnumMap, json['portStarboardColors']) ??
           PortStarboardColors.redGreen,
@@ -135,7 +138,8 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'windSpeedUnits': _$SpeedUnitsEnumMap[instance.windSpeedUnits]!,
       'depthUnits': _$DepthUnitsEnumMap[instance.depthUnits]!,
       'temperatureUnits': _$TemperatureUnitsEnumMap[instance.temperatureUnits]!,
-      'pressureUnits': _$PressureUnitsEnumMap[instance.pressureUnits]!,
+      'airPressureUnits': _$AirPressureUnitsEnumMap[instance.airPressureUnits]!,
+      'oilPressureUnits': _$OilPressureUnitsEnumMap[instance.oilPressureUnits]!,
       'portStarboardColors':
           _$PortStarboardColorsEnumMap[instance.portStarboardColors]!,
       'pages': instance.pages,
@@ -168,11 +172,16 @@ const _$TemperatureUnitsEnumMap = {
   TemperatureUnits.f: 'f',
 };
 
-const _$PressureUnitsEnumMap = {
-  PressureUnits.pascal: 'pascal',
-  PressureUnits.millibar: 'millibar',
-  PressureUnits.atmosphere: 'atmosphere',
-  PressureUnits.mercury: 'mercury',
+const _$AirPressureUnitsEnumMap = {
+  AirPressureUnits.pascal: 'pascal',
+  AirPressureUnits.millibar: 'millibar',
+  AirPressureUnits.atmosphere: 'atmosphere',
+  AirPressureUnits.mercury: 'mercury',
+};
+
+const _$OilPressureUnitsEnumMap = {
+  OilPressureUnits.psi: 'psi',
+  OilPressureUnits.kpa: 'kpa',
 };
 
 const _$PortStarboardColorsEnumMap = {

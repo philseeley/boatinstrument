@@ -172,12 +172,12 @@ class OutsidePressureBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertPressure(config.controller, value);
+    return convertAirPressure(config.controller, value);
   }
 
   @override
   String units(double value) {
-    return config.controller.pressureUnits.unit;
+    return config.controller.airPressureUnits.unit;
   }
 }
 

@@ -12,8 +12,9 @@ class _EngineSettings {
   int maxRPM;
   int rpmRedLine;
   double maxTemp;
+  double maxOilPressure;
 
-  _EngineSettings({this.id = '', this.maxRPM = 4000, this.rpmRedLine = 3500, this.maxTemp = kelvinOffset+120});
+  _EngineSettings({this.id = '', this.maxRPM = 4000, this.rpmRedLine = 3500, this.maxTemp = kelvinOffset+120, this.maxOilPressure = 500000});
 }
 
 double  revolutions2RPMK(double value) {
@@ -139,6 +140,63 @@ class _EngineTempState extends DoubleValueSemiGaugeBoxState<EngineTempBox> {
   }
 }
 
+class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
+  static const sid = 'propulsion-oil-pressure';
+  @override
+  String get id => sid;
+
+  final _EngineSettings _settings;
+
+  const EngineOilPressureBox._init(this._settings, config, path, {super.key, super.maxValue, super.ranges}) :
+    super(config, 'Oil Pressure', GaugeOrientation.up, path, step: 50000);
+
+  factory EngineOilPressureBox.fromSettings(config, {key}) {
+    _EngineSettings s = _$EngineSettingsFromJson(config.settings);
+
+    return EngineOilPressureBox._init(s, config, 'propulsion.${s.id}.oilPressure',
+      maxValue: s.maxOilPressure, key: key, ranges: [
+        GuageRange(s.maxOilPressure-50000, s.maxOilPressure, Colors.red),
+      ]);
+  }
+
+  @override
+  double convert(double value) {
+    return convertOilPressure(config.controller, value);
+  }
+  
+  @override
+  String units(double value) {
+    return config.controller.oilPressureUnits.unit;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _EngineSettingsWidget(config.controller, _settings);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.oilPressure" the ID is "port"');
+
+  @override
+  DoubleValueSemiGaugeBoxState<EngineOilPressureBox> createState() => _EngineOilPressureState();
+}
+
+class _EngineOilPressureState extends DoubleValueSemiGaugeBoxState<EngineOilPressureBox> {
+
+  @override
+  Widget build(BuildContext context) {
+    if(widget.config.editMode) {
+      value = 123000;
+      displayValue = convertOilPressure(widget.config.controller, value!);
+    }
+
+    return super.build(context);
+  }
+}
+
 class _EngineSettingsWidget extends BoxSettingsWidget {
   final BoatInstrumentController _controller;
   final _EngineSettings _settings;
@@ -194,6 +252,15 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
               initialValue: convertTemperature(c, s.maxTemp).toInt().toString(),
               onChanged: (value) => s.maxTemp = invertTemperature(c, double.parse(value))),
           trailing: Text(c.temperatureUnits.unit)
+      ),
+      ListTile(
+          leading: const Text("Max OilPressure:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: convertOilPressure(c, s.maxOilPressure).toInt().toString(),
+              onChanged: (value) => s.maxOilPressure = invertOilPressure(c, double.parse(value))),
+          trailing: Text(c.oilPressureUnits.unit)
       ),
     ];
 

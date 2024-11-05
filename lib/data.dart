@@ -108,16 +108,34 @@ double invertTemperature(BoatInstrumentController controller, double value) {
   }
 }
 
-double convertPressure(BoatInstrumentController controller, double value) {
-  switch (controller.pressureUnits) {
-    case PressureUnits.pascal:
+double convertAirPressure(BoatInstrumentController controller, double value) {
+  switch (controller.airPressureUnits) {
+    case AirPressureUnits.pascal:
       return value;
-    case PressureUnits.millibar:
+    case AirPressureUnits.millibar:
       return value * 0.01;
-    case PressureUnits.atmosphere:
+    case AirPressureUnits.atmosphere:
       return value * 9.869233e-06;
-    case PressureUnits.mercury:
+    case AirPressureUnits.mercury:
       return value * 0.007501;
+  }
+}
+
+double convertOilPressure(BoatInstrumentController controller, double value) {
+  switch (controller.oilPressureUnits) {
+    case OilPressureUnits.kpa:
+      return value / 1000;
+    case OilPressureUnits.psi:
+      return value * 0.000145038;
+  }
+}
+
+double invertOilPressure(BoatInstrumentController controller, double value) {
+  switch (controller.oilPressureUnits) {
+    case OilPressureUnits.kpa:
+      return value * 1000;
+    case OilPressureUnits.psi:
+      return value / 0.000145038;
   }
 }
 
@@ -447,7 +465,7 @@ enum TemperatureUnits {
   const TemperatureUnits(this.displayName, this.unit);
 }
 
-enum PressureUnits {
+enum AirPressureUnits {
   pascal('Pascal', 'Pa'),
   millibar('Millibars', 'mb'),
   atmosphere('Atmosphere', 'Atm'),
@@ -456,7 +474,17 @@ enum PressureUnits {
   final String displayName;
   final String unit;
 
-  const PressureUnits(this.displayName, this.unit);
+  const AirPressureUnits(this.displayName, this.unit);
+}
+
+enum OilPressureUnits {
+  psi('Pounds/Sq Inch', 'Psi'),
+  kpa('Kilopascal', 'kPa');
+
+  final String displayName;
+  final String unit;
+
+  const OilPressureUnits(this.displayName, this.unit);
 }
 
 enum PortStarboardColors {
@@ -495,7 +523,8 @@ class _Settings {
   SpeedUnits windSpeedUnits;
   DepthUnits depthUnits;
   TemperatureUnits temperatureUnits;
-  PressureUnits pressureUnits;
+  AirPressureUnits airPressureUnits;
+  OilPressureUnits oilPressureUnits;
   PortStarboardColors portStarboardColors;
   late List<_Page> pages;
   late Map<String, dynamic> boxSettings;
@@ -526,7 +555,8 @@ class _Settings {
     this.windSpeedUnits = SpeedUnits.kts,
     this.depthUnits = DepthUnits.m,
     this.temperatureUnits = TemperatureUnits.c,
-    this.pressureUnits = PressureUnits.millibar,
+    this.airPressureUnits = AirPressureUnits.millibar,
+    this.oilPressureUnits = OilPressureUnits.kpa,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
     widgetSettings
