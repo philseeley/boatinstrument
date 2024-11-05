@@ -13,6 +13,7 @@ import 'package:boatinstrument/widgets/electrical_box.dart';
 import 'package:boatinstrument/widgets/environment_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/propulsion_box.dart';
+import 'package:boatinstrument/widgets/tank_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
@@ -124,6 +125,7 @@ class BoatInstrumentController {
   TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
   AirPressureUnits get airPressureUnits => _settings!.airPressureUnits;
   OilPressureUnits get oilPressureUnits => _settings!.oilPressureUnits;
+  CapacityUnits get capacityUnits => _settings!.capacityUnits;
   int get numOfPages => _settings!.pages.length;
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {

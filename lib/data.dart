@@ -139,6 +139,28 @@ double invertOilPressure(BoatInstrumentController controller, double value) {
   }
 }
 
+double convertCapacity(BoatInstrumentController controller, double value) {
+  switch (controller.capacityUnits) {
+    case CapacityUnits.liter:
+      return value * 1000;
+    case CapacityUnits.gallon:
+      return value * 219.969248;
+    case CapacityUnits.usGallon:
+      return value * 264.172052;
+  }
+}
+
+double invertCapacity(BoatInstrumentController controller, double value) {
+  switch (controller.capacityUnits) {
+    case CapacityUnits.liter:
+      return value / 1000;
+    case CapacityUnits.gallon:
+      return value / 219.969248;
+    case CapacityUnits.usGallon:
+      return value / 264.172052;
+  }
+}
+
 class BoxWidgetConfig {
   final BoatInstrumentController controller;
   final Map<String, dynamic> settings;
@@ -487,6 +509,17 @@ enum OilPressureUnits {
   const OilPressureUnits(this.displayName, this.unit);
 }
 
+enum CapacityUnits {
+  liter('Liter', 'L'),
+  gallon('Gallon', 'gal'),
+  usGallon('US Gallon', 'US gal');
+
+  final String displayName;
+  final String unit;
+
+  const CapacityUnits(this.displayName, this.unit);
+}
+
 enum PortStarboardColors {
   none('None', Colors.black, Colors.white), // These are just placeholders and not used.
   redGreen('Red/Green', Colors.red, Colors.green),
@@ -525,6 +558,7 @@ class _Settings {
   TemperatureUnits temperatureUnits;
   AirPressureUnits airPressureUnits;
   OilPressureUnits oilPressureUnits;
+  CapacityUnits capacityUnits;
   PortStarboardColors portStarboardColors;
   late List<_Page> pages;
   late Map<String, dynamic> boxSettings;
@@ -557,6 +591,7 @@ class _Settings {
     this.temperatureUnits = TemperatureUnits.c,
     this.airPressureUnits = AirPressureUnits.millibar,
     this.oilPressureUnits = OilPressureUnits.kpa,
+    this.capacityUnits = CapacityUnits.liter,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
     widgetSettings

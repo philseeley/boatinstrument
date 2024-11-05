@@ -221,6 +221,10 @@ class _SettingsState extends State<SettingsPage> {
           title: _oilPressureMenu()
       ),
       ListTile(
+          leading: const Text("Capacities:"),
+          title: _capacityMenu()
+      ),
+      ListTile(
           leading: const Text("Port/Starboard Colours:"),
           title: _portStarboardColorsMenu()
       ),
@@ -435,6 +439,26 @@ class _SettingsState extends State<SettingsPage> {
       dropdownMenuEntries: l,
       onSelected: (value) {
         widget._controller._settings?.oilPressureUnits = value!;
+      },
+    );
+
+    return menu;
+  }
+
+  DropdownMenu _capacityMenu() {
+    List<DropdownMenuEntry<CapacityUnits>> l = [];
+    for(var v in CapacityUnits.values) {
+      l.add(DropdownMenuEntry<CapacityUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<CapacityUnits>(
+      initialSelection: widget._controller._settings?.capacityUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.capacityUnits = value!;
       },
     );
 

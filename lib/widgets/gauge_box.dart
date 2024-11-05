@@ -27,18 +27,18 @@ abstract class DoubleValueGaugeBox extends DoubleValueBox {
 }
 
 class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValueBoxState<T> {
-  int _minDisplay = 0;
-  int _maxDisplay = 0;
+  int minDisplay = 0;
+  int maxDisplay = 0;
   int _displayStep = 0;
   final List<GuageRange> _displayRanges = [];
 
   @override
   void initState() {
     super.initState();
-    _minDisplay = widget.convert(widget.minValue!).ceil();
-    _maxDisplay = widget.convert(widget.maxValue!).floor();
+    minDisplay = widget.convert(widget.minValue!).ceil();
+    maxDisplay = widget.convert(widget.maxValue!).floor();
     double steps = (widget.maxValue! - widget.minValue!)/widget.step;
-    _displayStep = ((_maxDisplay - _minDisplay)/steps).round();
+    _displayStep = ((maxDisplay - minDisplay)/steps).round();
     _displayStep = _displayStep < 1 ? 1 : _displayStep;
     for(GuageRange r in widget.ranges) {
       _displayRanges.add(GuageRange(widget.convert(r.min), widget.convert(r.max), r.color));
@@ -212,7 +212,7 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _SemiGaugePainter(context, o, widget.mirror, _minDisplay, _maxDisplay, _displayStep, _displayRanges)
+          painter: _SemiGaugePainter(context, o, widget.mirror, minDisplay, maxDisplay, _displayStep, _displayRanges)
       )
     ];
 
@@ -355,7 +355,7 @@ class DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> ex
       Positioned(top: 0, right: 0, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _CircularGaugePainter(context, widget.convert(widget.minValue!), _minDisplay, _maxDisplay, _displayStep, _displayRanges)
+          painter: _CircularGaugePainter(context, widget.convert(widget.minValue!), minDisplay, maxDisplay, _displayStep, _displayRanges)
       )
     ];
 
@@ -450,7 +450,7 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
       Expanded(child: Padding(padding: const EdgeInsets.all(pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _BarGaugePainter(context, _minDisplay, _maxDisplay, _displayStep, _displayRanges, displayValue)
+          painter: _BarGaugePainter(context, minDisplay, maxDisplay, _displayStep, _displayRanges, displayValue)
       )))),
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
     ]);

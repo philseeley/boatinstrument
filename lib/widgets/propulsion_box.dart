@@ -133,7 +133,7 @@ class _EngineTempState extends DoubleValueSemiGaugeBoxState<EngineTempBox> {
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
       value = kelvinOffset+12.3;
-      displayValue = convertTemperature(widget.config.controller, value!);
+      displayValue = widget.convert(value!);
     }
 
     return super.build(context);
@@ -190,7 +190,7 @@ class _EngineOilPressureState extends DoubleValueSemiGaugeBoxState<EngineOilPres
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
       value = 123000;
-      displayValue = convertOilPressure(widget.config.controller, value!);
+      displayValue = widget.convert(value!);
     }
 
     return super.build(context);
