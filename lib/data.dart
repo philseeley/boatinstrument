@@ -188,9 +188,10 @@ class _HelpBoxState extends State<HelpBox> {
 class BoxDetails {
   final String id;
   final String description;
+  final bool gauge;
   final BoxWidget Function(BoxWidgetConfig config) build;
 
-  BoxDetails(this.id, this.description, this.build);
+  BoxDetails(this.id, this.description, this.gauge, this.build);
 }
 
 BoxDetails getBoxDetails(String id) {
