@@ -77,7 +77,7 @@ abstract class WindSpeedBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertSpeed(config.controller.windSpeedUnits, value);
+    return config.controller.windSpeedToDisplay(value);
   }
 
   @override

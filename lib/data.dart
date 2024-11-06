@@ -1,9 +1,11 @@
 part of 'boatinstrument_controller.dart';
 
+const String degreesUnits = 'deg';
+const double kelvinOffset = 273.15;
+
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 String val2PS(num val) => val < 0 ? 'P' : (val > 0) ? 'S' : '';
-String degreesUnits = 'deg';
 double revolutions2RPM(double rev) => rev * 60;
 double rpm2Revolutions(double rpm) => rpm / 60;
 
@@ -46,119 +48,6 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   }
 
   return fontSize;
-}
-
-double convertDistance(BoatInstrumentController controller, double distance) {
-  switch (controller.distanceUnits) {
-    case DistanceUnits.meters:
-      return distance;
-    case DistanceUnits.km:
-      return distance * 0.001;
-    case DistanceUnits.miles:
-      return distance * 0.000621371;
-    case DistanceUnits.nm:
-      return distance * 0.000539957;
-    case DistanceUnits.nmM:
-      if(distance.abs() <= controller.m2nmThreshold) {
-        return distance;
-      } else {
-        return distance * 0.000539957;
-      }
-  }
-}
-
-String distanceUnits(BoatInstrumentController controller, double distance) {
-  if(controller.distanceUnits == DistanceUnits.nmM &&
-      distance.abs() <= controller.m2nmThreshold) {
-    return 'm';
-  }
-  return controller.distanceUnits.unit;
-}
-
-double convertSpeed(SpeedUnits units, double speed) {
-  switch (units) {
-    case SpeedUnits.mps:
-      return speed;
-    case SpeedUnits.kph:
-      return speed * 3.6;
-    case SpeedUnits.mph:
-      return speed * 2.236936;
-    case SpeedUnits.kts:
-      return speed * 1.943844;
-  }
-}
-
-const double kelvinOffset = 273.15;
-
-double convertTemperature(BoatInstrumentController controller, double value) {
-  switch (controller.temperatureUnits) {
-    case TemperatureUnits.c:
-      return value - kelvinOffset;
-    case TemperatureUnits.f:
-      return (value - kelvinOffset) * 9/5 + 32;
-  }
-}
-
-double invertTemperature(BoatInstrumentController controller, double value) {
-  switch (controller.temperatureUnits) {
-    case TemperatureUnits.c:
-      return value + kelvinOffset;
-    case TemperatureUnits.f:
-      return ((value - 32) * 5/9) + kelvinOffset;
-  }
-}
-
-double convertAirPressure(BoatInstrumentController controller, double value) {
-  switch (controller.airPressureUnits) {
-    case AirPressureUnits.pascal:
-      return value;
-    case AirPressureUnits.millibar:
-      return value * 0.01;
-    case AirPressureUnits.atmosphere:
-      return value * 9.869233e-06;
-    case AirPressureUnits.mercury:
-      return value * 0.007501;
-  }
-}
-
-double convertOilPressure(BoatInstrumentController controller, double value) {
-  switch (controller.oilPressureUnits) {
-    case OilPressureUnits.kpa:
-      return value / 1000;
-    case OilPressureUnits.psi:
-      return value * 0.000145038;
-  }
-}
-
-double invertOilPressure(BoatInstrumentController controller, double value) {
-  switch (controller.oilPressureUnits) {
-    case OilPressureUnits.kpa:
-      return value * 1000;
-    case OilPressureUnits.psi:
-      return value / 0.000145038;
-  }
-}
-
-double convertCapacity(BoatInstrumentController controller, double value) {
-  switch (controller.capacityUnits) {
-    case CapacityUnits.liter:
-      return value * 1000;
-    case CapacityUnits.gallon:
-      return value * 219.969248;
-    case CapacityUnits.usGallon:
-      return value * 264.172052;
-  }
-}
-
-double invertCapacity(BoatInstrumentController controller, double value) {
-  switch (controller.capacityUnits) {
-    case CapacityUnits.liter:
-      return value / 1000;
-    case CapacityUnits.gallon:
-      return value / 219.969248;
-    case CapacityUnits.usGallon:
-      return value / 264.172052;
-  }
 }
 
 class BoxWidgetConfig {

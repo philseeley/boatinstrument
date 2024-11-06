@@ -18,12 +18,12 @@ class CrossTrackErrorBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertDistance(config.controller, value);
+    return config.controller.distanceToDisplay(value);
   }
 
   @override
   String units(double value) {
-    return distanceUnits(config.controller, value);
+    return config.controller.distanceUnitsToDisplay(value);
   }
 }
 
@@ -144,12 +144,12 @@ class NextPointDistanceBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertDistance (config.controller, value);
+    return config.controller.distanceToDisplay(value);
   }
 
   @override
   String units(double value) {
-    return distanceUnits(config.controller, value);
+    return config.controller.distanceUnitsToDisplay(value);
   }
 }
 

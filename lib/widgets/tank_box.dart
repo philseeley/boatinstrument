@@ -23,7 +23,7 @@ abstract class TankBox extends DoubleValueBarGaugeBox {
 
   @override
   double convert(double value) {
-    return convertCapacity(config.controller, value);
+    return config.controller.capacityToDisplay(value);
   }
   
   @override
@@ -169,8 +169,8 @@ class _TankSettingsState extends State<_TankSettingsWidget> {
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: convertCapacity(c, s.capacity).toInt().toString(),
-              onChanged: (value) => s.capacity = invertCapacity(c, double.parse(value))),
+              initialValue: c.capacityToDisplay(s.capacity).toInt().toString(),
+              onChanged: (value) => s.capacity = c.capacityFromDisplay(double.parse(value))),
           trailing: Text(c.capacityUnits.unit)
       ),
     ];

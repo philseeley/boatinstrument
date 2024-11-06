@@ -104,7 +104,7 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 
   @override
   double convert(double value) {
-    return convertTemperature(config.controller, value);
+    return config.controller.temperatureToDisplay(value);
   }
   
   @override
@@ -148,7 +148,7 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
   final _EngineSettings _settings;
 
   const EngineOilPressureBox._init(this._settings, config, path, {super.key, super.maxValue, super.ranges}) :
-    super(config, 'Oil Pressure', GaugeOrientation.up, path, step: 50000);
+    super(config, 'Oil', GaugeOrientation.up, path, step: 50000);
 
   factory EngineOilPressureBox.fromSettings(config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
@@ -161,7 +161,7 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
 
   @override
   double convert(double value) {
-    return convertOilPressure(config.controller, value);
+    return config.controller.oilPressureToDisplay(value);
   }
   
   @override
@@ -249,17 +249,17 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: convertTemperature(c, s.maxTemp).toInt().toString(),
-              onChanged: (value) => s.maxTemp = invertTemperature(c, double.parse(value))),
+              initialValue: c.temperatureToDisplay(s.maxTemp).toInt().toString(),
+              onChanged: (value) => s.maxTemp = c.temperatureFromDisplay(double.parse(value))),
           trailing: Text(c.temperatureUnits.unit)
       ),
       ListTile(
-          leading: const Text("Max OilPressure:"),
+          leading: const Text("Max Oil Pressure:"),
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: convertOilPressure(c, s.maxOilPressure).toInt().toString(),
-              onChanged: (value) => s.maxOilPressure = invertOilPressure(c, double.parse(value))),
+              initialValue: c.oilPressureToDisplay(s.maxOilPressure).toInt().toString(),
+              onChanged: (value) => s.maxOilPressure = c.oilPressureFromDisplay(double.parse(value))),
           trailing: Text(c.oilPressureUnits.unit)
       ),
     ];
