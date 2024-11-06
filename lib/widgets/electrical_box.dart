@@ -20,13 +20,13 @@ class VoltMeterBox extends DoubleValueSemiGaugeBox {
 
   final _ElectricalSettings _settings;
 
-  const VoltMeterBox._init(this._settings, config, path, {super.key, super.minValue, super.maxValue, super.ranges}) :
-    super(config, 'Battery', GaugeOrientation.up, path);
+  const VoltMeterBox._init(this._settings, config, title, path, {super.key, super.minValue, super.maxValue, super.ranges}) :
+    super(config, title, GaugeOrientation.up, path);
 
   factory VoltMeterBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return VoltMeterBox._init(s, config, 'electrical.batteries.${s.id}.voltage',
+    return VoltMeterBox._init(s, config, 'Battery:${s.id}', 'electrical.batteries.${s.id}.voltage',
       minValue: 10, maxValue: 15, key: key, ranges: const [
         GuageRange(10, 12, Colors.red),
         GuageRange(12, 13, Colors.orange),
