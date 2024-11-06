@@ -12,6 +12,8 @@ import 'package:boatinstrument/widgets/date_time_box.dart';
 import 'package:boatinstrument/widgets/electrical_box.dart';
 import 'package:boatinstrument/widgets/environment_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
+import 'package:boatinstrument/widgets/propulsion_box.dart';
+import 'package:boatinstrument/widgets/tank_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
@@ -121,7 +123,9 @@ class BoatInstrumentController {
   SpeedUnits get windSpeedUnits => _settings!.windSpeedUnits;
   DepthUnits get depthUnits => _settings!.depthUnits;
   TemperatureUnits get temperatureUnits => _settings!.temperatureUnits;
-  PressureUnits get pressureUnits => _settings!.pressureUnits;
+  AirPressureUnits get airPressureUnits => _settings!.airPressureUnits;
+  OilPressureUnits get oilPressureUnits => _settings!.oilPressureUnits;
+  CapacityUnits get capacityUnits => _settings!.capacityUnits;
   int get numOfPages => _settings!.pages.length;
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
@@ -129,6 +133,130 @@ class BoatInstrumentController {
       return none??Theme.of(context).colorScheme.onSurface;
     }
     return val < 0 ? _settings!.portStarboardColors.portColor : (val > 0) ? _settings!.portStarboardColors.starboardColor : Theme.of(context).colorScheme.onSurface;
+  }
+
+  double distanceToDisplay(double distance) {
+  switch (distanceUnits) {
+    case DistanceUnits.meters:
+      return distance;
+    case DistanceUnits.km:
+      return distance * 0.001;
+    case DistanceUnits.miles:
+      return distance * 0.000621371;
+    case DistanceUnits.nm:
+      return distance * 0.000539957;
+    case DistanceUnits.nmM:
+      if(distance.abs() <= m2nmThreshold) {
+        return distance;
+      } else {
+        return distance * 0.000539957;
+      }
+    }
+  }
+
+  String distanceUnitsToDisplay(double distance) {
+    if(distanceUnits == DistanceUnits.nmM &&
+        distance.abs() <= m2nmThreshold) {
+      return 'm';
+    }
+    return distanceUnits.unit;
+  }
+
+  double speedToDisplay(double speed) {
+    switch (speedUnits) {
+      case SpeedUnits.mps:
+        return speed;
+      case SpeedUnits.kph:
+        return speed * 3.6;
+      case SpeedUnits.mph:
+        return speed * 2.236936;
+      case SpeedUnits.kts:
+        return speed * 1.943844;
+    }
+  }
+
+  double windSpeedToDisplay(double speed) {
+    switch (windSpeedUnits) {
+      case SpeedUnits.mps:
+        return speed;
+      case SpeedUnits.kph:
+        return speed * 3.6;
+      case SpeedUnits.mph:
+        return speed * 2.236936;
+      case SpeedUnits.kts:
+        return speed * 1.943844;
+    }
+  }
+
+  double temperatureToDisplay(double value) {
+    switch (temperatureUnits) {
+      case TemperatureUnits.c:
+        return value - kelvinOffset;
+      case TemperatureUnits.f:
+        return (value - kelvinOffset) * 9/5 + 32;
+    }
+  }
+
+  double temperatureFromDisplay(double value) {
+    switch (temperatureUnits) {
+      case TemperatureUnits.c:
+        return value + kelvinOffset;
+      case TemperatureUnits.f:
+        return ((value - 32) * 5/9) + kelvinOffset;
+    }
+  }
+
+  double airPressureToDisplay(double value) {
+    switch (airPressureUnits) {
+      case AirPressureUnits.pascal:
+        return value;
+      case AirPressureUnits.millibar:
+        return value * 0.01;
+      case AirPressureUnits.atmosphere:
+        return value * 9.869233e-06;
+      case AirPressureUnits.mercury:
+        return value * 0.007501;
+    }
+  }
+
+  double oilPressureToDisplay(double value) {
+    switch (oilPressureUnits) {
+      case OilPressureUnits.kpa:
+        return value / 1000;
+      case OilPressureUnits.psi:
+        return value * 0.000145038;
+    }
+  }
+
+  double oilPressureFromDisplay(double value) {
+    switch (oilPressureUnits) {
+      case OilPressureUnits.kpa:
+        return value * 1000;
+      case OilPressureUnits.psi:
+        return value / 0.000145038;
+    }
+  }
+
+  double capacityToDisplay(double value) {
+    switch (capacityUnits) {
+      case CapacityUnits.liter:
+        return value * 1000;
+      case CapacityUnits.gallon:
+        return value * 219.969248;
+      case CapacityUnits.usGallon:
+        return value * 264.172052;
+    }
+  }
+
+  double capacityFromDisplay(double value) {
+    switch (capacityUnits) {
+      case CapacityUnits.liter:
+        return value / 1000;
+      case CapacityUnits.gallon:
+        return value / 219.969248;
+      case CapacityUnits.usGallon:
+        return value / 264.172052;
+    }
   }
 
   loadSettings() async {

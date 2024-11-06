@@ -8,7 +8,7 @@ abstract class SpeedBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertSpeed(config.controller.speedUnits, value);
+    return config.controller.speedToDisplay(value);
   }
 
   @override

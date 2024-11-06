@@ -64,7 +64,7 @@ class WaterTemperatureBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertTemperature(config.controller, value);
+    return config.controller.temperatureToDisplay(value);
   }
 
   @override
@@ -133,7 +133,7 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
         _drift = averageDouble(_drift ?? next, next,
             smooth: widget.config.controller.valueSmoothing);
 
-        _displayDrift = convertSpeed(widget.config.controller.speedUnits, _drift!);
+        _displayDrift = widget.config.controller.speedToDisplay(_drift!);
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
       }
@@ -154,7 +154,7 @@ class OutsideTemperatureBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertTemperature(config.controller, value);
+    return config.controller.temperatureToDisplay(value);
   }
 
   @override
@@ -172,12 +172,12 @@ class OutsidePressureBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    return convertPressure(config.controller, value);
+    return config.controller.airPressureToDisplay(value);
   }
 
   @override
   String units(double value) {
-    return config.controller.pressureUnits.unit;
+    return config.controller.airPressureUnits.unit;
   }
 }
 

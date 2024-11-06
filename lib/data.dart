@@ -1,9 +1,13 @@
 part of 'boatinstrument_controller.dart';
 
+const String degreesUnits = 'deg';
+const double kelvinOffset = 273.15;
+
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 String val2PS(num val) => val < 0 ? 'P' : (val > 0) ? 'S' : '';
-String degreesUnits = 'deg';
+double revolutions2RPM(double rev) => rev * 60;
+double rpm2Revolutions(double rpm) => rpm / 60;
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);
@@ -44,68 +48,6 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   }
 
   return fontSize;
-}
-
-double convertDistance(BoatInstrumentController controller, double distance) {
-  switch (controller.distanceUnits) {
-    case DistanceUnits.meters:
-      return distance;
-    case DistanceUnits.km:
-      return distance * 0.001;
-    case DistanceUnits.miles:
-      return distance * 0.000621371;
-    case DistanceUnits.nm:
-      return distance * 0.000539957;
-    case DistanceUnits.nmM:
-      if(distance.abs() <= controller.m2nmThreshold) {
-        return distance;
-      } else {
-        return distance * 0.000539957;
-      }
-  }
-}
-
-String distanceUnits(BoatInstrumentController controller, double distance) {
-  if(controller.distanceUnits == DistanceUnits.nmM &&
-      distance.abs() <= controller.m2nmThreshold) {
-    return 'm';
-  }
-  return controller.distanceUnits.unit;
-}
-
-double convertSpeed(SpeedUnits units, double speed) {
-  switch (units) {
-    case SpeedUnits.mps:
-      return speed;
-    case SpeedUnits.kph:
-      return speed * 3.6;
-    case SpeedUnits.mph:
-      return speed * 2.236936;
-    case SpeedUnits.kts:
-      return speed * 1.943844;
-  }
-}
-
-double convertTemperature(BoatInstrumentController controller, double value) {
-  switch (controller.temperatureUnits) {
-    case TemperatureUnits.c:
-      return value - 273.15;
-    case TemperatureUnits.f:
-      return (value - 273.15) * 9/5 + 32;
-  }
-}
-
-double convertPressure(BoatInstrumentController controller, double value) {
-  switch (controller.pressureUnits) {
-    case PressureUnits.pascal:
-      return value;
-    case PressureUnits.millibar:
-      return value * 0.01;
-    case PressureUnits.atmosphere:
-      return value * 9.869233e-06;
-    case PressureUnits.mercury:
-      return value * 0.007501;
-  }
 }
 
 class BoxWidgetConfig {
@@ -434,7 +376,7 @@ enum TemperatureUnits {
   const TemperatureUnits(this.displayName, this.unit);
 }
 
-enum PressureUnits {
+enum AirPressureUnits {
   pascal('Pascal', 'Pa'),
   millibar('Millibars', 'mb'),
   atmosphere('Atmosphere', 'Atm'),
@@ -443,7 +385,28 @@ enum PressureUnits {
   final String displayName;
   final String unit;
 
-  const PressureUnits(this.displayName, this.unit);
+  const AirPressureUnits(this.displayName, this.unit);
+}
+
+enum OilPressureUnits {
+  psi('Pounds/Sq Inch', 'Psi'),
+  kpa('Kilopascal', 'kPa');
+
+  final String displayName;
+  final String unit;
+
+  const OilPressureUnits(this.displayName, this.unit);
+}
+
+enum CapacityUnits {
+  liter('Liter', 'L'),
+  gallon('Gallon', 'gal'),
+  usGallon('US Gallon', 'US gal');
+
+  final String displayName;
+  final String unit;
+
+  const CapacityUnits(this.displayName, this.unit);
 }
 
 enum PortStarboardColors {
@@ -482,7 +445,9 @@ class _Settings {
   SpeedUnits windSpeedUnits;
   DepthUnits depthUnits;
   TemperatureUnits temperatureUnits;
-  PressureUnits pressureUnits;
+  AirPressureUnits airPressureUnits;
+  OilPressureUnits oilPressureUnits;
+  CapacityUnits capacityUnits;
   PortStarboardColors portStarboardColors;
   late List<_Page> pages;
   late Map<String, dynamic> boxSettings;
@@ -513,7 +478,9 @@ class _Settings {
     this.windSpeedUnits = SpeedUnits.kts,
     this.depthUnits = DepthUnits.m,
     this.temperatureUnits = TemperatureUnits.c,
-    this.pressureUnits = PressureUnits.millibar,
+    this.airPressureUnits = AirPressureUnits.millibar,
+    this.oilPressureUnits = OilPressureUnits.kpa,
+    this.capacityUnits = CapacityUnits.liter,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
     widgetSettings

@@ -213,8 +213,16 @@ class _SettingsState extends State<SettingsPage> {
           title: _temperatureMenu()
       ),
       ListTile(
-          leading: const Text("Pressure:"),
-          title: _pressureMenu()
+          leading: const Text("Air Pressure:"),
+          title: _airPressureMenu()
+      ),
+      ListTile(
+          leading: const Text("Oil Pressure:"),
+          title: _oilPressureMenu()
+      ),
+      ListTile(
+          leading: const Text("Capacities:"),
+          title: _capacityMenu()
       ),
       ListTile(
           leading: const Text("Port/Starboard Colours:"),
@@ -397,20 +405,60 @@ class _SettingsState extends State<SettingsPage> {
     return menu;
   }
 
-  DropdownMenu _pressureMenu() {
-    List<DropdownMenuEntry<PressureUnits>> l = [];
-    for(var v in PressureUnits.values) {
-      l.add(DropdownMenuEntry<PressureUnits>(
+  DropdownMenu _airPressureMenu() {
+    List<DropdownMenuEntry<AirPressureUnits>> l = [];
+    for(var v in AirPressureUnits.values) {
+      l.add(DropdownMenuEntry<AirPressureUnits>(
           style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
           label: v.displayName));
     }
 
-    DropdownMenu menu = DropdownMenu<PressureUnits>(
-      initialSelection: widget._controller._settings?.pressureUnits,
+    DropdownMenu menu = DropdownMenu<AirPressureUnits>(
+      initialSelection: widget._controller._settings?.airPressureUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
-        widget._controller._settings?.pressureUnits = value!;
+        widget._controller._settings?.airPressureUnits = value!;
+      },
+    );
+
+    return menu;
+  }
+
+  DropdownMenu _oilPressureMenu() {
+    List<DropdownMenuEntry<OilPressureUnits>> l = [];
+    for(var v in OilPressureUnits.values) {
+      l.add(DropdownMenuEntry<OilPressureUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<OilPressureUnits>(
+      initialSelection: widget._controller._settings?.oilPressureUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.oilPressureUnits = value!;
+      },
+    );
+
+    return menu;
+  }
+
+  DropdownMenu _capacityMenu() {
+    List<DropdownMenuEntry<CapacityUnits>> l = [];
+    for(var v in CapacityUnits.values) {
+      l.add(DropdownMenuEntry<CapacityUnits>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.displayName));
+    }
+
+    DropdownMenu menu = DropdownMenu<CapacityUnits>(
+      initialSelection: widget._controller._settings?.capacityUnits,
+      dropdownMenuEntries: l,
+      onSelected: (value) {
+        widget._controller._settings?.capacityUnits = value!;
       },
     );
 

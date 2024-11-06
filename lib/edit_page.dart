@@ -59,6 +59,14 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(DebugBox.sid, 'Debug', (config) {return DebugBox(config, key: UniqueKey());}),
   BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
   BoxDetails(VoltMeterBox.sid, 'Volt Meter', (config) {return VoltMeterBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineRPMBox.sid, 'Engine RPM', (config) {return EngineRPMBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineTempBox.sid, 'Engine Temp', (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineOilPressureBox.sid, 'Engine Oil Pressure', (config) {return EngineOilPressureBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(FreshWaterTankBox.sid, 'Fresh Water', (config) {return FreshWaterTankBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(GreyWaterTankBox.sid, 'Grey Water', (config) {return GreyWaterTankBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(BlackWaterTankBox.sid, 'Black Water', (config) {return BlackWaterTankBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(FuelTankBox.sid, 'Fuel', (config) {return FuelTankBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(LubricationTankBox.sid, 'Lubrication', (config) {return LubricationTankBox.fromSettings(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -131,6 +139,18 @@ class _EditPageState extends State<_EditPage> {
         ]),
       _widgetSubMenuEntry(box, 'Electrical', [
         _widgetMenuEntry(VoltMeterBox.sid),
+        ]),
+      _widgetSubMenuEntry(box, 'Tanks', [
+        _widgetMenuEntry(FreshWaterTankBox.sid),
+        _widgetMenuEntry(GreyWaterTankBox.sid),
+        _widgetMenuEntry(BlackWaterTankBox.sid),
+        _widgetMenuEntry(FuelTankBox.sid),
+        _widgetMenuEntry(LubricationTankBox.sid),
+        ]),
+      _widgetSubMenuEntry(box, 'Engine', [
+        _widgetMenuEntry(EngineRPMBox.sid),
+        _widgetMenuEntry(EngineTempBox.sid),
+        _widgetMenuEntry(EngineOilPressureBox.sid),
         ]),
       _widgetMenuEntry(WebViewBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
