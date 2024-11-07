@@ -180,7 +180,7 @@ class InverterCurrentBox extends DoubleValueBox {
 }
 
 class SolarVoltageBox extends DoubleValueBox {
-  static const sid = 'electrical-solar-current';
+  static const sid = 'electrical-solar-voltage';
   @override
   String get id => sid;
 
