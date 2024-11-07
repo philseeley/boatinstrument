@@ -32,13 +32,13 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
 
   final _EngineSettings _settings;
 
-  EngineRPMBox._init(this._settings, config, path, {super.key, super.maxValue, super.ranges}) :
-    super(config, 'RPM', path, step: rpmK2Revolutions(1));
+  EngineRPMBox._init(this._settings, config, title, path, {super.key, super.maxValue, super.ranges}) :
+    super(config, title, path, step: rpmK2Revolutions(1));
 
   factory EngineRPMBox.fromSettings(config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
-    return EngineRPMBox._init(s, config, 'propulsion.${s.id}.revolutions',
+    return EngineRPMBox._init(s, config, 'RPM:${s.id}', 'propulsion.${s.id}.revolutions',
       maxValue: rpm2Revolutions(s.maxRPM.toDouble()), key: key, ranges: [
         GuageRange(rpm2Revolutions(s.rpmRedLine.toDouble()), rpm2Revolutions(s.maxRPM.toDouble()), Colors.red)
       ]);
@@ -88,13 +88,13 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 
   final _EngineSettings _settings;
 
-  const EngineTempBox._init(this._settings, config, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
-    super(config, 'Temp', GaugeOrientation.up, path, step: 20);
+  const EngineTempBox._init(this._settings, config, title, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
+    super(config, title, GaugeOrientation.up, path, step: 20);
 
   factory EngineTempBox.fromSettings(config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
-    return EngineTempBox._init(s, config, 'propulsion.${s.id}.temperature',
+    return EngineTempBox._init(s, config, 'Temp:${s.id}', 'propulsion.${s.id}.temperature',
       minValue: kelvinOffset, maxValue: s.maxTemp, key: key, ranges: [
         GuageRange(s.maxTemp-10, s.maxTemp, Colors.red),
         GuageRange(kelvinOffset+10, s.maxTemp-10, Colors.green),
@@ -147,13 +147,13 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
 
   final _EngineSettings _settings;
 
-  const EngineOilPressureBox._init(this._settings, config, path, {super.key, super.maxValue, super.ranges}) :
-    super(config, 'Oil', GaugeOrientation.up, path, step: 50000);
+  const EngineOilPressureBox._init(this._settings, config, title, path, {super.key, super.maxValue, super.ranges}) :
+    super(config, title, GaugeOrientation.up, path, step: 50000);
 
   factory EngineOilPressureBox.fromSettings(config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
-    return EngineOilPressureBox._init(s, config, 'propulsion.${s.id}.oilPressure',
+    return EngineOilPressureBox._init(s, config, 'Oil:${s.id}', 'propulsion.${s.id}.oilPressure',
       maxValue: s.maxOilPressure, key: key, ranges: [
         GuageRange(s.maxOilPressure-50000, s.maxOilPressure, Colors.red),
       ]);
