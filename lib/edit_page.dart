@@ -58,6 +58,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(MoonBox.sid, 'Moon', false, (config) {return MoonBox(config, key: UniqueKey());}),
   BoxDetails(DebugBox.sid, 'Debug', false, (config) {return DebugBox(config, key: UniqueKey());}),
   BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', true, (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
+  BoxDetails(BatteriesBox.sid, 'Batteries', false, (config) {return BatteriesBox(config, key: UniqueKey());}),
   BoxDetails(BatteryVoltMeterBox.sid, 'Volt Meter', true, (config) {return BatteryVoltMeterBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryVoltageBox.sid, 'Battery Voltage', false, (config) {return BatteryVoltageBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryCurrentBox.sid, 'Battery Current', false, (config) {return BatteryCurrentBox.fromSettings(config, key: UniqueKey());}),
@@ -147,6 +148,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AutopilotHeadingControlVerticalBox.sid),
         ]),
       _widgetSubMenuEntry(box, 'Electrical', [
+        _widgetMenuEntry(BatteriesBox.sid),
         _widgetMenuEntry(BatteryVoltMeterBox.sid),
         _widgetMenuEntry(BatteryVoltageBox.sid),
         _widgetMenuEntry(BatteryCurrentBox.sid),
