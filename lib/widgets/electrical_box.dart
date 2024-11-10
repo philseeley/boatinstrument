@@ -293,7 +293,7 @@ class _BatteriesBoxState extends State<BatteriesBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'electrical.batteries.*'}); //TODO dataTimeout?
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'electrical.batteries.*'});
   }
 
   @override
@@ -311,27 +311,6 @@ class _BatteriesBoxState extends State<BatteriesBox> {
          ..temperature = kelvinOffset+12.3;
       _batteries = [b];
     }
-
-    // _batteries = [
-    //   _Battery('1')
-    //     // ..name = 'One'
-    //     ..voltage = 1
-    //     ..current = 2
-    //     ..stateOfCharge = 0.5
-    //     ..temperature = kelvinOffset+10,
-    //   _Battery('2')
-    //     ..name = 'Two'
-    //     ..voltage = 12
-    //     ..current = -222.1
-    //     ..stateOfCharge = 1.0
-    //     ..temperature = kelvinOffset+100,
-    //   _Battery('3')
-    //     //..name = 'Three12356'
-    //     ..voltage = 13
-    //     ..current = 23
-    //     ..stateOfCharge = 1.0
-    //     ..temperature = kelvinOffset-100,
-    // ];
 
     _batteries.sort((a, b) => (a.name??a.id).compareTo(b.name??b.id));
 
@@ -364,13 +343,12 @@ class _BatteriesBoxState extends State<BatteriesBox> {
 
   void _onUpdate(List<Update>? updates) {
     if(updates == null) {
-      _batteries = []; //TODO do we want this?
+      _batteries = [];
     } else {
       for (Update u in updates) {
         try {
           List<String> p = u.path.split('.');
-          String id = p[2];
-          _Battery b = _getBattery(id);
+          _Battery b = _getBattery(p[2]);
 
           switch (p[3]) {
             case 'name':
