@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 
 import 'double_value_box.dart';
 
-class GuageRange {
+class GaugeRange {
   final double min;
   final double max;
   final Color color;
 
-  const GuageRange(this.min, this.max, this.color);
+  const GaugeRange(this.min, this.max, this.color);
 }
 
 abstract class DoubleValueGaugeBox extends DoubleValueBox {
   final double step;
-  final List<GuageRange> ranges;
+  final List<GaugeRange> ranges;
 
   const DoubleValueGaugeBox(super.config, super.title, super.path,
     {super.minValue = 0, required super.maxValue, super.angle,
@@ -30,7 +30,7 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
   int minDisplay = 0;
   int maxDisplay = 0;
   int _displayStep = 0;
-  final List<GuageRange> _displayRanges = [];
+  final List<GaugeRange> _displayRanges = [];
 
   @override
   void initState() {
@@ -40,8 +40,8 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
     double steps = (widget.maxValue! - widget.minValue!)/widget.step;
     _displayStep = ((maxDisplay - minDisplay)/steps).round();
     _displayStep = _displayStep < 1 ? 1 : _displayStep;
-    for(GuageRange r in widget.ranges) {
-      _displayRanges.add(GuageRange(widget.convert(r.min), widget.convert(r.max), r.color));
+    for(GaugeRange r in widget.ranges) {
+      _displayRanges.add(GaugeRange(widget.convert(r.min), widget.convert(r.max), r.color));
     }
   }
 }
@@ -76,7 +76,7 @@ class _SemiGaugePainter extends CustomPainter {
   final int _minValue;
   final int _maxValue;
   final int _step;
-  final List<GuageRange> _ranges;
+  final List<GaugeRange> _ranges;
 
   _SemiGaugePainter(this._context, this._orientation, this._mirror, this._minValue, this._maxValue, this._step, this._ranges);
 
@@ -108,7 +108,7 @@ class _SemiGaugePainter extends CustomPainter {
     paint.strokeWidth = 5.0;
     int range = _maxValue - _minValue;
 
-    for(GuageRange r in _ranges) {
+    for(GaugeRange r in _ranges) {
       paint.color = r.color;
       double start = pi*((r.min - _minValue)/range);
       double end = (pi*((r.max - _minValue)/range)) - start;
@@ -240,7 +240,7 @@ class _CircularGaugePainter extends CustomPainter {
   final int _minDisplay;
   final int _maxDisplay;
   final int _displayStep;
-  final List<GuageRange> _ranges;
+  final List<GaugeRange> _ranges;
 
   _CircularGaugePainter(this._context, this._minValue, this._minDisplay, this._maxDisplay, this._displayStep, this._ranges);
 
@@ -258,7 +258,7 @@ class _CircularGaugePainter extends CustomPainter {
     paint.strokeWidth = 5.0;
     int range = _maxDisplay - _minDisplay;
     double displayRange = (pi-circularGaugeOffset)*2;
-    for(GuageRange r in _ranges) {
+    for(GaugeRange r in _ranges) {
       paint.color = r.color;
       double start = displayRange*((r.min - _minValue)/range);
       double end = (displayRange*((r.max - _minValue)/range)) - start;
@@ -380,7 +380,7 @@ class _BarGaugePainter extends CustomPainter {
   final int _minValue;
   final int _maxValue;
   final int _step;
-  final List<GuageRange> _ranges;
+  final List<GaugeRange> _ranges;
   final double? _value;
 
   _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._ranges, this._value);
@@ -396,7 +396,7 @@ class _BarGaugePainter extends CustomPainter {
 
     double step = h/(_maxValue - _minValue);
 
-    for(GuageRange r in _ranges) {
+    for(GaugeRange r in _ranges) {
       paint.color = r.color;
       canvas.drawRect(Rect.fromLTRB(0, h-(step*(r.max-_minValue)), w, h-(step*(r.min - _minValue))), paint);
     }

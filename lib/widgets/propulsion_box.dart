@@ -40,7 +40,7 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
 
     return EngineRPMBox._init(s, config, 'RPM:${s.id}', 'propulsion.${s.id}.revolutions',
       maxValue: rpm2Revolutions(s.maxRPM.toDouble()), key: key, ranges: [
-        GuageRange(rpm2Revolutions(s.rpmRedLine.toDouble()), rpm2Revolutions(s.maxRPM.toDouble()), Colors.red)
+        GaugeRange(rpm2Revolutions(s.rpmRedLine.toDouble()), rpm2Revolutions(s.maxRPM.toDouble()), Colors.red)
       ]);
   }
 
@@ -96,9 +96,9 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 
     return EngineTempBox._init(s, config, 'Temp:${s.id}', 'propulsion.${s.id}.temperature',
       minValue: kelvinOffset, maxValue: s.maxTemp, key: key, ranges: [
-        GuageRange(s.maxTemp-10, s.maxTemp, Colors.red),
-        GuageRange(kelvinOffset+10, s.maxTemp-10, Colors.green),
-        const GuageRange(kelvinOffset, kelvinOffset+10, Colors.orange)
+        GaugeRange(s.maxTemp-10, s.maxTemp, Colors.red),
+        GaugeRange(kelvinOffset+10, s.maxTemp-10, Colors.green),
+        const GaugeRange(kelvinOffset, kelvinOffset+10, Colors.orange)
       ]);
   }
 
@@ -155,7 +155,7 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
 
     return EngineOilPressureBox._init(s, config, 'Oil:${s.id}', 'propulsion.${s.id}.oilPressure',
       maxValue: s.maxOilPressure, key: key, ranges: [
-        GuageRange(s.maxOilPressure-50000, s.maxOilPressure, Colors.red),
+        GaugeRange(s.maxOilPressure-50000, s.maxOilPressure, Colors.red),
       ]);
   }
 

@@ -28,9 +28,9 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
 
     return BatteryVoltMeterBox._init(s, config, 'Battery:${s.id}', 'electrical.batteries.${s.id}.voltage',
       minValue: 10, maxValue: 15, key: key, ranges: const [
-        GuageRange(10, 12, Colors.red),
-        GuageRange(12, 13, Colors.orange),
-        GuageRange(13, 15, Colors.green)
+        GaugeRange(10, 12, Colors.red),
+        GaugeRange(12, 13, Colors.orange),
+        GaugeRange(13, 15, Colors.green)
       ]);
   }
 
