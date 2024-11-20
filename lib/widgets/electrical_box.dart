@@ -2,6 +2,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
+import 'package:format/format.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'electrical_box.g.dart';
@@ -28,9 +29,9 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
 
     return BatteryVoltMeterBox._init(s, config, 'Battery:${s.id}', 'electrical.batteries.${s.id}.voltage',
       minValue: 10, maxValue: 15, key: key, ranges: const [
-        GuageRange(10, 12, Colors.red),
-        GuageRange(12, 13, Colors.orange),
-        GuageRange(13, 15, Colors.green)
+        GaugeRange(10, 12, Colors.red),
+        GaugeRange(12, 13, Colors.orange),
+        GaugeRange(13, 15, Colors.green)
       ]);
   }
 
@@ -239,6 +240,7 @@ class SolarCurrentBox extends DoubleValueBox {
   String units(double value) {
     return 'A';
   }
+
   @override
   bool get hasPerBoxSettings => true;
 
@@ -249,6 +251,136 @@ class SolarCurrentBox extends DoubleValueBox {
 
   @override
   Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.solar.1.current" the ID is "1"');
+}
+
+class BatteriesBox extends BoxWidget {
+  static const String sid = 'electrical-batteries';
+  @override
+  String get id => sid;
+
+  const BatteriesBox(super.config, {super.key});
+
+  @override
+  State<BatteriesBox> createState() => _BatteriesBoxState();
+}
+
+class _Battery {
+  final String id;
+  String? name;
+  double? voltage;
+  double? current;
+  double? stateOfCharge;
+  double? temperature;
+
+  _Battery(this.id);
+}
+
+class _BatteriesBoxState extends State<BatteriesBox> {
+  List<_Battery> _batteries = [];
+
+  _Battery _getBattery(String id) {
+    for (_Battery b in _batteries) {
+      if(b.id == id) {
+        return b;
+      }
+    }
+    _Battery b = _Battery(id);
+    _batteries.add(b);
+    
+    return b;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'electrical.batteries.*'});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    BoatInstrumentController c = widget.config.controller;
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+    const double pad = 5.0;
+
+    if(widget.config.editMode) {
+      _Battery b = _Battery('1')
+         ..name = 'bat1'
+         ..voltage = 12.3
+         ..current = 12.3
+         ..stateOfCharge = 0.5
+         ..temperature = kelvinOffset+12.3;
+      _batteries = [b];
+    }
+
+    _batteries.sort((a, b) => (a.name??a.id).compareTo(b.name??b.id));
+
+    String maxName = '';
+    for(_Battery b in _batteries) {
+      if((b.name??b.id).length > maxName.length) {
+        maxName = b.name??b.id;
+      }
+    }
+
+    List<Widget> l = [];
+    if(_batteries.isNotEmpty) {
+      String f = ' {:3.0f}% {:4.1f}V {:6.1f}A {:6.1f}${c.temperatureUnits.unit}';
+      String textSample = format('$maxName$f', 1.0, 1.0, 1.0, 1.0);
+      double fontSize = maxFontSize(textSample, style,
+          (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / _batteries.length,
+          widget.config.constraints.maxWidth - (2 * pad));
+
+      TextStyle contentStyle = style.copyWith(fontSize: fontSize);
+      for(_Battery b  in _batteries) {
+        l.add(Row(children: [Text(format('{:${maxName.length}s}$f', b.name??b.id, (b.stateOfCharge??0.0)*100, b.voltage??0.0, b.current??0.0, c.temperatureToDisplay(b.temperature??0.0)),
+              textScaler: TextScaler.noScaling,  style: contentStyle)]));
+      }
+    }
+
+    return Column(children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Batteries', style: style)])),
+      Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
+  }
+
+  void _onUpdate(List<Update>? updates) {
+    if(updates == null) {
+      _batteries = [];
+    } else {
+      for (Update u in updates) {
+        try {
+          List<String> p = u.path.split('.');
+          _Battery b = _getBattery(p[2]);
+
+          switch (p[3]) {
+            case 'name':
+              b.name = u.value;
+              break;
+            case 'voltage':
+              b.voltage = (u.value as num).toDouble();
+              break;
+            case 'current':
+              b.current = (u.value as num).toDouble();
+              break;
+            case 'capacity':
+              switch (p[4]) {
+                case 'stateOfCharge':
+                b.stateOfCharge = (u.value as num).toDouble();
+                break;
+              }
+              break;
+            case 'temperature':
+              b.temperature = (u.value as num).toDouble();
+              break;
+          }
+        } catch (e) {
+          widget.config.controller.l.e("Error converting $u", error: e);
+        }
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
+  }
 }
 
 class _ElectricalSettingsWidget extends BoxSettingsWidget {

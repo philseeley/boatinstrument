@@ -58,6 +58,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(MoonBox.sid, 'Moon', false, (config) {return MoonBox(config, key: UniqueKey());}),
   BoxDetails(DebugBox.sid, 'Debug', false, (config) {return DebugBox(config, key: UniqueKey());}),
   BoxDetails(AnchorAlarmBox.sid, 'Anchor Alarm', true, (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
+  BoxDetails(BatteriesBox.sid, 'Batteries', false, (config) {return BatteriesBox(config, key: UniqueKey());}),
   BoxDetails(BatteryVoltMeterBox.sid, 'Volt Meter', true, (config) {return BatteryVoltMeterBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryVoltageBox.sid, 'Battery Voltage', false, (config) {return BatteryVoltageBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryCurrentBox.sid, 'Battery Current', false, (config) {return BatteryCurrentBox.fromSettings(config, key: UniqueKey());}),
@@ -67,6 +68,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(EngineRPMBox.sid, 'Engine RPM', true, (config) {return EngineRPMBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineTempBox.sid, 'Engine Temp', true, (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineOilPressureBox.sid, 'Engine Oil Pressure', true, (config) {return EngineOilPressureBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(TanksBox.sid, 'Tanks', false, (config) {return TanksBox(config, key: UniqueKey());}),
   BoxDetails(FreshWaterTankBox.sid, 'Fresh Water', true, (config) {return FreshWaterTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(GreyWaterTankBox.sid, 'Grey Water', true, (config) {return GreyWaterTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BlackWaterTankBox.sid, 'Black Water', true, (config) {return BlackWaterTankBox.fromSettings(config, key: UniqueKey());}),
@@ -147,6 +149,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AutopilotHeadingControlVerticalBox.sid),
         ]),
       _widgetSubMenuEntry(box, 'Electrical', [
+        _widgetMenuEntry(BatteriesBox.sid),
         _widgetMenuEntry(BatteryVoltMeterBox.sid),
         _widgetMenuEntry(BatteryVoltageBox.sid),
         _widgetMenuEntry(BatteryCurrentBox.sid),
@@ -155,6 +158,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(SolarCurrentBox.sid),
         ]),
       _widgetSubMenuEntry(box, 'Tanks', [
+        _widgetMenuEntry(TanksBox.sid),
         _widgetMenuEntry(FreshWaterTankBox.sid),
         _widgetMenuEntry(GreyWaterTankBox.sid),
         _widgetMenuEntry(BlackWaterTankBox.sid),
