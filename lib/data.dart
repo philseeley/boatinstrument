@@ -56,8 +56,10 @@ class SignalkPathDropdownMenu extends StatefulWidget {
   final String _basePath;
   final ValueChanged<String> _onSelected;
   final bool listPaths;
+  final bool searchable;
 
-  const SignalkPathDropdownMenu(this._controller, this._initialValue, this._basePath, this._onSelected, {this.listPaths = false, super.key});
+  const SignalkPathDropdownMenu(this._controller, this._initialValue, this._basePath, this._onSelected,
+    {this.listPaths = false, this.searchable = false, super.key});
 
   @override
   State<StatefulWidget> createState() => _SignalkPathDropdownMenuState();
@@ -79,7 +81,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
         return;
       }
       try {
-        _paths('$path.$k', data[k], paths);
+        _paths('$path${path.isEmpty?'':'.'}$k', data[k], paths);
       } catch (e) {
         widget._controller.l.e('Walking path tree', error: e);
       }
@@ -142,7 +144,8 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
 
     DropdownMenu menu = DropdownMenu<String>(
       expandedInsets: EdgeInsets.zero,
-      requestFocusOnTap: false,
+      enableFilter: widget.searchable,
+      requestFocusOnTap: widget.searchable,
       initialSelection: iv,
       dropdownMenuEntries: values.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
           style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
