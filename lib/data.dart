@@ -50,6 +50,113 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   return fontSize;
 }
 
+class SignalkPathDropdownMenu extends StatefulWidget {
+  final BoatInstrumentController _controller;
+  final String _initialValue;
+  final String _basePath;
+  final ValueChanged<String> _onSelected;
+  final bool listPaths;
+
+  const SignalkPathDropdownMenu(this._controller, this._initialValue, this._basePath, this._onSelected, {this.listPaths = false, super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SignalkPathDropdownMenuState();
+}
+
+class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
+  List<String> values = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getPaths();
+  }
+
+  _paths(String path, Map<String, dynamic> data, List<String> paths) {
+    paths.add(path);
+    for (String k in data.keys) {
+      if({'meta', 'value', '\$source', 'timestamp', 'pgn'}.contains(k)) {
+        return;
+      }
+      try {
+        _paths('$path.$k', data[k], paths);
+      } catch (e) {
+        widget._controller.l.e('Walking path tree', error: e);
+      }
+    }
+  }
+
+  void getPaths() async {
+    Uri uri = widget._controller.httpApiUri;
+
+    try {
+
+      List<String> ps = [...uri.pathSegments]
+        ..removeLast()
+        ..addAll(['vessels', 'self'])
+        ..addAll(widget._basePath.split('.'));
+
+      uri = uri.replace(pathSegments: ps);
+
+      http.Response response = await http.get(
+          uri,
+          headers: {
+            "accept": "application/json",
+          },
+      );
+
+      if(response.statusCode == HttpStatus.ok) {
+        Map<String, dynamic> data = json.decode(response.body);
+
+        setState(() {
+          if(widget.listPaths) {
+            List<String> paths = [];
+            _paths(widget._basePath, data, paths);
+            values.addAll(paths);
+          } else {
+            values.addAll(data.keys);
+          }
+        });
+      } else {
+        setState(() {
+          values.add('');
+        });
+      }
+    } catch (e) {
+      widget._controller.l.e('Failed to retrieve metadata', error: e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(values.isEmpty) {
+      return const Text('Waiting for SignalK');
+    }
+
+    String iv = widget._initialValue;
+
+    if(widget._initialValue.isEmpty) {
+       iv = values.firstOrNull??'';
+       widget._onSelected(iv);
+    }
+
+    DropdownMenu menu = DropdownMenu<String>(
+      expandedInsets: EdgeInsets.zero,
+      requestFocusOnTap: false,
+      initialSelection: iv,
+      dropdownMenuEntries: values.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v);}).toList(),
+      onSelected: (value) {
+        widget._onSelected(value??'');
+      },
+    );
+
+    return menu;
+  }
+}
+
 class BoxWidgetConfig {
   final BoatInstrumentController controller;
   final Map<String, dynamic> settings;
