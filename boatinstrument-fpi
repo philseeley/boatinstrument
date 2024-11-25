@@ -2,7 +2,7 @@
 
 [ -f /boot/boatinstrument.json ] && mv /boot/boatinstrument.json /
 
-export BOAT_INSTRUMENT_ARGS="--noaudio --nobrightctrl"
+export BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake"
 
 /usr/bin/flutter-pi --release /usr/share/boatinstrument-fpi
 

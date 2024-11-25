@@ -26,11 +26,13 @@ class BoatInstrumentApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-    const noAudio = 'noaudio';
-    const noBrightnesCtrl = 'nobrightctrl';
+    const noAudio = 'no-audio';
+    const noBrightnessCtrl = 'no-brightness-ctrl';
+    const noKeepAwake = 'no-keep-awake';
     final p = ArgParser()
                 ..addFlag(noAudio, negatable: false)
-                ..addFlag(noBrightnesCtrl, negatable: false);
+                ..addFlag(noBrightnessCtrl, negatable: false)
+                ..addFlag(noKeepAwake, negatable: false);
 
     try {
       ArgResults r = p.parse(args);
@@ -41,7 +43,8 @@ class BoatInstrumentApp extends StatelessWidget {
       return MaterialApp(
         home: MainPage(
           r.flag(noAudio),
-          r.flag(noBrightnesCtrl)),
+          r.flag(noBrightnessCtrl),
+          r.flag(noKeepAwake)),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
     } catch (e) {
@@ -55,8 +58,9 @@ class BoatInstrumentApp extends StatelessWidget {
 class MainPage extends StatefulWidget {
   final bool noAudio;
   final bool noBrightnessControl;
+  final bool noKeepAwake;
 
-  const MainPage(this.noAudio, this.noBrightnessControl, {super.key});
+  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -124,7 +128,9 @@ class _MainPageState extends State<MainPage> {
       return const Center(child: _icon);
     }
 
-    WakelockPlus.toggle(enable: _controller.keepAwake);
+    if(!widget.noKeepAwake) {
+      WakelockPlus.toggle(enable: _controller.keepAwake);
+    }
 
     AppBar? appBar;
     if(_showAppBar) {
