@@ -14,6 +14,13 @@ class _ElectricalSettings {
   _ElectricalSettings({this.id = ''});
 }
 
+const String batteriesBasePath = 'electrical.batteries';
+const String batteryTitle = 'Battery';
+const String invertersBasePath = 'electrical.inverters';
+const String inverterTitle = 'Inverter';
+const String solarBasePath = 'electrical.solar';
+const String solarTitle = 'Solar';
+
 class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   static const sid = 'electrical-battery-voltage-meter';
   @override
@@ -50,7 +57,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(_settings);
+    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
   }
 
   @override
@@ -101,7 +108,7 @@ class BatteryVoltageBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(_settings);
+    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
   }
 
   @override
@@ -115,7 +122,7 @@ class BatteryCurrentBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const BatteryCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path);
+  const BatteryCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
 
   factory BatteryCurrentBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -137,7 +144,7 @@ class BatteryCurrentBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(_settings);
+    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
   }
 
   @override
@@ -151,7 +158,7 @@ class InverterCurrentBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const InverterCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path);
+  const InverterCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
 
   factory InverterCurrentBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -173,7 +180,7 @@ class InverterCurrentBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(_settings);
+    return _ElectricalSettingsWidget(config.controller, _settings, inverterTitle, invertersBasePath);
   }
 
   @override
@@ -209,7 +216,7 @@ class SolarVoltageBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(_settings);
+    return _ElectricalSettingsWidget(config.controller, _settings, solarTitle, solarBasePath);
   }
 
   @override
@@ -223,7 +230,7 @@ class SolarCurrentBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const SolarCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path);
+  const SolarCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
 
   factory SolarCurrentBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -246,7 +253,7 @@ class SolarCurrentBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(_settings);
+    return _ElectricalSettingsWidget(config.controller, _settings, solarTitle, solarBasePath);
   }
 
   @override
@@ -384,9 +391,12 @@ class _BatteriesBoxState extends State<BatteriesBox> {
 }
 
 class _ElectricalSettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
   final _ElectricalSettings _settings;
+  final String _title;
+  final String _basePath;
 
-  const _ElectricalSettingsWidget(this._settings);
+  const _ElectricalSettingsWidget(this._controller, this._settings, this._title, this._basePath);
 
   @override
   createState() => _ElectricalSettingsState();
@@ -405,10 +415,12 @@ class _ElectricalSettingsState extends State<_ElectricalSettingsWidget> {
 
     List<Widget> list = [
       ListTile(
-          leading: const Text("Battery ID:"),
-          title: TextFormField(
-              initialValue: s.id,
-              onChanged: (value) => s.id = value)
+          leading: Text("${widget._title} ID:"),
+          title: SignalkPathDropdownMenu(
+            widget._controller,
+            s.id,
+            widget._basePath,
+            (value) => s.id = value)
       ),
     ];
 

@@ -37,7 +37,7 @@ abstract class TankBox extends DoubleValueBarGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _TankSettingsWidget(config.controller, _settings);
+    return _TankSettingsWidget(config.controller, _settings, 'tanks.$_type');
   }
 
   @override
@@ -275,8 +275,9 @@ class _TanksBoxState extends State<TanksBox> {
 class _TankSettingsWidget extends BoxSettingsWidget {
   final BoatInstrumentController _controller;
   final _TankSettings _settings;
+  final String _basePath;
 
-  const _TankSettingsWidget(this._controller, this._settings);
+  const _TankSettingsWidget(this._controller, this._settings, this._basePath);
 
   @override
   createState() => _TankSettingsState();
@@ -297,10 +298,7 @@ class _TankSettingsState extends State<_TankSettingsWidget> {
     List<Widget> list = [
       ListTile(
           leading: const Text("Tank ID:"),
-          title: TextFormField(
-              initialValue: s.id,
-              onChanged: (value) => s.id = value)
-      ),
+          title: SignalkPathDropdownMenu(widget._controller, s.id, widget._basePath, (value) => s.id = value)),
       ListTile(
           leading: const Text("Capacity:"),
           title: TextFormField(
