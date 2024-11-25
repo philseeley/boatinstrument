@@ -18,7 +18,7 @@ abstract class DoubleValueGaugeBox extends DoubleValueBox {
   final List<GaugeRange> ranges;
 
   const DoubleValueGaugeBox(super.config, super.title, super.path,
-    {super.minValue = 0, required super.maxValue, super.angle,
+    {super.minValue = 0, required super.maxValue, super.angle, super.smoothing,
     this.step = 1, this.ranges = const [],
     super.key});
 
@@ -194,7 +194,7 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
   final bool mirror;
 
   const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path,
-    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.ranges,
+    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.smoothing, super.ranges,
     this.mirror = false, super.key});
 
   @override
@@ -340,7 +340,7 @@ abstract class DoubleValueCircularGaugeBox extends DoubleValueGaugeBox {
 
   const DoubleValueCircularGaugeBox(super.config, super.title, super.path,
     {super.minValue = 0, required super.maxValue, required super.step,
-    super.ranges, super.key});
+    super.ranges, super.smoothing, super.key});
 
   @override
   DoubleValueCircularGaugeBoxState createState() => DoubleValueCircularGaugeBoxState();
@@ -435,7 +435,7 @@ abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
 
   const DoubleValueBarGaugeBox(super.config, super.title, super.path,
     {super.minValue = 0, required super.maxValue, required super.step,
-    super.ranges, super.key});
+    super.ranges, super.smoothing, super.key});
 
   @override
   DoubleValueBarGaugeBoxState createState() => DoubleValueBarGaugeBoxState();
