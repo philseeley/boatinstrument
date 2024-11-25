@@ -25,6 +25,7 @@ class _CustomSettings {
   String units;
   double multiplier;
   double step;
+  bool portStarboard;
 
   _CustomSettings({
     this.title = 'title',
@@ -37,7 +38,8 @@ class _CustomSettings {
     this.smoothing = true,
     this.units = 'units',
     this.multiplier = 1,
-    this.step = 1
+    this.step = 1,
+    this.portStarboard = false
   });
 }
 
@@ -46,11 +48,11 @@ class CustomDoubleValueBox extends DoubleValueBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.key});
+  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.key});
 
   factory CustomDoubleValueBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, key: key);
+    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, key: key);
   }
 
   static String sid = 'custom-double-value';
@@ -281,6 +283,13 @@ class _SettingsState extends State<_SettingsWidget> {
           onChanged: (bool value) {
             setState(() {
               s.smoothing = value;
+            });
+          }),
+      SwitchListTile(title: const Text("Port/Starboard:"),
+          value: s.portStarboard,
+          onChanged: (bool value) {
+            setState(() {
+              s.portStarboard = value;
             });
           }),
     ]);

@@ -19,6 +19,7 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       units: json['units'] as String? ?? 'units',
       multiplier: (json['multiplier'] as num?)?.toDouble() ?? 1,
       step: (json['step'] as num?)?.toDouble() ?? 1,
+      portStarboard: json['portStarboard'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
@@ -34,6 +35,7 @@ Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
       'units': instance.units,
       'multiplier': instance.multiplier,
       'step': instance.step,
+      'portStarboard': instance.portStarboard,
     };
 
 _DebugSettings _$DebugSettingsFromJson(Map<String, dynamic> json) =>
