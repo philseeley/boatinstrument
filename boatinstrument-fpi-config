@@ -1,0 +1,2 @@
+FLUTTER_PI_ARGS="--release"
+BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake"
