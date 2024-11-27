@@ -1,7 +1,35 @@
 __NAME__ (__VERSION__-0) stable; urgency=medium
 
-  * 0.3.0 Added "--noaudio" and "--nobrightctrl" option to disable audio and brightness
-          controls on flutter-pi builds as these do not currently work.
+  * 0.3.0 Added Boxes for:
+            Rate of Turn
+            All and individual Tanks
+            All and individual Batteries
+            Inverter and Solar Currents/Voltages
+            Engine RPM, Oil Pressure and Temperature
+
+          Added commandline arguments for:
+            --no-audio
+            --no-brightness-ctrl
+            --no-keep-awake
+            --read-only
+          and allow them to be passed though the BOAT_INSTRUMENT_ARGS ENV variable.
+
+          Flutter-pi can now be configured through variables in /etc/boatinstrument-fpi/config:
+            FLUTTER_PI_ARGS
+            BOAT_INSTRUMENT_ARGS
+
+          Additional settings have been added to Custom Boxes:
+            Post/Starboard
+            Smoothing
+            Paths selection through searchable list
+
+          Handle "Nominal" notification states the same as "Normal".
+
+          Gauge Boxes are indicated in the Box selection menus.
+
+          Updated the Help Box and Page.
+
+          Support for arm32 builds.
   * 0.2.0 Added a "Demo Mode".
           Added Depth below Keel and Transducer Boxes.
   * 0.1.0 Initial release.
