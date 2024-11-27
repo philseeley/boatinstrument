@@ -29,10 +29,12 @@ class BoatInstrumentApp extends StatelessWidget {
     const noAudio = 'no-audio';
     const noBrightnessCtrl = 'no-brightness-ctrl';
     const noKeepAwake = 'no-keep-awake';
+    const readOnly = 'read-only';
     final p = ArgParser()
                 ..addFlag(noAudio, negatable: false)
                 ..addFlag(noBrightnessCtrl, negatable: false)
-                ..addFlag(noKeepAwake, negatable: false);
+                ..addFlag(noKeepAwake, negatable: false)
+                ..addFlag(readOnly, negatable: false);
 
     try {
       ArgResults r = p.parse(args);
@@ -44,7 +46,8 @@ class BoatInstrumentApp extends StatelessWidget {
         home: MainPage(
           r.flag(noAudio),
           r.flag(noBrightnessCtrl),
-          r.flag(noKeepAwake)),
+          r.flag(noKeepAwake),
+          r.flag(readOnly)),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
     } catch (e) {
@@ -59,8 +62,9 @@ class MainPage extends StatefulWidget {
   final bool noAudio;
   final bool noBrightnessControl;
   final bool noKeepAwake;
+  final bool readOnly;
 
-  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, {super.key});
+  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, this.readOnly, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -143,7 +147,9 @@ class _MainPageState extends State<MainPage> {
         actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
       }
 
-      actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
+      if(!widget.readOnly) {
+        actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
+      }
 
       appBar = AppBar(
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
