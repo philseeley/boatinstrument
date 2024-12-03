@@ -45,8 +45,20 @@ In "Demo Mode" the app connects to "https://demo.signalk.org".''')]))),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Help')),
+      appBar: AppBar(
+        title: const Text('Help'),
+        actions: [
+          IconButton(icon: const Icon(Icons.change_history),onPressed: () {_showChangeLog(context);})
+        ],
+      ),
       body: ListView(children: list)
     );
+  }
+
+  void _showChangeLog (BuildContext context) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return const ChangeLogPage();
+    }));
   }
 }
