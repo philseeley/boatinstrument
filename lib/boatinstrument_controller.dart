@@ -79,6 +79,7 @@ class CircularLogger extends Logger {
 
 enum NotificationState {
   normal(false, null),
+  nominal(false, null),
   alert(false, 'alert.mp3'),
   warn(false, 'warning.mp3'),
   alarm(true, 'alarm.mp3'),
@@ -434,7 +435,7 @@ class BoatInstrumentController {
               playSound = true;
             }
           }
-          if (state == NotificationState.normal) {
+          if ([NotificationState.normal, NotificationState.nominal].contains(state)) {
             _showNotifications = true;
             _audioPlayer?.stop();
           }
@@ -443,7 +444,7 @@ class BoatInstrumentController {
             ScaffoldMessenger.of(context).clearSnackBars();
 
             SnackBarAction? action;
-            if (state != NotificationState.normal) {
+            if ([NotificationState.normal, NotificationState.nominal].contains(state)) {
               action = SnackBarAction(label: 'Mute', onPressed: () {
                 _showNotifications = false;
                 _audioPlayer?.stop();

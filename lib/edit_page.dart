@@ -74,6 +74,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(BlackWaterTankBox.sid, 'Black Water', true, (config) {return BlackWaterTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(FuelTankBox.sid, 'Fuel', true, (config) {return FuelTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(LubricationTankBox.sid, 'Lubrication', true, (config) {return LubricationTankBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(RateOfTurnBox.sid, 'Rate of Turn', false, (config) {return RateOfTurnBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -129,6 +130,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CrossTrackErrorBox.sid),
         _widgetMenuEntry(CrossTrackErrorDeltaBox.sid),
         _widgetMenuEntry(PositionBox.sid),
+        _widgetMenuEntry(RateOfTurnBox.sid),
         _widgetMenuEntry(MagneticVariationBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedThroughWaterBox.sid),

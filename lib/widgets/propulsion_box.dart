@@ -222,9 +222,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
     List<Widget> list = [
       ListTile(
           leading: const Text("Engine ID:"),
-          title: TextFormField(
-              initialValue: s.id,
-              onChanged: (value) => s.id = value)
+          title: SignalkPathDropdownMenu(c, s.id, 'propulsion', (value) => s.id = value)
       ),
       ListTile(
           leading: const Text("Max RPM:"),

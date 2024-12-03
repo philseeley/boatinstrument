@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 class LogDisplay extends StatefulWidget {
@@ -48,5 +49,43 @@ class _LogDisplayState extends State<LogDisplay> {
 
   void _share (List<String> entries) async {
     await Share.share(entries.join('\n'), subject: 'Boat Instrument Log');
+  }
+}
+
+class ChangeLogPage extends StatefulWidget {
+  const ChangeLogPage({super.key});
+
+  
+  @override
+  State<ChangeLogPage> createState() => _ChangeLogState();
+}
+
+class _ChangeLogState extends State<ChangeLogPage> {
+  static Text? _log;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLog();
+  }
+  
+  _loadLog() async {
+    if(_log == null) {
+      String s = await rootBundle.loadString('assets/changelog');
+      setState(() {
+        _log = Text(s);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(_log == null) {
+      return Container();
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Change Log')),
+      body: SingleChildScrollView(child: _log!));
   }
 }

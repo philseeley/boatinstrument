@@ -26,11 +26,15 @@ class BoatInstrumentApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-    const noAudio = 'noaudio';
-    const noBrightnesCtrl = 'nobrightctrl';
+    const noAudio = 'no-audio';
+    const noBrightnessCtrl = 'no-brightness-ctrl';
+    const noKeepAwake = 'no-keep-awake';
+    const readOnly = 'read-only';
     final p = ArgParser()
                 ..addFlag(noAudio, negatable: false)
-                ..addFlag(noBrightnesCtrl, negatable: false);
+                ..addFlag(noBrightnessCtrl, negatable: false)
+                ..addFlag(noKeepAwake, negatable: false)
+                ..addFlag(readOnly, negatable: false);
 
     try {
       ArgResults r = p.parse(args);
@@ -41,7 +45,9 @@ class BoatInstrumentApp extends StatelessWidget {
       return MaterialApp(
         home: MainPage(
           r.flag(noAudio),
-          r.flag(noBrightnesCtrl)),
+          r.flag(noBrightnessCtrl),
+          r.flag(noKeepAwake),
+          r.flag(readOnly)),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
     } catch (e) {
@@ -55,8 +61,10 @@ class BoatInstrumentApp extends StatelessWidget {
 class MainPage extends StatefulWidget {
   final bool noAudio;
   final bool noBrightnessControl;
+  final bool noKeepAwake;
+  final bool readOnly;
 
-  const MainPage(this.noAudio, this.noBrightnessControl, {super.key});
+  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, this.readOnly, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -124,7 +132,9 @@ class _MainPageState extends State<MainPage> {
       return const Center(child: _icon);
     }
 
-    WakelockPlus.toggle(enable: _controller.keepAwake);
+    if(!widget.noKeepAwake) {
+      WakelockPlus.toggle(enable: _controller.keepAwake);
+    }
 
     AppBar? appBar;
     if(_showAppBar) {
@@ -137,7 +147,9 @@ class _MainPageState extends State<MainPage> {
         actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
       }
 
-      actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
+      if(!widget.readOnly) {
+        actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
+      }
 
       appBar = AppBar(
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),

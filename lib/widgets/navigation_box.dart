@@ -464,3 +464,21 @@ class MagneticVariationBox extends DoubleValueBox {
     return degreesUnits;
   }
 }
+
+class RateOfTurnBox extends DoubleValueBox {
+  static const String sid = 'navigation-rate-of-turn';
+  @override
+  String get id => sid;
+
+  const RateOfTurnBox(config, {super.key}) : super(config, 'Turn Rate', 'navigation.rateOfTurn', precision: 0, portStarboard: true);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value).toDouble();
+  }
+
+  @override
+  String units(double value) {
+    return '$degreesUnits/s';
+  }
+}

@@ -15,9 +15,11 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       minValue: (json['minValue'] as num?)?.toDouble() ?? 0,
       maxValue: (json['maxValue'] as num?)?.toDouble() ?? 100,
       angle: json['angle'] as bool? ?? false,
+      smoothing: json['smoothing'] as bool? ?? true,
       units: json['units'] as String? ?? 'units',
       multiplier: (json['multiplier'] as num?)?.toDouble() ?? 1,
       step: (json['step'] as num?)?.toDouble() ?? 1,
+      portStarboard: json['portStarboard'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
@@ -29,9 +31,11 @@ Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
       'minValue': instance.minValue,
       'maxValue': instance.maxValue,
       'angle': instance.angle,
+      'smoothing': instance.smoothing,
       'units': instance.units,
       'multiplier': instance.multiplier,
       'step': instance.step,
+      'portStarboard': instance.portStarboard,
     };
 
 _DebugSettings _$DebugSettingsFromJson(Map<String, dynamic> json) =>

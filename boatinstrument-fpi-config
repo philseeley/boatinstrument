@@ -1,0 +1,10 @@
+# Options passed to the flutter-pi command.
+# See https://github.com/ardera/flutter-pi?tab=readme-ov-file#running-your-app-with-flutter-pi
+FLUTTER_PI_ARGS="--release"
+
+# Options passed to the boatinstrument:
+#   --no-audio           Disables loading audio support
+#   --no-brightness-ctrl Disables loading brightness control support
+#   --no-keep-awake      Disables loading Keep Screen Awake support
+#   --read-only          Disables the ability to change the configuration
+BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake"

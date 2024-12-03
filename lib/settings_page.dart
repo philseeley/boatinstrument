@@ -313,6 +313,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<DistanceUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.distanceUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -335,6 +336,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<SpeedUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.speedUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -355,6 +357,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<SpeedUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.windSpeedUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -375,6 +378,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<DepthUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.depthUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -395,6 +399,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<TemperatureUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.temperatureUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -415,6 +420,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<AirPressureUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.airPressureUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -435,6 +441,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<OilPressureUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.oilPressureUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -455,6 +462,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<CapacityUnits>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.capacityUnits,
       dropdownMenuEntries: l,
       onSelected: (value) {
@@ -475,6 +483,7 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     DropdownMenu menu = DropdownMenu<PortStarboardColors>(
+      expandedInsets: EdgeInsets.zero,
       initialSelection: widget._controller._settings?.portStarboardColors,
       dropdownMenuEntries: l,
       onSelected: (value) {
