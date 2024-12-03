@@ -270,7 +270,7 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataTimeout: DataTimeout.infrequent);
   }
 
   @override
@@ -431,7 +431,7 @@ class _MoonBox extends State<MoonBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataTimeout: DataTimeout.infrequent);
   }
 
   @override

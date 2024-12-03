@@ -288,7 +288,7 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure({OnUpdate? onUpdate, Set<String>? paths, bool dataTimeout = true, bool isBox = true}) {
+  void configure({OnUpdate? onUpdate, Set<String>? paths, DataTimeout dataTimeout = DataTimeout.realTime, bool isBox = true}) {
     if(!isBox) {
       ++_boxesOnPage;
     }
@@ -394,7 +394,7 @@ class BoatInstrumentController {
     return LayoutBuilder(builder: (context, constraints) {
       clear();
 
-      configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, dataTimeout: true, isBox: false);
+      configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
 
       // We need to calculate the total number of boxes on the page so that we
       // know when tha last one calls configure(). As we're using LayoutBuilders
@@ -657,18 +657,25 @@ class BoatInstrumentController {
 
       for (dynamic u in d['updates']) {
         try {
-          String source = u[r'$source'];
           // Note: the demo server has old date/times.
-          if (_settings!.demoMode ||
-              source == 'defaults' ||
-              source == 'derived-data' ||
-              now.difference(DateTime.parse(u['timestamp'])) <=
-                  Duration(milliseconds: _settings!.dataTimeout)) {
-            for (dynamic v in u['values']) {
-              String path = v['path'];
-              for (_BoxData bd in _boxData) {
-                for (RegExp r in bd.regExpPaths) {
-                  if (r.hasMatch(path)) {
+          for (dynamic v in u['values']) {
+            String path = v['path'];
+            for (_BoxData bd in _boxData) {
+              for (RegExp r in bd.regExpPaths) {
+                if (r.hasMatch(path)) {
+                  Duration d = now.difference(bd.lastUpdate);
+                  if (
+                    _settings!.demoMode ||
+                    bd.dataTimeout == DataTimeout.static ||
+                    (
+                      (bd.dataTimeout == DataTimeout.realTime) && d >
+                        Duration(milliseconds: _settings!.realTimeDataTimeout)
+                    ) ||
+                    (
+                      (bd.dataTimeout == DataTimeout.infrequent) && d >
+                        Duration(milliseconds: _settings!.infrequentDataTimeout)
+                    )
+                  ) {
                     bd.updates.add(Update(path, v['value']));
                     bd.lastUpdate = now;
                   }
@@ -685,8 +692,16 @@ class BoatInstrumentController {
         if(bd.onUpdate != null) {
           if (bd.updates.isNotEmpty) {
             bd.onUpdate!(bd.updates);
-          } else if (bd.dataTimeout && now.difference(bd.lastUpdate) >
-              Duration(milliseconds: _settings!.dataTimeout)) {
+          } else if (
+              (
+                (bd.dataTimeout == DataTimeout.realTime) && now.difference(bd.lastUpdate) >
+                  Duration(milliseconds: _settings!.realTimeDataTimeout)
+              ) ||
+              (
+                (bd.dataTimeout == DataTimeout.infrequent) && now.difference(bd.lastUpdate) >
+                  Duration(milliseconds: _settings!.infrequentDataTimeout)
+              )
+            ) {
             bd.onUpdate!(null);
             bd.lastUpdate = now;
           }

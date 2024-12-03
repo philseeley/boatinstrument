@@ -28,9 +28,9 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool relativeAngle;
   final bool smoothing;
   final bool portStarboard;
-  final bool dataTimeout;
+  final DataTimeout dataTimeout;
 
-  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, this.portStarboard = false, this.dataTimeout = true, super.key});
+  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, this.portStarboard = false, this.dataTimeout = DataTimeout.realTime, super.key});
 
   @override
   State<DoubleValueBox> createState() => DoubleValueBoxState();

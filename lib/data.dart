@@ -327,12 +327,18 @@ class Update {
   }
 }
 
+enum DataTimeout {
+  realTime,
+  infrequent,
+  static;
+}
+
 typedef OnUpdate = Function(List<Update>? updates);
 
 class _BoxData {
   final OnUpdate? onUpdate;
   final Set<String> paths;
-  final bool dataTimeout;
+  final DataTimeout dataTimeout;
   List<RegExp> regExpPaths = [];
   DateTime lastUpdate = DateTime.now();
   List<Update> updates = [];
@@ -542,7 +548,8 @@ class _Settings {
   int signalkPort;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
-  int dataTimeout;
+  int realTimeDataTimeout;
+  int infrequentDataTimeout;
   bool demoMode;
   bool darkMode;
   bool wrapPages;
@@ -575,7 +582,8 @@ class _Settings {
     this.signalkPort = 3000,
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
-    this.dataTimeout = 10000,
+    this.realTimeDataTimeout = 10000,
+    this.infrequentDataTimeout = 60000,
     this.demoMode = false,
     this.darkMode = true,
     this.wrapPages = true,
