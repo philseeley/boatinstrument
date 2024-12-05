@@ -47,3 +47,13 @@ Map<String, dynamic> _$DebugSettingsToJson(_DebugSettings instance) =>
     <String, dynamic>{
       'path': instance.path,
     };
+
+_TextBoxSettings _$TextBoxSettingsFromJson(Map<String, dynamic> json) =>
+    _TextBoxSettings(
+      text: json['text'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$TextBoxSettingsToJson(_TextBoxSettings instance) =>
+    <String, dynamic>{
+      'text': instance.text,
+    };
