@@ -144,6 +144,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
 
     DropdownMenu menu = DropdownMenu<String>(
       expandedInsets: EdgeInsets.zero,
+      enableSearch: false,
       enableFilter: widget.searchable,
       requestFocusOnTap: widget.searchable,
       initialSelection: iv,
