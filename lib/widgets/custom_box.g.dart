@@ -48,12 +48,18 @@ Map<String, dynamic> _$DebugSettingsToJson(_DebugSettings instance) =>
       'path': instance.path,
     };
 
-_TextBoxSettings _$TextBoxSettingsFromJson(Map<String, dynamic> json) =>
-    _TextBoxSettings(
-      text: json['text'] as String? ?? '',
+_CustomTextBoxSettings _$CustomTextBoxSettingsFromJson(
+        Map<String, dynamic> json) =>
+    _CustomTextBoxSettings(
+      text:
+          (json['text'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              const [],
+      path: json['path'] as String? ?? '',
     );
 
-Map<String, dynamic> _$TextBoxSettingsToJson(_TextBoxSettings instance) =>
+Map<String, dynamic> _$CustomTextBoxSettingsToJson(
+        _CustomTextBoxSettings instance) =>
     <String, dynamic>{
       'text': instance.text,
+      'path': instance.path,
     };
