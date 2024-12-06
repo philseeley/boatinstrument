@@ -16,6 +16,7 @@ class _EditPage extends StatefulWidget {
 final List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', false, (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', false, (config) {return HelpBox(config, key: UniqueKey());}),
+  BoxDetails(TextBox.sid, 'Text', false, (config) {return TextBox(config, key: UniqueKey());}),
   BoxDetails(DepthBelowSurfaceBox.sid, 'Depth Below Surface', false, (config) {return DepthBelowSurfaceBox(config, key: UniqueKey());}),
   BoxDetails(DepthBelowKeelBox.sid, 'Depth Below Keel', false, (config) {return DepthBelowKeelBox(config, key: UniqueKey());}),
   BoxDetails(DepthBelowTransducerBox.sid, 'Depth Below Transducer', false, (config) {return DepthBelowTransducerBox(config, key: UniqueKey());}),
@@ -28,6 +29,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(PositionBox.sid, 'Position', false, (config) {return PositionBox(config, key: UniqueKey());}),
   BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', false, (config) {return CourseOverGroundBox(config, key: UniqueKey());}),
   BoxDetails(WaterTemperatureBox.sid, 'Water Temperature', false, (config) {return WaterTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(OutsideHumidityBox.sid, 'Outside Humidity', false, (config) {return OutsideHumidityBox(config, key: UniqueKey());}),
+  BoxDetails(InsideHumidityBox.sid, 'Inside Humidity', false, (config) {return InsideHumidityBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStatusBox.sid, 'Autopilot Status', false, (config) {return AutopilotStatusBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStateControlHorizontalBox.sid, 'AP State Ctrl-H', false, (config) {return AutopilotStateControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStateControlVerticalBox.sid, 'AP State Ctrl-V', false, (config) {return AutopilotStateControlVerticalBox(config, key: UniqueKey());}),
@@ -117,6 +120,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
         _widgetMenuEntry(OutsidePressureBox.sid),
+        _widgetMenuEntry(OutsideHumidityBox.sid),
+        _widgetMenuEntry(InsideHumidityBox.sid),
         _widgetMenuEntry(SunlightBox.sid),
         _widgetMenuEntry(MoonBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [
@@ -172,9 +177,10 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(EngineTempBox.sid),
         _widgetMenuEntry(EngineOilPressureBox.sid),
         ]),
-      _widgetMenuEntry(WebViewBox.sid),
+      _widgetMenuEntry(TextBox.sid),
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetMenuEntry(AnchorAlarmBox.sid),
+      _widgetMenuEntry(WebViewBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid),
         _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid),

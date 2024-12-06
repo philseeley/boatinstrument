@@ -445,3 +445,98 @@ class _DebugSettingsState extends State<_DebugSettingsWidget> {
   }
 }
 
+@JsonSerializable()
+class _TextBoxSettings {
+  String text;
+
+  _TextBoxSettings({
+    this.text = ''
+  });
+}
+
+class TextBox extends BoxWidget {
+  late final _TextBoxSettings _settings;
+
+  static const sid = 'text';
+  @override
+  String get id => sid;
+
+  TextBox(super.config, {super.key})  {
+    _settings = _$TextBoxSettingsFromJson(config.settings);
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _TextBoxSettingsWidget(_settings);
+  }
+
+  @override
+  State<TextBox> createState() => _TextBoxState();
+}
+
+class _TextBoxState extends State<TextBox> {
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _TextBoxSettings s = widget._settings;
+    String text = s.text;
+
+    if(widget.config.editMode && text.isEmpty) {
+      text = 'Your text here';
+    }
+
+    List<String> lines = const LineSplitter().convert(text);
+    String max = lines.reduce((a, b) {return a.length > b.length ? a : b;});
+
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+    double fontSize = maxFontSize(max, style,
+        ((widget.config.constraints.maxHeight - style.fontSize!) / lines.length),
+        widget.config.constraints.maxWidth);
+
+    return Center(child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
+  }
+}
+
+class _TextBoxSettingsWidget extends BoxSettingsWidget {
+  final _TextBoxSettings _settings;
+
+  const _TextBoxSettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$TextBoxSettingsToJson(_settings);
+  }
+
+  @override
+  createState() => _TextBoxSettingsState();
+}
+
+class _TextBoxSettingsState extends State<_TextBoxSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _TextBoxSettings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+          leading: const Text("Text:"),
+          title: TextFormField(
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.multiline,
+            minLines: 2,
+            maxLines: null,
+            initialValue: s.text,
+            onChanged: (value) => s.text = value
+          )
+      ),
+    ]);
+  }
+}
