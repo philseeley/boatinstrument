@@ -29,6 +29,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(PositionBox.sid, 'Position', false, (config) {return PositionBox(config, key: UniqueKey());}),
   BoxDetails(CourseOverGroundBox.sid, 'Course Over Ground', false, (config) {return CourseOverGroundBox(config, key: UniqueKey());}),
   BoxDetails(WaterTemperatureBox.sid, 'Water Temperature', false, (config) {return WaterTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(OutsideHumidityBox.sid, 'Outside Humidity', false, (config) {return OutsideHumidityBox(config, key: UniqueKey());}),
+  BoxDetails(InsideHumidityBox.sid, 'Inside Humidity', false, (config) {return InsideHumidityBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStatusBox.sid, 'Autopilot Status', false, (config) {return AutopilotStatusBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStateControlHorizontalBox.sid, 'AP State Ctrl-H', false, (config) {return AutopilotStateControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStateControlVerticalBox.sid, 'AP State Ctrl-V', false, (config) {return AutopilotStateControlVerticalBox(config, key: UniqueKey());}),
@@ -118,6 +120,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
         _widgetMenuEntry(OutsidePressureBox.sid),
+        _widgetMenuEntry(OutsideHumidityBox.sid),
+        _widgetMenuEntry(InsideHumidityBox.sid),
         _widgetMenuEntry(SunlightBox.sid),
         _widgetMenuEntry(MoonBox.sid)]),
       _widgetSubMenuEntry(box, 'Navigation', [

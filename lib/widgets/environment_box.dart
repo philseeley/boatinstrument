@@ -73,6 +73,42 @@ class WaterTemperatureBox extends DoubleValueBox {
   }
 }
 
+class OutsideHumidityBox extends DoubleValueBox {
+  static const String sid = 'environment-outside-relative-humidity';
+  @override
+  String get id => sid;
+
+  const OutsideHumidityBox(config, {super.key}) : super(config, 'Humidity Out', 'environment.outside.relativeHumidity', precision: 0);
+
+  @override
+  double convert(double value) {
+    return value*100;
+  }
+
+  @override
+  String units(double value) {
+    return '%';
+  }
+}
+
+class InsideHumidityBox extends DoubleValueBox {
+  static const String sid = 'environment-inside-relative-humidity';
+  @override
+  String get id => sid;
+
+  const InsideHumidityBox(config, {super.key}) : super(config, 'Humidity In', 'environment.inside.relativeHumidity', precision: 0);
+
+  @override
+  double convert(double value) {
+    return value*100;
+  }
+
+  @override
+  String units(double value) {
+    return '%';
+  }
+}
+
 class SetAndDriftBox extends BoxWidget {
 
   const SetAndDriftBox(super.config, {super.key});
