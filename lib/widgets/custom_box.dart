@@ -476,6 +476,9 @@ class CustomTextBox extends BoxWidget {
   }
 
   @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('Note: the Path data is only retrieved once from SignalK, as it is intended to display static data like vessel Name or MMSI and these paths cannot be subscribed to.');
+
+  @override
   State<CustomTextBox> createState() => _CustomTextBoxState();
 }
 
@@ -486,7 +489,7 @@ class _CustomTextBoxState extends State<CustomTextBox> {
   void initState() {
     super.initState();
     String path = widget._settings.path;
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: path.isEmpty?null:{path}, dataTimeout: false);
+    widget.config.controller.configure(onStaticUpdate: _onUpdate, staticPaths: path.isEmpty?null:{path});
   }
 
   @override
@@ -500,11 +503,16 @@ class _CustomTextBoxState extends State<CustomTextBox> {
 
     lines.addAll(_pathData);
 
-    String max = lines.reduce((a, b) {return a.length > b.length ? a : b;});
+    String max = '-';
+    int numLines = 1;
+    if(lines.isNotEmpty) {
+      numLines = lines.length;
+      max = lines.reduce((a, b) {return a.length > b.length ? a : b;});
+    }
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     double fontSize = maxFontSize(max, style,
-        ((widget.config.constraints.maxHeight - style.fontSize!) / lines.length),
+        ((widget.config.constraints.maxHeight - style.fontSize!) / numLines),
         widget.config.constraints.maxWidth);
 
     return Center(child: Text(lines.join('\n'), textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
@@ -518,7 +526,6 @@ class _CustomTextBoxState extends State<CustomTextBox> {
         setState(() {
           _pathData = [];
           for(Update u in updates) {
-            print(u.value);
             _pathData.add(u.value.toString());
           }
         });
@@ -557,7 +564,7 @@ class _TextBoxSettingsState extends State<_TextBoxSettingsWidget> {
             minLines: 2,
             maxLines: null,
             initialValue: s.text.join('\n'),
-            onChanged: (value) => s.text = value.split('\n')
+            onChanged: (value) => s.text = value.isEmpty?[]: value.split('\n')
           )
       ),
       const ListTile(

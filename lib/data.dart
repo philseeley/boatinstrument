@@ -337,12 +337,16 @@ typedef OnUpdate = Function(List<Update>? updates);
 class _BoxData {
   final OnUpdate? onUpdate;
   final Set<String> paths;
+  final OnUpdate? onStaticUpdate;
+  final Set<String> staticPaths;
   final bool dataTimeout;
   List<RegExp> regExpPaths = [];
+  List<RegExp> regExpStaticPaths = [];
   DateTime lastUpdate = DateTime.now();
   List<Update> updates = [];
+  List<Update> staticUpdates = [];
 
-  _BoxData(this.onUpdate, this.paths, this.dataTimeout);
+  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataTimeout);
 }
 
 class _Resizable {
