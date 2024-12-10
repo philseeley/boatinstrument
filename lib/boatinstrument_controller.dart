@@ -288,18 +288,25 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure({OnUpdate? onUpdate, Set<String>? paths, bool dataTimeout = true, bool isBox = true}) {
+  void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, bool dataTimeout = true, bool isBox = true}) {
     if(!isBox) {
       ++_boxesOnPage;
     }
 
-    _BoxData bd = _BoxData(onUpdate, paths??{}, dataTimeout);
+    _BoxData bd = _BoxData(onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataTimeout);
     _boxData.add(bd);
 
     for(String path in bd.paths) {
       // Need to escape all the '.'s and make a wildcard character for any '*'s, otherwise
       // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
       bd.regExpPaths.add(
+          RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
+    }
+
+    for(String path in bd.staticPaths) {
+      // Need to escape all the '.'s and make a wildcard character for any '*'s, otherwise
+      // 'a.*.c' would match anything starting 'a' and ending 'b', e.g 'abbbbc'.
+      bd.regExpStaticPaths.add(
           RegExp('^${path.replaceAll(r'.', r'\.').replaceAll(r'*', r'.*')}\$'));
     }
 
@@ -609,11 +616,15 @@ class BoatInstrumentController {
   void _subscribe() {
     if(_boxData.length == _boxesOnPage) {
       Set<String> paths = {};
+      Set<String> staticPaths = {};
 
       // Find all the unique paths.
       for (_BoxData bd in _boxData) {
         paths.addAll(bd.paths);
+        staticPaths.addAll(bd.staticPaths);
       }
+
+      _getStaticData(staticPaths);
 
       _unsubscribe();
 
@@ -626,6 +637,7 @@ class BoatInstrumentController {
           "minPeriod": _settings!.signalkMinPeriod.toString()
         });
       }
+
       _channel?.sink.add(
         jsonEncode(
           {
@@ -692,6 +704,68 @@ class BoatInstrumentController {
           }
         }
       }
+    }
+  }
+
+  _processStaticData(String path, Uri uri) async {
+    http.Response response = await http.get(
+        uri,
+        headers: {
+          "accept": "application/json",
+        },
+    );
+
+    for(_BoxData bd in _boxData) {
+      bd.staticUpdates.clear();
+    }
+
+    if(response.statusCode == HttpStatus.ok) {
+      dynamic data = json.decode(response.body);
+      try {
+
+        String value = '-';
+        if(data.runtimeType == String) {
+          value = data;
+        } else {
+          value = data['value'].toString();
+        }
+        for (_BoxData bd in _boxData) {
+          for (RegExp r in bd.regExpStaticPaths) {
+            if (r.hasMatch(path)) {
+              bd.staticUpdates.add(Update(path, value));
+            }
+          }
+        }
+      } catch (e) {
+        l.e('Error converting "$data" for "$path"', error: e);
+      }
+    }
+
+    for(_BoxData bd in _boxData) {
+      if(bd.onStaticUpdate != null) {
+        if (bd.staticUpdates.isNotEmpty) {
+          bd.onStaticUpdate!(bd.staticUpdates);
+        }
+      }
+    }
+  }
+
+  _getStaticData(Set<String> staticPaths) {
+    Uri uri = httpApiUri;
+    try {
+      List<String> basePathSegments = [...uri.pathSegments]
+        ..removeLast()
+        ..addAll(['vessels', 'self']);
+
+      for(String path in staticPaths) {
+        List<String> pathSegments = [...basePathSegments, ...path.split('.')];
+
+        uri = uri.replace(pathSegments: pathSegments);
+
+        _processStaticData(path, uri);
+      }
+    } catch (e) {
+      l.e('Failed to retrieve static path', error: e);
     }
   }
 }

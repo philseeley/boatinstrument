@@ -446,23 +446,25 @@ class _DebugSettingsState extends State<_DebugSettingsWidget> {
 }
 
 @JsonSerializable()
-class _TextBoxSettings {
-  String text;
+class _CustomTextBoxSettings {
+  List<String> text;
+  String path;
 
-  _TextBoxSettings({
-    this.text = ''
+  _CustomTextBoxSettings({
+    this.text = const [],
+    this.path = ''
   });
 }
 
-class TextBox extends BoxWidget {
-  late final _TextBoxSettings _settings;
+class CustomTextBox extends BoxWidget {
+  late final _CustomTextBoxSettings _settings;
 
-  static const sid = 'text';
+  static const sid = 'custom-text';
   @override
   String get id => sid;
 
-  TextBox(super.config, {super.key})  {
-    _settings = _$TextBoxSettingsFromJson(config.settings);
+  CustomTextBox(super.config, {super.key})  {
+    _settings = _$CustomTextBoxSettingsFromJson(config.settings);
   }
 
   @override
@@ -470,49 +472,77 @@ class TextBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _TextBoxSettingsWidget(_settings);
+    return _TextBoxSettingsWidget(config, _settings);
   }
 
   @override
-  State<TextBox> createState() => _TextBoxState();
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('Note: the Path data is only retrieved once from SignalK, as it is intended to display static data like vessel Name or MMSI and these paths cannot be subscribed to.');
+
+  @override
+  State<CustomTextBox> createState() => _CustomTextBoxState();
 }
 
-class _TextBoxState extends State<TextBox> {
+class _CustomTextBoxState extends State<CustomTextBox> {
+  List<String> _pathData = [];
+
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure();
+    String path = widget._settings.path;
+    widget.config.controller.configure(onStaticUpdate: _onUpdate, staticPaths: path.isEmpty?null:{path});
   }
 
   @override
   Widget build(BuildContext context) {
-    _TextBoxSettings s = widget._settings;
-    String text = s.text;
+    _CustomTextBoxSettings s = widget._settings;
+    List<String> lines = s.text.toList();
 
-    if(widget.config.editMode && text.isEmpty) {
-      text = 'Your text here';
+    if(widget.config.editMode && lines.isEmpty && _pathData.isEmpty) {
+      lines = ['Your text here'];
     }
 
-    List<String> lines = const LineSplitter().convert(text);
-    String max = lines.reduce((a, b) {return a.length > b.length ? a : b;});
+    lines.addAll(_pathData);
+
+    String max = '-';
+    int numLines = 1;
+    if(lines.isNotEmpty) {
+      numLines = lines.length;
+      max = lines.reduce((a, b) {return a.length > b.length ? a : b;});
+    }
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     double fontSize = maxFontSize(max, style,
-        ((widget.config.constraints.maxHeight - style.fontSize!) / lines.length),
+        ((widget.config.constraints.maxHeight - style.fontSize!) / numLines),
         widget.config.constraints.maxWidth);
 
-    return Center(child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
+    return Center(child: Text(lines.join('\n'), textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
+  }
+
+  void _onUpdate(List<Update>? updates) {
+    if (updates == null) {
+      _pathData = [];
+    } else {
+      if(mounted) {
+        setState(() {
+          _pathData = [];
+          for(Update u in updates) {
+            _pathData.add(u.value.toString());
+          }
+        });
+      }
+    }
   }
 }
 
 class _TextBoxSettingsWidget extends BoxSettingsWidget {
-  final _TextBoxSettings _settings;
+  final BoxWidgetConfig _config;
+  final _CustomTextBoxSettings _settings;
 
-  const _TextBoxSettingsWidget(this._settings);
+  const _TextBoxSettingsWidget(this._config, this._settings);
 
   @override
   Map<String, dynamic> getSettingsJson() {
-    return _$TextBoxSettingsToJson(_settings);
+    return _$CustomTextBoxSettingsToJson(_settings);
   }
 
   @override
@@ -523,7 +553,7 @@ class _TextBoxSettingsState extends State<_TextBoxSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _TextBoxSettings s = widget._settings;
+    _CustomTextBoxSettings s = widget._settings;
 
     return ListView(children: [
       ListTile(
@@ -533,9 +563,22 @@ class _TextBoxSettingsState extends State<_TextBoxSettingsWidget> {
             keyboardType: TextInputType.multiline,
             minLines: 2,
             maxLines: null,
-            initialValue: s.text,
-            onChanged: (value) => s.text = value
+            initialValue: s.text.join('\n'),
+            onChanged: (value) => s.text = value.isEmpty?[]: value.split('\n')
           )
+      ),
+      const ListTile(
+          title: Text("And/Or")
+      ),
+      ListTile(
+        leading: const Text("Signalk Path:"),
+        title: SignalkPathDropdownMenu(
+          searchable: true,
+          widget._config.controller,
+          s.path,
+          '',
+          (value) => s.path = value,
+          listPaths: true)
       ),
     ]);
   }
