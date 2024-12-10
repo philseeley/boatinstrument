@@ -81,7 +81,11 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
         return;
       }
       try {
-        _paths('$path${path.isEmpty?'':'.'}$k', data[k], paths);
+        if(data[k].runtimeType == String) {
+          paths.add(k);
+        } else {
+          _paths('$path${path.isEmpty?'':'.'}$k', data[k], paths);
+        }
       } catch (e) {
         widget._controller.l.e('Walking path tree', error: e);
       }
