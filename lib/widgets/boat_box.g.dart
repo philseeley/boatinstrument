@@ -10,6 +10,7 @@ _RudderAngleSettings _$RudderAngleSettingsFromJson(Map<String, dynamic> json) =>
     _RudderAngleSettings(
       showLabels: json['showLabels'] as bool? ?? true,
       maxAngle: (json['maxAngle'] as num?)?.toInt() ?? 30,
+      autoScale: json['autoScale'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$RudderAngleSettingsToJson(
@@ -17,4 +18,5 @@ Map<String, dynamic> _$RudderAngleSettingsToJson(
     <String, dynamic>{
       'showLabels': instance.showLabels,
       'maxAngle': instance.maxAngle,
+      'autoScale': instance.autoScale,
     };

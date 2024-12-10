@@ -44,10 +44,12 @@ class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
 class _RudderAngleSettings {
   bool showLabels;
   int maxAngle;
+  bool autoScale;
 
   _RudderAngleSettings({
     this.showLabels = true,
-    this.maxAngle = 30
+    this.maxAngle = 30,
+    this.autoScale = true
   });
 }
 
@@ -61,24 +63,42 @@ class _RudderAnglePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
+    int maxAngle = _settings.maxAngle;
+    int rudderAngle = rad2Deg((_rudderAngle??0).abs());
     double max = canvasSize.width/2;
 
     Paint paint = Paint()..style = PaintingStyle.fill;
 
+    double d = 0;
+    double sign = (_rudderAngle??0)<0 ? -1 : 1;
+
+    if(_settings.autoScale) {
+      while(rudderAngle > maxAngle) {
+        maxAngle += 10;
+      }
+    }
+
     if(_rudderAngle != null) {
       paint.color = _controller.val2PSColor(_context, _rudderAngle);
 
+      double w = max / (maxAngle / rudderAngle);
+      if(w - max > 0) {
+        d = w - max;
+        w = max;
+      }
       canvas.drawRect(Rect.fromLTWH(
-          max, 0, max / (_settings.maxAngle / rad2Deg(_rudderAngle)),
+          max, 0, w*sign,
           canvasSize.height), paint);
     }
+
+    canvas.save();
+    canvas.translate(max, 0);
 
     paint.color = Theme.of(_context).colorScheme.onSurface;
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
-      canvas.translate(max, 0);
-      for (int a = 0; a <= _settings.maxAngle; a += 10) {
-        double x = max / (_settings.maxAngle / a);
+      for (int a = 0; a <= maxAngle; a += 10) {
+        double x = max / (maxAngle / a);
 
         canvas.drawRect(Rect.fromLTWH(x - 1, 0, 2, canvasSize.height), paint);
         canvas.drawRect(Rect.fromLTWH(-x - 1, 0, 2, canvasSize.height), paint);
@@ -96,6 +116,15 @@ class _RudderAnglePainter extends CustomPainter {
       }
     } finally {
       tp.dispose();
+    }
+
+    canvas.restore();
+
+    if(d > 0) {
+      paint.color = Colors.blue;
+      canvas.drawRect(Rect.fromLTWH(
+          max+((d%max)*sign)-(1*sign), 0, 2*sign,
+          canvasSize.height), paint);
     }
   }
 
@@ -126,6 +155,9 @@ class RudderAngleBox extends DoubleValueBox {
   }
 
   @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('Auto Scaling will temporarily extend the Max Angle if it is exceeded. If Auto Scaling is disabled and Max Angle is exceeded, a line will indicate further rudder movement');
+
+  @override
   double convert(double value) {
     return value;
   }
@@ -139,6 +171,10 @@ class RudderAngleBox extends DoubleValueBox {
 class _RudderAngleBoxState extends DoubleValueBoxState<RudderAngleBox> {
   @override
   Widget build(BuildContext context) {
+    if(widget.config.editMode) {
+      displayValue = deg2Rad(12);
+    }
+
     return Container(
         padding: const EdgeInsets.all(5.0),
         child: RepaintBoundary(
@@ -197,6 +233,13 @@ class _RudderAngleSettingsState extends State<_RudderAngleSettingsWidget> {
               });
             }),
       ),
+      SwitchListTile(title: const Text("Auto Scale:"),
+          value: s.autoScale,
+          onChanged: (bool value) {
+            setState(() {
+              s.autoScale = value;
+            });
+          }),
     ]);
   }
 }
