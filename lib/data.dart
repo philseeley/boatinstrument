@@ -74,8 +74,10 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
     getPaths();
   }
 
-  _paths(String path, Map<String, dynamic> data, List<String> paths) {
-    paths.add(path);
+  _paths(String path, Map<String, dynamic> data, bool add, List<String> paths) {
+    if(add) {
+      paths.add(path);
+    }
     for (String k in data.keys) {
       if({'meta', 'value', '\$source', 'timestamp', 'pgn'}.contains(k)) {
         return;
@@ -84,7 +86,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
         if(data[k].runtimeType == String) {
           paths.add(k);
         } else {
-          _paths('$path${path.isEmpty?'':'.'}$k', data[k], paths);
+          _paths('$path${path.isEmpty?'':'.'}$k', data[k], data[k]['value'] != null, paths);
         }
       } catch (e) {
         widget._controller.l.e('Walking path tree', error: e);
@@ -117,7 +119,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
         setState(() {
           if(widget.listPaths) {
             List<String> paths = [];
-            _paths(widget._basePath, data, paths);
+            _paths(widget._basePath, data, true, paths);
             values.addAll(paths);
           } else {
             values.addAll(data.keys);

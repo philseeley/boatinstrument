@@ -727,7 +727,7 @@ class BoatInstrumentController {
         if(data.runtimeType == String) {
           value = data;
         } else {
-          value = data['value'].toString();
+          value = (data['value']??'-').toString();
         }
         for (_BoxData bd in _boxData) {
           for (RegExp r in bd.regExpStaticPaths) {
