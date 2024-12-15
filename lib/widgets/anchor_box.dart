@@ -315,7 +315,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         }
       }
     } catch (e) {
-      widget.config.controller.l.e('Error Sending to WebSocket', error: e);
+      widget.config.controller.l.e('Error posting to server', error: e);
     }
   }
 
