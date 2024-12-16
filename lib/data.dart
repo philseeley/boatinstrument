@@ -47,7 +47,8 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
     textPainter.dispose();
   }
 
-  return fontSize;
+  // Make sure the font is at least readable, even if this overflows.
+  return fontSize>10.0?fontSize:10.0;
 }
 
 String dynamic2String(dynamic d) {
