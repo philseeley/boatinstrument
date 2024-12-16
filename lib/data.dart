@@ -50,6 +50,29 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
   return fontSize;
 }
 
+String dynamic2String(dynamic d) {
+  StringBuffer s = StringBuffer();
+
+  _dynamic2String(d, s);
+
+  return s.toString();
+}
+
+void _dynamic2String(dynamic d, StringBuffer s) {
+
+  if(({String, bool, int, double}).contains(d.runtimeType)) {
+    s.write(d);
+  } else {
+    if(d['value'] != null) {
+      _dynamic2String(d['value'], s);
+    } else {
+      for(String k in d.keys) {
+        s.write('$k: ${d[k]} ');
+      }
+    }
+  }
+}
+
 class SignalkPathDropdownMenu extends StatefulWidget {
   final BoatInstrumentController _controller;
   final String _initialValue;
@@ -79,17 +102,16 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
       paths.add(path);
     }
     for (String k in data.keys) {
-      if({'meta', 'value', '\$source', 'timestamp', 'pgn'}.contains(k)) {
-        return;
-      }
-      try {
-        if(data[k].runtimeType == String) {
-          paths.add(k);
-        } else {
-          _paths('$path${path.isEmpty?'':'.'}$k', data[k], data[k]['value'] != null, paths);
+      if(!{r'meta', r'value', r'$source', r'timestamp', r'pgn'}.contains(k)) {
+        try {
+          if(data[k].runtimeType == String) {
+            paths.add(k);
+          } else {
+            _paths('$path${path.isEmpty?'':'.'}$k', data[k], data[k]['value'] != null, paths);
+          }
+        } catch (e) {
+          widget._controller.l.e('Walking path tree', error: e);
         }
-      } catch (e) {
-        widget._controller.l.e('Walking path tree', error: e);
       }
     }
   }
