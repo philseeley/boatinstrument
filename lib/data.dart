@@ -106,7 +106,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
       if(!{r'meta', r'value', r'$source', r'timestamp', r'pgn'}.contains(k)) {
         try {
           if(data[k].runtimeType == String) {
-            paths.add(k);
+            paths.add('$path${path.isEmpty?'':'.'}$k');
           } else {
             _paths('$path${path.isEmpty?'':'.'}$k', data[k], data[k]['value'] != null, paths);
           }
