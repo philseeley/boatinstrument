@@ -19,8 +19,8 @@ class _CustomSettings {
   String path;
   int precision;
   int minLen;
-  double minValue;
-  double maxValue;
+  double? minValue;
+  double? maxValue;
   bool angle;
   bool smoothing;
   String units;
@@ -33,8 +33,8 @@ class _CustomSettings {
     this.path = 'path',
     this.precision = 1,
     this.minLen = 2,
-    this.minValue = 0,
-    this.maxValue = 100,
+    this.minValue,
+    this.maxValue,
     this.angle = false,
     this.smoothing = true,
     this.units = 'units',
@@ -236,7 +236,7 @@ class _SettingsState extends State<_SettingsWidget> {
         leading: const Text("Multiplier:"),
         title: TextFormField(
             initialValue: s.multiplier.toString(),
-            onChanged: (value) => s.multiplier = double.parse(value)),
+            onChanged: (value) => s.multiplier = double.tryParse(value)??1),
       ),
       ListTile(
         leading: const Text("Precision:"),
@@ -244,7 +244,7 @@ class _SettingsState extends State<_SettingsWidget> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             initialValue: s.precision.toString(),
-            onChanged: (value) => s.precision = int.parse(value)),
+            onChanged: (value) => s.precision = int.tryParse(value)??0),
       ),
       ListTile(
         leading: const Text("Min Length:"),
@@ -252,25 +252,25 @@ class _SettingsState extends State<_SettingsWidget> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             initialValue: s.minLen.toString(),
-            onChanged: (value) => s.minLen = int.parse(value)),
+            onChanged: (value) => s.minLen = int.tryParse(value)??0),
       ),
       ListTile(
         leading: const Text("Min Value:"),
         title: TextFormField(
-            initialValue: s.minValue.toString(),
-            onChanged: (value) => s.minValue = double.parse(value)),
+            initialValue: (s.minValue??'').toString(),
+            onChanged: (value) => s.minValue = double.tryParse(value)),
       ),
       ListTile(
         leading: const Text("Max Value:"),
         title: TextFormField(
-            initialValue: s.maxValue.toString(),
-            onChanged: (value) => s.maxValue = double.parse(value)),
+            initialValue: (s.maxValue??'').toString(),
+            onChanged: (value) => s.maxValue = double.tryParse(value)),
       ),
       ListTile(
         leading: const Text("Step:"),
         title: TextFormField(
             initialValue: s.step.toString(),
-            onChanged: (value) => s.step = double.parse(value)),
+            onChanged: (value) => s.step = double.tryParse(value)??1),
       ),
       SwitchListTile(title: const Text("Is Angle:"),
           value: s.angle,

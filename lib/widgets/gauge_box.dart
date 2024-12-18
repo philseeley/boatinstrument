@@ -26,6 +26,8 @@ abstract class DoubleValueGaugeBox extends DoubleValueBox {
   DoubleValueGaugeBoxState createState() => DoubleValueGaugeBoxState();
 }
 
+const double _defaultMax = 100;
+
 class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValueBoxState<T> {
   int minDisplay = 0;
   int maxDisplay = 0;
@@ -35,9 +37,9 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
   @override
   void initState() {
     super.initState();
-    minDisplay = widget.convert(widget.minValue!).ceil();
-    maxDisplay = widget.convert(widget.maxValue!).floor();
-    double steps = (widget.maxValue! - widget.minValue!)/widget.step;
+    minDisplay = widget.convert(widget.minValue??0).ceil();
+    maxDisplay = widget.convert(widget.maxValue??_defaultMax).floor();
+    double steps = ((widget.maxValue??100) - (widget.minValue??0))/widget.step;
     _displayStep = ((maxDisplay - minDisplay)/steps).round();
     _displayStep = _displayStep < 1 ? 1 : _displayStep;
     for(GaugeRange r in widget.ranges) {
@@ -217,7 +219,7 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
     ];
 
     if(value != null) {
-      double angle = ((pi/(widget.maxValue! - widget.minValue!)) * (value! - widget.minValue!)) - pi/2;
+      double angle = ((pi/((widget.maxValue??_defaultMax) - (widget.minValue??0))) * (value! - (widget.minValue??0))) - pi/2;
       if(widget.mirror) {
         angle = (pi*2)-angle;
       }
@@ -355,15 +357,15 @@ class DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> ex
       Positioned(top: 0, right: 0, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
-          painter: _CircularGaugePainter(context, widget.convert(widget.minValue!), minDisplay, maxDisplay, _displayStep, _displayRanges)
+          painter: _CircularGaugePainter(context, widget.convert(widget.minValue??0), minDisplay, maxDisplay, _displayStep, _displayRanges)
       )
     ];
 
     if(displayValue != null) {
-      double steps = widget.maxValue! - widget.minValue!;
+      double steps = (widget.maxValue??_defaultMax) - (widget.minValue??0);
       double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
 
-      double angle = angleStep * (value! - widget.minValue!);
+      double angle = angleStep * (value! - (widget.minValue??0));
 
       stack.add(CustomPaint(
           size: Size.infinite,
