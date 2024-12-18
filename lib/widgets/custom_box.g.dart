@@ -51,15 +51,11 @@ Map<String, dynamic> _$DebugSettingsToJson(_DebugSettings instance) =>
 _CustomTextBoxSettings _$CustomTextBoxSettingsFromJson(
         Map<String, dynamic> json) =>
     _CustomTextBoxSettings(
-      text:
-          (json['text'] as List<dynamic>?)?.map((e) => e as String).toList() ??
-              const [],
-      path: json['path'] as String? ?? '',
+      template: json['template'] as String? ?? '',
     );
 
 Map<String, dynamic> _$CustomTextBoxSettingsToJson(
         _CustomTextBoxSettings instance) =>
     <String, dynamic>{
-      'text': instance.text,
-      'path': instance.path,
+      'template': instance.template,
     };

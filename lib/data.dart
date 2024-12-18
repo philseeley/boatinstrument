@@ -47,7 +47,31 @@ double maxFontSize(String text, TextStyle style, double availableHeight, double 
     textPainter.dispose();
   }
 
-  return fontSize;
+  // Make sure the font is at least readable, even if this overflows.
+  return fontSize>10.0?fontSize:10.0;
+}
+
+String dynamic2String(dynamic d) {
+  StringBuffer s = StringBuffer();
+
+  _dynamic2String(d, s);
+
+  return s.toString();
+}
+
+void _dynamic2String(dynamic d, StringBuffer s) {
+
+  if(({String, bool, int, double}).contains(d.runtimeType)) {
+    s.write(d);
+  } else {
+    if(d['value'] != null) {
+      _dynamic2String(d['value'], s);
+    } else {
+      for(String k in d.keys) {
+        s.write('$k: ${d[k]} ');
+      }
+    }
+  }
 }
 
 class SignalkPathDropdownMenu extends StatefulWidget {
@@ -74,20 +98,21 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
     getPaths();
   }
 
-  _paths(String path, Map<String, dynamic> data, List<String> paths) {
-    paths.add(path);
+  _paths(String path, Map<String, dynamic> data, bool add, List<String> paths) {
+    if(add) {
+      paths.add(path);
+    }
     for (String k in data.keys) {
-      if({'meta', 'value', '\$source', 'timestamp', 'pgn'}.contains(k)) {
-        return;
-      }
-      try {
-        if(data[k].runtimeType == String) {
-          paths.add(k);
-        } else {
-          _paths('$path${path.isEmpty?'':'.'}$k', data[k], paths);
+      if(!{r'meta', r'value', r'$source', r'timestamp', r'pgn'}.contains(k)) {
+        try {
+          if(data[k].runtimeType == String) {
+            paths.add('$path${path.isEmpty?'':'.'}$k');
+          } else {
+            _paths('$path${path.isEmpty?'':'.'}$k', data[k], data[k]['value'] != null, paths);
+          }
+        } catch (e) {
+          widget._controller.l.e('Walking path tree', error: e);
         }
-      } catch (e) {
-        widget._controller.l.e('Walking path tree', error: e);
       }
     }
   }
@@ -117,7 +142,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
         setState(() {
           if(widget.listPaths) {
             List<String> paths = [];
-            _paths(widget._basePath, data, paths);
+            _paths(widget._basePath, data, true, paths);
             values.addAll(paths);
           } else {
             values.addAll(data.keys);
