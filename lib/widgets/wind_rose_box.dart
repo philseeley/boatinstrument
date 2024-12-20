@@ -161,7 +161,7 @@ class _SpeedPainter extends CustomPainter {
   void _paintSpeedBox(BoatInstrumentController controller, Canvas canvas, String title, double? speed, Offset loc, double size, Color fg, Color bg, TextStyle style) {
     String speedText = '-';
     if(speed != null) {
-      speedText = format('{:2d}', controller.windSpeedToDisplay(speed).toInt());
+      speedText = format('{:2d}', controller.windSpeedToDisplay(speed).round());
     }
 
     Paint paint = Paint()
