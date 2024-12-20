@@ -12,6 +12,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       showLabels: json['showLabels'] as bool? ?? true,
       showButton: json['showButton'] as bool? ?? false,
       autoSwitchingDelay: (json['autoSwitchingDelay'] as num?)?.toInt() ?? 15,
+      showSpeeds: json['showSpeeds'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
@@ -19,6 +20,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'showLabels': instance.showLabels,
       'showButton': instance.showButton,
       'autoSwitchingDelay': instance.autoSwitchingDelay,
+      'showSpeeds': instance.showSpeeds,
     };
 
 const _$WindRoseTypeEnumMap = {
