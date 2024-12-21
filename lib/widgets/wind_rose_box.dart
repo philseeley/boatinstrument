@@ -130,6 +130,7 @@ class _RosePainter extends CustomPainter {
 
 class _SpeedPainter extends CustomPainter {
   static const double _hubWidth = 12;
+  static const double _pad = 5;
   final BoatInstrumentController _controller;
   final BuildContext _context;
   final bool _showTrueWind;
@@ -144,7 +145,7 @@ class _SpeedPainter extends CustomPainter {
     Color fg = Theme.of(_context).colorScheme.onSurface;
     Color bg = Theme.of(_context).colorScheme.surface;
     double centre = min(canvasSize.width, canvasSize.height)/2;
-    TextStyle style = Theme.of(_context).textTheme.bodyMedium!;
+    TextStyle style = Theme.of(_context).textTheme.bodyMedium!.copyWith(height: 1.0);
 
     double speedSize = centre-_hubWidth-40;
     if(_showTrueWind) {
@@ -197,19 +198,19 @@ class _SpeedPainter extends CustomPainter {
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
-      double fontSize = maxFontSize(speedText, style, size-style.fontSize!-10, size-10);
+      double fontSize = maxFontSize(speedText, style, size-(2*_pad), size-style.fontSize!-(3*_pad));
 
       tp.text = TextSpan(
           text: title,
           style: style);
       tp.layout();
-      tp.paint(canvas, loc+const Offset(5,5));
+      tp.paint(canvas, loc+const Offset(_pad,_pad));
 
       tp.text = TextSpan(
           text: speedText,
           style: style.copyWith(fontSize: fontSize));
       tp.layout();
-      Offset o = loc+Offset(0, size-fontSize-style.fontSize!-5);
+      Offset o = loc+Offset(_pad, size-fontSize-_pad);
       tp.paint(canvas, o);
     } finally {
       tp.dispose();
