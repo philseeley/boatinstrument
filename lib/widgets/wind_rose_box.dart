@@ -201,7 +201,7 @@ class _SpeedPainter extends CustomPainter {
       double fontSize = maxFontSize(speedText, style, size-(2*_pad), size-style.fontSize!-(3*_pad));
 
       tp.text = TextSpan(
-          text: title,
+          text: '$title ${_controller.windSpeedUnits.unit}',
           style: style);
       tp.layout();
       tp.paint(canvas, loc+const Offset(_pad,_pad));
