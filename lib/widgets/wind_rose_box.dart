@@ -25,13 +25,15 @@ class _Settings {
   bool showButton;
   int autoSwitchingDelay;
   bool showSpeeds;
+  bool showTrueWind;
 
   _Settings({
     this.type = WindRoseType.normal,
     this.showLabels = true,
     this.showButton = false,
     this.autoSwitchingDelay = 15,
-    this.showSpeeds = true
+    this.showSpeeds = true,
+    this.showTrueWind = true
   });
 }
 
@@ -127,13 +129,15 @@ class _RosePainter extends CustomPainter {
 }
 
 class _SpeedPainter extends CustomPainter {
+  static const double _hubWidth = 12;
   final BoatInstrumentController _controller;
   final BuildContext _context;
+  final bool _showTrueWind;
   final double _apparentDirection;
   final double? _apparentSpeed;
   final double? _trueSpeed;
 
-  _SpeedPainter(this._controller, this._context, this._apparentDirection, this._apparentSpeed, this._trueSpeed);
+  _SpeedPainter(this._controller, this._context, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -142,20 +146,37 @@ class _SpeedPainter extends CustomPainter {
     double centre = min(canvasSize.width, canvasSize.height)/2;
     TextStyle style = Theme.of(_context).textTheme.bodyMedium!;
 
-    double speedSize = sqrt(((centre-style.fontSize!-10)*(centre-style.fontSize!-10))/2);
+    double speedSize = centre-_hubWidth-40;
+    if(_showTrueWind) {
+      speedSize = sqrt(((centre-style.fontSize!-_hubWidth)*(centre-style.fontSize!-_hubWidth))/2);
+    }
 
-    Offset apparentSpeedLoc = Offset(centre-10-speedSize, centre-10-speedSize);
-    Offset trueSpeedLoc = Offset(centre-10-speedSize, centre+10);
+    Offset apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
+    Offset trueSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+
+    if(!_showTrueWind) {
+      apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
+    }
 
     if(_apparentDirection.abs() > deg2Rad(150)) {
-      trueSpeedLoc = Offset(centre+10, centre-10-speedSize);
+      if(_showTrueWind) {
+        trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+      } else {
+        apparentSpeedLoc = Offset(centre-(speedSize/2), centre-_hubWidth-speedSize);
+      }
     } else if(_apparentDirection < 0) {
-      apparentSpeedLoc = Offset(centre+10, centre-10-speedSize);
-      trueSpeedLoc = Offset(centre+10, centre+10);
+      if(_showTrueWind) {
+        apparentSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+      } else {
+        apparentSpeedLoc = Offset(centre+_hubWidth, centre-(speedSize/2));
+      }
     }
 
     _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, apparentSpeedLoc, speedSize, fg, bg, style);
-    _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, trueSpeedLoc, speedSize, fg, bg, style);
+    if(_showTrueWind) {
+      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, trueSpeedLoc, speedSize, fg, bg, style);
+    }
   }
 
   void _paintSpeedBox(BoatInstrumentController controller, Canvas canvas, String title, double? speed, Offset loc, double size, Color fg, Color bg, TextStyle style) {
@@ -320,12 +341,12 @@ class _WindRoseBoxState extends State<WindRoseBox> {
       CustomPaint(size: Size.infinite, painter: _RosePainter(widget.config.controller, context, widget._settings, _displayType))
     ];
 
-    if(_windAngleTrue != null) {
+    if(widget._settings.showTrueWind && _windAngleTrue != null) {
       stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, _windAngleTrue!)));
     }
 
     if(widget._settings.showSpeeds) {
-      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
     }
 
     if(_windAngleApparent != null) {
@@ -428,6 +449,13 @@ class _SettingsState extends State<_SettingsWidget> {
           leading: const Text("Type:"),
           title: _roseTypeMenu()
       ),
+      SwitchListTile(title: const Text("Show True Wind:"),
+          value: s.showTrueWind,
+          onChanged: (bool value) {
+            setState(() {
+              s.showTrueWind = value;
+            });
+          }),
       SwitchListTile(title: const Text("Show Speeds:"),
           value: s.showSpeeds,
           onChanged: (bool value) {
