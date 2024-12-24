@@ -159,7 +159,14 @@ class _SpeedPainter extends CustomPainter {
       apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
     }
 
-    if(_apparentDirection.abs() > deg2Rad(150)) {
+    if(_apparentDirection.abs() < deg2Rad(10)) {
+      if(_showTrueWind) {
+        apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+      } else {
+        apparentSpeedLoc = Offset(centre-(speedSize/2), centre+_hubWidth);
+      }
+    } else if(_apparentDirection.abs() > deg2Rad(170)) {
       if(_showTrueWind) {
         trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
       } else {
