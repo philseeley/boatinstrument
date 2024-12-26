@@ -190,6 +190,26 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
   }
 }
 
+abstract class EnumMenuEntry {
+  String get displayName;
+}
+
+class EnumDropdownMenu<T extends EnumMenuEntry> extends DropdownMenu<T> {
+  EnumDropdownMenu(List<T> entries, T? initialSelection, ValueChanged<T?> onSelected, {super.key}) :
+    super(
+      expandedInsets: EdgeInsets.zero,
+      initialSelection: initialSelection,
+      onSelected: onSelected,
+      dropdownMenuEntries: entries.map((v) {
+        return DropdownMenuEntry<T>(
+              label: v.displayName,
+              value: v,
+              style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+            );
+      }).toList()
+    );
+}
+
 class BoxWidgetConfig {
   final BoatInstrumentController controller;
   final Map<String, dynamic> settings;
@@ -475,96 +495,113 @@ class _Page {
   }
 }
 
-enum DistanceUnits {
+enum DistanceUnits implements EnumMenuEntry {
   meters('Meters', 'm'),
   km('Kilometers', 'km'),
   miles('Miles', 'mile'),
   nm('Nautical Miles', 'nm'),
   nmM('Nautical Miles/Meters', 'nm');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+
+  final String _displayName;
   final String unit;
 
-  const DistanceUnits(this.displayName, this.unit);
+  const DistanceUnits(this._displayName, this.unit);
 }
 
-enum SpeedUnits {
+enum SpeedUnits implements EnumMenuEntry {
   mps('M/S', 'm/s'),
   kph('KPH', 'km/h'),
   mph('MPH', 'mph'),
   kts('Knots', 'kts');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final String unit;
 
-  const SpeedUnits(this.displayName, this.unit);
+  const SpeedUnits(this._displayName, this.unit);
 }
 
-enum DepthUnits {
+enum DepthUnits implements EnumMenuEntry {
   m('Meters', 'm'),
   ft('Feet', 'ft'),
   fa('Fathom', 'Fa');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final String unit;
 
-  const DepthUnits(this.displayName, this.unit);
+  const DepthUnits(this._displayName, this.unit);
 }
 
-enum TemperatureUnits {
+enum TemperatureUnits implements EnumMenuEntry {
   c('Centigrade', 'C'),
   f('Fahrenheit', 'F');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final String unit;
 
-  const TemperatureUnits(this.displayName, this.unit);
+  const TemperatureUnits(this._displayName, this.unit);
 }
 
-enum AirPressureUnits {
+enum AirPressureUnits implements EnumMenuEntry {
   pascal('Pascal', 'Pa'),
   millibar('Millibars', 'mb'),
   atmosphere('Atmosphere', 'Atm'),
   mercury('MM Mercury', 'mmHg');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final String unit;
 
-  const AirPressureUnits(this.displayName, this.unit);
+  const AirPressureUnits(this._displayName, this.unit);
 }
 
-enum OilPressureUnits {
+enum OilPressureUnits implements EnumMenuEntry {
   psi('Pounds/Sq Inch', 'Psi'),
   kpa('Kilopascal', 'kPa');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final String unit;
 
-  const OilPressureUnits(this.displayName, this.unit);
+  const OilPressureUnits(this._displayName, this.unit);
 }
 
-enum CapacityUnits {
+enum CapacityUnits implements EnumMenuEntry {
   liter('Liter', 'L'),
   gallon('Gallon', 'gal'),
   usGallon('US Gallon', 'US gal');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final String unit;
 
-  const CapacityUnits(this.displayName, this.unit);
+  const CapacityUnits(this._displayName, this.unit);
 }
 
-enum PortStarboardColors {
+enum PortStarboardColors implements EnumMenuEntry {
   none('None', Colors.black, Colors.white), // These are just placeholders and not used.
   redGreen('Red/Green', Colors.red, Colors.green),
   redBlue('Red/Blue', Colors.red, Colors.blue),
   orangeYellow('Orange/Yellow', Colors.orange, Colors.yellow);
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
   final Color portColor;
   final Color starboardColor;
 
-  const PortStarboardColors(this.displayName, this.portColor, this.starboardColor);
+  const PortStarboardColors(this._displayName, this.portColor, this.starboardColor);
 }
 
 @JsonSerializable()

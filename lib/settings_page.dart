@@ -180,7 +180,14 @@ class _SettingsState extends State<SettingsPage> {
           }),
       ListTile(
           leading: const Text("Distance:   "),
-          title: _distanceMenu()
+          title: EnumDropdownMenu(
+            DistanceUnits.values,
+            widget._controller._settings?.distanceUnits,
+            (v) {
+              setState(() {
+                widget._controller._settings?.distanceUnits = v!;
+              });
+            })
       ),
       ListTile(
         leading: const Text("Meters to NM threshold:"),
@@ -198,35 +205,35 @@ class _SettingsState extends State<SettingsPage> {
       ),
       ListTile(
           leading: const Text("Speed:      "),
-          title: _speedMenu()
+          title: EnumDropdownMenu(SpeedUnits.values, widget._controller._settings?.speedUnits, (v) {widget._controller._settings?.speedUnits = v!;})
       ),
       ListTile(
           leading: const Text("Wind Speed: "),
-          title: _windSpeedMenu()
+          title: EnumDropdownMenu(SpeedUnits.values, widget._controller._settings?.windSpeedUnits, (v) {widget._controller._settings?.windSpeedUnits = v!;})
       ),
       ListTile(
           leading: const Text("Depth:      "),
-          title: _depthMenu()
+          title: EnumDropdownMenu(DepthUnits.values, widget._controller._settings?.depthUnits, (v) {widget._controller._settings?.depthUnits = v!;})
       ),
       ListTile(
           leading: const Text("Temperature:"),
-          title: _temperatureMenu()
+          title: EnumDropdownMenu(TemperatureUnits.values, widget._controller._settings?.temperatureUnits, (v) {widget._controller._settings?.temperatureUnits = v!;})
       ),
       ListTile(
           leading: const Text("Air Pressure:"),
-          title: _airPressureMenu()
+          title: EnumDropdownMenu(AirPressureUnits.values, widget._controller._settings?.airPressureUnits, (v) {widget._controller._settings?.airPressureUnits = v!;})
       ),
       ListTile(
           leading: const Text("Oil Pressure:"),
-          title: _oilPressureMenu()
+          title: EnumDropdownMenu(OilPressureUnits.values, widget._controller._settings?.oilPressureUnits, (v) {widget._controller._settings?.oilPressureUnits = v!;})
       ),
       ListTile(
           leading: const Text("Capacities:"),
-          title: _capacityMenu()
+          title: EnumDropdownMenu(CapacityUnits.values, widget._controller._settings?.capacityUnits, (v) {widget._controller._settings?.capacityUnits = v!;})
       ),
       ListTile(
           leading: const Text("Port/Starboard Colours:"),
-          title: _portStarboardColorsMenu()
+          title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),
       const ListTile(
           title: Text("Signalk:"),
@@ -301,197 +308,6 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
-  }
-
-  DropdownMenu _distanceMenu() {
-    List<DropdownMenuEntry<DistanceUnits>> l = [];
-    for(var v in DistanceUnits.values) {
-      l.add(DropdownMenuEntry<DistanceUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<DistanceUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.distanceUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        setState(() {
-          widget._controller._settings?.distanceUnits = value!;
-        });
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _speedMenu() {
-    List<DropdownMenuEntry<SpeedUnits>> l = [];
-    for(var v in SpeedUnits.values) {
-      l.add(DropdownMenuEntry<SpeedUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<SpeedUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.speedUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.speedUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _windSpeedMenu() {
-    List<DropdownMenuEntry<SpeedUnits>> l = [];
-    for(var v in SpeedUnits.values) {
-      l.add(DropdownMenuEntry<SpeedUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<SpeedUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.windSpeedUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.windSpeedUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _depthMenu() {
-    List<DropdownMenuEntry<DepthUnits>> l = [];
-    for(var v in DepthUnits.values) {
-      l.add(DropdownMenuEntry<DepthUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<DepthUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.depthUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.depthUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _temperatureMenu() {
-    List<DropdownMenuEntry<TemperatureUnits>> l = [];
-    for(var v in TemperatureUnits.values) {
-      l.add(DropdownMenuEntry<TemperatureUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<TemperatureUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.temperatureUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.temperatureUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _airPressureMenu() {
-    List<DropdownMenuEntry<AirPressureUnits>> l = [];
-    for(var v in AirPressureUnits.values) {
-      l.add(DropdownMenuEntry<AirPressureUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<AirPressureUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.airPressureUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.airPressureUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _oilPressureMenu() {
-    List<DropdownMenuEntry<OilPressureUnits>> l = [];
-    for(var v in OilPressureUnits.values) {
-      l.add(DropdownMenuEntry<OilPressureUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<OilPressureUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.oilPressureUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.oilPressureUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _capacityMenu() {
-    List<DropdownMenuEntry<CapacityUnits>> l = [];
-    for(var v in CapacityUnits.values) {
-      l.add(DropdownMenuEntry<CapacityUnits>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<CapacityUnits>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.capacityUnits,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.capacityUnits = value!;
-      },
-    );
-
-    return menu;
-  }
-
-  DropdownMenu _portStarboardColorsMenu() {
-    List<DropdownMenuEntry<PortStarboardColors>> l = [];
-    for(var v in PortStarboardColors.values) {
-      l.add(DropdownMenuEntry<PortStarboardColors>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<PortStarboardColors>(
-      expandedInsets: EdgeInsets.zero,
-      initialSelection: widget._controller._settings?.portStarboardColors,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._controller._settings?.portStarboardColors = value!;
-      },
-    );
-
-    return menu;
   }
 
   _showHelpPage () async {
