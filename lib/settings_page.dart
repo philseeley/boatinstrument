@@ -160,7 +160,7 @@ class _SettingsState extends State<SettingsPage> {
             setState(() {
               settings.brightnessControl = value;
               if(!value) {
-                ScreenBrightness().resetScreenBrightness();
+                ScreenBrightness().resetApplicationScreenBrightness();
               }
             });
           }),
