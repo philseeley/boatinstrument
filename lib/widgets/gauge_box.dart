@@ -218,7 +218,7 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       )
     ];
 
-    if(value != null) {
+    if(displayValue != null) {
       double angle = ((pi/((widget.maxValue??_defaultMax) - (widget.minValue??0))) * (value! - (widget.minValue??0))) - pi/2;
       if(widget.mirror) {
         angle = (pi*2)-angle;

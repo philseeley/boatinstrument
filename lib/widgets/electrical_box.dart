@@ -14,15 +14,18 @@ class _ElectricalSettings {
   _ElectricalSettings({this.id = ''});
 }
 
-enum BatteryVoltage {
-  twelve('12', 1),
-  twentyFour('24', 2),
-  fortyEight('48', 4);
+enum BatteryVoltage implements EnumMenuEntry {
+  twelve(12, 1),
+  twentyFour(24, 2),
+  fortyEight(48, 4);
 
-  final String displayName;
+  @override
+  String get displayName => '${voltage}v';
+
+  final int voltage;
   final int multiplier;
 
-  const BatteryVoltage(this.displayName, this.multiplier);
+  const BatteryVoltage(this.voltage, this.multiplier);
 }
 
 @JsonSerializable()
@@ -481,21 +484,10 @@ class _ElectricalBatterySettingsState extends State<_ElectricalBatterySettingsWi
       ),
       ListTile(
         leading: const Text("System Voltage:"),
-        title: DropdownMenu<BatteryVoltage>(
-          expandedInsets: EdgeInsets.zero,
-          initialSelection: s.voltage,
-          dropdownMenuEntries: BatteryVoltage.values.map((v) {
-            return DropdownMenuEntry<BatteryVoltage>(
-              label: v.displayName,
-              value: v,
-              style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey))
-            );
-          }).toList(),
-          onSelected: (value) {
-            setState(() {
-              s.voltage = value!;
-            });
-          },
+        title: EnumDropdownMenu(
+          BatteryVoltage.values,
+          s.voltage,
+          (value) {s.voltage = value!;},
         )
       ),
     ];

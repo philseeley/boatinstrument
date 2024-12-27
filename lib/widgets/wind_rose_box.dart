@@ -8,14 +8,16 @@ import 'package:format/format.dart';
 
 part 'wind_rose_box.g.dart';
 
-enum WindRoseType {
+enum WindRoseType implements EnumMenuEntry {
   normal('Normal'),
   closeHaul('Close Haul'),
   auto('Auto');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
 
-  const WindRoseType(this.displayName);
+  const WindRoseType(this._displayName);
 }
 
 @JsonSerializable()
@@ -455,7 +457,7 @@ class _SettingsState extends State<_SettingsWidget> {
     return ListView(children: [
       ListTile(
           leading: const Text("Type:"),
-          title: _roseTypeMenu()
+          title: EnumDropdownMenu(WindRoseType.values, widget._settings.type, (value) {widget._settings.type = value!;})
       ),
       SwitchListTile(title: const Text("Show True Wind:"),
           value: s.showTrueWind,
@@ -500,25 +502,5 @@ class _SettingsState extends State<_SettingsWidget> {
             }),
       ),
     ]);
-  }
-
-  DropdownMenu _roseTypeMenu() {
-    List<DropdownMenuEntry<WindRoseType>> l = [];
-    for(var v in WindRoseType.values) {
-      l.add(DropdownMenuEntry<WindRoseType>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<WindRoseType>(
-      initialSelection: widget._settings.type,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._settings.type = value!;
-      },
-    );
-
-    return menu;
   }
 }
