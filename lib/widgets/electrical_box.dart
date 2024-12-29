@@ -435,34 +435,54 @@ class _ElectricalSettingsState extends State<_ElectricalSettingsWidget> {
 
 @JsonSerializable()
 class _ElectricalSwitchesSettings {
+  bool useSliderForDimming;
   String clientID;
   String authToken;
 
   _ElectricalSwitchesSettings({
+    this.useSliderForDimming = false,
     clientID,
     this.authToken = '',
   }) : clientID = clientID??'boatinstrument-electrical-switches-${customAlphabet('0123456789', 4)}';
 }
 
-@JsonSerializable()
-class _PerBoxElectricalSwitchesSettings {
-  bool useSlider;
+mixin SwitchCommands {
+  void _sendCommand(BoxWidgetConfig config, BuildContext context, String authToken, String id, String type, String params) async {
+    if(config.editMode) {
+      return;
+    }
 
-  _PerBoxElectricalSwitchesSettings({
-    this.useSlider = false
-  });
+    try {
+      Uri uri = config.controller.httpApiUri.replace(
+          path: 'signalk/v1/api/vessels/self/electrical/switches/$id/$type');
+
+      http.Response response = await http.put(
+          uri,
+          headers: {
+            "Content-Type": "application/json",
+            "accept": "application/json",
+            "Authorization": "Bearer $authToken"
+          },
+          body: params
+      );
+
+      if(response.statusCode != HttpStatus.ok) {
+        if(context.mounted) {
+          config.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
+        }
+      }
+    } catch (e) {
+      config.controller.l.e('Error putting to server', error: e);
+    }
+  }
 }
 
 class ElectricalSwitchesBox extends BoxWidget {
-  late final _PerBoxElectricalSwitchesSettings _perBoxSettings;
-
   static const String sid = 'electrical-switches';
   @override
   String get id => sid;
 
-  ElectricalSwitchesBox(super.config, {super.key}) {
-    _perBoxSettings = _$PerBoxElectricalSwitchesSettingsFromJson(config.settings);
-  }
+  const ElectricalSwitchesBox(super.config, {super.key});
 
   @override
   bool get hasSettings => true;
@@ -470,14 +490,6 @@ class ElectricalSwitchesBox extends BoxWidget {
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
     return _ElectricalSwitchesSettingsWidget(super.config.controller, _$ElectricalSwitchesSettingsFromJson(json));
-  }
-
-  @override
-  bool get hasPerBoxSettings => true;
-
-  @override
-  BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _PerBoxElectricalSwitchesSettingsWidget(_perBoxSettings);
   }
 
   @override
@@ -510,7 +522,7 @@ class _ElectricalSwitch {
   _ElectricalSwitch(this.id);
 }
 
-class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> {
+class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with SwitchCommands {
   late final _ElectricalSwitchesSettings _settings;
   List<_ElectricalSwitch> _switches = [];
 
@@ -554,6 +566,13 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> {
 
     _switches.sort((a, b) => (a.name??a.id).compareTo(b.name??b.id));
 
+    String maxName = '';
+    for(_ElectricalSwitch b in _switches) {
+      if((b.name??b.id).length > maxName.length) {
+        maxName = b.name??b.id;
+      }
+    }
+
     List<Widget> l = [];
 
     for(_ElectricalSwitch s  in _switches) {
@@ -561,7 +580,7 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> {
 
       if(s.type == ElectricalSwitchType.dimmer &&
          s.dimmingLevel != null) {
-          if(widget._perBoxSettings.useSlider) {
+          if(_settings.useSliderForDimming) {
             dimmerList.addAll([
               Text('${(s.dimmingLevel!*100).toInt()}%'),
               Expanded(child: Slider(
@@ -591,8 +610,8 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> {
           }
       }
       ListTile lt = ListTile(
-        leading: Text(s.name??s.id, style: style),
-        title: Row(children: dimmerList),
+        leading: Text(format('{:${maxName.length}s}', s.name??s.id), style: style),
+        title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: dimmerList),
         trailing: s.state == null ? null : Switch(value: s.state!, onChanged: (value) {
             _setSwitchState(s, value);
         }),
@@ -610,7 +629,7 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> {
     setState(() {
       s.state = state;
     });
-    _sendCommand(s.id, 'state', '{"value": $state}');
+    _sendCommand(widget.config, context, _settings.authToken, s.id, 'state', '{"value": $state}');
   }
 
   void _setDimmer(_ElectricalSwitch s, double dimmingLevel) {
@@ -619,36 +638,7 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> {
       dimmingLevel = dimmingLevel<0 ? 0 : dimmingLevel;
       s.dimmingLevel = dimmingLevel;
     });
-    _sendCommand(s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
-  }
-
-  void _sendCommand(String id, String type, String params) async {
-    if(widget.config.editMode) {
-      return;
-    }
-
-    try {
-      Uri uri = widget.config.controller.httpApiUri.replace(
-          path: 'signalk/v1/api/vessels/self/electrical/switches/$id/$type');
-
-      http.Response response = await http.put(
-          uri,
-          headers: {
-            "Content-Type": "application/json",
-            "accept": "application/json",
-            "Authorization": "Bearer ${_settings.authToken}"
-          },
-          body: params
-      );
-
-      if(response.statusCode != HttpStatus.ok) {
-        if(mounted) {
-          widget.config.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
-        }
-      }
-    } catch (e) {
-      widget.config.controller.l.e('Error putting to server', error: e);
-    }
+    _sendCommand(widget.config, context, _settings.authToken, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
   }
 
   void _onUpdate(List<Update>? updates) {
@@ -708,6 +698,13 @@ class _ElectricalSwitchSettingsState extends State<_ElectricalSwitchesSettingsWi
     _ElectricalSwitchesSettings s = widget._settings;
 
     List<Widget> list = [
+      SwitchListTile(title: const Text('Use Slider for Dimming:'),
+          value: s.useSliderForDimming,
+          onChanged: (bool value) {
+            setState(() {
+              s.useSliderForDimming = value;
+            });
+          }),
       ListTile(
           leading: const Text("Client ID:"),
           title: TextFormField(
@@ -748,34 +745,156 @@ class _ElectricalSwitchSettingsState extends State<_ElectricalSwitchesSettingsWi
   }
 }
 
-class _PerBoxElectricalSwitchesSettingsWidget extends BoxSettingsWidget {
-  final _PerBoxElectricalSwitchesSettings _perBoxSettings;
+class ElectricalSwitchBox extends BoxWidget {
+  late final _ElectricalSettings _perBoxSettings;
 
-  const _PerBoxElectricalSwitchesSettingsWidget(this._perBoxSettings);
-
+  static const String sid = 'electrical-switch';
   @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$PerBoxElectricalSwitchesSettingsToJson(_perBoxSettings);
+  String get id => ElectricalSwitchesBox.sid;
+
+  ElectricalSwitchBox(super.config, {super.key}) {
+    _perBoxSettings = _$ElectricalSettingsFromJson(config.settings);
   }
 
   @override
-  createState() => _PerBoxElectricalSwitchesSettingsSate();
+  bool get hasSettings => true;
+
+  @override
+  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
+    return _ElectricalSwitchesSettingsWidget(super.config.controller, _$ElectricalSwitchesSettingsFromJson(json));
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _ElectricalSettingsWidget(config.controller, _perBoxSettings, 'Switch', 'electrical.switches');
+  }
+
+  @override
+  Widget? getSettingsHelp() => const HelpTextWidget('''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.switch.1.state" the ID is "1"');
+
+  @override
+  State<ElectricalSwitchBox> createState() => _ElectricalSwitchBoxState();
 }
 
-class _PerBoxElectricalSwitchesSettingsSate extends State<_PerBoxElectricalSwitchesSettingsWidget> {
+class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCommands {
+  late final _ElectricalSwitchesSettings _settings;
+  late final _ElectricalSwitch _switch;
+
+  @override
+  void initState() {
+    super.initState();
+    _settings = _$ElectricalSwitchesSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    
+    _switch = _ElectricalSwitch(widget._perBoxSettings.id);
+
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'electrical.switches.${widget._perBoxSettings.id}.*'});
+  }
 
   @override
   Widget build(BuildContext context) {
-    _PerBoxElectricalSwitchesSettings s = widget._perBoxSettings;
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+    const double pad = 5.0;
 
-    return ListView(children: [
-      SwitchListTile(title: const Text('Use Slider for Dimming:'),
-          value: s.useSlider,
-          onChanged: (bool value) {
-            setState(() {
-              s.useSlider = value;
-            });
-          }),
-    ]);
+    List<Widget> dimmerList = [];
+
+    if(_switch.type == ElectricalSwitchType.dimmer &&
+        _switch.dimmingLevel != null) {
+        if(_settings.useSliderForDimming) {
+          dimmerList.addAll([
+            Text(' ${(_switch.dimmingLevel!*100).toInt()}%'),
+            Expanded(child: Slider(
+              min: 0,
+              max: 100,
+              divisions: 10,
+              value: _switch.dimmingLevel!*100,
+              label: "${(_switch.dimmingLevel!*100).toInt()}",
+              onChanged: (double value) {
+                setState(() {
+                  _switch.dimmingLevel = value/100;
+                });
+              },
+              onChangeEnd: (double value) {
+                _setDimmer(_switch, value/100);
+              }
+            ))
+          ]);
+        } else {
+          dimmerList.addAll([
+            IconButton(icon: const Icon(Icons.first_page), onPressed: () {_setDimmer(_switch, 0);}),
+            IconButton(icon: const Icon(Icons.chevron_left), onPressed: () {_setDimmer(_switch, _switch.dimmingLevel!-0.1);}),
+            Text('${((_switch.dimmingLevel??0)*100).round()}%'),
+            IconButton(icon: const Icon(Icons.chevron_right), onPressed: () {_setDimmer(_switch, _switch.dimmingLevel!+0.1);}),
+            IconButton(icon: const Icon(Icons.last_page), onPressed: () {_setDimmer(_switch, 1);}),
+          ]);
+        }
+    }
+
+    Widget? toggleSwitch = _switch.state == null ?
+      null :
+      Switch(value: _switch.state!, onChanged: (value) {
+            _setSwitchState(value);
+      });
+
+    return Column(children: [
+        Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text('Switch ${_switch.name??_switch.id}', style: style)])),
+        Center(child: toggleSwitch),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: dimmerList)
+      ]);
+  }
+
+  void _setSwitchState(bool state) {
+    setState(() {
+      _switch.state = state;
+    });
+    _sendCommand(widget.config, context, _settings.authToken, _switch.id, 'state', '{"value": $state}');
+  }
+
+  void _setDimmer(_ElectricalSwitch s, double dimmingLevel) {
+    setState(() {
+      dimmingLevel = dimmingLevel>1 ? 1 : dimmingLevel;
+      dimmingLevel = dimmingLevel<0 ? 0 : dimmingLevel;
+      s.dimmingLevel = dimmingLevel;
+    });
+    _sendCommand(widget.config, context, _settings.authToken, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
+  }
+
+  void _onUpdate(List<Update>? updates) {
+    if(updates == null) {
+      _switch.state = _switch.dimmingLevel = null;
+    } else {
+      for (Update u in updates) {
+        try {
+          List<String> p = u.path.split('.');
+
+          switch (p[3]) {
+            case 'name':
+              _switch.name = u.value;
+              break;
+            case 'type':
+              _switch.type = ElectricalSwitchType.values.firstWhere((s) => s.type == u.value);
+              break;
+            case 'state':
+              _switch.state = u.value;
+              break;
+            case 'dimmingLevel':
+              _switch.dimmingLevel = (u.value as num).toDouble();
+              break;
+          }
+        } catch (e) {
+          widget.config.controller.l.e("Error converting $u", error: e);
+        }
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
   }
 }

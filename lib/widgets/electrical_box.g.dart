@@ -19,6 +19,7 @@ Map<String, dynamic> _$ElectricalSettingsToJson(_ElectricalSettings instance) =>
 _ElectricalSwitchesSettings _$ElectricalSwitchesSettingsFromJson(
         Map<String, dynamic> json) =>
     _ElectricalSwitchesSettings(
+      useSliderForDimming: json['useSliderForDimming'] as bool? ?? false,
       clientID: json['clientID'],
       authToken: json['authToken'] as String? ?? '',
     );
@@ -26,18 +27,7 @@ _ElectricalSwitchesSettings _$ElectricalSwitchesSettingsFromJson(
 Map<String, dynamic> _$ElectricalSwitchesSettingsToJson(
         _ElectricalSwitchesSettings instance) =>
     <String, dynamic>{
+      'useSliderForDimming': instance.useSliderForDimming,
       'clientID': instance.clientID,
       'authToken': instance.authToken,
-    };
-
-_PerBoxElectricalSwitchesSettings _$PerBoxElectricalSwitchesSettingsFromJson(
-        Map<String, dynamic> json) =>
-    _PerBoxElectricalSwitchesSettings(
-      useSlider: json['useSlider'] as bool? ?? false,
-    );
-
-Map<String, dynamic> _$PerBoxElectricalSwitchesSettingsToJson(
-        _PerBoxElectricalSwitchesSettings instance) =>
-    <String, dynamic>{
-      'useSlider': instance.useSlider,
     };

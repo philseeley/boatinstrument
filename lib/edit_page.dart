@@ -79,6 +79,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(LubricationTankBox.sid, 'Lubrication', true, (config) {return LubricationTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(RateOfTurnBox.sid, 'Rate of Turn', false, (config) {return RateOfTurnBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchesBox.sid, 'Switches', false, (config) {return ElectricalSwitchesBox(config, key: UniqueKey());}),
+  BoxDetails(ElectricalSwitchBox.sid, 'Switch', false, (config) {return ElectricalSwitchBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -165,6 +166,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(SolarVoltageBox.sid),
         _widgetMenuEntry(SolarCurrentBox.sid),
         _widgetMenuEntry(ElectricalSwitchesBox.sid),
+        _widgetMenuEntry(ElectricalSwitchBox.sid),
         ]),
       _widgetSubMenuEntry(box, 'Tanks', [
         _widgetMenuEntry(TanksBox.sid),
