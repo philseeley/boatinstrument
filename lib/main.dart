@@ -188,7 +188,7 @@ class _MainPageState extends State<MainPage> {
       }
     });
 
-    ScreenBrightness().setScreenBrightness(_brightness/_brightnessMax);
+    ScreenBrightness().setApplicationScreenBrightness(_brightness/_brightnessMax);
   }
 
   void _nightMode() {

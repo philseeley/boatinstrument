@@ -52,7 +52,7 @@ class DepthBelowTransducerBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowTransducerBox(config, {super.key}) : super(config, 'Depth below Transducer', 'environment.depth.belowTransducer');
+  const DepthBelowTransducerBox(config, {super.key}) : super(config, 'DBT', 'environment.depth.belowTransducer');
 }
 
 class WaterTemperatureBox extends DoubleValueBox {

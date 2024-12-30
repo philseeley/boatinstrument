@@ -12,8 +12,8 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       path: json['path'] as String? ?? 'path',
       precision: (json['precision'] as num?)?.toInt() ?? 1,
       minLen: (json['minLen'] as num?)?.toInt() ?? 2,
-      minValue: (json['minValue'] as num?)?.toDouble() ?? 0,
-      maxValue: (json['maxValue'] as num?)?.toDouble() ?? 100,
+      minValue: (json['minValue'] as num?)?.toDouble(),
+      maxValue: (json['maxValue'] as num?)?.toDouble(),
       angle: json['angle'] as bool? ?? false,
       smoothing: json['smoothing'] as bool? ?? true,
       units: json['units'] as String? ?? 'units',
@@ -51,15 +51,11 @@ Map<String, dynamic> _$DebugSettingsToJson(_DebugSettings instance) =>
 _CustomTextBoxSettings _$CustomTextBoxSettingsFromJson(
         Map<String, dynamic> json) =>
     _CustomTextBoxSettings(
-      text:
-          (json['text'] as List<dynamic>?)?.map((e) => e as String).toList() ??
-              const [],
-      path: json['path'] as String? ?? '',
+      template: json['template'] as String? ?? '',
     );
 
 Map<String, dynamic> _$CustomTextBoxSettingsToJson(
         _CustomTextBoxSettings instance) =>
     <String, dynamic>{
-      'text': instance.text,
-      'path': instance.path,
+      'template': instance.template,
     };

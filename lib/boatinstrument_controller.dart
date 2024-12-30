@@ -189,6 +189,19 @@ class BoatInstrumentController {
     }
   }
 
+  double windSpeedFromDisplay(double speed) {
+    switch (windSpeedUnits) {
+      case SpeedUnits.mps:
+        return speed;
+      case SpeedUnits.kph:
+        return speed / 3.6;
+      case SpeedUnits.mph:
+        return speed / 2.236936;
+      case SpeedUnits.kts:
+        return speed / 1.943844;
+    }
+  }
+
   double temperatureToDisplay(double value) {
     switch (temperatureUnits) {
       case TemperatureUnits.c:
@@ -722,13 +735,8 @@ class BoatInstrumentController {
     if(response.statusCode == HttpStatus.ok) {
       dynamic data = json.decode(response.body);
       try {
-
-        String value = '-';
-        if(data.runtimeType == String) {
-          value = data;
-        } else {
-          value = data['value'].toString();
-        }
+        String value = dynamic2String(data);
+        
         for (_BoxData bd in _boxData) {
           for (RegExp r in bd.regExpStaticPaths) {
             if (r.hasMatch(path)) {
@@ -742,8 +750,8 @@ class BoatInstrumentController {
     }
 
     for(_BoxData bd in _boxData) {
-      if(bd.onStaticUpdate != null) {
-        if (bd.staticUpdates.isNotEmpty) {
+      if(bd.staticUpdates.isNotEmpty) {
+        if (bd.onStaticUpdate != null) {
           bd.onStaticUpdate!(bd.staticUpdates);
         }
       }

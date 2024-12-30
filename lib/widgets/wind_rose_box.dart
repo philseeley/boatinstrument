@@ -4,17 +4,20 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:format/format.dart';
 
 part 'wind_rose_box.g.dart';
 
-enum WindRoseType {
+enum WindRoseType implements EnumMenuEntry {
   normal('Normal'),
   closeHaul('Close Haul'),
   auto('Auto');
 
-  final String displayName;
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
 
-  const WindRoseType(this.displayName);
+  const WindRoseType(this._displayName);
 }
 
 @JsonSerializable()
@@ -23,12 +26,16 @@ class _Settings {
   bool showLabels;
   bool showButton;
   int autoSwitchingDelay;
+  bool showSpeeds;
+  bool showTrueWind;
 
   _Settings({
     this.type = WindRoseType.normal,
     this.showLabels = true,
     this.showButton = false,
-    this.autoSwitchingDelay = 15
+    this.autoSwitchingDelay = 15,
+    this.showSpeeds = true,
+    this.showTrueWind = true
   });
 }
 
@@ -123,6 +130,106 @@ class _RosePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+class _SpeedPainter extends CustomPainter {
+  static const double _hubWidth = 12;
+  static const double _pad = 5;
+  final BoatInstrumentController _controller;
+  final BuildContext _context;
+  final bool _showTrueWind;
+  final double _apparentDirection;
+  final double? _apparentSpeed;
+  final double? _trueSpeed;
+
+  _SpeedPainter(this._controller, this._context, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed);
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    Color fg = Theme.of(_context).colorScheme.onSurface;
+    Color bg = Theme.of(_context).colorScheme.surface;
+    double centre = min(canvasSize.width, canvasSize.height)/2;
+    TextStyle style = Theme.of(_context).textTheme.bodyMedium!.copyWith(height: 1.0);
+
+    double speedSize = centre-_hubWidth-40;
+    if(_showTrueWind) {
+      speedSize = sqrt(((centre-style.fontSize!-_hubWidth)*(centre-style.fontSize!-_hubWidth))/2);
+    }
+
+    Offset apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
+    Offset trueSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+
+    if(!_showTrueWind) {
+      apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
+    }
+
+    if(_apparentDirection.abs() < deg2Rad(10)) {
+      if(_showTrueWind) {
+        apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+      } else {
+        apparentSpeedLoc = Offset(centre-(speedSize/2), centre+_hubWidth);
+      }
+    } else if(_apparentDirection.abs() > deg2Rad(170)) {
+      if(_showTrueWind) {
+        trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+      } else {
+        apparentSpeedLoc = Offset(centre-(speedSize/2), centre-_hubWidth-speedSize);
+      }
+    } else if(_apparentDirection < 0) {
+      if(_showTrueWind) {
+        apparentSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+      } else {
+        apparentSpeedLoc = Offset(centre+_hubWidth, centre-(speedSize/2));
+      }
+    }
+
+    _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, apparentSpeedLoc, speedSize, fg, bg, style);
+    if(_showTrueWind) {
+      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, trueSpeedLoc, speedSize, fg, bg, style);
+    }
+  }
+
+  void _paintSpeedBox(BoatInstrumentController controller, Canvas canvas, String title, double? speed, Offset loc, double size, Color fg, Color bg, TextStyle style) {
+    String speedText = '-';
+    if(speed != null) {
+      speedText = format('{:2d}', controller.windSpeedToDisplay(speed).round());
+    }
+
+    Paint paint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = bg
+      ..strokeWidth = 2.0;
+
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromPoints(loc, loc+Offset(size, size)), const Radius.circular(10)), paint);
+    paint..style = PaintingStyle.stroke
+      ..color = fg;
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromPoints(loc, loc+Offset(size, size)), const Radius.circular(10)), paint);
+
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    try {
+      double fontSize = maxFontSize(speedText, style, size-(2*_pad), size-style.fontSize!-(3*_pad));
+
+      tp.text = TextSpan(
+          text: '$title ${_controller.windSpeedUnits.unit}',
+          style: style);
+      tp.layout();
+      tp.paint(canvas, loc+const Offset(_pad,_pad));
+
+      tp.text = TextSpan(
+          text: speedText,
+          style: style.copyWith(fontSize: fontSize));
+      tp.layout();
+      Offset o = loc+Offset(_pad, size-fontSize-_pad);
+      tp.paint(canvas, o);
+    } finally {
+      tp.dispose();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
 class _NeedlePainter extends CustomPainter {
 
   final WindRoseType _type;
@@ -195,20 +302,34 @@ class WindRoseBox extends BoxWidget {
 class _WindRoseBoxState extends State<WindRoseBox> {
   double? _windAngleApparent;
   double? _windAngleTrue;
+  double? _windSpeedApparent;
+  double? _windSpeedTrue;
   WindRoseType _displayType = WindRoseType.normal;
   Timer? _autoTimer;
 
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _processData, paths: {
+    Set<String> paths = {
       'environment.wind.angleApparent',
       'environment.wind.angleTrueWater'
-    });
+    };
+    if(widget._settings.showSpeeds) {
+      paths.addAll({
+        'environment.wind.speedApparent',
+        'environment.wind.speedTrue'});
+    }
+    widget.config.controller.configure(onUpdate: _processData, paths: paths);
   }
 
   @override
   Widget build(BuildContext context) {
+    if(widget.config.editMode) {
+      _windAngleApparent = deg2Rad(123);
+      _windAngleTrue = deg2Rad(90);
+      _windSpeedApparent = _windSpeedTrue = widget.config.controller.windSpeedFromDisplay(12.3);
+    }
+
     if(widget._settings.type == WindRoseType.auto) {
       if((_displayType == WindRoseType.normal && rad2Deg(_windAngleApparent).abs() <= 60) ||
          (_displayType == WindRoseType.closeHaul && rad2Deg(_windAngleApparent).abs() > 60)) {
@@ -230,8 +351,12 @@ class _WindRoseBoxState extends State<WindRoseBox> {
       CustomPaint(size: Size.infinite, painter: _RosePainter(widget.config.controller, context, widget._settings, _displayType))
     ];
 
-    if(_windAngleTrue != null) {
+    if(widget._settings.showTrueWind && _windAngleTrue != null) {
       stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, _windAngleTrue!)));
+    }
+
+    if(widget._settings.showSpeeds) {
+      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
     }
 
     if(_windAngleApparent != null) {
@@ -260,7 +385,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
 
   _processData(List<Update>? updates) {
     if(updates == null) {
-      _windAngleApparent = _windAngleTrue = null;
+      _windAngleApparent = _windAngleTrue = _windSpeedApparent = _windSpeedTrue = null;
     } else {
       for (Update u in updates) {
         try {
@@ -283,6 +408,18 @@ class _WindRoseBoxState extends State<WindRoseBox> {
                   _windAngleTrue ?? latest, latest,
                   smooth: widget.config.controller.valueSmoothing,
                   relative: true);
+              break;
+            case 'environment.wind.speedApparent':
+              double latest = (u.value as num).toDouble();
+              _windSpeedApparent = averageDouble(
+                  _windSpeedApparent ?? latest, latest,
+                  smooth: widget.config.controller.valueSmoothing);
+              break;
+            case 'environment.wind.speedTrue':
+              double latest = (u.value as num).toDouble();
+              _windSpeedTrue = averageDouble(
+                  _windSpeedTrue ?? latest, latest,
+                  smooth: widget.config.controller.valueSmoothing);
               break;
           }
         } catch (e) {
@@ -320,8 +457,22 @@ class _SettingsState extends State<_SettingsWidget> {
     return ListView(children: [
       ListTile(
           leading: const Text("Type:"),
-          title: _roseTypeMenu()
+          title: EnumDropdownMenu(WindRoseType.values, widget._settings.type, (value) {widget._settings.type = value!;})
       ),
+      SwitchListTile(title: const Text("Show True Wind:"),
+          value: s.showTrueWind,
+          onChanged: (bool value) {
+            setState(() {
+              s.showTrueWind = value;
+            });
+          }),
+      SwitchListTile(title: const Text("Show Speeds:"),
+          value: s.showSpeeds,
+          onChanged: (bool value) {
+            setState(() {
+              s.showSpeeds = value;
+            });
+          }),
       SwitchListTile(title: const Text("Show Labels:"),
           value: s.showLabels,
           onChanged: (bool value) {
@@ -351,25 +502,5 @@ class _SettingsState extends State<_SettingsWidget> {
             }),
       ),
     ]);
-  }
-
-  DropdownMenu _roseTypeMenu() {
-    List<DropdownMenuEntry<WindRoseType>> l = [];
-    for(var v in WindRoseType.values) {
-      l.add(DropdownMenuEntry<WindRoseType>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v.displayName));
-    }
-
-    DropdownMenu menu = DropdownMenu<WindRoseType>(
-      initialSelection: widget._settings.type,
-      dropdownMenuEntries: l,
-      onSelected: (value) {
-        widget._settings.type = value!;
-      },
-    );
-
-    return menu;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:boatinstrument/path_text_formatter.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +19,8 @@ class _CustomSettings {
   String path;
   int precision;
   int minLen;
-  double minValue;
-  double maxValue;
+  double? minValue;
+  double? maxValue;
   bool angle;
   bool smoothing;
   String units;
@@ -32,8 +33,8 @@ class _CustomSettings {
     this.path = 'path',
     this.precision = 1,
     this.minLen = 2,
-    this.minValue = 0,
-    this.maxValue = 100,
+    this.minValue,
+    this.maxValue,
     this.angle = false,
     this.smoothing = true,
     this.units = 'units',
@@ -235,7 +236,7 @@ class _SettingsState extends State<_SettingsWidget> {
         leading: const Text("Multiplier:"),
         title: TextFormField(
             initialValue: s.multiplier.toString(),
-            onChanged: (value) => s.multiplier = double.parse(value)),
+            onChanged: (value) => s.multiplier = double.tryParse(value)??1),
       ),
       ListTile(
         leading: const Text("Precision:"),
@@ -243,7 +244,7 @@ class _SettingsState extends State<_SettingsWidget> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             initialValue: s.precision.toString(),
-            onChanged: (value) => s.precision = int.parse(value)),
+            onChanged: (value) => s.precision = int.tryParse(value)??0),
       ),
       ListTile(
         leading: const Text("Min Length:"),
@@ -251,25 +252,25 @@ class _SettingsState extends State<_SettingsWidget> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             initialValue: s.minLen.toString(),
-            onChanged: (value) => s.minLen = int.parse(value)),
+            onChanged: (value) => s.minLen = int.tryParse(value)??0),
       ),
       ListTile(
         leading: const Text("Min Value:"),
         title: TextFormField(
-            initialValue: s.minValue.toString(),
-            onChanged: (value) => s.minValue = double.parse(value)),
+            initialValue: (s.minValue??'').toString(),
+            onChanged: (value) => s.minValue = double.tryParse(value)),
       ),
       ListTile(
         leading: const Text("Max Value:"),
         title: TextFormField(
-            initialValue: s.maxValue.toString(),
-            onChanged: (value) => s.maxValue = double.parse(value)),
+            initialValue: (s.maxValue??'').toString(),
+            onChanged: (value) => s.maxValue = double.tryParse(value)),
       ),
       ListTile(
         leading: const Text("Step:"),
         title: TextFormField(
             initialValue: s.step.toString(),
-            onChanged: (value) => s.step = double.parse(value)),
+            onChanged: (value) => s.step = double.tryParse(value)??1),
       ),
       SwitchListTile(title: const Text("Is Angle:"),
           value: s.angle,
@@ -447,12 +448,10 @@ class _DebugSettingsState extends State<_DebugSettingsWidget> {
 
 @JsonSerializable()
 class _CustomTextBoxSettings {
-  List<String> text;
-  String path;
+  String template;
 
   _CustomTextBoxSettings({
-    this.text = const [],
-    this.path = ''
+    this.template = ''
   });
 }
 
@@ -472,36 +471,36 @@ class CustomTextBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _TextBoxSettingsWidget(config, _settings);
+    return _CustomTextBoxSettingsWidget(config.controller, _settings);
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('Note: the Path data is only retrieved once from SignalK, as it is intended to display static data like vessel Name or MMSI and these paths cannot be subscribed to.');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('''Add SignalK Path data by selecting the Path and pressing "+" to append to the template.
+
+Note: as this Box is intended to display static data like vessel Name or MMSI, the data items are only retrieved once from SignalK.''');
 
   @override
   State<CustomTextBox> createState() => _CustomTextBoxState();
 }
 
 class _CustomTextBoxState extends State<CustomTextBox> {
-  List<String> _pathData = [];
+  late PathTextFormatter _formatter;
+  final Map<String, String> _pathData = {};
 
   @override
   void initState() {
     super.initState();
-    String path = widget._settings.path;
-    widget.config.controller.configure(onStaticUpdate: _onUpdate, staticPaths: path.isEmpty?null:{path});
+    _formatter = PathTextFormatter(widget.config.controller, widget._settings.template);
+    widget.config.controller.configure(onStaticUpdate: _onUpdate, staticPaths: _formatter.paths);
   }
 
   @override
   Widget build(BuildContext context) {
-    _CustomTextBoxSettings s = widget._settings;
-    List<String> lines = s.text.toList();
+    List<String> lines = _formatter.format(_pathData).split('\n');
 
-    if(widget.config.editMode && lines.isEmpty && _pathData.isEmpty) {
+    if(widget.config.editMode && lines.length == 1 && lines[0].isEmpty) {
       lines = ['Your text here'];
     }
-
-    lines.addAll(_pathData);
 
     String max = '-';
     int numLines = 1;
@@ -519,14 +518,11 @@ class _CustomTextBoxState extends State<CustomTextBox> {
   }
 
   void _onUpdate(List<Update>? updates) {
-    if (updates == null) {
-      _pathData = [];
-    } else {
+    if(updates != null) {
       if(mounted) {
         setState(() {
-          _pathData = [];
           for(Update u in updates) {
-            _pathData.add(u.value.toString());
+            _pathData[u.path] = u.value.toString();
           }
         });
       }
@@ -534,11 +530,11 @@ class _CustomTextBoxState extends State<CustomTextBox> {
   }
 }
 
-class _TextBoxSettingsWidget extends BoxSettingsWidget {
-  final BoxWidgetConfig _config;
+class _CustomTextBoxSettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
   final _CustomTextBoxSettings _settings;
 
-  const _TextBoxSettingsWidget(this._config, this._settings);
+  const _CustomTextBoxSettingsWidget(this._controller, this._settings);
 
   @override
   Map<String, dynamic> getSettingsJson() {
@@ -546,39 +542,42 @@ class _TextBoxSettingsWidget extends BoxSettingsWidget {
   }
 
   @override
-  createState() => _TextBoxSettingsState();
+  createState() => _CustomTextBoxSettingsState();
 }
 
-class _TextBoxSettingsState extends State<_TextBoxSettingsWidget> {
+class _CustomTextBoxSettingsState extends State<_CustomTextBoxSettingsWidget> {
+  String _path = '';
 
   @override
   Widget build(BuildContext context) {
     _CustomTextBoxSettings s = widget._settings;
 
     return ListView(children: [
-      ListTile(
-          leading: const Text("Text:"),
+      ListTile(key: UniqueKey(),
+          leading: const Text("Text\nTemplate:"),
           title: TextFormField(
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
             minLines: 2,
             maxLines: null,
-            initialValue: s.text.join('\n'),
-            onChanged: (value) => s.text = value.isEmpty?[]: value.split('\n')
+            initialValue: s.template,
+            onChanged: (value) => s.template = value
           )
-      ),
-      const ListTile(
-          title: Text("And/Or")
       ),
       ListTile(
         leading: const Text("Signalk Path:"),
         title: SignalkPathDropdownMenu(
           searchable: true,
-          widget._config.controller,
-          s.path,
+          widget._controller,
           '',
-          (value) => s.path = value,
-          listPaths: true)
+          '',
+          (value) => _path = value,
+          listPaths: true),
+        trailing: IconButton(onPressed: () {
+          setState(() {
+            s.template = '${s.template}{$_path}';
+          });
+        }, icon: const Icon(Icons.add)),
       ),
     ]);
   }

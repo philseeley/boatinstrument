@@ -19,6 +19,28 @@ class _ElectricalSettings {
   _ElectricalSettings({this.id = ''});
 }
 
+enum BatteryVoltage implements EnumMenuEntry {
+  twelve(12, 1),
+  twentyFour(24, 2),
+  fortyEight(48, 4);
+
+  @override
+  String get displayName => '${voltage}v';
+
+  final int voltage;
+  final int multiplier;
+
+  const BatteryVoltage(this.voltage, this.multiplier);
+}
+
+@JsonSerializable()
+class _ElectricalBatterySettings {
+  String id;
+  BatteryVoltage voltage;
+
+  _ElectricalBatterySettings({this.id = '', this.voltage = BatteryVoltage.twelve});
+}
+
 const String batteriesBasePath = 'electrical.batteries';
 const String batteryTitle = 'Battery';
 const String invertersBasePath = 'electrical.inverters';
@@ -31,19 +53,19 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  final _ElectricalSettings _settings;
+  final _ElectricalBatterySettings _settings;
 
   const BatteryVoltMeterBox._init(this._settings, config, title, path, {super.key, super.minValue, super.maxValue, super.ranges}) :
     super(config, title, GaugeOrientation.up, path);
 
   factory BatteryVoltMeterBox.fromSettings(config, {key}) {
-    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
+    _ElectricalBatterySettings s = _$ElectricalBatterySettingsFromJson(config.settings);
 
     return BatteryVoltMeterBox._init(s, config, 'Battery:${s.id}', 'electrical.batteries.${s.id}.voltage',
-      minValue: 10, maxValue: 15, key: key, ranges: const [
-        GaugeRange(10, 12, Colors.red),
-        GaugeRange(12, 13, Colors.orange),
-        GaugeRange(13, 15, Colors.green)
+      minValue: 10.0*s.voltage.multiplier, maxValue: 15.0*s.voltage.multiplier, key: key, ranges: [
+        GaugeRange(10.0*s.voltage.multiplier, 12.0*s.voltage.multiplier, Colors.red),
+        GaugeRange(12.0*s.voltage.multiplier, 13.0*s.voltage.multiplier, Colors.orange),
+        GaugeRange(13.0*s.voltage.multiplier, 15.0*s.voltage.multiplier, Colors.green)
       ]);
   }
 
@@ -62,7 +84,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
+    return _ElectricalBatterySettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
   }
 
   @override
@@ -77,7 +99,7 @@ class _BatteryVoltMeterState extends DoubleValueSemiGaugeBoxState<BatteryVoltMet
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      value = displayValue = 12.3;
+      value = displayValue = 12.3*widget._settings.voltage.multiplier;
     }
 
     return super.build(context);
@@ -742,6 +764,52 @@ class _ElectricalSwitchSettingsState extends State<_ElectricalSwitchesSettingsWi
     setState(() {
       widget._settings.authToken = 'PENDING - keep this page open until request approved';
     });
+  }
+}
+
+class _ElectricalBatterySettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
+  final _ElectricalBatterySettings _settings;
+  final String _title;
+  final String _basePath;
+
+  const _ElectricalBatterySettingsWidget(this._controller, this._settings, this._title, this._basePath);
+
+  @override
+  createState() => _ElectricalBatterySettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$ElectricalBatterySettingsToJson(_settings);
+  }
+}
+
+class _ElectricalBatterySettingsState extends State<_ElectricalBatterySettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _ElectricalBatterySettings s = widget._settings;
+
+    List<Widget> list = [
+      ListTile(
+          leading: Text("${widget._title} ID:"),
+          title: SignalkPathDropdownMenu(
+            widget._controller,
+            s.id,
+            widget._basePath,
+            (value) => s.id = value)
+      ),
+      ListTile(
+        leading: const Text("System Voltage:"),
+        title: EnumDropdownMenu(
+          BatteryVoltage.values,
+          s.voltage,
+          (value) {s.voltage = value!;},
+        )
+      ),
+    ];
+
+    return ListView(children: list);
   }
 }
 
