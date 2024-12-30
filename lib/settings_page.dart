@@ -294,6 +294,13 @@ class _SettingsState extends State<SettingsPage> {
               onChanged: (value) => settings.dataTimeout = int.parse(value)),
           trailing: const Text('ms')
       ),
+      SwitchListTile(title: const Text("Enable Experimental Boxes:"),
+          value: settings.enableExperimentalBoxes,
+          onChanged: (bool value) {
+            setState(() {
+              settings.enableExperimentalBoxes = value;
+            });
+          }),
     ];
 
     return Scaffold(

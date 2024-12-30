@@ -118,6 +118,7 @@ class BoatInstrumentController {
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
   bool get pageTimerOnStart => _settings!.pageTimerOnStart;
+  bool get enableExperimentalBoxes => _settings!.enableExperimentalBoxes;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   int get m2nmThreshold => _settings!.m2nmThreshold;
   SpeedUnits get speedUnits => _settings!.speedUnits;

@@ -349,9 +349,10 @@ class BoxDetails {
   final String id;
   final String description;
   final bool gauge;
+  final bool experimental;
   final BoxWidget Function(BoxWidgetConfig config) build;
 
-  BoxDetails(this.id, this.description, this.gauge, this.build);
+  BoxDetails(this.id, this.description, this.build, {this.gauge = false, this.experimental = false});
 }
 
 BoxDetails getBoxDetails(String id) {
@@ -621,6 +622,7 @@ class _Settings {
   bool keepAwake;
   bool autoConfirmActions;
   bool pageTimerOnStart;
+  bool enableExperimentalBoxes;
   DistanceUnits distanceUnits;
   int m2nmThreshold;
   SpeedUnits speedUnits;
@@ -654,6 +656,7 @@ class _Settings {
     this.keepAwake = false,
     this.autoConfirmActions = false,
     this.pageTimerOnStart = false,
+    this.enableExperimentalBoxes = false,
     this.distanceUnits = DistanceUnits.nm,
     this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,
