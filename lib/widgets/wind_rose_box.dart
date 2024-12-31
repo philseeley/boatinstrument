@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -131,6 +132,10 @@ class _RosePainter extends CustomPainter {
 }
 
 class _SpeedPainter extends CustomPainter {
+  static GaugeOrientation? _orientation;
+  static Offset _apparentSpeedLoc = Offset(0, 0);
+  static Offset _trueSpeedLoc = Offset(0, 0);
+
   static const double _hubWidth = 12;
   static const double _pad = 5;
   final BoatInstrumentController _controller;
@@ -141,6 +146,42 @@ class _SpeedPainter extends CustomPainter {
   final double? _trueSpeed;
 
   _SpeedPainter(this._controller, this._context, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed);
+
+  void _newOrientation (double centre, double speedSize) {
+    _orientation = GaugeOrientation.down;
+    if(_showTrueWind) {
+      _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+      _trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+    } else {
+      _apparentSpeedLoc = Offset(centre-(speedSize/2), centre+_hubWidth);
+    }
+
+    if(_apparentDirection.abs() > deg2Rad(135)) {
+      _orientation = GaugeOrientation.up;
+      if(_showTrueWind) {
+        _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
+        _trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+      } else {
+        _apparentSpeedLoc = Offset(centre-(speedSize/2), centre-_hubWidth-speedSize);
+      }
+    } else if(_apparentDirection < deg2Rad(-45) && _apparentDirection > deg2Rad(-135)) {
+      _orientation = GaugeOrientation.right;
+      if(_showTrueWind) {
+        _apparentSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+        _trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+      } else {
+        _apparentSpeedLoc = Offset(centre+_hubWidth, centre-(speedSize/2));
+      }
+    } else if(_apparentDirection > deg2Rad(45) && _apparentDirection < deg2Rad(135)) {
+      _orientation = GaugeOrientation.left;
+      if(_showTrueWind) {
+        _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
+        _trueSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+      } else {
+        _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
+      }
+    }
+  }
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -154,38 +195,31 @@ class _SpeedPainter extends CustomPainter {
       speedSize = sqrt(((centre-style.fontSize!-_hubWidth)*(centre-style.fontSize!-_hubWidth))/2);
     }
 
-    Offset apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
-    Offset trueSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
-
-    if(!_showTrueWind) {
-      apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
+    switch (_orientation) {
+      case null:
+        _newOrientation(centre, speedSize);
+      case GaugeOrientation.down:
+        if(_apparentDirection.abs() > deg2Rad(80)) {
+          _newOrientation(centre, speedSize);
+        }
+      case GaugeOrientation.left:
+        if(_apparentDirection < deg2Rad(10) || _apparentDirection > deg2Rad(170)) {
+          _newOrientation(centre, speedSize);
+        }
+      case GaugeOrientation.up:
+        if(_apparentDirection.abs() < deg2Rad(100)) {
+          _newOrientation(centre, speedSize);
+        }
+      case GaugeOrientation.right:
+        if(_apparentDirection > deg2Rad(-10) || _apparentDirection < deg2Rad(-170)) {
+          _newOrientation(centre, speedSize);
+        }
     }
+print(_orientation);
 
-    if(_apparentDirection.abs() < deg2Rad(10)) {
-      if(_showTrueWind) {
-        apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
-        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
-      } else {
-        apparentSpeedLoc = Offset(centre-(speedSize/2), centre+_hubWidth);
-      }
-    } else if(_apparentDirection.abs() > deg2Rad(170)) {
-      if(_showTrueWind) {
-        trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
-      } else {
-        apparentSpeedLoc = Offset(centre-(speedSize/2), centre-_hubWidth-speedSize);
-      }
-    } else if(_apparentDirection < 0) {
-      if(_showTrueWind) {
-        apparentSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
-        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
-      } else {
-        apparentSpeedLoc = Offset(centre+_hubWidth, centre-(speedSize/2));
-      }
-    }
-
-    _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, apparentSpeedLoc, speedSize, fg, bg, style);
+    _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, _apparentSpeedLoc, speedSize, fg, bg, style);
     if(_showTrueWind) {
-      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, trueSpeedLoc, speedSize, fg, bg, style);
+      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, _trueSpeedLoc, speedSize, fg, bg, style);
     }
   }
 
