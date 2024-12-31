@@ -106,6 +106,52 @@ class _BatteryVoltMeterState extends DoubleValueSemiGaugeBoxState<BatteryVoltMet
   }
 }
 
+class _ElectricalBatterySettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
+  final _ElectricalBatterySettings _settings;
+  final String _title;
+  final String _basePath;
+
+  const _ElectricalBatterySettingsWidget(this._controller, this._settings, this._title, this._basePath);
+
+  @override
+  createState() => _ElectricalBatterySettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$ElectricalBatterySettingsToJson(_settings);
+  }
+}
+
+class _ElectricalBatterySettingsState extends State<_ElectricalBatterySettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _ElectricalBatterySettings s = widget._settings;
+
+    List<Widget> list = [
+      ListTile(
+          leading: Text("${widget._title} ID:"),
+          title: SignalkPathDropdownMenu(
+            widget._controller,
+            s.id,
+            widget._basePath,
+            (value) => s.id = value)
+      ),
+      ListTile(
+        leading: const Text("System Voltage:"),
+        title: EnumDropdownMenu(
+          BatteryVoltage.values,
+          s.voltage,
+          (value) {s.voltage = value!;},
+        )
+      ),
+    ];
+
+    return ListView(children: list);
+  }
+}
+
 class BatteryVoltageBox extends DoubleValueBox {
   static const sid = 'electrical-battery-voltage';
   @override
@@ -764,52 +810,6 @@ class _ElectricalSwitchSettingsState extends State<_ElectricalSwitchesSettingsWi
     setState(() {
       widget._settings.authToken = 'PENDING - keep this page open until request approved';
     });
-  }
-}
-
-class _ElectricalBatterySettingsWidget extends BoxSettingsWidget {
-  final BoatInstrumentController _controller;
-  final _ElectricalBatterySettings _settings;
-  final String _title;
-  final String _basePath;
-
-  const _ElectricalBatterySettingsWidget(this._controller, this._settings, this._title, this._basePath);
-
-  @override
-  createState() => _ElectricalBatterySettingsState();
-
-  @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$ElectricalBatterySettingsToJson(_settings);
-  }
-}
-
-class _ElectricalBatterySettingsState extends State<_ElectricalBatterySettingsWidget> {
-
-  @override
-  Widget build(BuildContext context) {
-    _ElectricalBatterySettings s = widget._settings;
-
-    List<Widget> list = [
-      ListTile(
-          leading: Text("${widget._title} ID:"),
-          title: SignalkPathDropdownMenu(
-            widget._controller,
-            s.id,
-            widget._basePath,
-            (value) => s.id = value)
-      ),
-      ListTile(
-        leading: const Text("System Voltage:"),
-        title: EnumDropdownMenu(
-          BatteryVoltage.values,
-          s.voltage,
-          (value) {s.voltage = value!;},
-        )
-      ),
-    ];
-
-    return ListView(children: list);
   }
 }
 
