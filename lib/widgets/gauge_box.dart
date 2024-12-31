@@ -48,29 +48,6 @@ class DoubleValueGaugeBoxState<T extends DoubleValueGaugeBox> extends DoubleValu
   }
 }
 
-enum GaugeOrientation {
-  down(0, 0.0, -0.5, null, 0, 0, null, null, 0, null, 0),
-  left(pi/2, 0.0, 0.0, 0, null, 0, null, null, 0, 0, null),
-  up(pi, 0.0, 0.0, 0, null, 0, null, 0, null, null, 0),
-  right(pi/2+pi, -0.5, 0.0, 0, null, null, 0, null, 0, null, 0);
-
-  final double _rotation;
-  final double _xm;
-  final double _ym;
-  final double? _titleTop;
-  final double? _titleBottom;
-  final double? _titleLeft;
-  final double? _titleRight;
-  final double? _unitsTop;
-  final double? _unitsBottom;
-  final double? _unitsLeft;
-  final double? _unitsRight;
-
-  const GaugeOrientation(this._rotation, this._xm, this._ym,
-      this._titleTop, this._titleBottom, this._titleLeft, this._titleRight,
-      this._unitsTop, this._unitsBottom, this._unitsLeft, this._unitsRight);
-}
-
 class _SemiGaugePainter extends CustomPainter {
   final BuildContext _context;
   final GaugeOrientation _orientation;
@@ -100,9 +77,9 @@ class _SemiGaugePainter extends CustomPainter {
     }
 
     canvas.save();
-    canvas.translate(base*_orientation._xm, base*_orientation._ym);
+    canvas.translate(base*_orientation.xm, base*_orientation.ym);
     canvas.translate(base/2, base/2);
-    canvas.rotate(_orientation._rotation);
+    canvas.rotate(_orientation.rotation);
     canvas.translate(-base/2, -base/2);
 
     canvas.drawArc(Rect.fromLTWH(0, 0, base, base), 0.0, pi, true, paint);
@@ -121,7 +98,7 @@ class _SemiGaugePainter extends CustomPainter {
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
-      canvas.translate((base / 2) + base*_orientation._xm, (base / 2) + base*_orientation._ym);
+      canvas.translate((base / 2) + base*_orientation.xm, (base / 2) + base*_orientation.ym);
 
       double steps = range / _step;
       double angleStep = pi/steps;
@@ -134,7 +111,7 @@ class _SemiGaugePainter extends CustomPainter {
             style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
         tp.layout();
 
-        double angle = (_mirror ? pi - angleStep*i : angleStep*i) + _orientation._rotation;
+        double angle = (_mirror ? pi - angleStep*i : angleStep*i) + _orientation.rotation;
         double x = cos(angle) * (base / 2 - 20.0);
         double y = sin(angle) * (base / 2 - 20.0);
 
@@ -179,9 +156,9 @@ class _SemiGaugeNeedlePainter extends CustomPainter {
       ..addArc(const Offset(-10, -10.0) & const Size(20.0, 20.0), 0.0, -pi)
       ..close();
 
-    canvas.translate(base*_orientation._xm, base*_orientation._ym);
+    canvas.translate(base*_orientation.xm, base*_orientation.ym);
     canvas.translate(base/2, base/2);
-    canvas.rotate(_orientation._rotation);
+    canvas.rotate(_orientation.rotation);
     canvas.rotate(_angle);
 
     canvas.drawPath(needle, paint);
@@ -210,8 +187,8 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
     GaugeOrientation o = widget.orientation;
 
     List<Widget> stack = [
-      Positioned(top: o._titleTop, bottom: o._titleBottom, left: o._titleLeft, right: o._titleRight, child: Text(widget.title)),
-      Positioned(top: o._unitsTop, bottom: o._unitsBottom, left: o._unitsLeft, right: o._unitsRight, child: Text(widget.units(displayValue??0.0))),
+      Positioned(top: o.titleTop, bottom: o.titleBottom, left: o.titleLeft, right: o.titleRight, child: Text(widget.title)),
+      Positioned(top: o.unitsTop, bottom: o.unitsBottom, left: o.unitsLeft, right: o.unitsRight, child: Text(widget.units(displayValue??0.0))),
       CustomPaint(
           size: Size.infinite,
           painter: _SemiGaugePainter(context, o, widget.mirror, minDisplay, maxDisplay, _displayStep, _displayRanges)

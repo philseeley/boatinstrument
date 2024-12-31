@@ -697,3 +697,26 @@ class _Settings {
     _store?.writeAsStringSync(json.encode(toJson()));
   }
 }
+
+enum GaugeOrientation {
+  down(0, 0.0, -0.5, null, 0, 0, null, null, 0, null, 0),
+  left(m.pi/2, 0.0, 0.0, 0, null, 0, null, null, 0, 0, null),
+  up(m.pi, 0.0, 0.0, 0, null, 0, null, 0, null, null, 0),
+  right(m.pi/2+m.pi, -0.5, 0.0, 0, null, null, 0, null, 0, null, 0);
+
+  final double rotation;
+  final double xm;
+  final double ym;
+  final double? titleTop;
+  final double? titleBottom;
+  final double? titleLeft;
+  final double? titleRight;
+  final double? unitsTop;
+  final double? unitsBottom;
+  final double? unitsLeft;
+  final double? unitsRight;
+
+  const GaugeOrientation(this.rotation, this.xm, this.ym,
+      this.titleTop, this.titleBottom, this.titleLeft, this.titleRight,
+      this.unitsTop, this.unitsBottom, this.unitsLeft, this.unitsRight);
+}
