@@ -55,14 +55,14 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
 
   final _ElectricalBatterySettings _settings;
 
-  const BatteryVoltMeterBox._init(this._settings, config, title, path, {super.key, super.minValue, super.maxValue, super.ranges}) :
+  const BatteryVoltMeterBox._init(this._settings, config, title, path, {super.key, super.minValue, super.maxValue, super.ranges, super.step}) :
     super(config, title, GaugeOrientation.up, path);
 
   factory BatteryVoltMeterBox.fromSettings(config, {key}) {
     _ElectricalBatterySettings s = _$ElectricalBatterySettingsFromJson(config.settings);
 
     return BatteryVoltMeterBox._init(s, config, 'Battery:${s.id}', 'electrical.batteries.${s.id}.voltage',
-      minValue: 10.0*s.voltage.multiplier, maxValue: 15.0*s.voltage.multiplier, key: key, ranges: [
+      minValue: 10.0*s.voltage.multiplier, maxValue: 15.0*s.voltage.multiplier, step: s.voltage.multiplier.toDouble(), key: key, ranges: [
         GaugeRange(10.0*s.voltage.multiplier, 12.0*s.voltage.multiplier, Colors.red),
         GaugeRange(12.0*s.voltage.multiplier, 13.0*s.voltage.multiplier, Colors.orange),
         GaugeRange(13.0*s.voltage.multiplier, 15.0*s.voltage.multiplier, Colors.green)
