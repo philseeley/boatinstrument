@@ -464,8 +464,9 @@ class BoatInstrumentController {
     }
   }
 
-  _onNotification(BuildContext context, List<Update>? updates) {
+  _onNotification(BuildContext context, List<Update>? updates) {print(updates);
     if (updates == null) {
+      _audioPlayer?.release();
       _resetNotifications(false);
     } else {
       DateTime now = DateTime.now();
@@ -486,25 +487,16 @@ class BoatInstrumentController {
 
             ScaffoldMessenger.of(context).clearSnackBars();
 
-            SnackBarAction? action;
-            if (![NotificationState.normal, NotificationState.nominal].contains(newState)) {
-              action = SnackBarAction(label: 'Mute', onPressed: () {
-                notificationStatus.mute = true;
-                _audioPlayer?.release();
-              });
-            }
-
             showMessage(
                 context, u.value['message'], error: newState.error,
-                action: action);
+                action: SnackBarAction(label: 'Mute', onPressed: () {
+                  notificationStatus.mute = true;
+                  _audioPlayer?.release();
+                }));
 
             if (playSound && newState.soundFile != null) {
-              _audioPlayer?.release();
               _audioPlayer?.play(AssetSource(newState.soundFile!));
             }
-
-          } else {
-            _audioPlayer?.release();
           }
         } catch(e) {
           l.e('Error handling notification $u', error: e);
