@@ -78,6 +78,8 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       signalkConnectionTimeout:
           (json['signalkConnectionTimeout'] as num?)?.toInt() ?? 20000,
       dataTimeout: (json['dataTimeout'] as num?)?.toInt() ?? 10000,
+      notificationMuteTimeout:
+          (json['notificationMuteTimeout'] as num?)?.toInt() ?? 15,
       demoMode: json['demoMode'] as bool? ?? false,
       darkMode: json['darkMode'] as bool? ?? true,
       wrapPages: json['wrapPages'] as bool? ?? true,
@@ -130,6 +132,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'signalkMinPeriod': instance.signalkMinPeriod,
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
       'dataTimeout': instance.dataTimeout,
+      'notificationMuteTimeout': instance.notificationMuteTimeout,
       'demoMode': instance.demoMode,
       'darkMode': instance.darkMode,
       'wrapPages': instance.wrapPages,

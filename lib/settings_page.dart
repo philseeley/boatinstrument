@@ -294,6 +294,21 @@ class _SettingsState extends State<SettingsPage> {
               onChanged: (value) => settings.dataTimeout = int.parse(value)),
           trailing: const Text('ms')
       ),
+      ListTile(
+        leading: const Text("Notification Mute Timeout:"),
+        title: Slider(
+            min: 5,
+            max: 60,
+            divisions: 11,
+            value: settings.notificationMuteTimeout.toDouble(),
+            label: "${settings.notificationMuteTimeout.toInt()}",
+            onChanged: (double value) {
+              setState(() {
+                settings.notificationMuteTimeout = value.toInt();
+              });
+            }),
+        trailing: const Text('minutes')
+      ),
       SwitchListTile(title: const Text("Enable Experimental Boxes:"),
           value: settings.enableExperimentalBoxes,
           onChanged: (bool value) {

@@ -138,10 +138,19 @@ class _MainPageState extends State<MainPage> {
 
     AppBar? appBar;
     if(_showAppBar) {
-      List<Widget> actions = [
+      List<Widget> actions = [];
+      
+      if(_controller.muted) {
+        actions.add(IconButton(icon: const Icon(Icons.volume_off), onPressed: () {
+          setState(() {
+            _controller.unMute();
+          });}));
+      }
+
+      actions.addAll([
         IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
         IconButton(icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
-      ];
+      ]);
 
       if(_controller.brightnessControl) {
         actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));

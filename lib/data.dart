@@ -615,6 +615,7 @@ class _Settings {
   int signalkMinPeriod;
   int signalkConnectionTimeout;
   int dataTimeout;
+  int notificationMuteTimeout; //Minutes
   bool demoMode;
   bool darkMode;
   bool wrapPages;
@@ -649,6 +650,7 @@ class _Settings {
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
     this.dataTimeout = 10000,
+    this.notificationMuteTimeout = 15,
     this.demoMode = false,
     this.darkMode = true,
     this.wrapPages = true,
