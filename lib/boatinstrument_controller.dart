@@ -464,7 +464,7 @@ class BoatInstrumentController {
     }
   }
 
-  _onNotification(BuildContext context, List<Update>? updates) {print(updates);
+  _onNotification(BuildContext context, List<Update>? updates) {
     if (updates == null) {
       _audioPlayer?.release();
       _resetNotifications(false);
