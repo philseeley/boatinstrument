@@ -561,7 +561,9 @@ class ElectricalSwitchesBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpTextWidget('Note: due to the scrollable list of Switches, swipe down from the title to configure');
+  Widget? getHelp(BuildContext context) => const HelpTextWidget('''Note: due to the scrollable list of Switches, swipe down from the title to configure.
+
+This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.''');
 
   @override
   Widget? getSettingsHelp() => const HelpTextWidget('''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
@@ -751,7 +753,7 @@ class _ElectricalSwitchesSettingsWidget extends BoxSettingsWidget {
   const _ElectricalSwitchesSettingsWidget(this._controller, this._settings);
 
   @override
-  createState() => _ElectricalSwitchSettingsState();
+  createState() => _ElectricalSwitchesSettingsState();
 
   @override
   Map<String, dynamic> getSettingsJson() {
@@ -759,7 +761,7 @@ class _ElectricalSwitchesSettingsWidget extends BoxSettingsWidget {
   }
 }
 
-class _ElectricalSwitchSettingsState extends State<_ElectricalSwitchesSettingsWidget> {
+class _ElectricalSwitchesSettingsState extends State<_ElectricalSwitchesSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
@@ -831,6 +833,9 @@ class ElectricalSwitchBox extends BoxWidget {
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
     return _ElectricalSwitchesSettingsWidget(super.config.controller, _$ElectricalSwitchesSettingsFromJson(json));
   }
+
+  @override
+  Widget? getHelp(BuildContext context) => const HelpTextWidget('This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.');
 
   @override
   bool get hasPerBoxSettings => true;
