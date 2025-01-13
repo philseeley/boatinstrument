@@ -139,12 +139,13 @@ class _SpeedPainter extends CustomPainter {
   static const double _pad = 5;
   final BoatInstrumentController _controller;
   final BuildContext _context;
+  final bool _close;
   final bool _showTrueWind;
   final double _apparentDirection;
   final double? _apparentSpeed;
   final double? _trueSpeed;
 
-  _SpeedPainter(this._controller, this._context, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed);
+  _SpeedPainter(this._controller, this._context, WindRoseType type, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed) : _close = type == WindRoseType.closeHaul;
 
   void _newOrientation (GaugeOrientation newOrientation, double centre, double speedSize) {
     _orientation = newOrientation;
@@ -201,31 +202,34 @@ class _SpeedPainter extends CustomPainter {
       case null:
         _newOrientation(GaugeOrientation.down, centre, speedSize);
       case GaugeOrientation.down:
-        if(_apparentDirection > deg2Rad(80)) {
+        if(_apparentDirection > deg2Rad(_close ? 40 : 80)) {
           _newOrientation(GaugeOrientation.left, centre, speedSize);
-        } else if(_apparentDirection < deg2Rad(-80)) {
+        } else if(_apparentDirection < deg2Rad(_close ? -40 : -80)) {
           _newOrientation(GaugeOrientation.right, centre, speedSize);
-        } 
+        }
+        break;
       case GaugeOrientation.left:
         if(_apparentDirection < deg2Rad(10)) {
           _newOrientation(GaugeOrientation.down, centre, speedSize);
         } else if(_apparentDirection > deg2Rad(170)) {
           _newOrientation(GaugeOrientation.up, centre, speedSize);
-        } 
+        }
+        break;
       case GaugeOrientation.up:
-        if(_apparentDirection.abs() < deg2Rad(100)) {
+        if(_apparentDirection.abs() < deg2Rad(_close ? 50 : 100)) {
           if(_apparentDirection > 0) {
             _newOrientation(GaugeOrientation.left, centre, speedSize);
           } else {
             _newOrientation(GaugeOrientation.right, centre, speedSize);
           }
-        } 
+        }
+        break;
       case GaugeOrientation.right:
         if(_apparentDirection > deg2Rad(-10)) {
           _newOrientation(GaugeOrientation.down, centre, speedSize);
         } else if(_apparentDirection < deg2Rad(-170)) {
           _newOrientation(GaugeOrientation.up, centre, speedSize);
-        } 
+        }
     }
 
     _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, _apparentSpeedLoc, speedSize, fg, bg, style);
@@ -401,7 +405,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     }
 
     if(widget._settings.showSpeeds) {
-      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, _displayType, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
     }
 
     if(_windAngleApparent != null) {
