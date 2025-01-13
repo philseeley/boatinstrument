@@ -450,26 +450,19 @@ class BoatInstrumentController {
   }
 
   void unMute() {
-    _resetNotifications(true);
-  }
-
-  _resetNotifications (bool all) {
-    if(all) {
-      _notifications.clear();
-    } else {
-      DateTime now = DateTime.now();
-      _notifications.removeWhere((path, notification) {
-        return now.difference(notification.last) > Duration(minutes: _settings!.notificationMuteTimeout);
-      });
-    }
+    _notifications.clear();
   }
 
   _onNotification(BuildContext context, List<Update>? updates) {
+    DateTime now = DateTime.now();
+
+    _notifications.removeWhere((path, notification) {
+      return now.difference(notification.last) > Duration(minutes: _settings!.notificationMuteTimeout);
+    });
+
     if (updates == null) {
       _audioPlayer?.release();
-      _resetNotifications(false);
     } else {
-      DateTime now = DateTime.now();
       for(Update u in updates) {
         try {
           _NotificationStatus notificationStatus = _notifications.putIfAbsent(u.path, () => _NotificationStatus());
