@@ -78,17 +78,25 @@ class CircularLogger extends Logger {
 }
 
 enum NotificationState {
-  normal(false, null),
-  nominal(false, null),
-  alert(false, 'alert.mp3'),
-  warn(false, 'warning.mp3'),
-  alarm(true, 'alarm.mp3'),
-  emergency(true, 'emergency.wav');
+  normal(false, 1, null),
+  nominal(false, 1, null),
+  alert(false, 5, 'alert.mp3'),
+  warn(false, 10, 'warning.mp3'),
+  alarm(true, 20, 'alarm.mp3'),
+  emergency(true, 30, 'emergency.wav');
 
   final bool error;
+  final int count;
   final String? soundFile;
 
-  const NotificationState(this.error, this.soundFile);
+  const NotificationState(this.error, this.count, this.soundFile);
+}
+
+class _NotificationStatus {
+  NotificationState state = NotificationState.normal;
+  int count = 0;
+  bool mute = false;
+  DateTime last = DateTime.now();
 }
 
 class BoatInstrumentController {
@@ -103,7 +111,7 @@ class BoatInstrumentController {
   WebSocketChannel? _channel;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
-  bool _showNotifications = true;
+  final Map<String, _NotificationStatus> _notifications = {};
 
   BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
@@ -118,6 +126,7 @@ class BoatInstrumentController {
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
   bool get pageTimerOnStart => _settings!.pageTimerOnStart;
+  bool get enableExperimentalBoxes => _settings!.enableExperimentalBoxes;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   int get m2nmThreshold => _settings!.m2nmThreshold;
   SpeedUnits get speedUnits => _settings!.speedUnits;
@@ -128,6 +137,7 @@ class BoatInstrumentController {
   OilPressureUnits get oilPressureUnits => _settings!.oilPressureUnits;
   CapacityUnits get capacityUnits => _settings!.capacityUnits;
   int get numOfPages => _settings!.pages.length;
+  bool get muted => _notifications.entries.any((element) => element.value.mute);
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
     if(_settings!.portStarboardColors == PortStarboardColors.none) {
@@ -273,15 +283,23 @@ class BoatInstrumentController {
     }
   }
 
-  loadSettings() async {
+  _loadDefaultConfig(bool portrait) async {
+    String config = portrait ?
+      'default-config-portrait.json' :
+      'default-config-landscape.json';
+    String s = await rootBundle.loadString('assets/$config');
+    _settings = _Settings.fromJson(jsonDecode(s));
+}
+
+  loadSettings(bool portrait) async {
     try {
       _settings = await _Settings.load();
     } on Exception catch (e) {
       l.e('Exception loading Settings', error: e);
-      _settings = _Settings();
+      await _loadDefaultConfig(portrait);
     } on Error catch(e) {
       l.e('Error loading Settings', error: e);
-      _settings = _Settings();
+      await _loadDefaultConfig(portrait);
     }
 
     if(_noBrightnessControls) {
@@ -414,7 +432,7 @@ class BoatInstrumentController {
     return LayoutBuilder(builder: (context, constraints) {
       clear();
 
-      configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, dataTimeout: true, isBox: false);
+      configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
 
       // We need to calculate the total number of boxes on the page so that we
       // know when tha last one calls configure(). As we're using LayoutBuilders
@@ -439,43 +457,46 @@ class BoatInstrumentController {
     });
   }
 
+  void unMute() {
+    _notifications.clear();
+  }
+
   _onNotification(BuildContext context, List<Update>? updates) {
+    DateTime now = DateTime.now();
+
+    _notifications.removeWhere((path, notification) {
+      return now.difference(notification.last) > Duration(minutes: _settings!.notificationMuteTimeout);
+    });
+
     if (updates == null) {
-      _showNotifications = true;
+      _audioPlayer?.release();
     } else {
       for(Update u in updates) {
         try {
-          NotificationState state = NotificationState.values.byName(
+          _NotificationStatus notificationStatus = _notifications.putIfAbsent(u.path, () => _NotificationStatus());
+          NotificationState newState = NotificationState.values.byName(
               u.value['state']);
 
-          bool playSound = false;
-          dynamic method = u.value['method'];
-          for(String m in method) {
-            if(m == 'sound') {
-              playSound = true;
-            }
-          }
-          if ([NotificationState.normal, NotificationState.nominal].contains(state)) {
-            _showNotifications = true;
-            _audioPlayer?.stop();
-          }
+          bool playSound = u.value['method'].contains('sound');
 
-          if (_showNotifications) {
+          notificationStatus.last = now;
+
+          if((newState != notificationStatus.state || notificationStatus.count < newState.count) && !notificationStatus.mute) {            
+            notificationStatus.count = (newState == notificationStatus.state) ? notificationStatus.count+1 : 1;
+
+            notificationStatus.state = newState;
+
             ScaffoldMessenger.of(context).clearSnackBars();
 
-            SnackBarAction? action;
-            if ([NotificationState.normal, NotificationState.nominal].contains(state)) {
-              action = SnackBarAction(label: 'Mute', onPressed: () {
-                _showNotifications = false;
-                _audioPlayer?.stop();
-              });
-            }
             showMessage(
-                context, u.value['message'], error: state.error,
-                action: action);
+                context, u.value['message'], error: newState.error,
+                action: SnackBarAction(label: 'Mute', onPressed: () {
+                  notificationStatus.mute = true;
+                  _audioPlayer?.release();
+                }));
 
-            if (playSound && state.soundFile != null) {
-              _audioPlayer?.play(AssetSource(state.soundFile!));
+            if (playSound && newState.soundFile != null) {
+              _audioPlayer?.play(AssetSource(newState.soundFile!));
             }
           }
         } catch(e) {

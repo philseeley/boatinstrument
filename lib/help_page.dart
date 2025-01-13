@@ -34,7 +34,12 @@ If no data is received within the "Connection Timeout" the connection is reopene
 
 If a Box receives no data within the "Data Timeout" the box is cleared and a "-" is generally displayed.
 
-In "Demo Mode" the app connects to "https://demo.signalk.org".''')]))),
+In "Demo Mode" the app connects to "https://demo.signalk.org".
+
+Boxes marked '''),
+        WidgetSpan(child: Icon(Icons.science_outlined)),
+        TextSpan(text: ''' are experimental and may not function as expected, but any feedback will be gratefully received. You must enable Experimental Boxes in the Advanced Settings.'''),
+      ]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness')),
       const ListTile(leading: Icon(Icons.sync_alt), title: Text('Toggles the Auto-Page rotation. Set the per-page delays in the page list. Pages without delays are not shown')),

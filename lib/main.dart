@@ -100,12 +100,10 @@ class _MainPageState extends State<MainPage> {
 
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl);
-
-    _configure();
   }
 
   _configure () async {
-    await _controller.loadSettings();
+    await _controller.loadSettings(MediaQuery.of(context).orientation == Orientation.portrait);
     await _controller.connect();
 
     _themeProvider.setDarkMode(_controller.darkMode);
@@ -129,6 +127,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     if(!_controller.ready) {
+      _configure();
       return const Center(child: _icon);
     }
 
@@ -138,10 +137,19 @@ class _MainPageState extends State<MainPage> {
 
     AppBar? appBar;
     if(_showAppBar) {
-      List<Widget> actions = [
+      List<Widget> actions = [];
+      
+      if(_controller.muted) {
+        actions.add(IconButton(icon: const Icon(Icons.volume_off), onPressed: () {
+          setState(() {
+            _controller.unMute();
+          });}));
+      }
+
+      actions.addAll([
         IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
         IconButton(icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
-      ];
+      ]);
 
       if(_controller.brightnessControl) {
         actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
@@ -159,7 +167,7 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: appBar,
-      body: GestureDetector(
+      body: SafeArea(child: GestureDetector(
         onPanStart: (details) {
           _panStart = details.localPosition;
         },
@@ -176,7 +184,7 @@ class _MainPageState extends State<MainPage> {
           }
         },
         child: _controller.buildPage(_pageNum),
-      ),
+      )),
     );
   }
 

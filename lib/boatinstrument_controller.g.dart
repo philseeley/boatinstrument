@@ -78,6 +78,8 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       signalkConnectionTimeout:
           (json['signalkConnectionTimeout'] as num?)?.toInt() ?? 20000,
       dataTimeout: (json['dataTimeout'] as num?)?.toInt() ?? 10000,
+      notificationMuteTimeout:
+          (json['notificationMuteTimeout'] as num?)?.toInt() ?? 15,
       demoMode: json['demoMode'] as bool? ?? false,
       darkMode: json['darkMode'] as bool? ?? true,
       wrapPages: json['wrapPages'] as bool? ?? true,
@@ -85,6 +87,8 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       keepAwake: json['keepAwake'] as bool? ?? false,
       autoConfirmActions: json['autoConfirmActions'] as bool? ?? false,
       pageTimerOnStart: json['pageTimerOnStart'] as bool? ?? false,
+      enableExperimentalBoxes:
+          json['enableExperimentalBoxes'] as bool? ?? false,
       distanceUnits:
           $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
               DistanceUnits.nm,
@@ -128,6 +132,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'signalkMinPeriod': instance.signalkMinPeriod,
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
       'dataTimeout': instance.dataTimeout,
+      'notificationMuteTimeout': instance.notificationMuteTimeout,
       'demoMode': instance.demoMode,
       'darkMode': instance.darkMode,
       'wrapPages': instance.wrapPages,
@@ -135,6 +140,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'keepAwake': instance.keepAwake,
       'autoConfirmActions': instance.autoConfirmActions,
       'pageTimerOnStart': instance.pageTimerOnStart,
+      'enableExperimentalBoxes': instance.enableExperimentalBoxes,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
       'm2nmThreshold': instance.m2nmThreshold,
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,

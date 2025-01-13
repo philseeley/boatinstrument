@@ -131,16 +131,58 @@ class _RosePainter extends CustomPainter {
 }
 
 class _SpeedPainter extends CustomPainter {
+  static GaugeOrientation? _orientation;
+  Offset _apparentSpeedLoc = Offset(0, 0);
+  Offset _trueSpeedLoc = Offset(0, 0);
+
   static const double _hubWidth = 12;
   static const double _pad = 5;
   final BoatInstrumentController _controller;
   final BuildContext _context;
+  final bool _close;
   final bool _showTrueWind;
   final double _apparentDirection;
   final double? _apparentSpeed;
   final double? _trueSpeed;
 
-  _SpeedPainter(this._controller, this._context, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed);
+  _SpeedPainter(this._controller, this._context, WindRoseType type, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed) : _close = type == WindRoseType.closeHaul;
+
+  void _calcSpeedLoc (double centre, double speedSize) {
+    switch (_orientation) {
+      case null:
+      case GaugeOrientation.down:
+        if(_showTrueWind) {
+          _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+          _trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+        } else {
+          _apparentSpeedLoc = Offset(centre-(speedSize/2), centre+_hubWidth);
+        }
+        break;
+      case GaugeOrientation.up:
+      if(_showTrueWind) {
+        _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
+        _trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+      } else {
+        _apparentSpeedLoc = Offset(centre-(speedSize/2), centre-_hubWidth-speedSize);
+      }
+      break;
+    case GaugeOrientation.right:
+      if(_showTrueWind) {
+        _apparentSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
+        _trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
+      } else {
+        _apparentSpeedLoc = Offset(centre+_hubWidth, centre-(speedSize/2));
+      }
+      break;
+    case GaugeOrientation.left:
+      if(_showTrueWind) {
+        _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
+        _trueSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
+      } else {
+        _apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
+      }
+    }
+  }
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -153,39 +195,46 @@ class _SpeedPainter extends CustomPainter {
     if(_showTrueWind) {
       speedSize = sqrt(((centre-style.fontSize!-_hubWidth)*(centre-style.fontSize!-_hubWidth))/2);
     }
-
-    Offset apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-_hubWidth-speedSize);
-    Offset trueSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
-
-    if(!_showTrueWind) {
-      apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre-(speedSize/2));
+    
+    switch (_orientation) {
+      case null:
+        _orientation = GaugeOrientation.down;
+      case GaugeOrientation.down:
+        if(_apparentDirection > deg2Rad(_close ? 40 : 80)) {
+          _orientation = GaugeOrientation.left;
+        } else if(_apparentDirection < deg2Rad(_close ? -40 : -80)) {
+          _orientation = GaugeOrientation.right;
+        }
+        break;
+      case GaugeOrientation.left:
+        if(_apparentDirection < deg2Rad(10)) {
+          _orientation = GaugeOrientation.down;
+        } else if(_apparentDirection > deg2Rad(170)) {
+          _orientation = GaugeOrientation.up;
+        }
+        break;
+      case GaugeOrientation.up:
+        if(_apparentDirection.abs() < deg2Rad(_close ? 50 : 100)) {
+          if(_apparentDirection > 0) {
+            _orientation = GaugeOrientation.left;
+          } else {
+            _orientation = GaugeOrientation.right;
+          }
+        }
+        break;
+      case GaugeOrientation.right:
+        if(_apparentDirection > deg2Rad(-10)) {
+          _orientation = GaugeOrientation.down;
+        } else if(_apparentDirection < deg2Rad(-170)) {
+          _orientation = GaugeOrientation.up;
+        }
     }
 
-    if(_apparentDirection.abs() < deg2Rad(10)) {
-      if(_showTrueWind) {
-        apparentSpeedLoc = Offset(centre-_hubWidth-speedSize, centre+_hubWidth);
-        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
-      } else {
-        apparentSpeedLoc = Offset(centre-(speedSize/2), centre+_hubWidth);
-      }
-    } else if(_apparentDirection.abs() > deg2Rad(170)) {
-      if(_showTrueWind) {
-        trueSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
-      } else {
-        apparentSpeedLoc = Offset(centre-(speedSize/2), centre-_hubWidth-speedSize);
-      }
-    } else if(_apparentDirection < 0) {
-      if(_showTrueWind) {
-        apparentSpeedLoc = Offset(centre+_hubWidth, centre-_hubWidth-speedSize);
-        trueSpeedLoc = Offset(centre+_hubWidth, centre+_hubWidth);
-      } else {
-        apparentSpeedLoc = Offset(centre+_hubWidth, centre-(speedSize/2));
-      }
-    }
+    _calcSpeedLoc(centre, speedSize);
 
-    _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, apparentSpeedLoc, speedSize, fg, bg, style);
+    _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, _apparentSpeedLoc, speedSize, fg, bg, style);
     if(_showTrueWind) {
-      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, trueSpeedLoc, speedSize, fg, bg, style);
+      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, _trueSpeedLoc, speedSize, fg, bg, style);
     }
   }
 
@@ -356,7 +405,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     }
 
     if(widget._settings.showSpeeds) {
-      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, _displayType, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
     }
 
     if(_windAngleApparent != null) {

@@ -1,3 +1,37 @@
+
+  * 0.4.0 Added option for enabling Experimental Boxes.
+  
+          We now handle notifications in a more sane way so we don't continually
+          show repeat notifications. We also mute individual notifications
+          rather than all or none. Muted notifications are automatically un-muted
+          after a configurable number of minutes.
+
+          On devices that have restricted areas of the screen, e.g. phones with
+          notches, we now display Boxes outside these areas.
+
+          For new installs, a basic landscape or portrait config is now included.
+
+          Value Smoothing can now be disabled completely by setting the value to 0.
+
+          Added Boxes for:
+            Text - these are templated for flexibility
+            In/Outside Humidity Boxes
+            Electrical Switch and all Switches Boxes - Experimental
+
+          Box changes:
+            Rudder Angle Box can now auto-scale
+            Wind Rose can now show wind speeds
+            Battery Volt Meter can now select the nominal battery voltage
+            Depth Below Transducer Box title shortened to "DBT"
+
+          Custom Boxes:
+            The min and max values can now be omitted
+
+          Bug fixes:
+            Issue when filtering paths in Custom Boxes
+            Rudder Angle Box could draw out of bounds
+            When scaling text, we now make sure the font size is at least readable.
+            Semi Gauge Boxes now don't display the needle out of range
   * 0.3.0 Added Boxes for:
             Rate of Turn
             All and individual Tanks

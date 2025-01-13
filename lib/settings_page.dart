@@ -101,6 +101,21 @@ class _EditPagesState extends State<EditPagesPage> {
   }
 }
 
+class _Divider extends StatelessWidget {
+  final String _title;
+
+  const _Divider(this._title);
+
+  @override
+  Widget build(BuildContext context) {
+    Color color = Theme.of(context).colorScheme.secondary;
+    return Row(children: [
+      Expanded(child: Divider(thickness: 3, color: color)),
+      Text(' $_title '),
+      Expanded(child: Divider(thickness: 3, color: color))
+    ]);
+  }
+}
 class SettingsPage extends StatefulWidget {
   final BoatInstrumentController _controller;
 
@@ -121,9 +136,9 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
         leading: const Text("Value Smoothing:"),
         title: Slider(
-            min: 1,
+            min: 0,
             max: 20,
-            divisions: 20,
+            divisions: 21,
             value: settings.valueSmoothing.toDouble(),
             label: "${settings.valueSmoothing.toInt()}",
             onChanged: (double value) {
@@ -178,6 +193,7 @@ class _SettingsState extends State<SettingsPage> {
               settings.pageTimerOnStart = value;
             });
           }),
+      _Divider('Units'), //=====================================================
       ListTile(
           leading: const Text("Distance:   "),
           title: EnumDropdownMenu(
@@ -235,9 +251,7 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Port/Starboard Colours:"),
           title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),
-      const ListTile(
-          title: Text("Signalk:"),
-      ),
+      _Divider('Signalk'), //=====================================================
       SwitchListTile(title: const Text("Auto Discover:"),
           value: settings.discoverServer,
           onChanged: settings.demoMode ? null : (bool value) {
@@ -294,6 +308,29 @@ class _SettingsState extends State<SettingsPage> {
               onChanged: (value) => settings.dataTimeout = int.parse(value)),
           trailing: const Text('ms')
       ),
+      _Divider('Advanced'), //=====================================================
+      ListTile(
+        leading: const Text("Notification Mute Timeout:"),
+        title: Slider(
+            min: 5,
+            max: 60,
+            divisions: 11,
+            value: settings.notificationMuteTimeout.toDouble(),
+            label: "${settings.notificationMuteTimeout.toInt()}",
+            onChanged: (double value) {
+              setState(() {
+                settings.notificationMuteTimeout = value.toInt();
+              });
+            }),
+        trailing: const Text('minutes')
+      ),
+      SwitchListTile(title: const Text("Enable Experimental Boxes:"),
+          value: settings.enableExperimentalBoxes,
+          onChanged: (bool value) {
+            setState(() {
+              settings.enableExperimentalBoxes = value;
+            });
+          }),
     ];
 
     return Scaffold(

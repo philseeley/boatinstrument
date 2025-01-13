@@ -36,3 +36,19 @@ const _$BatteryVoltageEnumMap = {
   BatteryVoltage.twentyFour: 'twentyFour',
   BatteryVoltage.fortyEight: 'fortyEight',
 };
+
+_ElectricalSwitchesSettings _$ElectricalSwitchesSettingsFromJson(
+        Map<String, dynamic> json) =>
+    _ElectricalSwitchesSettings(
+      useSliderForDimming: json['useSliderForDimming'] as bool? ?? false,
+      clientID: json['clientID'],
+      authToken: json['authToken'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$ElectricalSwitchesSettingsToJson(
+        _ElectricalSwitchesSettings instance) =>
+    <String, dynamic>{
+      'useSliderForDimming': instance.useSliderForDimming,
+      'clientID': instance.clientID,
+      'authToken': instance.authToken,
+    };
