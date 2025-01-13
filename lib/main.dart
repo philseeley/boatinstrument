@@ -168,7 +168,7 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: appBar,
-      body: GestureDetector(
+      body: SafeArea(child: GestureDetector(
         onPanStart: (details) {
           _panStart = details.localPosition;
         },
@@ -185,7 +185,7 @@ class _MainPageState extends State<MainPage> {
           }
         },
         child: _controller.buildPage(_pageNum),
-      ),
+      )),
     );
   }
 
