@@ -283,15 +283,23 @@ class BoatInstrumentController {
     }
   }
 
-  loadSettings() async {
+  _loadDefaultConfig(bool portrait) async {
+    String config = portrait ?
+      'default-config-portrait.json' :
+      'default-config-landscape.json';
+    String s = await rootBundle.loadString('assets/$config');
+    _settings = _Settings.fromJson(jsonDecode(s));
+}
+
+  loadSettings(bool portrait) async {
     try {
       _settings = await _Settings.load();
     } on Exception catch (e) {
       l.e('Exception loading Settings', error: e);
-      _settings = _Settings();
+      await _loadDefaultConfig(portrait);
     } on Error catch(e) {
       l.e('Error loading Settings', error: e);
-      _settings = _Settings();
+      await _loadDefaultConfig(portrait);
     }
 
     if(_noBrightnessControls) {

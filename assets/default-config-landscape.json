@@ -1,0 +1,173 @@
+{
+    "version": 0,
+    "valueSmoothing": 10,
+    "discoverServer": false,
+    "signalkHost": "localhost",
+    "signalkPort": 3000,
+    "signalkMinPeriod": 500,
+    "signalkConnectionTimeout": 20000,
+    "dataTimeout": 10000,
+    "notificationMuteTimeout": 15,
+    "demoMode": true,
+    "darkMode": true,
+    "wrapPages": false,
+    "brightnessControl": false,
+    "keepAwake": true,
+    "autoConfirmActions": false,
+    "pageTimerOnStart": false,
+    "enableExperimentalBoxes": false,
+    "distanceUnits": "nmM",
+    "m2nmThreshold": 507,
+    "speedUnits": "kts",
+    "windSpeedUnits": "kts",
+    "depthUnits": "m",
+    "temperatureUnits": "c",
+    "airPressureUnits": "millibar",
+    "oilPressureUnits": "kpa",
+    "capacityUnits": "liter",
+    "portStarboardColors": "redGreen",
+    "pages": [
+        {
+            "name": "main",
+            "timeout": null,
+            "pageRows": [
+                {
+                    "percentage": 0.9545983701979092,
+                    "columns": [
+                        {
+                            "percentage": 0.5,
+                            "rows": [
+                                {
+                                    "percentage": 0.79975521986744,
+                                    "boxes": [
+                                        {
+                                            "percentage": 1.0,
+                                            "id": "wind-rose",
+                                            "settings": {
+                                                "type": "normal",
+                                                "showLabels": true,
+                                                "showButton": true,
+                                                "autoSwitchingDelay": 15,
+                                                "showSpeeds": true,
+                                                "showTrueWind": true
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "percentage": 0.20024478013255997,
+                                    "boxes": [
+                                        {
+                                            "percentage": 0.5,
+                                            "id": "environment-depth-belowTransducer",
+                                            "settings": {}
+                                        },
+                                        {
+                                            "percentage": 0.5,
+                                            "id": "date-time",
+                                            "settings": {
+                                                "showDate": true,
+                                                "showTime": true,
+                                                "utc": false,
+                                                "timeFormat": "HH:mm:ss"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "percentage": 0.5,
+                            "rows": [
+                                {
+                                    "percentage": 0.45393739163553853,
+                                    "boxes": [
+                                        {
+                                            "percentage": 1.0,
+                                            "id": "_HELP_",
+                                            "settings": {}
+                                        }
+                                    ]
+                                },
+                                {
+                                    "percentage": 0.2983724097453413,
+                                    "boxes": [
+                                        {
+                                            "percentage": 1.0,
+                                            "id": "navigation-position",
+                                            "settings": {}
+                                        }
+                                    ]
+                                },
+                                {
+                                    "percentage": 0.24769019861912023,
+                                    "boxes": [
+                                        {
+                                            "percentage": 0.5,
+                                            "id": "boat-speed-through-water",
+                                            "settings": {}
+                                        },
+                                        {
+                                            "percentage": 0.5,
+                                            "id": "navigation-speed-over-ground",
+                                            "settings": {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "percentage": 0.04540162980209084,
+                    "columns": [
+                        {
+                            "percentage": 1.0,
+                            "rows": [
+                                {
+                                    "percentage": 1.0,
+                                    "boxes": [
+                                        {
+                                            "percentage": 1.0,
+                                            "id": "boat-rudder-angle",
+                                            "settings": {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "boxSettings": {
+        "autopilot-control": {
+            "clientID": "boatinstrument-autopilot-mac",
+            "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2UiOiJib2F0aW5zdHJ1bWVudC1hdXRvcGlsb3QtbWFjIiwiaWF0IjoxNzM0NDcyMDMzLCJleHAiOjE3NjYwMjk2MzN9.lK9h-2GmCPsafuAgodFI891RyNATDfd8NnWbvfrkpKQ"
+        },
+        "date-time": {
+            "dateFormat": "yyyy-MM-dd"
+        },
+        "environment-sun": {
+            "timeFormat": "HH:mm:ss"
+        },
+        "environment-celestial": {
+            "timeFormat": "HH:mm"
+        },
+        "anchor-alarm": {
+            "clientID": "boatinstrument-anchor-alarm-mac",
+            "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2UiOiJib2F0aW5zdHJ1bWVudC1hbmNob3ItYWxhcm0tbWFjIiwiaWF0IjoxNzIzMzc2MTQ2LCJleHAiOjE3NTQ5MzM3NDZ9.rfvUijEsKdPosAnfdG5iOdpP9WHc2D4ziVACvwGoZWs",
+            "recordSeconds": 10,
+            "recordPoints": 1000
+        },
+        "electrical-battery-voltage": {
+            "id": "house"
+        },
+        "electrical-switches": {
+            "useSliderForDimming": false,
+            "clientID": "boatinstrument-electrical-switches-macos",
+            "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2UiOiJib2F0aW5zdHJ1bWVudC1lbGVjdHJpY2FsLXN3aXRjaGVzLW1hY29zIiwiaWF0IjoxNzM0MDIzMjA5LCJleHAiOjE3NjU1ODA4MDl9.iKY42LiOJbqP__G4RR0xgNRMfTH9BUftkEpqWPq34Ms"
+        }
+    }
+}

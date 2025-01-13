@@ -100,12 +100,10 @@ class _MainPageState extends State<MainPage> {
 
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl);
-
-    _configure();
   }
 
   _configure () async {
-    await _controller.loadSettings();
+    await _controller.loadSettings(MediaQuery.of(context).orientation == Orientation.portrait);
     await _controller.connect();
 
     _themeProvider.setDarkMode(_controller.darkMode);
@@ -129,6 +127,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     if(!_controller.ready) {
+      _configure();
       return const Center(child: _icon);
     }
 
