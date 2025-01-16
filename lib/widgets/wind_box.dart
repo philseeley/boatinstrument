@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:boatinstrument/widgets/gauge_box.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -214,5 +216,54 @@ class WindAngleApparentBox extends DoubleValueBox {
   @override
   String units(double value) {
     return degreesUnits;
+  }
+}
+
+class ApparentWindSpeedGraphBackground extends GraphBackground {
+  static double _value = 0;
+  static final CircularBuffer<DataPoint> _data = CircularBuffer(1000);
+
+  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, 'environment.wind.speedApparent');
+
+  @override
+  List<DataPoint> get data => _data.toList();
+  @override
+  double get value => _value;
+  @override
+  set value(double value) => _value = value;
+
+  @override
+  void addDataPoint(DataPoint dataPoint) {
+    _data.add(dataPoint);
+  }
+}
+
+class ApparentWindSpeedGraph extends GraphBox {
+  static const String sid = 'wind-speed-apparent-graph';
+  @override
+  String get id => sid;
+
+  late final ApparentWindSpeedGraphBackground background;
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', step: 5,
+  ranges: [
+        GaugeRange(config.controller.windSpeedFromDisplay(10), config.controller.windSpeedFromDisplay(10), Colors.green),
+        GaugeRange(config.controller.windSpeedFromDisplay(20), config.controller.windSpeedFromDisplay(20), Colors.orange),
+        GaugeRange(config.controller.windSpeedFromDisplay(30), config.controller.windSpeedFromDisplay(30), Colors.red),
+      ]) {
+        background = ApparentWindSpeedGraphBackground();
+      }
+
+  @override
+  double convert(double value) {
+    return config.controller.windSpeedToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.windSpeedUnits.unit;
   }
 }

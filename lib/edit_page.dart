@@ -12,7 +12,7 @@ class _EditPage extends StatefulWidget {
   @override
   State<_EditPage> createState() => _EditPageState();
 }
-
+// TODO need to make these menu names more consistent. Probably move labels into menu list so we can shorten names.
 final List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, 'Blank', (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, 'Help', (config) {return HelpBox(config, key: UniqueKey());}),
@@ -80,6 +80,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RateOfTurnBox.sid, 'Rate of Turn', (config) {return RateOfTurnBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchesBox.sid, 'Switches', experimental: true, (config) {return ElectricalSwitchesBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchBox.sid, 'Switch', experimental: true, (config) {return ElectricalSwitchBox(config, key: UniqueKey());}),
+  BoxDetails(ApparentWindSpeedGraph.sid, 'Wind Speed Apparent', graph: true, background: (ctrl) {ApparentWindSpeedGraphBackground(controller: ctrl);}, (config) {return ApparentWindSpeedGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -89,6 +90,9 @@ class _EditPageState extends State<_EditPage> {
     List<Widget> c = [Text(bd.description)];
     if(bd.gauge) {
       c.add(const Icon(Icons.speed));
+    }
+    if(bd.graph) {
+      c.add(const Icon(Icons.show_chart));
     }
     if(bd.experimental) {
       c.add(const Icon(Icons.science_outlined));
@@ -153,7 +157,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WindSpeedTrueBox.sid),
         _widgetMenuEntry(WindDirectionTrueBox.sid),
         _widgetMenuEntry(WindSpeedTrueBeaufortBox.sid),
-        _widgetMenuEntry(WindRoseBox.sid)]),
+        _widgetMenuEntry(WindRoseBox.sid),
+        _widgetMenuEntry(ApparentWindSpeedGraph.sid)]),
       _widgetSubMenuEntry(box, 'Autopilot', [
         _widgetMenuEntry(AutopilotStatusBox.sid),
         _widgetMenuEntry(AutopilotStateControlHorizontalBox.sid),

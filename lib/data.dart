@@ -349,10 +349,12 @@ class BoxDetails {
   final String id;
   final String description;
   final bool gauge;
+  final bool graph;
   final bool experimental;
   final BoxWidget Function(BoxWidgetConfig config) build;
+  final void Function(BoatInstrumentController controller)? background;
 
-  BoxDetails(this.id, this.description, this.build, {this.gauge = false, this.experimental = false});
+  BoxDetails(this.id, this.description, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.background});
 }
 
 BoxDetails getBoxDetails(String id) {

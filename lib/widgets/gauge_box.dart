@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -426,12 +427,243 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
     const double pad = 5.0;
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.title, style: Theme.of(context).textTheme.titleMedium))]),
-      Expanded(child: Padding(padding: const EdgeInsets.all(pad),
+      Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
           painter: _BarGaugePainter(context, minDisplay, maxDisplay, _displayStep, _displayRanges, displayValue)
       )))),
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
     ]);
+  }
+}
+
+class DataPoint {
+  final DateTime date;
+  final double value;
+
+  DataPoint(this.date, this.value);
+}
+
+class _GraphPainter extends CustomPainter {
+  final BuildContext _context;
+  final GraphBox _widget;
+  final List<DataPoint> _data;
+  final int _minutes;
+  final int _step;
+  final List<GaugeRange> _ranges;
+
+  _GraphPainter(this._context, this._widget, this._data, this._minutes, this._step, this._ranges);
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    ThemeData theme = Theme.of(_context);
+    double w = canvasSize.width;
+    double h = canvasSize.height;
+    List<double?> values = List.filled(w.toInt(), null);
+
+    if(_data.isEmpty) {
+      return;
+    }
+
+    int duration = _minutes*60*1000;
+    DateTime now = DateTime.now();
+    int slice = (duration/w).round();
+    DateTime start = now.subtract(Duration(milliseconds: duration));
+    int dp=0;
+    for(; dp<_data.length; ++dp) {
+      if(_data[dp].date.isAfter(start)) {
+        break;
+      }
+    }
+
+    double minDisplay = 0;
+    double maxDisplay = 0;
+    for(int i=0; i<values.length; ++i) {
+      double total = 0;
+      int count = 0;
+
+      DateTime end = start.add(Duration(milliseconds: slice));
+      while(dp < _data.length && _data[dp].date.isBefore(end)) {
+        total += _widget.convert(_data[dp].value);
+        ++count;
+        ++dp;
+      }
+      start = end;
+      if(count > 0) {
+        double displayValue = total/count;
+        values[i] = displayValue;
+        if(displayValue < minDisplay) minDisplay = displayValue;
+        if(displayValue > maxDisplay) maxDisplay = displayValue;
+      }
+    }
+
+    // Scale display range to the step above and below.
+    maxDisplay += _step - (maxDisplay % _step);
+    minDisplay -= (minDisplay % _step);
+
+    Paint paint = Paint()
+      ..strokeWidth = 0.0
+      ..style = PaintingStyle.fill;
+
+    double step = h/(maxDisplay - minDisplay);//TOTO these variables need better names!
+
+    double steps = (maxDisplay - minDisplay) / _step;
+    double lineStep = h / steps;
+
+    paint..color = theme.colorScheme.onSurface
+      ..strokeWidth = 0.0
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i <= steps; ++i) {
+      canvas.drawRect(Rect.fromLTWH(0, h-(lineStep*i)-1, w, 2), paint);
+    }
+
+    for(GaugeRange r in _ranges) {
+      paint.color = r.color;
+      canvas.drawRect(Rect.fromLTRB(0, h-(step*(r.max-minDisplay))-1, w, h-(step*(r.min-minDisplay))+1), paint);
+    }
+
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    try {
+      for (int i = 0; i <= steps; ++i) {
+        tp.text = TextSpan(
+            text: (i*_step+minDisplay).toInt().toString(),
+            style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
+        tp.layout();
+
+        tp.paint(canvas, Offset(5, h-(i*lineStep)-(tp.size.height/2)));
+      }
+    } finally {
+      tp.dispose();
+    }
+
+    paint
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke
+      ..color = Colors.blue;
+
+    bool first = true;
+    Path p = Path();
+    for(int i=0; i<values.length; ++i) {
+      if(values[i] != null) {
+        if(first) {
+          first = false;
+          p.moveTo(i.toDouble(), h-(step*(values[i]!-minDisplay)));
+        } else {
+          p.lineTo(i.toDouble(), h-(step*(values[i]!-minDisplay)));
+        }
+      }
+    }
+    canvas.drawPath(p, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+abstract class GraphBox extends BoxWidget {
+  final String title;
+  final int step;
+  final List<GaugeRange> ranges;
+
+  const GraphBox(super.config, this.title, 
+    {required this.step, this.ranges = const [], super.key});
+
+  List<DataPoint> get data;
+
+  double convert(double value);
+
+  String units(double value);
+
+  @override
+  createState() => GraphBoxState();
+}
+
+class GraphBoxState extends State<GraphBox> {
+  final List<GaugeRange> _displayRanges = [];
+  int _minutes = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+    
+    for(GaugeRange r in widget.ranges) {
+      _displayRanges.add(GaugeRange(widget.convert(r.min), widget.convert(r.max), r.color));
+    }
+    Timer(Duration(seconds: 1), _update);
+  }
+
+  _update() {
+    if(mounted) {
+      setState(() {});
+    }
+    Timer(Duration(seconds: 1), _update);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const double pad = 5.0;
+    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.all(pad), child: Row(children: [
+        Text('${widget.title} ${widget.units(0)} $_minutes mins', style: Theme.of(context).textTheme.titleMedium),
+        IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
+        IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
+      ])),
+      Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad, bottom: pad*2),
+        child: RepaintBoundary(child: CustomPaint(
+          size: Size.infinite,
+          painter: _GraphPainter(context, widget, widget.data, _minutes, widget.step, _displayRanges)
+      )))),
+    ]);
+  }
+
+  void _increaseTime() {
+    setState(() {
+      ++_minutes;
+    });
+  }
+
+  void _decreaseTime() {
+    setState(() {
+      --_minutes;
+    });
+  }
+}
+
+abstract class GraphBackground {
+  BoatInstrumentController? controller;
+  double? minValue;
+  double? maxValue;
+  bool smoothing;
+
+  GraphBackground(String path, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
+    controller?.configure(onUpdate: processUpdates, paths: { path }, isBox: false);
+  }
+
+  List<DataPoint> get data;
+  void addDataPoint(DataPoint dataPoint);
+  double get value;
+  set value(double value);
+
+  processUpdates(List<Update>? updates) {
+    if(updates != null) {
+      try {
+        double next =(updates[0].value as num).toDouble();
+
+        if ((minValue == null || next >= minValue!) &&
+            (maxValue == null || next <= maxValue!)) {
+          if(smoothing) {
+            value = averageDouble(value, next,
+                smooth: controller!.valueSmoothing);
+          } else {
+            value = next;
+          }
+          addDataPoint(DataPoint(DateTime.now(), value));
+        }
+      } catch (e) {
+        controller!.l.e("Error converting $updates", error: e);
+      }
+    }
   }
 }

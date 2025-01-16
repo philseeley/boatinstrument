@@ -112,6 +112,7 @@ class BoatInstrumentController {
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
   final Map<String, _NotificationStatus> _notifications = {};
+  final Set<String> _backgroundIDs = {};
 
   BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
@@ -302,6 +303,8 @@ class BoatInstrumentController {
       await _loadDefaultConfig(portrait);
     }
 
+    _configureBackgroundData();
+
     if(_noBrightnessControls) {
       _settings?.brightnessControl = false;
     }
@@ -348,6 +351,26 @@ class BoatInstrumentController {
 
   void save() {
     _settings?._save();
+    _configureBackgroundData();
+  }
+
+  void _configureBackgroundData() {
+    _backgroundIDs.clear();
+    
+    for(var page in _settings!.pages) {
+      for(var pageRow in page.pageRows) {
+        for (var column in pageRow.columns) {
+          for (var row in column.rows) {
+            _boxesOnPage += row.boxes.length;
+            for(var box in row.boxes) {
+              if(getBoxDetails(box.id).background != null) {
+                _backgroundIDs.add(box.id);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   void showMessage(BuildContext context, String msg, {bool error = false, int millisecondsDuration = 4000, SnackBarAction? action}) {
@@ -433,6 +456,9 @@ class BoatInstrumentController {
       clear();
 
       configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
+      for(var id in _backgroundIDs) {
+        getBoxDetails(id).background!.call(this);
+      }
 
       // We need to calculate the total number of boxes on the page so that we
       // know when tha last one calls configure(). As we're using LayoutBuilders
