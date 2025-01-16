@@ -41,12 +41,15 @@ Boxes marked '''),
         TextSpan(text: ''' are experimental and may not function as expected, but any feedback will be gratefully received. You must enable Experimental Boxes in the Advanced Settings.'''),
       ]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
-      const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness')),
+      const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness on supported platforms')),
       const ListTile(leading: Icon(Icons.sync_alt), title: Text('Toggles the Auto-Page rotation. Set the per-page delays in the page list. Pages without delays are not shown')),
+      const ListTile(leading: Icon(Icons.volume_off), title: Text('Un-mutes notifications')),
       const ListTile(leading: Icon(Icons.copy), title: Text('Copy/Clone a Page')),
+      const ListTile(leading: Icon(Icons.drag_handle), title: Text('Drag handle for reordering pages')),
       const ListTile(leading: Icon(Icons.share), title: Text('Shares/Exports the Settings')),
       const ListTile(leading: Icon(Icons.file_open), title: Text('Imports Settings from a file')),
       const ListTile(leading: Icon(Icons.notes), title: Text('Shows the message/error log')),
+      const ListTile(leading: Icon(Icons.change_history), title: Text('Shows the change log')),
     ];
 
     return Scaffold(
