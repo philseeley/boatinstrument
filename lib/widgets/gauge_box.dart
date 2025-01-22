@@ -3,8 +3,12 @@ import 'dart:math';
 
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
+import 'package:json_annotation/json_annotation.dart';
 
 import 'double_value_box.dart';
+
+part 'gauge_box.g.dart';
 
 class GaugeRange {
   final double min;
@@ -437,22 +441,17 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
   }
 }
 
-class DataPoint {
-  final DateTime date;
-  final double value;
-
-  DataPoint(this.date, this.value);
-}
-
 class _GraphPainter extends CustomPainter {
+  static final intl.DateFormat _dateFormat = intl.DateFormat(intl.DateFormat.HOUR24_MINUTE);
   final BuildContext _context;
   final GraphBox _widget;
   final List<DataPoint> _data;
   final int _minutes;
   final int _step;
+  final bool _zeroBase;
   final List<GaugeRange> _ranges;
 
-  _GraphPainter(this._context, this._widget, this._data, this._minutes, this._step, this._ranges);
+  _GraphPainter(this._context, this._widget, this._data, this._minutes, this._step, this._zeroBase, this._ranges);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -467,9 +466,10 @@ class _GraphPainter extends CustomPainter {
 
     int duration = _minutes*60*1000;
     int slice = (duration/w).round();
-    DateTime end = DateTime.now();
+    DateTime now = DateTime.now();
+    DateTime end = now;
 
-    double minDisplay = 0;
+    double minDisplay = _zeroBase ? 0 : double.infinity;
     double maxDisplay = 0;
     int dp=_data.length-1;
     for(int i=values.length-1; i>=0; --i) {
@@ -499,7 +499,7 @@ class _GraphPainter extends CustomPainter {
       ..strokeWidth = 0.0
       ..style = PaintingStyle.fill;
 
-    double step = h/(maxDisplay - minDisplay);//TOTO these variables need better names!
+    double hStep = h/(maxDisplay - minDisplay);
 
     double steps = (maxDisplay - minDisplay) / _step;
     double lineStep = h / steps;
@@ -514,8 +514,12 @@ class _GraphPainter extends CustomPainter {
 
     for(GaugeRange r in _ranges) {
       paint.color = r.color;
-      canvas.drawRect(Rect.fromLTRB(0, h-(step*(r.max-minDisplay))-1, w, h-(step*(r.min-minDisplay))+1), paint);
+      if(hStep*(r.max-minDisplay) <= h) {
+        canvas.drawRect(Rect.fromLTRB(0, h-(hStep*(r.max-minDisplay))-1, w, h-(hStep*(r.min-minDisplay))+1), paint);
+      }
     }
+
+    paint.color = theme.colorScheme.secondary;
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
@@ -526,7 +530,28 @@ class _GraphPainter extends CustomPainter {
         tp.layout();
 
         tp.paint(canvas, Offset(5, h-(i*lineStep)-(tp.size.height/2)));
+        tp.paint(canvas, Offset(w-5-tp.size.width, h-(i*lineStep)-(tp.size.height/2)));
       }
+
+      int minutesStep = (_minutes/4).round();
+      minutesStep = minutesStep < 1 ? 1 : minutesStep;
+      double wStep = w/_minutes;
+      for (int m = minutesStep; m < _minutes; m+=minutesStep) {
+
+        canvas.drawRect(Rect.fromLTRB(w-(m*wStep)-1, 0, w-(m*wStep)+1, h), paint);
+
+        String time = m.toString();
+        if(_minutes > 60) {
+          time = _dateFormat.format(now.subtract(Duration(minutes: m)));
+        }
+        tp.text = TextSpan(
+            text: time,
+            style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
+        tp.layout();
+
+        tp.paint(canvas, Offset(w-(m*wStep)-(tp.size.width/2), 5));
+      }
+
     } finally {
       tp.dispose();
     }
@@ -542,9 +567,9 @@ class _GraphPainter extends CustomPainter {
       if(values[i] != null) {
         if(first) {
           first = false;
-          p.moveTo(i.toDouble(), h-(step*(values[i]!-minDisplay)));
+          p.moveTo(i.toDouble(), h-(hStep*(values[i]!-minDisplay)));
         } else {
-          p.lineTo(i.toDouble(), h-(step*(values[i]!-minDisplay)));
+          p.lineTo(i.toDouble(), h-(hStep*(values[i]!-minDisplay)));
         }
       }
     }
@@ -555,13 +580,53 @@ class _GraphPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
+enum GraphDuration implements EnumMenuEntry {
+  oneMinutes('1 Minutes', 1),
+  twoMinutes('2 Minutes', 2),
+  threeMinutes('3 Minutes', 3),
+  fourMinutes('4 Minutes', 4),
+  fiveMinutes('5 Minutes', 5),
+  tenMinutes('10 Minutes', 10),
+  fifteenMinutes('15 Minutes', 15),
+  thirtyMinutes('30 Minutes', 30),
+  oneHour('1 Hour', 1*60),
+  twoHours('2 Hours', 2*60),
+  fourHours('4 Hours', 4*60),
+  sixHours('6 Hours', 6*60),
+  twelveHours('12 Hours', 12*60),
+  oneDay('1 Day', 24*60);
+
+  @override
+  String get displayName => _displayName;
+
+  final String _displayName;
+  final int minutes;
+
+  const GraphDuration(this._displayName, this.minutes);
+
+  GraphDuration operator +(int i) => GraphDuration.values[(index+i)%GraphDuration.values.length];
+  GraphDuration operator -(int i) => GraphDuration.values[(index-i)%GraphDuration.values.length];
+}
+
+@JsonSerializable()
+class _GraphSettings {
+  GraphDuration displayDuration;
+
+  _GraphSettings({this.displayDuration = GraphDuration.fifteenMinutes});
+}
+
 abstract class GraphBox extends BoxWidget {
+  late final _GraphSettings _settings;
+
   final String title;
-  final int step;
+  final double step;
+  final bool zeroBase;
   final List<GaugeRange> ranges;
 
-  const GraphBox(super.config, this.title, 
-    {required this.step, this.ranges = const [], super.key});
+  GraphBox(super.config, this.title, 
+    {required this.step, this.zeroBase = true, this.ranges = const [], super.key}) {
+    _settings = _$GraphSettingsFromJson(config.settings);
+  }
 
   List<DataPoint> get data;
 
@@ -570,12 +635,28 @@ abstract class GraphBox extends BoxWidget {
   String units(double value);
 
   @override
+  bool get hasSettings => true;
+
+  @override
+  BoxSettingsWidget? getSettingsWidget(Map<String, dynamic> json) {
+    return BackgroundDataSettingsWidget(json);
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _GraphSettingsWidget(_settings);
+  }
+
+  @override
   createState() => GraphBoxState();
 }
 
 class GraphBoxState extends State<GraphBox> {
   final List<GaugeRange> _displayRanges = [];
-  int _minutes = 5;
+  int _displayStep = 0;
 
   @override
   void initState() {
@@ -585,6 +666,9 @@ class GraphBoxState extends State<GraphBox> {
     for(GaugeRange r in widget.ranges) {
       _displayRanges.add(GaugeRange(widget.convert(r.min), widget.convert(r.max), r.color));
     }
+
+    _displayStep = widget.convert(widget.step).round();
+
     Timer(Duration(seconds: 1), _update);
   }
 
@@ -600,64 +684,64 @@ class GraphBoxState extends State<GraphBox> {
     const double pad = 5.0;
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.all(pad), child: Row(children: [
-        Text('${widget.title} ${widget.units(0)} $_minutes mins', style: Theme.of(context).textTheme.titleMedium),
+        Text('${widget.title} ${widget.units(0)} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
+        Expanded(child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
         IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
-      ])),
+    ]))])),
       Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad, bottom: pad*2),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _GraphPainter(context, widget, widget.data, _minutes, widget.step, _displayRanges)
+          painter: _GraphPainter(context, widget, widget.data, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
       )))),
     ]);
   }
 
   void _increaseTime() {
     setState(() {
-      ++_minutes;
+      widget._settings.displayDuration++;
     });
   }
 
   void _decreaseTime() {
     setState(() {
-      --_minutes;
+      widget._settings.displayDuration--;
     });
   }
 }
 
-abstract class GraphBackground {
-  BoatInstrumentController? controller;
-  double? minValue;
-  double? maxValue;
-  bool smoothing;
+class _GraphSettingsWidget extends BoxSettingsWidget {
+  final _GraphSettings _settings;
 
-  GraphBackground(String path, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
-    controller?.configure(onUpdate: processUpdates, paths: { path }, isBox: false);
+  const _GraphSettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$GraphSettingsToJson(_settings);
   }
 
-  List<DataPoint> get data;
-  void addDataPoint(DataPoint dataPoint);
-  double get value;
-  set value(double value);
+  @override
+  createState() => _SettingsState();
+}
 
-  processUpdates(List<Update>? updates) {
-    if(updates != null) {
-      try {
-        double next =(updates[0].value as num).toDouble();
+class _SettingsState extends State<_GraphSettingsWidget> {
 
-        if ((minValue == null || next >= minValue!) &&
-            (maxValue == null || next <= maxValue!)) {
-          if(smoothing) {
-            value = averageDouble(value, next,
-                smooth: controller!.valueSmoothing);
-          } else {
-            value = next;
-          }
-          addDataPoint(DataPoint(DateTime.now(), value));
-        }
-      } catch (e) {
-        controller!.l.e("Error converting $updates", error: e);
-      }
-    }
+  @override
+  Widget build(BuildContext context) {
+    _GraphSettings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+          leading: const Text("Display Duration:"),
+          title: EnumDropdownMenu(
+            GraphDuration.values,
+            s.displayDuration,
+            (v) {
+              setState(() {
+                s.displayDuration = v!;
+              });
+            })
+      ),
+    ]);
   }
 }

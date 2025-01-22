@@ -8,6 +8,8 @@ double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 String val2PS(num val) => val < 0 ? 'P' : (val > 0) ? 'S' : '';
 double revolutions2RPM(double rev) => rev * 60;
 double rpm2Revolutions(double rpm) => rpm / 60;
+double kts2ms(double kts) => kts / 1.943844;
+double ms2kts(double kts) => kts * 1.943844;
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);
@@ -723,4 +725,123 @@ enum GaugeOrientation {
   const GaugeOrientation(this.rotation, this.xm, this.ym,
       this.titleTop, this.titleBottom, this.titleLeft, this.titleRight,
       this.unitsTop, this.unitsBottom, this.unitsLeft, this.unitsRight);
+}
+
+class DataPoint {
+  final DateTime date;
+  final double value;
+
+  DataPoint(this.date, this.value);
+}
+
+enum BackgroundDataDuration implements EnumMenuEntry {
+  thirtyMinutes('30 Minutes', 30),
+  oneHour('1 Hour', 1*60),
+  twoHours('2 Hours', 2*60),
+  fourHours('4 Hours', 4*60),
+  sixHours('6 Hours', 6*60),
+  twelveHours('12 Hours', 12*60),
+  oneDay('1 Day', 24*60);
+
+  @override
+  String get displayName => _displayName;
+
+  final String _displayName;
+  final int minutes;
+
+  const BackgroundDataDuration(this._displayName, this.minutes);
+}
+
+@JsonSerializable()
+class BackgroundDataSettings {
+  BackgroundDataDuration dataDuration;
+
+  BackgroundDataSettings({this.dataDuration = BackgroundDataDuration.thirtyMinutes});
+}
+
+abstract class BackgroundData {
+  static const int dataIncrement = 1000;
+
+  BoatInstrumentController? controller;
+  late Duration duration;
+  double? minValue;
+  double? maxValue;
+  bool smoothing;
+
+  BackgroundData(String id, String path, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
+    if(controller != null) {
+      duration = Duration(minutes: _$BackgroundDataSettingsFromJson(controller!.getBoxSettingsJson(id)).dataDuration.minutes);
+
+      controller!.configure(onUpdate: processUpdates, paths: { path }, isBox: false);
+    }
+  }
+
+  CircularBuffer<DataPoint> get data;
+  set data(CircularBuffer<DataPoint> data);
+
+  double? get value;
+  set value(double? value);
+
+  processUpdates(List<Update>? updates) {
+    if(updates != null) {
+      try {
+        double next =(updates[0].value as num).toDouble();
+
+        if ((minValue == null || next >= minValue!) &&
+            (maxValue == null || next <= maxValue!)) {
+          if(smoothing) {
+            value = averageDouble(value??next, next,
+                smooth: controller!.valueSmoothing);
+          } else {
+            value = next;
+          }
+          DateTime now = DateTime.now();
+          if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
+            data = CircularBuffer<DataPoint>.of(data, data.capacity+dataIncrement);
+          }
+          data.add(DataPoint(now, value!));
+        }
+      } catch (e) {
+        controller!.l.e("Error converting $updates", error: e);
+      }
+    }
+  }
+}
+
+class BackgroundDataSettingsWidget extends BoxSettingsWidget {
+  late final BackgroundDataSettings _settings;
+
+  BackgroundDataSettingsWidget(Map<String, dynamic> json, {super.key}) {
+    _settings = _$BackgroundDataSettingsFromJson(json);
+  }
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$BackgroundDataSettingsToJson(_settings);
+  }
+
+  @override
+  createState() => _BackgroundDataSettingsState();
+}
+
+class _BackgroundDataSettingsState extends State<BackgroundDataSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    BackgroundDataSettings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+          leading: const Text("Data Duration:"),
+          title: EnumDropdownMenu(
+            BackgroundDataDuration.values,
+            s.dataDuration,
+            (v) {
+              setState(() {
+                s.dataDuration = v!;
+              });
+            })
+      ),
+    ]);
+  }
 }

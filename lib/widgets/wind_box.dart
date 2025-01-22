@@ -219,23 +219,21 @@ class WindAngleApparentBox extends DoubleValueBox {
   }
 }
 
-class ApparentWindSpeedGraphBackground extends GraphBackground {
-  static double _value = 0;
-  static final CircularBuffer<DataPoint> _data = CircularBuffer(1000);
+class ApparentWindSpeedGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, 'environment.wind.speedApparent');
-
-  @override
-  List<DataPoint> get data => _data.toList();
-  @override
-  double get value => _value;
-  @override
-  set value(double value) => _value = value;
+  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, 'environment.wind.speedApparent');
 
   @override
-  void addDataPoint(DataPoint dataPoint) {
-    _data.add(dataPoint);
-  }
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
 }
 
 class ApparentWindSpeedGraph extends GraphBox {
@@ -243,19 +241,17 @@ class ApparentWindSpeedGraph extends GraphBox {
   @override
   String get id => sid;
 
-  late final ApparentWindSpeedGraphBackground background;
+  final ApparentWindSpeedGraphBackground background = ApparentWindSpeedGraphBackground();
 
   @override
   List<DataPoint> get data => background.data;
 
-  ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', step: 5,
+  ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', step: kts2ms(5),
   ranges: [
-        GaugeRange(config.controller.windSpeedFromDisplay(10), config.controller.windSpeedFromDisplay(10), Colors.green),
-        GaugeRange(config.controller.windSpeedFromDisplay(20), config.controller.windSpeedFromDisplay(20), Colors.orange),
-        GaugeRange(config.controller.windSpeedFromDisplay(30), config.controller.windSpeedFromDisplay(30), Colors.red),
-      ]) {
-        background = ApparentWindSpeedGraphBackground();
-      }
+        GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
+        GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
+        GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
+      ]);
 
   @override
   double convert(double value) {

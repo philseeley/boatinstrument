@@ -148,21 +148,21 @@ class BoatInstrumentController {
   }
 
   double distanceToDisplay(double distance) {
-  switch (distanceUnits) {
-    case DistanceUnits.meters:
-      return distance;
-    case DistanceUnits.km:
-      return distance * 0.001;
-    case DistanceUnits.miles:
-      return distance * 0.000621371;
-    case DistanceUnits.nm:
-      return distance * 0.000539957;
-    case DistanceUnits.nmM:
-      if(distance.abs() <= m2nmThreshold) {
+    switch (distanceUnits) {
+      case DistanceUnits.meters:
         return distance;
-      } else {
+      case DistanceUnits.km:
+        return distance * 0.001;
+      case DistanceUnits.miles:
+        return distance * 0.000621371;
+      case DistanceUnits.nm:
         return distance * 0.000539957;
-      }
+      case DistanceUnits.nmM:
+        if(distance.abs() <= m2nmThreshold) {
+          return distance;
+        } else {
+          return distance * 0.000539957;
+        }
     }
   }
 
@@ -183,7 +183,7 @@ class BoatInstrumentController {
       case SpeedUnits.mph:
         return speed * 2.236936;
       case SpeedUnits.kts:
-        return speed * 1.943844;
+        return ms2kts(speed);
     }
   }
 
@@ -196,7 +196,7 @@ class BoatInstrumentController {
       case SpeedUnits.mph:
         return speed * 2.236936;
       case SpeedUnits.kts:
-        return speed * 1.943844;
+        return ms2kts(speed);
     }
   }
 
@@ -209,7 +209,7 @@ class BoatInstrumentController {
       case SpeedUnits.mph:
         return speed / 2.236936;
       case SpeedUnits.kts:
-        return speed / 1.943844;
+        return kts2ms(speed);
     }
   }
 

@@ -116,6 +116,7 @@ class _Divider extends StatelessWidget {
     ]);
   }
 }
+
 class SettingsPage extends StatefulWidget {
   final BoatInstrumentController _controller;
 
