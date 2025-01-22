@@ -1,5 +1,7 @@
 import 'dart:math' as m;
 
+import 'package:boatinstrument/widgets/gauge_box.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:format/format.dart' as fmt;
@@ -61,6 +63,46 @@ class WaterTemperatureBox extends DoubleValueBox {
   String get id => sid;
 
   const WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature');
+
+  @override
+  double convert(double value) {
+    return config.controller.temperatureToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+}
+
+class WaterTemperatureGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  WaterTemperatureGraphBackground({controller}) : super(controller: controller, WaterTemperatureGraph.sid, 'environment.water.temperature');
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class WaterTemperatureGraph extends GraphBox {
+  static const String sid = 'environment-water-temperature-graph';
+  @override
+  String get id => sid;
+
+  final WaterTemperatureGraphBackground background = WaterTemperatureGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  WaterTemperatureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Water Temp', step: 1+kelvinOffset, zeroBase: false);
 
   @override
   double convert(double value) {

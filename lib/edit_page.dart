@@ -81,6 +81,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(ElectricalSwitchesBox.sid, 'Switches', experimental: true, (config) {return ElectricalSwitchesBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchBox.sid, 'Switch', experimental: true, (config) {return ElectricalSwitchBox(config, key: UniqueKey());}),
   BoxDetails(ApparentWindSpeedGraph.sid, 'Wind Speed Apparent', graph: true, background: (ctrl) {ApparentWindSpeedGraphBackground(controller: ctrl);}, (config) {return ApparentWindSpeedGraph(config, key: UniqueKey());}),
+  BoxDetails(WaterTemperatureGraph.sid, 'Water Temperature', graph: true, background: (ctrl) {WaterTemperatureGraphBackground(controller: ctrl);}, (config) {return WaterTemperatureGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -128,6 +129,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(DepthBelowTransducerBox.sid),
         _widgetMenuEntry(SetAndDriftBox.sid),
         _widgetMenuEntry(WaterTemperatureBox.sid),
+        _widgetMenuEntry(WaterTemperatureGraph.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
         _widgetMenuEntry(OutsidePressureBox.sid),
         _widgetMenuEntry(OutsideHumidityBox.sid),
@@ -153,12 +155,12 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AttitudeRollGaugeBox.sid)]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
+        _widgetMenuEntry(ApparentWindSpeedGraph.sid),
         _widgetMenuEntry(WindAngleApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
         _widgetMenuEntry(WindDirectionTrueBox.sid),
         _widgetMenuEntry(WindSpeedTrueBeaufortBox.sid),
-        _widgetMenuEntry(WindRoseBox.sid),
-        _widgetMenuEntry(ApparentWindSpeedGraph.sid)]),
+        _widgetMenuEntry(WindRoseBox.sid)]),
       _widgetSubMenuEntry(box, 'Autopilot', [
         _widgetMenuEntry(AutopilotStatusBox.sid),
         _widgetMenuEntry(AutopilotStateControlHorizontalBox.sid),
