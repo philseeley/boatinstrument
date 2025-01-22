@@ -466,29 +466,23 @@ class _GraphPainter extends CustomPainter {
     }
 
     int duration = _minutes*60*1000;
-    DateTime now = DateTime.now();
     int slice = (duration/w).round();
-    DateTime start = now.subtract(Duration(milliseconds: duration));
-    int dp=0;
-    for(; dp<_data.length; ++dp) {
-      if(_data[dp].date.isAfter(start)) {
-        break;
-      }
-    }
+    DateTime end = DateTime.now();
 
     double minDisplay = 0;
     double maxDisplay = 0;
-    for(int i=0; i<values.length; ++i) {
+    int dp=_data.length-1;
+    for(int i=values.length-1; i>=0; --i) {
       double total = 0;
       int count = 0;
 
-      DateTime end = start.add(Duration(milliseconds: slice));
-      while(dp < _data.length && _data[dp].date.isBefore(end)) {
+      DateTime start = end.subtract(Duration(milliseconds: slice));
+      while(dp >= 0 && _data[dp].date.isAfter(start)) {
         total += _widget.convert(_data[dp].value);
         ++count;
-        ++dp;
+        --dp;
       }
-      start = end;
+      end = start;
       if(count > 0) {
         double displayValue = total/count;
         values[i] = displayValue;
