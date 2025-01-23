@@ -80,7 +80,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RateOfTurnBox.sid, 'Rate of Turn', (config) {return RateOfTurnBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchesBox.sid, 'Switches', experimental: true, (config) {return ElectricalSwitchesBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchBox.sid, 'Switch', experimental: true, (config) {return ElectricalSwitchBox(config, key: UniqueKey());}),
-  BoxDetails(ApparentWindSpeedGraph.sid, 'Wind Speed Apparent', graph: true, background: (ctrl) {ApparentWindSpeedGraphBackground(controller: ctrl);}, (config) {return ApparentWindSpeedGraph(config, key: UniqueKey());}),
+  BoxDetails(TrueWindSpeedGraph.sid, 'Wind Speed True', graph: true, background: (ctrl) {TrueWindSpeedGraphBackground(controller: ctrl);}, (config) {return TrueWindSpeedGraph(config, key: UniqueKey());}),
   BoxDetails(WaterTemperatureGraph.sid, 'Water Temperature', graph: true, background: (ctrl) {WaterTemperatureGraphBackground(controller: ctrl);}, (config) {return WaterTemperatureGraph(config, key: UniqueKey());}),
 ];
 
@@ -155,9 +155,9 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(AttitudeRollGaugeBox.sid)]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
-        _widgetMenuEntry(ApparentWindSpeedGraph.sid),
         _widgetMenuEntry(WindAngleApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
+        _widgetMenuEntry(TrueWindSpeedGraph.sid),
         _widgetMenuEntry(WindDirectionTrueBox.sid),
         _widgetMenuEntry(WindSpeedTrueBeaufortBox.sid),
         _widgetMenuEntry(WindRoseBox.sid)]),
