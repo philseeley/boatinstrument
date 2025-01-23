@@ -112,6 +112,7 @@ class BoatInstrumentController {
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
   final Map<String, _NotificationStatus> _notifications = {};
+  final Set<String> _backgroundIDs = {};
 
   BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
@@ -147,21 +148,21 @@ class BoatInstrumentController {
   }
 
   double distanceToDisplay(double distance) {
-  switch (distanceUnits) {
-    case DistanceUnits.meters:
-      return distance;
-    case DistanceUnits.km:
-      return distance * 0.001;
-    case DistanceUnits.miles:
-      return distance * 0.000621371;
-    case DistanceUnits.nm:
-      return distance * 0.000539957;
-    case DistanceUnits.nmM:
-      if(distance.abs() <= m2nmThreshold) {
+    switch (distanceUnits) {
+      case DistanceUnits.meters:
         return distance;
-      } else {
+      case DistanceUnits.km:
+        return distance * 0.001;
+      case DistanceUnits.miles:
+        return distance * 0.000621371;
+      case DistanceUnits.nm:
         return distance * 0.000539957;
-      }
+      case DistanceUnits.nmM:
+        if(distance.abs() <= m2nmThreshold) {
+          return distance;
+        } else {
+          return distance * 0.000539957;
+        }
     }
   }
 
@@ -182,7 +183,7 @@ class BoatInstrumentController {
       case SpeedUnits.mph:
         return speed * 2.236936;
       case SpeedUnits.kts:
-        return speed * 1.943844;
+        return ms2kts(speed);
     }
   }
 
@@ -195,7 +196,7 @@ class BoatInstrumentController {
       case SpeedUnits.mph:
         return speed * 2.236936;
       case SpeedUnits.kts:
-        return speed * 1.943844;
+        return ms2kts(speed);
     }
   }
 
@@ -208,7 +209,7 @@ class BoatInstrumentController {
       case SpeedUnits.mph:
         return speed / 2.236936;
       case SpeedUnits.kts:
-        return speed / 1.943844;
+        return kts2ms(speed);
     }
   }
 
@@ -302,6 +303,8 @@ class BoatInstrumentController {
       await _loadDefaultConfig(portrait);
     }
 
+    _configureBackgroundData();
+
     if(_noBrightnessControls) {
       _settings?.brightnessControl = false;
     }
@@ -348,6 +351,26 @@ class BoatInstrumentController {
 
   void save() {
     _settings?._save();
+    _configureBackgroundData();
+  }
+
+  void _configureBackgroundData() {
+    _backgroundIDs.clear();
+    
+    for(var page in _settings!.pages) {
+      for(var pageRow in page.pageRows) {
+        for (var column in pageRow.columns) {
+          for (var row in column.rows) {
+            _boxesOnPage += row.boxes.length;
+            for(var box in row.boxes) {
+              if(getBoxDetails(box.id).background != null) {
+                _backgroundIDs.add(box.id);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   void showMessage(BuildContext context, String msg, {bool error = false, int millisecondsDuration = 4000, SnackBarAction? action}) {
@@ -433,6 +456,9 @@ class BoatInstrumentController {
       clear();
 
       configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
+      for(var id in _backgroundIDs) {
+        getBoxDetails(id).background!.call(this);
+      }
 
       // We need to calculate the total number of boxes on the page so that we
       // know when tha last one calls configure(). As we're using LayoutBuilders

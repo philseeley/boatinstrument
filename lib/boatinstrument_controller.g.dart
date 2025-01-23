@@ -206,3 +206,27 @@ const _$PortStarboardColorsEnumMap = {
   PortStarboardColors.redBlue: 'redBlue',
   PortStarboardColors.orangeYellow: 'orangeYellow',
 };
+
+BackgroundDataSettings _$BackgroundDataSettingsFromJson(
+        Map<String, dynamic> json) =>
+    BackgroundDataSettings(
+      dataDuration: $enumDecodeNullable(
+              _$BackgroundDataDurationEnumMap, json['dataDuration']) ??
+          BackgroundDataDuration.thirtyMinutes,
+    );
+
+Map<String, dynamic> _$BackgroundDataSettingsToJson(
+        BackgroundDataSettings instance) =>
+    <String, dynamic>{
+      'dataDuration': _$BackgroundDataDurationEnumMap[instance.dataDuration]!,
+    };
+
+const _$BackgroundDataDurationEnumMap = {
+  BackgroundDataDuration.thirtyMinutes: 'thirtyMinutes',
+  BackgroundDataDuration.oneHour: 'oneHour',
+  BackgroundDataDuration.twoHours: 'twoHours',
+  BackgroundDataDuration.fourHours: 'fourHours',
+  BackgroundDataDuration.sixHours: 'sixHours',
+  BackgroundDataDuration.twelveHours: 'twelveHours',
+  BackgroundDataDuration.oneDay: 'oneDay',
+};

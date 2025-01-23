@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:boatinstrument/widgets/gauge_box.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -214,5 +216,50 @@ class WindAngleApparentBox extends DoubleValueBox {
   @override
   String units(double value) {
     return degreesUnits;
+  }
+}
+
+class TrueWindSpeedGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  TrueWindSpeedGraphBackground({controller}) : super(controller: controller, TrueWindSpeedGraph.sid, 'environment.wind.speedTrue');
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class TrueWindSpeedGraph extends GraphBox {
+  static const String sid = 'wind-speed-true-graph';
+  @override
+  String get id => sid;
+
+  final TrueWindSpeedGraphBackground background = TrueWindSpeedGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  TrueWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'TWS', step: kts2ms(5),
+  ranges: [
+        GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
+        GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
+        GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
+      ]);
+
+  @override
+  double convert(double value) {
+    return config.controller.windSpeedToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.windSpeedUnits.unit;
   }
 }
