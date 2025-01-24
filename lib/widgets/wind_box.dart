@@ -263,3 +263,48 @@ class TrueWindSpeedGraph extends GraphBox {
     return config.controller.windSpeedUnits.unit;
   }
 }
+
+class ApparentWindSpeedGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, 'environment.wind.speedApparent');
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class ApparentWindSpeedGraph extends GraphBox {
+  static const String sid = 'wind-speed-apparent-graph';
+  @override
+  String get id => sid;
+
+  final ApparentWindSpeedGraphBackground background = ApparentWindSpeedGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', step: kts2ms(5),
+  ranges: [
+        GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
+        GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
+        GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
+      ]);
+
+  @override
+  double convert(double value) {
+    return config.controller.windSpeedToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.windSpeedUnits.unit;
+  }
+}

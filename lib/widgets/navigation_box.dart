@@ -1,5 +1,6 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 // import 'package:great_circle_distance_calculator/great_circle_distance_calculator.dart';
 import 'package:intl/intl.dart';
@@ -115,6 +116,46 @@ class SpeedOverGroundBox extends SpeedBox {
   String get id => sid;
 
   const SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+}
+
+class SpeedOverGroundGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  SpeedOverGroundGraphBackground({controller}) : super(controller: controller, SpeedOverGroundGraph.sid, 'navigation.speedOverGround');
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class SpeedOverGroundGraph extends GraphBox {
+  static const String sid = 'navigation-speed-over-ground-graph';
+  @override
+  String get id => sid;
+
+  final SpeedOverGroundGraphBackground background = SpeedOverGroundGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  SpeedOverGroundGraph(BoxWidgetConfig config, {super.key}) : super(config, 'SOG', step: kts2ms(1), zeroBase: false);
+
+  @override
+  double convert(double value) {
+    return config.controller.speedToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.speedUnits.unit;
+  }
 }
 
 class HeadingBox extends DoubleValueBox {

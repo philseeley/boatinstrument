@@ -81,7 +81,10 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(ElectricalSwitchesBox.sid, 'Switches', experimental: true, (config) {return ElectricalSwitchesBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchBox.sid, 'Switch', experimental: true, (config) {return ElectricalSwitchBox(config, key: UniqueKey());}),
   BoxDetails(TrueWindSpeedGraph.sid, 'Wind Speed True', graph: true, background: (ctrl) {TrueWindSpeedGraphBackground(controller: ctrl);}, (config) {return TrueWindSpeedGraph(config, key: UniqueKey());}),
+  BoxDetails(ApparentWindSpeedGraph.sid, 'Wind Speed Apparent', graph: true, background: (ctrl) {ApparentWindSpeedGraphBackground(controller: ctrl);}, (config) {return ApparentWindSpeedGraph(config, key: UniqueKey());}),
   BoxDetails(WaterTemperatureGraph.sid, 'Water Temperature', graph: true, background: (ctrl) {WaterTemperatureGraphBackground(controller: ctrl);}, (config) {return WaterTemperatureGraph(config, key: UniqueKey());}),
+  BoxDetails(SpeedThroughWaterGraph.sid, 'Speed Through Water', graph: true, background: (ctrl) {SpeedThroughWaterGraphBackground(controller: ctrl);}, (config) {return SpeedThroughWaterGraph(config, key: UniqueKey());}),
+  BoxDetails(SpeedOverGroundGraph.sid, 'Speed Over Ground', graph: true, background: (ctrl) {SpeedOverGroundGraphBackground(controller: ctrl);}, (config) {return SpeedOverGroundGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -139,6 +142,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
+        _widgetMenuEntry(SpeedOverGroundGraph.sid),
         _widgetMenuEntry(HeadingBox.sid),
         _widgetMenuEntry(NextPointDistanceBox.sid),
         _widgetMenuEntry(NextPointVelocityMadeGoodBox.sid),
@@ -151,10 +155,12 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(MagneticVariationBox.sid)]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedThroughWaterBox.sid),
+        _widgetMenuEntry(SpeedThroughWaterGraph.sid),
         _widgetMenuEntry(RudderAngleBox.sid),
         _widgetMenuEntry(AttitudeRollGaugeBox.sid)]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
+        _widgetMenuEntry(ApparentWindSpeedGraph.sid),
         _widgetMenuEntry(WindAngleApparentBox.sid),
         _widgetMenuEntry(WindSpeedTrueBox.sid),
         _widgetMenuEntry(TrueWindSpeedGraph.sid),
