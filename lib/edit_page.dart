@@ -86,6 +86,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(SpeedThroughWaterGraph.sid, 'Speed Through Water', graph: true, experimental: true, background: (ctrl) {SpeedThroughWaterGraphBackground(controller: ctrl);}, (config) {return SpeedThroughWaterGraph(config, key: UniqueKey());}),
   BoxDetails(SpeedOverGroundGraph.sid, 'Speed Over Ground', graph: true, experimental: true, background: (ctrl) {SpeedOverGroundGraphBackground(controller: ctrl);}, (config) {return SpeedOverGroundGraph(config, key: UniqueKey());}),
   BoxDetails(OutsidePressureGraph.sid, 'Outside Pressure', graph: true, experimental: true, background: (ctrl) {OutsidePressureGraphBackground(controller: ctrl);}, (config) {return OutsidePressureGraph(config, key: UniqueKey());}),
+  BoxDetails(OutsideTemperatureGraph.sid, 'Outside Temperature', graph: true, experimental: true, background: (ctrl) {OutsideTemperatureGraphBackground(controller: ctrl);}, (config) {return OutsideTemperatureGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -135,6 +136,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(WaterTemperatureGraph.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
+        _widgetMenuEntry(OutsideTemperatureGraph.sid),
         _widgetMenuEntry(OutsidePressureBox.sid),
         _widgetMenuEntry(OutsidePressureGraph.sid),
         _widgetMenuEntry(OutsideHumidityBox.sid),

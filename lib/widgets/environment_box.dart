@@ -241,6 +241,46 @@ class OutsideTemperatureBox extends DoubleValueBox {
   }
 }
 
+class OutsideTemperatureGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  OutsideTemperatureGraphBackground({controller}) : super(controller: controller, OutsideTemperatureGraph.sid, 'environment.outside.temperature');
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class OutsideTemperatureGraph extends GraphBox {
+  static const String sid = 'environment-outside-temperature-graph';
+  @override
+  String get id => sid;
+
+  final OutsideTemperatureGraphBackground background = OutsideTemperatureGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  OutsideTemperatureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Outside Temp', step: 1+kelvinOffset, zeroBase: false);
+
+  @override
+  double convert(double value) {
+    return config.controller.temperatureToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+}
+
 class OutsidePressureBox extends DoubleValueBox {
   static const String sid = 'environment-outside-pressure';
   @override
