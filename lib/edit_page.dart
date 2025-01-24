@@ -87,6 +87,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(SpeedOverGroundGraph.sid, 'Speed Over Ground', graph: true, experimental: true, background: (ctrl) {SpeedOverGroundGraphBackground(controller: ctrl);}, (config) {return SpeedOverGroundGraph(config, key: UniqueKey());}),
   BoxDetails(OutsidePressureGraph.sid, 'Outside Pressure', graph: true, experimental: true, background: (ctrl) {OutsidePressureGraphBackground(controller: ctrl);}, (config) {return OutsidePressureGraph(config, key: UniqueKey());}),
   BoxDetails(OutsideTemperatureGraph.sid, 'Outside Temperature', graph: true, experimental: true, background: (ctrl) {OutsideTemperatureGraphBackground(controller: ctrl);}, (config) {return OutsideTemperatureGraph(config, key: UniqueKey());}),
+  BoxDetails(VNCBox.sid, 'VNC', experimental: true, (config) {return VNCBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -205,6 +206,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetMenuEntry(AnchorAlarmBox.sid),
       _widgetMenuEntry(WebViewBox.sid),
+      _widgetMenuEntry(VNCBox.sid),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomTextBox.sid),
         _widgetMenuEntry(CustomDoubleValueBox.sid),
