@@ -80,11 +80,12 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RateOfTurnBox.sid, 'Rate of Turn', (config) {return RateOfTurnBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchesBox.sid, 'Switches', experimental: true, (config) {return ElectricalSwitchesBox(config, key: UniqueKey());}),
   BoxDetails(ElectricalSwitchBox.sid, 'Switch', experimental: true, (config) {return ElectricalSwitchBox(config, key: UniqueKey());}),
-  BoxDetails(TrueWindSpeedGraph.sid, 'Wind Speed True', graph: true, background: (ctrl) {TrueWindSpeedGraphBackground(controller: ctrl);}, (config) {return TrueWindSpeedGraph(config, key: UniqueKey());}),
-  BoxDetails(ApparentWindSpeedGraph.sid, 'Wind Speed Apparent', graph: true, background: (ctrl) {ApparentWindSpeedGraphBackground(controller: ctrl);}, (config) {return ApparentWindSpeedGraph(config, key: UniqueKey());}),
-  BoxDetails(WaterTemperatureGraph.sid, 'Water Temperature', graph: true, background: (ctrl) {WaterTemperatureGraphBackground(controller: ctrl);}, (config) {return WaterTemperatureGraph(config, key: UniqueKey());}),
-  BoxDetails(SpeedThroughWaterGraph.sid, 'Speed Through Water', graph: true, background: (ctrl) {SpeedThroughWaterGraphBackground(controller: ctrl);}, (config) {return SpeedThroughWaterGraph(config, key: UniqueKey());}),
-  BoxDetails(SpeedOverGroundGraph.sid, 'Speed Over Ground', graph: true, background: (ctrl) {SpeedOverGroundGraphBackground(controller: ctrl);}, (config) {return SpeedOverGroundGraph(config, key: UniqueKey());}),
+  BoxDetails(TrueWindSpeedGraph.sid, 'Wind Speed True', graph: true, experimental: true, background: (ctrl) {TrueWindSpeedGraphBackground(controller: ctrl);}, (config) {return TrueWindSpeedGraph(config, key: UniqueKey());}),
+  BoxDetails(ApparentWindSpeedGraph.sid, 'Wind Speed Apparent', graph: true, experimental: true, background: (ctrl) {ApparentWindSpeedGraphBackground(controller: ctrl);}, (config) {return ApparentWindSpeedGraph(config, key: UniqueKey());}),
+  BoxDetails(WaterTemperatureGraph.sid, 'Water Temperature', graph: true, experimental: true, background: (ctrl) {WaterTemperatureGraphBackground(controller: ctrl);}, (config) {return WaterTemperatureGraph(config, key: UniqueKey());}),
+  BoxDetails(SpeedThroughWaterGraph.sid, 'Speed Through Water', graph: true, experimental: true, background: (ctrl) {SpeedThroughWaterGraphBackground(controller: ctrl);}, (config) {return SpeedThroughWaterGraph(config, key: UniqueKey());}),
+  BoxDetails(SpeedOverGroundGraph.sid, 'Speed Over Ground', graph: true, experimental: true, background: (ctrl) {SpeedOverGroundGraphBackground(controller: ctrl);}, (config) {return SpeedOverGroundGraph(config, key: UniqueKey());}),
+  BoxDetails(OutsidePressureGraph.sid, 'Outside Pressure', graph: true, experimental: true, background: (ctrl) {OutsidePressureGraphBackground(controller: ctrl);}, (config) {return OutsidePressureGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -135,6 +136,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WaterTemperatureGraph.sid),
         _widgetMenuEntry(OutsideTemperatureBox.sid),
         _widgetMenuEntry(OutsidePressureBox.sid),
+        _widgetMenuEntry(OutsidePressureGraph.sid),
         _widgetMenuEntry(OutsideHumidityBox.sid),
         _widgetMenuEntry(InsideHumidityBox.sid),
         _widgetMenuEntry(SunlightBox.sid),
