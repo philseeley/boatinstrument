@@ -5,6 +5,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:json_annotation/json_annotation.dart';
+import 'package:format/format.dart' as fmt;
 
 import 'double_value_box.dart';
 
@@ -621,10 +622,12 @@ abstract class GraphBox extends BoxWidget {
   final String title;
   final double step;
   final bool zeroBase;
+  final int precision;
+  final int minLen;
   final List<GaugeRange> ranges;
 
   GraphBox(super.config, this.title, 
-    {required this.step, this.zeroBase = true, this.ranges = const [], super.key}) {
+    {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.ranges = const [], super.key}) {
     _settings = _$GraphSettingsFromJson(config.settings);
   }
 
@@ -682,13 +685,20 @@ class GraphBoxState extends State<GraphBox> {
   @override
   Widget build(BuildContext context) {
     const double pad = 5.0;
+    double currentValue = widget.data.lastOrNull?.value??0;
+    double displayValue = widget.convert(currentValue);
+    String currentValueString =
+          fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f} ${widget.units(currentValue)}', displayValue);
+
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.all(pad), child: Row(children: [
-        Text('${widget.title} ${widget.units(0)} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
+        Text('${widget.title} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
         Expanded(child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
-        IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
-    ]))])),
+          Expanded(child: Text(currentValueString, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium)),
+          IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
+          IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
+        ]))
+      ])),
       Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad, bottom: pad*2),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
