@@ -673,7 +673,7 @@ class GraphBoxState extends State<GraphBox> {
 
     _displayStep = widget.convert(widget.step).round();
 
-    _updateTimer = Timer(Duration(seconds: 1), _update);
+    _update();
   }
 
   @override
