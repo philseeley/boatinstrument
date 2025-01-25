@@ -551,6 +551,7 @@ class _GraphPainter extends CustomPainter {
         tp.layout();
 
         tp.paint(canvas, Offset(w-(m*wStep)-(tp.size.width/2), 5));
+        tp.paint(canvas, Offset(w-(m*wStep)-(tp.size.width/2), h-tp.size.height-5));
       }
 
     } finally {
