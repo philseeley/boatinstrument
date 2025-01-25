@@ -372,6 +372,12 @@ class _WindRoseBoxState extends State<WindRoseBox> {
   }
 
   @override
+  void dispose() {
+    _autoTimer?.cancel();
+    super.dispose();
+  }
+  
+  @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
       _windAngleApparent = deg2Rad(123);

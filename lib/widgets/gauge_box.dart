@@ -660,6 +660,7 @@ abstract class GraphBox extends BoxWidget {
 class GraphBoxState extends State<GraphBox> {
   final List<GaugeRange> _displayRanges = [];
   int _displayStep = 0;
+  Timer? _updateTimer;
 
   @override
   void initState() {
@@ -672,14 +673,20 @@ class GraphBoxState extends State<GraphBox> {
 
     _displayStep = widget.convert(widget.step).round();
 
-    Timer(Duration(seconds: 1), _update);
+    _updateTimer = Timer(Duration(seconds: 1), _update);
+  }
+
+  @override
+  void dispose() {
+    _updateTimer?.cancel();
+    super.dispose();
   }
 
   _update() {
     if(mounted) {
       setState(() {});
     }
-    Timer(Duration(seconds: 1), _update);
+    _updateTimer = Timer(Duration(seconds: 1), _update);
   }
 
   @override
