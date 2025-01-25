@@ -58,7 +58,9 @@ class _VNCBoxState extends State<VNCBox> {
         hostName: widget._settings.host,
         port: widget._settings.port,
         onError: (final Object e) {
-          widget.config.controller.showMessage(context, 'Error connecting to ${widget._settings.host}:${widget._settings.port} $e', error: true);
+          String msg = 'Error connecting to ${widget._settings.host}:${widget._settings.port}';
+          widget.config.controller.l.e(msg, error: e);
+          widget.config.controller.showMessage(context, '$msg $e', error: true);
         },
         password: widget._settings.password
       ))
