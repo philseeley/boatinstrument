@@ -28,6 +28,46 @@ class CrossTrackErrorBox extends DoubleValueBox {
   }
 }
 
+class CrossTrackErrorGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, 'navigation.*.crossTrackError');
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class CrossTrackErrorGraph extends GraphBox {
+  static const String sid = 'navigation-xte-graph';
+  @override
+  String get id => sid;
+
+  final CrossTrackErrorGraphBackground background = CrossTrackErrorGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  CrossTrackErrorGraph(BoxWidgetConfig config, {super.key}) : super(config, 'XTE', step: nm2m(1), precision: 2, zeroBase: false, vertical: true);
+
+  @override
+  double convert(double value) {
+    return config.controller.distanceToDisplay(value, fixed: true);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.distanceUnitsToDisplay(value, fixed: true);
+  }
+}
+
 class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
   static const String sid = 'navigation-xte-delta';
   @override
@@ -210,7 +250,6 @@ abstract class TimeToGoBox extends BoxWidget {
 
   @override
   State<TimeToGoBox> createState() => TimeToGoBoxState();
-
 }
 
 class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {

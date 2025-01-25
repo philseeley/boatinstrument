@@ -11,6 +11,8 @@ double rpm2Revolutions(double rpm) => rpm / 60;
 double kts2ms(double kts) => kts / 1.943844;
 double ms2kts(double kts) => kts * 1.943844;
 double millibar2pascal (double millibar) => millibar / 0.01;
+double nm2m (double nm) => nm / 0.000539957;
+double m2nm (double m) => m * 0.000539957;
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);

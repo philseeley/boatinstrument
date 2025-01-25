@@ -148,7 +148,7 @@ class BoatInstrumentController {
     return val < 0 ? _settings!.portStarboardColors.portColor : (val > 0) ? _settings!.portStarboardColors.starboardColor : Theme.of(context).colorScheme.onSurface;
   }
 
-  double distanceToDisplay(double distance) {
+  double distanceToDisplay(double distance, {bool fixed = false}) {
     switch (distanceUnits) {
       case DistanceUnits.meters:
         return distance;
@@ -157,18 +157,18 @@ class BoatInstrumentController {
       case DistanceUnits.miles:
         return distance * 0.000621371;
       case DistanceUnits.nm:
-        return distance * 0.000539957;
+        return m2nm(distance);
       case DistanceUnits.nmM:
-        if(distance.abs() <= m2nmThreshold) {
+        if(!fixed && distance.abs() <= m2nmThreshold) {
           return distance;
         } else {
-          return distance * 0.000539957;
+          return m2nm(distance);
         }
     }
   }
 
-  String distanceUnitsToDisplay(double distance) {
-    if(distanceUnits == DistanceUnits.nmM &&
+  String distanceUnitsToDisplay(double distance, {bool fixed = false}) {
+    if(!fixed && distanceUnits == DistanceUnits.nmM &&
         distance.abs() <= m2nmThreshold) {
       return 'm';
     }

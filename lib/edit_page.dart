@@ -88,6 +88,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsidePressureGraph.sid, 'Outside Pressure', graph: true, experimental: true, background: (ctrl) {OutsidePressureGraphBackground(controller: ctrl);}, (config) {return OutsidePressureGraph(config, key: UniqueKey());}),
   BoxDetails(OutsideTemperatureGraph.sid, 'Outside Temperature', graph: true, experimental: true, background: (ctrl) {OutsideTemperatureGraphBackground(controller: ctrl);}, (config) {return OutsideTemperatureGraph(config, key: UniqueKey());}),
   BoxDetails(VNCBox.sid, 'VNC', experimental: true, (config) {return VNCBox(config, key: UniqueKey());}),
+  BoxDetails(CrossTrackErrorGraph.sid, 'Cross Track Error', graph: true, experimental: true, background: (ctrl) {CrossTrackErrorGraphBackground(controller: ctrl);}, (config) {return CrossTrackErrorGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -154,6 +155,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(WaypointTimeToGoBox.sid),
         // _widgetMenuEntry(RouteTimeToGoBox.sid),
         _widgetMenuEntry(CrossTrackErrorBox.sid),
+        _widgetMenuEntry(CrossTrackErrorGraph.sid),
         _widgetMenuEntry(CrossTrackErrorDeltaBox.sid),
         _widgetMenuEntry(PositionBox.sid),
         _widgetMenuEntry(RateOfTurnBox.sid),
