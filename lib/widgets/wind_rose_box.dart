@@ -28,6 +28,7 @@ class _Settings {
   int autoSwitchingDelay;
   bool showSpeeds;
   bool showTrueWind;
+  bool maximizeSpeedBoxes;
 
   _Settings({
     this.type = WindRoseType.normal,
@@ -35,7 +36,8 @@ class _Settings {
     this.showButton = false,
     this.autoSwitchingDelay = 15,
     this.showSpeeds = true,
-    this.showTrueWind = true
+    this.showTrueWind = true,
+    this.maximizeSpeedBoxes = false
   });
 }
 
@@ -141,11 +143,12 @@ class _SpeedPainter extends CustomPainter {
   final BuildContext _context;
   final bool _close;
   final bool _showTrueWind;
+  final bool _maximizeSpeedBoxes;
   final double _apparentDirection;
   final double? _apparentSpeed;
   final double? _trueSpeed;
 
-  _SpeedPainter(this._controller, this._context, WindRoseType type, this._showTrueWind, this._apparentDirection, this._apparentSpeed, this._trueSpeed) : _close = type == WindRoseType.closeHaul;
+  _SpeedPainter(this._controller, this._context, WindRoseType type, this._showTrueWind, this._maximizeSpeedBoxes, this._apparentDirection, this._apparentSpeed, this._trueSpeed) : _close = type == WindRoseType.closeHaul;
 
   void _calcSpeedLoc (double centre, double speedSize) {
     switch (_orientation) {
@@ -195,7 +198,8 @@ class _SpeedPainter extends CustomPainter {
     if(_showTrueWind) {
       speedSize = sqrt(((centre-style.fontSize!-_hubWidth)*(centre-style.fontSize!-_hubWidth))/2);
     }
-    
+    if(_maximizeSpeedBoxes) speedSize = centre-_hubWidth;
+
     switch (_orientation) {
       case null:
         _orientation = GaugeOrientation.down;
@@ -411,7 +415,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     }
 
     if(widget._settings.showSpeeds) {
-      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, _displayType, widget._settings.showTrueWind, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
+      stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, _displayType, widget._settings.showTrueWind, widget._settings.maximizeSpeedBoxes, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
     }
 
     if(_windAngleApparent != null) {
@@ -526,6 +530,13 @@ class _SettingsState extends State<_SettingsWidget> {
           onChanged: (bool value) {
             setState(() {
               s.showSpeeds = value;
+            });
+          }),
+      SwitchListTile(title: const Text("Maximize Speed Boxes:"),
+          value: s.maximizeSpeedBoxes,
+          onChanged: (bool value) {
+            setState(() {
+              s.maximizeSpeedBoxes = value;
             });
           }),
       SwitchListTile(title: const Text("Show Labels:"),

@@ -14,6 +14,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       autoSwitchingDelay: (json['autoSwitchingDelay'] as num?)?.toInt() ?? 15,
       showSpeeds: json['showSpeeds'] as bool? ?? true,
       showTrueWind: json['showTrueWind'] as bool? ?? true,
+      maximizeSpeedBoxes: json['maximizeSpeedBoxes'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
@@ -23,6 +24,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'autoSwitchingDelay': instance.autoSwitchingDelay,
       'showSpeeds': instance.showSpeeds,
       'showTrueWind': instance.showTrueWind,
+      'maximizeSpeedBoxes': instance.maximizeSpeedBoxes,
     };
 
 const _$WindRoseTypeEnumMap = {
