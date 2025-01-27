@@ -62,7 +62,7 @@ class _VNCBoxState extends State<VNCBox> {
           widget.config.controller.l.e(msg, error: e);
           widget.config.controller.showMessage(context, '$msg $e', error: true);
         },
-        password: widget._settings.password
+        password: widget._settings.password.isEmpty ? null : widget._settings.password
       ))
     ]);
   }
