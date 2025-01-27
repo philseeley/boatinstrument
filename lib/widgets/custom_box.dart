@@ -27,6 +27,7 @@ class _CustomSettings {
   double multiplier;
   double step;
   bool portStarboard;
+  bool dataTimeout;
 
   _CustomSettings({
     this.title = 'title',
@@ -40,7 +41,8 @@ class _CustomSettings {
     this.units = 'units',
     this.multiplier = 1,
     this.step = 1,
-    this.portStarboard = false
+    this.portStarboard = false,
+    this.dataTimeout = true
   });
 }
 
@@ -49,11 +51,11 @@ class CustomDoubleValueBox extends DoubleValueBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.key});
+  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.dataTimeout, super.key});
 
   factory CustomDoubleValueBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, key: key);
+    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, dataTimeout: s.dataTimeout, key: key);
   }
 
   static String sid = 'custom-double-value';
@@ -84,11 +86,11 @@ class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.step, super.angle, super.smoothing, super.key});
+  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.step, super.angle, super.smoothing, super.dataTimeout, super.key});
 
   factory CustomDoubleValueSemiGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, angle: s.angle, smoothing: s.smoothing, key: key);
+    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, angle: s.angle, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
   }
 
   static String sid = 'custom-gauge-semi';
@@ -119,11 +121,11 @@ class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueCircularGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.key});
+  const CustomDoubleValueCircularGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.key});
 
   factory CustomDoubleValueCircularGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, key: key);
+    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
   }
 
   static String sid = 'custom-gauge-circular';
@@ -154,11 +156,11 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.key});
+  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.key});
 
   factory CustomDoubleValueBarGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, key: key);
+    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
   }
 
   static String sid = 'custom-gauge-bar';
@@ -291,6 +293,13 @@ class _SettingsState extends State<_SettingsWidget> {
           onChanged: (bool value) {
             setState(() {
               s.portStarboard = value;
+            });
+          }),
+      SwitchListTile(title: const Text("Data Timeout:"),
+          value: s.dataTimeout,
+          onChanged: (bool value) {
+            setState(() {
+              s.dataTimeout = value;
             });
           }),
     ]);
