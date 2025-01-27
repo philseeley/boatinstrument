@@ -89,6 +89,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsideTemperatureGraph.sid, 'Outside Temperature', graph: true, experimental: true, background: (ctrl) {OutsideTemperatureGraphBackground(controller: ctrl);}, (config) {return OutsideTemperatureGraph(config, key: UniqueKey());}),
   BoxDetails(VNCBox.sid, 'VNC', experimental: true, (config) {return VNCBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorGraph.sid, 'Cross Track Error', graph: true, experimental: true, background: (ctrl) {CrossTrackErrorGraphBackground(controller: ctrl);}, (config) {return CrossTrackErrorGraph(config, key: UniqueKey());}),
+  BoxDetails(RPiCPUTemperatureBox.sid, 'RPi CPU Temperature', experimental: true, (config) {return RPiCPUTemperatureBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -144,7 +145,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(OutsideHumidityBox.sid),
         _widgetMenuEntry(InsideHumidityBox.sid),
         _widgetMenuEntry(SunlightBox.sid),
-        _widgetMenuEntry(MoonBox.sid)]),
+        _widgetMenuEntry(MoonBox.sid),
+      ]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CourseOverGroundBox.sid),
         _widgetMenuEntry(SpeedOverGroundBox.sid),
@@ -159,12 +161,14 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CrossTrackErrorDeltaBox.sid),
         _widgetMenuEntry(PositionBox.sid),
         _widgetMenuEntry(RateOfTurnBox.sid),
-        _widgetMenuEntry(MagneticVariationBox.sid)]),
+        _widgetMenuEntry(MagneticVariationBox.sid),
+      ]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetMenuEntry(SpeedThroughWaterBox.sid),
         _widgetMenuEntry(SpeedThroughWaterGraph.sid),
         _widgetMenuEntry(RudderAngleBox.sid),
-        _widgetMenuEntry(AttitudeRollGaugeBox.sid)]),
+        _widgetMenuEntry(AttitudeRollGaugeBox.sid),
+      ]),
       _widgetSubMenuEntry(box, 'Wind', [
         _widgetMenuEntry(WindSpeedApparentBox.sid),
         _widgetMenuEntry(ApparentWindSpeedGraph.sid),
@@ -173,14 +177,15 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(TrueWindSpeedGraph.sid),
         _widgetMenuEntry(WindDirectionTrueBox.sid),
         _widgetMenuEntry(WindSpeedTrueBeaufortBox.sid),
-        _widgetMenuEntry(WindRoseBox.sid)]),
+        _widgetMenuEntry(WindRoseBox.sid),
+      ]),
       _widgetSubMenuEntry(box, 'Autopilot', [
         _widgetMenuEntry(AutopilotStatusBox.sid),
         _widgetMenuEntry(AutopilotStateControlHorizontalBox.sid),
         _widgetMenuEntry(AutopilotStateControlVerticalBox.sid),
         _widgetMenuEntry(AutopilotHeadingControlHorizontalBox.sid),
         _widgetMenuEntry(AutopilotHeadingControlVerticalBox.sid),
-        ]),
+      ]),
       _widgetSubMenuEntry(box, 'Electrical', [
         _widgetMenuEntry(BatteriesBox.sid),
         _widgetMenuEntry(BatteryVoltMeterBox.sid),
@@ -191,7 +196,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(SolarCurrentBox.sid),
         _widgetMenuEntry(ElectricalSwitchesBox.sid),
         _widgetMenuEntry(ElectricalSwitchBox.sid),
-        ]),
+      ]),
       _widgetSubMenuEntry(box, 'Tanks', [
         _widgetMenuEntry(TanksBox.sid),
         _widgetMenuEntry(FreshWaterTankBox.sid),
@@ -199,12 +204,15 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(BlackWaterTankBox.sid),
         _widgetMenuEntry(FuelTankBox.sid),
         _widgetMenuEntry(LubricationTankBox.sid),
-        ]),
+      ]),
       _widgetSubMenuEntry(box, 'Engine', [
         _widgetMenuEntry(EngineRPMBox.sid),
         _widgetMenuEntry(EngineTempBox.sid),
         _widgetMenuEntry(EngineOilPressureBox.sid),
-        ]),
+      ]),
+      _widgetSubMenuEntry(box, 'Raspberry Pi', [
+        _widgetMenuEntry(RPiCPUTemperatureBox.sid),
+      ]),
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetMenuEntry(AnchorAlarmBox.sid),
       _widgetMenuEntry(WebViewBox.sid),
@@ -215,7 +223,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid),
         _widgetMenuEntry(CustomDoubleValueCircularGaugeBox.sid),
         _widgetMenuEntry(CustomDoubleValueBarGaugeBox.sid),
-        _widgetMenuEntry(DebugBox.sid)]),
+        _widgetMenuEntry(DebugBox.sid),
+      ]),
     ];
 
     return popupMenuEntries;

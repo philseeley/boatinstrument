@@ -13,6 +13,7 @@ import 'package:boatinstrument/widgets/electrical_box.dart';
 import 'package:boatinstrument/widgets/environment_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/propulsion_box.dart';
+import 'package:boatinstrument/widgets/rpi_box.dart';
 import 'package:boatinstrument/widgets/tank_box.dart';
 import 'package:boatinstrument/widgets/vnc_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
