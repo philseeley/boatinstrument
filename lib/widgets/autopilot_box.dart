@@ -92,6 +92,12 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     widget.config.controller.configure();
   }
 
+  @override
+  void dispose() {
+    _lockTimer?.cancel();
+    super.dispose();
+  }
+  
   _sendCommand(String path, String params) async {
 
     if(widget.config.editMode) {

@@ -9,6 +9,7 @@ flutter build apk --no-shrink
 flutter build appbundle # Android
 flutter build ios
 
+curl http://localhost:3000/signalk/v1/api/vessels/self/environment/depth/belowKeel
 
 python3 -m json.tool /Users/admin//Library/Containers/name.seeley.phil.boatinstrument/Data/Documents/boatinstrument.json
 

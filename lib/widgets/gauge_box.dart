@@ -5,6 +5,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:json_annotation/json_annotation.dart';
+import 'package:format/format.dart' as fmt;
 
 import 'double_value_box.dart';
 
@@ -23,7 +24,7 @@ abstract class DoubleValueGaugeBox extends DoubleValueBox {
   final List<GaugeRange> ranges;
 
   const DoubleValueGaugeBox(super.config, super.title, super.path,
-    {super.minValue = 0, required super.maxValue, super.angle, super.smoothing,
+    {super.minValue = 0, required super.maxValue, super.angle, super.smoothing, super.dataTimeout,
     this.step = 1, this.ranges = const [],
     super.key});
 
@@ -178,7 +179,7 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
   final bool mirror;
 
   const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path,
-    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.smoothing, super.ranges,
+    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.smoothing, super.dataTimeout, super.ranges,
     this.mirror = false, super.key});
 
   @override
@@ -324,7 +325,7 @@ abstract class DoubleValueCircularGaugeBox extends DoubleValueGaugeBox {
 
   const DoubleValueCircularGaugeBox(super.config, super.title, super.path,
     {super.minValue = 0, required super.maxValue, required super.step,
-    super.ranges, super.smoothing, super.key});
+    super.ranges, super.smoothing, super.dataTimeout, super.key});
 
   @override
   DoubleValueCircularGaugeBoxState createState() => DoubleValueCircularGaugeBoxState();
@@ -419,7 +420,7 @@ abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
 
   const DoubleValueBarGaugeBox(super.config, super.title, super.path,
     {super.minValue = 0, required super.maxValue, required super.step,
-    super.ranges, super.smoothing, super.key});
+    super.ranges, super.smoothing, super.dataTimeout, super.key});
 
   @override
   DoubleValueBarGaugeBoxState createState() => DoubleValueBarGaugeBoxState();
@@ -446,18 +447,28 @@ class _GraphPainter extends CustomPainter {
   final BuildContext _context;
   final GraphBox _widget;
   final List<DataPoint> _data;
+  final bool _vertical;
   final int _minutes;
   final int _step;
   final bool _zeroBase;
   final List<GaugeRange> _ranges;
 
-  _GraphPainter(this._context, this._widget, this._data, this._minutes, this._step, this._zeroBase, this._ranges);
+  _GraphPainter(this._context, this._widget, this._data, this._vertical, this._minutes, this._step, this._zeroBase, this._ranges);
+
+  void _paintRText(Canvas canvas, TextPainter tp, Offset offset) {
+    canvas.save();
+    canvas.translate(offset.dx, offset.dy);
+    if(_vertical) canvas.rotate(deg2Rad(-90).toDouble());
+    tp.paint(canvas, Offset(-tp.size.width/2, -tp.size.height/2));
+    canvas.restore();
+  }
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
     ThemeData theme = Theme.of(_context);
     double w = canvasSize.width;
     double h = canvasSize.height;
+    if(_vertical) (h, w) = (w, h);
     List<double?> values = List.filled(w.toInt(), null);
 
     if(_data.isEmpty) {
@@ -508,6 +519,12 @@ class _GraphPainter extends CustomPainter {
       ..strokeWidth = 0.0
       ..style = PaintingStyle.fill;
 
+    if(_vertical) {
+      canvas.translate(h/2, w/2);
+      canvas.rotate(deg2Rad(90).toDouble());
+      canvas.translate(-w/2, -h/2);
+    }
+
     for (int i = 0; i <= steps; ++i) {
       canvas.drawRect(Rect.fromLTWH(0, h-(lineStep*i)-1, w, 2), paint);
     }
@@ -524,13 +541,15 @@ class _GraphPainter extends CustomPainter {
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
       for (int i = 0; i <= steps; ++i) {
+        int v = (i*_step+minDisplay).toInt();
+        String t = (v.abs() >= 1000) ? '${(v/1000).toInt()}k' : v.toString();
         tp.text = TextSpan(
-            text: (i*_step+minDisplay).toInt().toString(),
+            text: t,
             style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
         tp.layout();
 
-        tp.paint(canvas, Offset(5, h-(i*lineStep)-(tp.size.height/2)));
-        tp.paint(canvas, Offset(w-5-tp.size.width, h-(i*lineStep)-(tp.size.height/2)));
+        _paintRText(canvas, tp, Offset(5+((_vertical?tp.height:tp.width)/2), h-(i*lineStep)));
+        _paintRText(canvas, tp, Offset(w-5-((_vertical?tp.height:tp.width)/2), h-(i*lineStep)));
       }
 
       int minutesStep = (_minutes/4).round();
@@ -549,7 +568,8 @@ class _GraphPainter extends CustomPainter {
             style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
         tp.layout();
 
-        tp.paint(canvas, Offset(w-(m*wStep)-(tp.size.width/2), 5));
+        _paintRText(canvas, tp, Offset(w-(m*wStep), 5+(_vertical?tp.width:tp.height)/2));
+        _paintRText(canvas, tp, Offset(w-(m*wStep), h-5-(_vertical?tp.width:tp.height)/2));
       }
 
     } finally {
@@ -621,10 +641,13 @@ abstract class GraphBox extends BoxWidget {
   final String title;
   final double step;
   final bool zeroBase;
+  final int precision;
+  final int minLen;
+  final bool vertical;
   final List<GaugeRange> ranges;
 
   GraphBox(super.config, this.title, 
-    {required this.step, this.zeroBase = true, this.ranges = const [], super.key}) {
+    {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.vertical = false, this.ranges = const [], super.key}) {
     _settings = _$GraphSettingsFromJson(config.settings);
   }
 
@@ -657,6 +680,7 @@ abstract class GraphBox extends BoxWidget {
 class GraphBoxState extends State<GraphBox> {
   final List<GaugeRange> _displayRanges = [];
   int _displayStep = 0;
+  Timer? _updateTimer;
 
   @override
   void initState() {
@@ -669,30 +693,43 @@ class GraphBoxState extends State<GraphBox> {
 
     _displayStep = widget.convert(widget.step).round();
 
-    Timer(Duration(seconds: 1), _update);
+    _update();
+  }
+
+  @override
+  void dispose() {
+    _updateTimer?.cancel();
+    super.dispose();
   }
 
   _update() {
     if(mounted) {
       setState(() {});
     }
-    Timer(Duration(seconds: 1), _update);
+    _updateTimer = Timer(Duration(seconds: 1), _update);
   }
 
   @override
   Widget build(BuildContext context) {
     const double pad = 5.0;
-    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.all(pad), child: Row(children: [
-        Text('${widget.title} ${widget.units(0)} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
+    double currentValue = widget.data.lastOrNull?.value??0;
+    double displayValue = widget.convert(currentValue);
+    String currentValueString =
+          fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f} ${widget.units(currentValue)}', displayValue);
+
+    return Column(children: [
+      Padding(padding: const EdgeInsets.only(left: pad, right: pad), child: Row(children: [
+        Text('${widget.title} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
         Expanded(child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
-        IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
-    ]))])),
-      Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad, bottom: pad*2),
+          Expanded(child: Text(currentValueString, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium)),
+          IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
+          IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
+        ]))
+      ])),
+      Expanded(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _GraphPainter(context, widget, widget.data, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
+          painter: _GraphPainter(context, widget, widget.data, widget.vertical, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
       )))),
     ]);
   }

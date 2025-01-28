@@ -184,6 +184,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   @override
+  void dispose() {
+    _lockTimer?.cancel();
+    super.dispose();
+  }
+  
+  @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
       _maxRadius = 100;
