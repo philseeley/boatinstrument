@@ -677,7 +677,7 @@ class BoatInstrumentController {
 
   void _subscribe() {
     if(_boxData.length == _boxesOnPage) {
-      Set<String> paths = {};
+      Set<String> paths = {'navigation.datetime'};
       Set<String> staticPaths = {};
 
       // Find all the unique paths.
