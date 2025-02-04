@@ -355,7 +355,7 @@ class _EditPageState extends State<_EditPage> {
     }
 
     return Scaffold(
-      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows),
+      body: SafeArea(child: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows)),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: const Icon(Icons.save), onPressed: _save),
         IconButton(icon: const Icon(Icons.close), onPressed: _close)
