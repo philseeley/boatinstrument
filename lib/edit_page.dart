@@ -89,7 +89,12 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsideTemperatureGraph.sid, 'Outside Temperature', graph: true, experimental: true, background: (ctrl) {OutsideTemperatureGraphBackground(controller: ctrl);}, (config) {return OutsideTemperatureGraph(config, key: UniqueKey());}),
   BoxDetails(VNCBox.sid, 'VNC', experimental: true, (config) {return VNCBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorGraph.sid, 'Cross Track Error', graph: true, experimental: true, background: (ctrl) {CrossTrackErrorGraphBackground(controller: ctrl);}, (config) {return CrossTrackErrorGraph(config, key: UniqueKey());}),
-  BoxDetails(RPiCPUTemperatureBox.sid, 'RPi CPU Temperature', experimental: true, (config) {return RPiCPUTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(RPiCPUTemperatureBox.sid, 'RPi CPU Temperature', (config) {return RPiCPUTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(RPiGPUTemperatureBox.sid, 'RPi GPU Temperature', (config) {return RPiGPUTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(RPiCPUUtilisationBox.sid, 'RPi CPU Utilisation', gauge: true, (config) {return RPiCPUUtilisationBox(config, key: UniqueKey());}),
+  BoxDetails(RPiMemoryUtilisationBox.sid, 'RPi Memory Utilisation', gauge: true, (config) {return RPiMemoryUtilisationBox(config, key: UniqueKey());}),
+  BoxDetails(RPiSDUtilisationBox.sid, 'RPi SD Utilisation', gauge: true, (config) {return RPiSDUtilisationBox(config, key: UniqueKey());}),
+  BoxDetails(RaspberryPiBox.sid, 'Raspberry Pi', experimental: true, (config) {return RaspberryPiBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -212,6 +217,11 @@ class _EditPageState extends State<_EditPage> {
       ]),
       _widgetSubMenuEntry(box, 'Raspberry Pi', [
         _widgetMenuEntry(RPiCPUTemperatureBox.sid),
+        _widgetMenuEntry(RPiGPUTemperatureBox.sid),
+        _widgetMenuEntry(RPiCPUUtilisationBox.sid),
+        _widgetMenuEntry(RPiMemoryUtilisationBox.sid),
+        _widgetMenuEntry(RPiSDUtilisationBox.sid),
+        _widgetMenuEntry(RaspberryPiBox.sid),
       ]),
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetMenuEntry(AnchorAlarmBox.sid),

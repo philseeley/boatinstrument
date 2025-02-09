@@ -21,6 +21,7 @@ import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:format/format.dart' as fmt;
 import 'package:flutter/services.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:provider/provider.dart';
