@@ -150,6 +150,17 @@ class BoatInstrumentController {
     return val < 0 ? _settings!.portStarboardColors.portColor : (val > 0) ? _settings!.portStarboardColors.starboardColor : Theme.of(context).colorScheme.onSurface;
   }
 
+  double depthToDisplay(double depth) {
+    switch (depthUnits) {
+      case DepthUnits.m:
+        return depth;
+      case DepthUnits.ft:
+        return depth * 3.28084;
+      case DepthUnits.fa:
+        return depth * 0.546807;
+    }
+  }
+
   double distanceToDisplay(double distance, {bool fixed = false}) {
     switch (distanceUnits) {
       case DistanceUnits.meters:
