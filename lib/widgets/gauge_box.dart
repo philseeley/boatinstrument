@@ -451,14 +451,15 @@ class _GraphPainter extends CustomPainter {
   final int _minutes;
   final int _step;
   final bool _zeroBase;
+  final bool _mirror;
   final List<GaugeRange> _ranges;
 
-  _GraphPainter(this._context, this._widget, this._data, this._vertical, this._minutes, this._step, this._zeroBase, this._ranges);
+  _GraphPainter(this._context, this._widget, this._data, this._vertical, this._mirror, this._minutes, this._step, this._zeroBase, this._ranges);
 
   void _paintRText(Canvas canvas, TextPainter tp, Offset offset) {
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
-    if(_vertical) canvas.rotate(deg2Rad(-90).toDouble());
+    if(_vertical) canvas.rotate(deg2Rad(90).toDouble());
     tp.paint(canvas, Offset(-tp.size.width/2, -tp.size.height/2));
     canvas.restore();
   }
@@ -521,7 +522,7 @@ class _GraphPainter extends CustomPainter {
 
     if(_vertical) {
       canvas.translate(h/2, w/2);
-      canvas.rotate(deg2Rad(90).toDouble());
+      canvas.rotate(deg2Rad(-90).toDouble());
       canvas.translate(-w/2, -h/2);
     }
 
@@ -539,17 +540,20 @@ class _GraphPainter extends CustomPainter {
     paint.color = theme.colorScheme.secondary;
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    TextStyle style = theme.textTheme.bodyMedium!.copyWith(backgroundColor: theme.colorScheme.surface);
     try {
       for (int i = 0; i <= steps; ++i) {
-        int v = (i*_step+minDisplay).toInt();
+        int v = (minDisplay+(i*_step)).toInt();
         String t = (v.abs() >= 1000) ? '${(v/1000).toInt()}k' : v.toString();
         tp.text = TextSpan(
             text: t,
-            style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
+            style: style);
         tp.layout();
 
-        _paintRText(canvas, tp, Offset(5+((_vertical?tp.height:tp.width)/2), h-(i*lineStep)));
-        _paintRText(canvas, tp, Offset(w-5-((_vertical?tp.height:tp.width)/2), h-(i*lineStep)));
+        double y = i*lineStep;
+        if(!_mirror) y = h-y;
+        _paintRText(canvas, tp, Offset(5+((_vertical?tp.height:tp.width)/2), y));
+        _paintRText(canvas, tp, Offset(w-5-((_vertical?tp.height:tp.width)/2), y));
       }
 
       int minutesStep = (_minutes/4).round();
@@ -574,6 +578,11 @@ class _GraphPainter extends CustomPainter {
 
     } finally {
       tp.dispose();
+    }
+
+    if(_mirror) {
+      canvas.scale(1, -1);
+      canvas.translate(0, -h);
     }
 
     paint
@@ -644,10 +653,11 @@ abstract class GraphBox extends BoxWidget {
   final int precision;
   final int minLen;
   final bool vertical;
+  final bool mirror;
   final List<GaugeRange> ranges;
 
   GraphBox(super.config, this.title, 
-    {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.vertical = false, this.ranges = const [], super.key}) {
+    {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.vertical = false, this.mirror = false, this.ranges = const [], super.key}) {
     _settings = _$GraphSettingsFromJson(config.settings);
   }
 
@@ -729,7 +739,7 @@ class GraphBoxState extends State<GraphBox> {
       Expanded(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _GraphPainter(context, widget, widget.data, widget.vertical, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
+          painter: _GraphPainter(context, widget, widget.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
       )))),
     ]);
   }

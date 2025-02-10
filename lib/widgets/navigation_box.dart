@@ -55,7 +55,7 @@ class CrossTrackErrorGraph extends GraphBox {
   @override
   List<DataPoint> get data => background.data;
 
-  CrossTrackErrorGraph(BoxWidgetConfig config, {super.key}) : super(config, 'XTE', step: nm2m(1), precision: 2, zeroBase: false, vertical: true);
+  CrossTrackErrorGraph(BoxWidgetConfig config, {super.key}) : super(config, 'XTE', step: nm2m(1), precision: 2, zeroBase: false, vertical: true, mirror: true);
 
   @override
   double convert(double value) {
