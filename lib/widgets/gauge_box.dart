@@ -532,8 +532,10 @@ class _GraphPainter extends CustomPainter {
 
     for(GaugeRange r in _ranges) {
       paint.color = r.color;
-      if(hStep*(r.max-minDisplay) <= h) {
-        canvas.drawRect(Rect.fromLTRB(0, h-(hStep*(r.max-minDisplay))-1, w, h-(hStep*(r.min-minDisplay))+1), paint);
+      double y = hStep*(r.max-minDisplay);
+      if(y <= h) {
+        if(!_mirror) y = h-y;
+        canvas.drawRect(Rect.fromLTRB(0, y-1, w, y+1), paint);
       }
     }
 
