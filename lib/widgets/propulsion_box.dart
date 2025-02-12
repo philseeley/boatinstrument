@@ -13,8 +13,9 @@ class _EngineSettings {
   int rpmRedLine;
   double maxTemp;
   double maxOilPressure;
+  double maxExhaustTemp;
 
-  _EngineSettings({this.id = '', this.maxRPM = 4000, this.rpmRedLine = 3500, this.maxTemp = kelvinOffset+120, this.maxOilPressure = 500000});
+  _EngineSettings({this.id = '', this.maxRPM = 4000, this.rpmRedLine = 3500, this.maxTemp = kelvinOffset+120, this.maxOilPressure = 500000, this.maxExhaustTemp = kelvinOffset+600});
 }
 
 double  revolutions2RPMK(double value) {
@@ -96,9 +97,9 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 
     return EngineTempBox._init(s, config, 'Temp:${s.id}', 'propulsion.${s.id}.temperature',
       minValue: kelvinOffset, maxValue: s.maxTemp, key: key, ranges: [
-        GaugeRange(s.maxTemp-10, s.maxTemp, Colors.red),
-        GaugeRange(kelvinOffset+10, s.maxTemp-10, Colors.green),
-        const GaugeRange(kelvinOffset, kelvinOffset+10, Colors.orange)
+        GaugeRange(s.maxTemp-((s.maxTemp-kelvinOffset)*0.1), s.maxTemp, Colors.red),
+        GaugeRange(kelvinOffset+((s.maxTemp-kelvinOffset)*0.1), s.maxTemp-((s.maxTemp-kelvinOffset)*0.1), Colors.green),
+        GaugeRange(kelvinOffset, kelvinOffset+((s.maxTemp-kelvinOffset)*0.1), Colors.orange)
       ]);
   }
 
@@ -128,6 +129,65 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 }
 
 class _EngineTempState extends DoubleValueSemiGaugeBoxState<EngineTempBox> {
+
+  @override
+  Widget build(BuildContext context) {
+    if(widget.config.editMode) {
+      value = kelvinOffset+12.3;
+      displayValue = widget.convert(value!);
+    }
+
+    return super.build(context);
+  }
+}
+
+class EngineExhaustTempBox extends DoubleValueSemiGaugeBox {
+  static const sid = 'propulsion-exhaust-temp';
+  @override
+  String get id => sid;
+
+  final _EngineSettings _settings;
+
+  const EngineExhaustTempBox._init(this._settings, config, title, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
+    super(config, title, GaugeOrientation.up, path, step: 100);
+
+  factory EngineExhaustTempBox.fromSettings(config, {key}) {
+    _EngineSettings s = _$EngineSettingsFromJson(config.settings);
+
+    return EngineExhaustTempBox._init(s, config, 'Exhaust Temp:${s.id}', 'propulsion.${s.id}.exhaustTemperature',
+      minValue: kelvinOffset, maxValue: s.maxExhaustTemp, key: key, ranges: [
+        GaugeRange(s.maxExhaustTemp-((s.maxExhaustTemp-kelvinOffset)*0.1), s.maxExhaustTemp, Colors.red),
+        GaugeRange(kelvinOffset+((s.maxExhaustTemp-kelvinOffset)*0.1), s.maxExhaustTemp-((s.maxExhaustTemp-kelvinOffset)*0.1), Colors.green),
+        GaugeRange(kelvinOffset, kelvinOffset+((s.maxExhaustTemp-kelvinOffset)*0.1), Colors.orange)
+      ]);
+  }
+
+  @override
+  double convert(double value) {
+    return config.controller.temperatureToDisplay(value);
+  }
+  
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _EngineSettingsWidget(config.controller, _settings);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.exhaustTemperature" the ID is "port"');
+
+  @override
+  DoubleValueSemiGaugeBoxState<EngineExhaustTempBox> createState() => _EngineExhaustTempState();
+}
+
+class _EngineExhaustTempState extends DoubleValueSemiGaugeBoxState<EngineExhaustTempBox> {
 
   @override
   Widget build(BuildContext context) {
@@ -259,6 +319,15 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
               initialValue: c.oilPressureToDisplay(s.maxOilPressure).toInt().toString(),
               onChanged: (value) => s.maxOilPressure = c.oilPressureFromDisplay(double.parse(value))),
           trailing: Text(c.oilPressureUnits.unit)
+      ),
+      ListTile(
+          leading: const Text("Max Exhaust Temp:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: c.temperatureToDisplay(s.maxExhaustTemp).toInt().toString(),
+              onChanged: (value) => s.maxExhaustTemp = c.temperatureFromDisplay(double.parse(value))),
+          trailing: Text(c.temperatureUnits.unit)
       ),
     ];
 

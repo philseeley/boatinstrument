@@ -61,7 +61,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   factory BatteryVoltMeterBox.fromSettings(config, {key}) {
     _ElectricalBatterySettings s = _$ElectricalBatterySettingsFromJson(config.settings);
 
-    return BatteryVoltMeterBox._init(s, config, 'Battery:${s.id}', 'electrical.batteries.${s.id}.voltage',
+    return BatteryVoltMeterBox._init(s, config, 'Battery:${s.id}', '$batteriesBasePath.${s.id}.voltage',
       minValue: 10.0*s.voltage.multiplier, maxValue: 15.0*s.voltage.multiplier, step: s.voltage.multiplier.toDouble(), key: key, ranges: [
         GaugeRange(10.0*s.voltage.multiplier, 12.0*s.voltage.multiplier, Colors.red),
         GaugeRange(12.0*s.voltage.multiplier, 13.0*s.voltage.multiplier, Colors.orange),
@@ -88,7 +88,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.batteries.start.voltage" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.voltage" the ID is "start"');
 
   @override
   DoubleValueSemiGaugeBoxState<BatteryVoltMeterBox> createState() => _BatteryVoltMeterState();
@@ -164,7 +164,7 @@ class BatteryVoltageBox extends DoubleValueBox {
   factory BatteryVoltageBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return BatteryVoltageBox._init(s, config, 'Voltage:${s.id}', 'electrical.batteries.${s.id}.voltage', key: key);
+    return BatteryVoltageBox._init(s, config, 'Voltage:${s.id}', '$batteriesBasePath.${s.id}.voltage', key: key);
   }
 
   @override
@@ -185,7 +185,7 @@ class BatteryVoltageBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.batteries.start.voltage" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.voltage" the ID is "start"');
 }
 
 class BatteryCurrentBox extends DoubleValueBox {
@@ -200,7 +200,7 @@ class BatteryCurrentBox extends DoubleValueBox {
   factory BatteryCurrentBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return BatteryCurrentBox._init(s, config, 'Current:${s.id}', 'electrical.batteries.${s.id}.current', key: key);
+    return BatteryCurrentBox._init(s, config, 'Current:${s.id}', '$batteriesBasePath.${s.id}.current', key: key);
   }
 
   @override
@@ -221,7 +221,43 @@ class BatteryCurrentBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.batteries.start.current" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.current" the ID is "start"');
+}
+
+class BatteryTemperatureBox extends DoubleValueBox {
+  static const sid = 'electrical-battery-temperature';
+  @override
+  String get id => sid;
+
+  final _ElectricalSettings _settings;
+
+  const BatteryTemperatureBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
+
+  factory BatteryTemperatureBox.fromSettings(config, {key}) {
+    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
+
+    return BatteryTemperatureBox._init(s, config, 'Temp:${s.id}', '$batteriesBasePath.${s.id}.temperature', key: key);
+  }
+
+  @override
+  double convert(double value) {
+    return config.controller.temperatureToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.temperatureUnits.unit;
+  }
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.temperature" the ID is "start"');
 }
 
 class InverterCurrentBox extends DoubleValueBox {
@@ -236,7 +272,7 @@ class InverterCurrentBox extends DoubleValueBox {
   factory InverterCurrentBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return InverterCurrentBox._init(s, config, 'Inverter:${s.id}', 'electrical.inverters.${s.id}.dc.current', key: key);
+    return InverterCurrentBox._init(s, config, 'Inverter:${s.id}', '$invertersBasePath.${s.id}.dc.current', key: key);
   }
 
   @override
@@ -257,7 +293,7 @@ class InverterCurrentBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.inverters.1.dc.current" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$invertersBasePath.1.dc.current" the ID is "1"');
 }
 
 class SolarVoltageBox extends DoubleValueBox {
@@ -272,7 +308,7 @@ class SolarVoltageBox extends DoubleValueBox {
   factory SolarVoltageBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return SolarVoltageBox._init(s, config, 'Solar:${s.id}', 'electrical.solar.${s.id}.voltage', key: key);
+    return SolarVoltageBox._init(s, config, 'Solar:${s.id}', '$solarBasePath.${s.id}.voltage', key: key);
   }
 
   @override
@@ -293,7 +329,7 @@ class SolarVoltageBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.solar.1.voltage" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$solarBasePath.1.voltage" the ID is "1"');
 }
 
 class SolarCurrentBox extends DoubleValueBox {
@@ -308,7 +344,7 @@ class SolarCurrentBox extends DoubleValueBox {
   factory SolarCurrentBox.fromSettings(config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return SolarCurrentBox._init(s, config, 'Solar:${s.id}', 'electrical.solar.${s.id}.current', key: key);
+    return SolarCurrentBox._init(s, config, 'Solar:${s.id}', '$solarBasePath.${s.id}.current', key: key);
   }
 
   @override
@@ -330,7 +366,7 @@ class SolarCurrentBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.solar.1.current" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$solarBasePath.1.current" the ID is "1"');
 }
 
 class BatteriesBox extends BoxWidget {
@@ -373,7 +409,7 @@ class _BatteriesBoxState extends State<BatteriesBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'electrical.batteries.*'});
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'$batteriesBasePath.*'});
   }
 
   @override

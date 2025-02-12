@@ -17,14 +17,7 @@ abstract class DepthBox extends DoubleValueBox {
 
   @override
   double convert(double value) {
-    switch (config.controller.depthUnits) {
-      case DepthUnits.m:
-        return value;
-      case DepthUnits.ft:
-        return value * 3.28084;
-      case DepthUnits.fa:
-        return value * 0.546807;
-    }
+    return config.controller.depthToDisplay(value);
   }
 
   @override
@@ -41,6 +34,46 @@ class DepthBelowSurfaceBox extends DepthBox {
   const DepthBelowSurfaceBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface');
 }
 
+class DepthBelowSurfaceGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  DepthBelowSurfaceGraphBackground({controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, 'environment.depth.belowSurface', smoothing: false);
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class DepthBelowSurfaceGraph extends GraphBox {
+  static const String sid = 'environment-depth-belowSurface-graph';
+  @override
+  String get id => sid;
+
+  final DepthBelowSurfaceGraphBackground background = DepthBelowSurfaceGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  DepthBelowSurfaceGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Depth', step: 10, precision: 1, mirror: true);
+
+  @override
+  double convert(double value) {
+    return config.controller.depthToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.depthUnits.unit;
+  }
+}
+
 class DepthBelowKeelBox extends DepthBox {
   static const String sid = 'environment-depth-belowKeel';
   @override
@@ -49,12 +82,92 @@ class DepthBelowKeelBox extends DepthBox {
   const DepthBelowKeelBox(config, {super.key}) : super(config, 'Depth below Keel', 'environment.depth.belowKeel');
 }
 
+class DepthBelowKeelGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  DepthBelowKeelGraphBackground({controller}) : super(controller: controller, DepthBelowKeelGraph.sid, 'environment.depth.belowKeel', smoothing: false);
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class DepthBelowKeelGraph extends GraphBox {
+  static const String sid = 'environment-depth-belowKeel-graph';
+  @override
+  String get id => sid;
+
+  final DepthBelowKeelGraphBackground background = DepthBelowKeelGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  DepthBelowKeelGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Depth below Keel', step: 10, precision: 1, mirror: true);
+
+  @override
+  double convert(double value) {
+    return config.controller.depthToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.depthUnits.unit;
+  }
+}
+
 class DepthBelowTransducerBox extends DepthBox {
   static const String sid = 'environment-depth-belowTransducer';
   @override
   String get id => sid;
 
   const DepthBelowTransducerBox(config, {super.key}) : super(config, 'DBT', 'environment.depth.belowTransducer');
+}
+
+class DepthBelowTransducerGraphBackground extends BackgroundData {
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  DepthBelowTransducerGraphBackground({controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, 'environment.depth.belowTransducer', smoothing: false);
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+}
+
+class DepthBelowTransducerGraph extends GraphBox {
+  static const String sid = 'environment-depth-belowTransducer-graph';
+  @override
+  String get id => sid;
+
+  final DepthBelowTransducerGraphBackground background = DepthBelowTransducerGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  DepthBelowTransducerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'DBT', step: 10, precision: 1, mirror: true);
+
+  @override
+  double convert(double value) {
+    return config.controller.depthToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.depthUnits.unit;
+  }
 }
 
 class WaterTemperatureBox extends DoubleValueBox {

@@ -65,11 +65,13 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(BatteryVoltMeterBox.sid, 'Volt Meter', gauge: true, (config) {return BatteryVoltMeterBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryVoltageBox.sid, 'Battery Voltage', (config) {return BatteryVoltageBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryCurrentBox.sid, 'Battery Current', (config) {return BatteryCurrentBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(BatteryTemperatureBox.sid, 'Battery Temperature', (config) {return BatteryTemperatureBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(InverterCurrentBox.sid, 'Inverter Current', (config) {return InverterCurrentBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(SolarVoltageBox.sid, 'Solar Voltage', (config) {return SolarVoltageBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(SolarCurrentBox.sid, 'Solar Current', (config) {return SolarCurrentBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineRPMBox.sid, 'Engine RPM', gauge: true, (config) {return EngineRPMBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineTempBox.sid, 'Engine Temp', gauge: true, (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineExhaustTempBox.sid, 'Engine Exhaust Temp', gauge: true, (config) {return EngineExhaustTempBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineOilPressureBox.sid, 'Engine Oil Pressure', gauge: true, (config) {return EngineOilPressureBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(TanksBox.sid, 'Tanks', (config) {return TanksBox(config, key: UniqueKey());}),
   BoxDetails(FreshWaterTankBox.sid, 'Fresh Water', gauge: true, (config) {return FreshWaterTankBox.fromSettings(config, key: UniqueKey());}),
@@ -89,7 +91,15 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsideTemperatureGraph.sid, 'Outside Temperature', graph: true, experimental: true, background: (ctrl) {OutsideTemperatureGraphBackground(controller: ctrl);}, (config) {return OutsideTemperatureGraph(config, key: UniqueKey());}),
   BoxDetails(VNCBox.sid, 'VNC', experimental: true, (config) {return VNCBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorGraph.sid, 'Cross Track Error', graph: true, experimental: true, background: (ctrl) {CrossTrackErrorGraphBackground(controller: ctrl);}, (config) {return CrossTrackErrorGraph(config, key: UniqueKey());}),
-  BoxDetails(RPiCPUTemperatureBox.sid, 'RPi CPU Temperature', experimental: true, (config) {return RPiCPUTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(DepthBelowSurfaceGraph.sid, 'Depth Below Surface', graph: true, experimental: true, background: (ctrl) {DepthBelowSurfaceGraphBackground(controller: ctrl);}, (config) {return DepthBelowSurfaceGraph(config, key: UniqueKey());}),
+  BoxDetails(DepthBelowKeelGraph.sid, 'Depth Below Keel', graph: true, experimental: true, background: (ctrl) {DepthBelowKeelGraphBackground(controller: ctrl);}, (config) {return DepthBelowKeelGraph(config, key: UniqueKey());}),
+  BoxDetails(DepthBelowTransducerGraph.sid, 'Depth Below Transducer', graph: true, experimental: true, background: (ctrl) {DepthBelowTransducerGraphBackground(controller: ctrl);}, (config) {return DepthBelowTransducerGraph(config, key: UniqueKey());}),
+  BoxDetails(RPiCPUTemperatureBox.sid, 'RPi CPU Temperature', (config) {return RPiCPUTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(RPiGPUTemperatureBox.sid, 'RPi GPU Temperature', (config) {return RPiGPUTemperatureBox(config, key: UniqueKey());}),
+  BoxDetails(RPiCPUUtilisationBox.sid, 'RPi CPU Utilisation', gauge: true, (config) {return RPiCPUUtilisationBox(config, key: UniqueKey());}),
+  BoxDetails(RPiMemoryUtilisationBox.sid, 'RPi Memory Utilisation', gauge: true, (config) {return RPiMemoryUtilisationBox(config, key: UniqueKey());}),
+  BoxDetails(RPiSDUtilisationBox.sid, 'RPi SD Utilisation', gauge: true, (config) {return RPiSDUtilisationBox(config, key: UniqueKey());}),
+  BoxDetails(RaspberryPiBox.sid, 'Raspberry Pi', experimental: true, (config) {return RaspberryPiBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -133,8 +143,11 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(BlankBox.sid),
       _widgetSubMenuEntry(box, 'Environment', [
         _widgetMenuEntry(DepthBelowSurfaceBox.sid),
+        _widgetMenuEntry(DepthBelowSurfaceGraph.sid),
         _widgetMenuEntry(DepthBelowKeelBox.sid),
+        _widgetMenuEntry(DepthBelowKeelGraph.sid),
         _widgetMenuEntry(DepthBelowTransducerBox.sid),
+        _widgetMenuEntry(DepthBelowTransducerGraph.sid),
         _widgetMenuEntry(SetAndDriftBox.sid),
         _widgetMenuEntry(WaterTemperatureBox.sid),
         _widgetMenuEntry(WaterTemperatureGraph.sid),
@@ -191,6 +204,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(BatteryVoltMeterBox.sid),
         _widgetMenuEntry(BatteryVoltageBox.sid),
         _widgetMenuEntry(BatteryCurrentBox.sid),
+        _widgetMenuEntry(BatteryTemperatureBox.sid),
         _widgetMenuEntry(InverterCurrentBox.sid),
         _widgetMenuEntry(SolarVoltageBox.sid),
         _widgetMenuEntry(SolarCurrentBox.sid),
@@ -209,9 +223,15 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(EngineRPMBox.sid),
         _widgetMenuEntry(EngineTempBox.sid),
         _widgetMenuEntry(EngineOilPressureBox.sid),
+        _widgetMenuEntry(EngineExhaustTempBox.sid),
       ]),
       _widgetSubMenuEntry(box, 'Raspberry Pi', [
         _widgetMenuEntry(RPiCPUTemperatureBox.sid),
+        _widgetMenuEntry(RPiGPUTemperatureBox.sid),
+        _widgetMenuEntry(RPiCPUUtilisationBox.sid),
+        _widgetMenuEntry(RPiMemoryUtilisationBox.sid),
+        _widgetMenuEntry(RPiSDUtilisationBox.sid),
+        _widgetMenuEntry(RaspberryPiBox.sid),
       ]),
       _widgetMenuEntry(DateTimeBox.sid),
       _widgetMenuEntry(AnchorAlarmBox.sid),
@@ -355,7 +375,7 @@ class _EditPageState extends State<_EditPage> {
     }
 
     return Scaffold(
-      body: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows),
+      body: SafeArea(child: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows)),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: const Icon(Icons.save), onPressed: _save),
         IconButton(icon: const Icon(Icons.close), onPressed: _close)

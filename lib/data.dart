@@ -548,7 +548,8 @@ enum DepthUnits implements EnumMenuEntry {
 
 enum TemperatureUnits implements EnumMenuEntry {
   c('Centigrade', 'C'),
-  f('Fahrenheit', 'F');
+  f('Fahrenheit', 'F'),
+  k('Kelvin', 'K');
 
   @override
   String get displayName => _displayName;
@@ -846,5 +847,48 @@ class _BackgroundDataSettingsState extends State<BackgroundDataSettingsWidget> {
             })
       ),
     ]);
+  }
+}
+
+mixin DoubleValeBoxPainter {
+  static const double _pad = 5.0;
+
+  void paintDoubleBox(Canvas canvas, BuildContext context, String title, String units, int minLen, int precision, double? value, Offset loc, double size) {
+    Color fg = Theme.of(context).colorScheme.onSurface;
+    Color bg = Theme.of(context).colorScheme.surface;
+    TextStyle style = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0);
+
+    String speedText = '-';
+    if(value != null) speedText = fmt.format('{:${minLen+(precision > 0?1:0)+precision}.${precision}f}', value);
+
+    Paint paint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = bg
+      ..strokeWidth = 2.0;
+
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromPoints(loc, loc+Offset(size, size)), const Radius.circular(10)), paint);
+    paint..style = PaintingStyle.stroke
+      ..color = fg;
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromPoints(loc, loc+Offset(size, size)), const Radius.circular(10)), paint);
+
+    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+    try {
+      double fontSize = maxFontSize(speedText, style, size-(2*_pad), size-style.fontSize!-(3*_pad));
+
+      tp.text = TextSpan(
+          text: '$title $units',
+          style: style);
+      tp.layout();
+      tp.paint(canvas, loc+const Offset(_pad,_pad));
+
+      tp.text = TextSpan(
+          text: speedText,
+          style: style.copyWith(fontSize: fontSize));
+      tp.layout();
+      Offset o = loc+Offset(_pad, size-fontSize-_pad);
+      tp.paint(canvas, o);
+    } finally {
+      tp.dispose();
+    }
   }
 }

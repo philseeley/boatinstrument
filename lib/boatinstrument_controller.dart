@@ -21,6 +21,7 @@ import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:format/format.dart' as fmt;
 import 'package:flutter/services.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:provider/provider.dart';
@@ -149,6 +150,17 @@ class BoatInstrumentController {
     return val < 0 ? _settings!.portStarboardColors.portColor : (val > 0) ? _settings!.portStarboardColors.starboardColor : Theme.of(context).colorScheme.onSurface;
   }
 
+  double depthToDisplay(double depth) {
+    switch (depthUnits) {
+      case DepthUnits.m:
+        return depth;
+      case DepthUnits.ft:
+        return depth * 3.28084;
+      case DepthUnits.fa:
+        return depth * 0.546807;
+    }
+  }
+
   double distanceToDisplay(double distance, {bool fixed = false}) {
     switch (distanceUnits) {
       case DistanceUnits.meters:
@@ -217,6 +229,8 @@ class BoatInstrumentController {
 
   double temperatureToDisplay(double value) {
     switch (temperatureUnits) {
+      case TemperatureUnits.k:
+        return value;
       case TemperatureUnits.c:
         return value - kelvinOffset;
       case TemperatureUnits.f:
@@ -226,6 +240,8 @@ class BoatInstrumentController {
 
   double temperatureFromDisplay(double value) {
     switch (temperatureUnits) {
+      case TemperatureUnits.k:
+        return value;
       case TemperatureUnits.c:
         return value + kelvinOffset;
       case TemperatureUnits.f:
@@ -677,7 +693,7 @@ class BoatInstrumentController {
 
   void _subscribe() {
     if(_boxData.length == _boxesOnPage) {
-      Set<String> paths = {};
+      Set<String> paths = {'navigation.datetime'};
       Set<String> staticPaths = {};
 
       // Find all the unique paths.
