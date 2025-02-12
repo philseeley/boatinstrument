@@ -24,7 +24,7 @@ abstract class DoubleValueGaugeBox extends DoubleValueBox {
   final List<GaugeRange> ranges;
 
   const DoubleValueGaugeBox(super.config, super.title, super.path,
-    {super.minValue = 0, required super.maxValue, super.angle, super.smoothing, super.dataTimeout,
+    {super.minValue = 0, required super.maxValue, super.angle, super.relativeAngle, super.smoothing, super.dataTimeout,
     this.step = 1, this.ranges = const [],
     super.key});
 
@@ -179,7 +179,7 @@ abstract class DoubleValueSemiGaugeBox extends DoubleValueGaugeBox {
   final bool mirror;
 
   const DoubleValueSemiGaugeBox(super.config, super.title, this.orientation, super.path,
-    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.smoothing, super.dataTimeout, super.ranges,
+    {super.minValue = 0, required super.maxValue, super.step, super.angle, super.relativeAngle, super.smoothing, super.dataTimeout, super.ranges,
     this.mirror = false, super.key});
 
   @override
