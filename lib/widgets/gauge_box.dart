@@ -417,9 +417,10 @@ class _BarGaugePainter extends CustomPainter {
 }
 
 abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
+  final bool showPercent;
 
   const DoubleValueBarGaugeBox(super.config, super.title, super.path,
-    {super.minValue = 0, required super.maxValue, required super.step,
+    {this.showPercent = false, super.minValue = 0, required super.maxValue, required super.step,
     super.ranges, super.smoothing, super.dataTimeout, super.key});
 
   @override
@@ -430,14 +431,16 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
   @override
   Widget build(BuildContext context) {
     const double pad = 5.0;
+    final TextStyle style = Theme.of(context).textTheme.titleMedium!;
+
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.title, style: Theme.of(context).textTheme.titleMedium))]),
+      Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text('${widget.title}${widget.showPercent?' ${((value??0)*100).toInt()}%':''}', style: style))]),
       Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
           painter: _BarGaugePainter(context, minDisplay, maxDisplay, _displayStep, _displayRanges, displayValue)
       )))),
-      Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: Theme.of(context).textTheme.titleMedium))]),
+      Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: style))]),
     ]);
   }
 }
