@@ -59,7 +59,18 @@ class SpeedThroughWaterGraph extends GraphBox {
 }
 
 class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
-  const AttitudeRollGaugeBox(config, {super.key}) : super(config, 'Roll', GaugeOrientation.down, 'navigation.attitude', minValue: -pi/4, maxValue: pi/4, step: pi/40, mirror: true, angle: true);
+  const AttitudeRollGaugeBox(config, {super.key}) : super(
+    config,
+    'Roll',
+    GaugeOrientation.down,
+    'navigation.attitude',
+    minValue: -pi/4,
+    maxValue: pi/4,
+    step: pi/40,
+    mirror: true,
+    angle: true,
+    relativeAngle: true,
+    smoothing: false);
 
   static String sid = 'boat-attitude-roll';
   @override
