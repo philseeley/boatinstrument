@@ -180,6 +180,7 @@ const _$DepthUnitsEnumMap = {
 const _$TemperatureUnitsEnumMap = {
   TemperatureUnits.c: 'c',
   TemperatureUnits.f: 'f',
+  TemperatureUnits.k: 'k',
 };
 
 const _$AirPressureUnitsEnumMap = {

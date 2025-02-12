@@ -229,6 +229,8 @@ class BoatInstrumentController {
 
   double temperatureToDisplay(double value) {
     switch (temperatureUnits) {
+      case TemperatureUnits.k:
+        return value;
       case TemperatureUnits.c:
         return value - kelvinOffset;
       case TemperatureUnits.f:
@@ -238,6 +240,8 @@ class BoatInstrumentController {
 
   double temperatureFromDisplay(double value) {
     switch (temperatureUnits) {
+      case TemperatureUnits.k:
+        return value;
       case TemperatureUnits.c:
         return value + kelvinOffset;
       case TemperatureUnits.f:

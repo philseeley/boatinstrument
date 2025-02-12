@@ -548,7 +548,8 @@ enum DepthUnits implements EnumMenuEntry {
 
 enum TemperatureUnits implements EnumMenuEntry {
   c('Centigrade', 'C'),
-  f('Fahrenheit', 'F');
+  f('Fahrenheit', 'F'),
+  k('Kelvin', 'K');
 
   @override
   String get displayName => _displayName;
