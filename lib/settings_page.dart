@@ -249,6 +249,10 @@ class _SettingsState extends State<SettingsPage> {
           title: EnumDropdownMenu(CapacityUnits.values, widget._controller._settings?.capacityUnits, (v) {widget._controller._settings?.capacityUnits = v!;})
       ),
       ListTile(
+          leading: const Text("Fluid Rate:"),
+          title: EnumDropdownMenu(FluidRateUnits.values, widget._controller._settings?.fluidRateUnits, (v) {widget._controller._settings?.fluidRateUnits = v!;})
+      ),
+      ListTile(
           leading: const Text("Port/Starboard Colours:"),
           title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),

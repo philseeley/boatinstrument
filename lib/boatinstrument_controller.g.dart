@@ -114,6 +114,9 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       capacityUnits:
           $enumDecodeNullable(_$CapacityUnitsEnumMap, json['capacityUnits']) ??
               CapacityUnits.liter,
+      fluidRateUnits: $enumDecodeNullable(
+              _$FluidRateUnitsEnumMap, json['fluidRateUnits']) ??
+          FluidRateUnits.litersPerHour,
       portStarboardColors: $enumDecodeNullable(
               _$PortStarboardColorsEnumMap, json['portStarboardColors']) ??
           PortStarboardColors.redGreen,
@@ -150,6 +153,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'airPressureUnits': _$AirPressureUnitsEnumMap[instance.airPressureUnits]!,
       'oilPressureUnits': _$OilPressureUnitsEnumMap[instance.oilPressureUnits]!,
       'capacityUnits': _$CapacityUnitsEnumMap[instance.capacityUnits]!,
+      'fluidRateUnits': _$FluidRateUnitsEnumMap[instance.fluidRateUnits]!,
       'portStarboardColors':
           _$PortStarboardColorsEnumMap[instance.portStarboardColors]!,
       'pages': instance.pages,
@@ -199,6 +203,12 @@ const _$CapacityUnitsEnumMap = {
   CapacityUnits.liter: 'liter',
   CapacityUnits.gallon: 'gallon',
   CapacityUnits.usGallon: 'usGallon',
+};
+
+const _$FluidRateUnitsEnumMap = {
+  FluidRateUnits.litersPerHour: 'litersPerHour',
+  FluidRateUnits.gallonsPerHour: 'gallonsPerHour',
+  FluidRateUnits.usGallonsPerHour: 'usGallonsPerHour',
 };
 
 const _$PortStarboardColorsEnumMap = {

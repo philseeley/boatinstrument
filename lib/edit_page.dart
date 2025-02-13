@@ -73,6 +73,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(EngineTempBox.sid, 'Engine Temp', gauge: true, (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineExhaustTempBox.sid, 'Engine Exhaust Temp', gauge: true, (config) {return EngineExhaustTempBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineOilPressureBox.sid, 'Engine Oil Pressure', gauge: true, (config) {return EngineOilPressureBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineFuelRateBox.sid, 'Fuel Rate', (config) {return EngineFuelRateBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(TanksBox.sid, 'Tanks', (config) {return TanksBox(config, key: UniqueKey());}),
   BoxDetails(FreshWaterTankBox.sid, 'Fresh Water', gauge: true, (config) {return FreshWaterTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(GreyWaterTankBox.sid, 'Grey Water', gauge: true, (config) {return GreyWaterTankBox.fromSettings(config, key: UniqueKey());}),
@@ -224,6 +225,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(EngineTempBox.sid),
         _widgetMenuEntry(EngineOilPressureBox.sid),
         _widgetMenuEntry(EngineExhaustTempBox.sid),
+        _widgetMenuEntry(EngineFuelRateBox.sid),
       ]),
       _widgetSubMenuEntry(box, 'Raspberry Pi', [
         _widgetMenuEntry(RPiCPUTemperatureBox.sid),

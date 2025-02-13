@@ -140,6 +140,7 @@ class BoatInstrumentController {
   AirPressureUnits get airPressureUnits => _settings!.airPressureUnits;
   OilPressureUnits get oilPressureUnits => _settings!.oilPressureUnits;
   CapacityUnits get capacityUnits => _settings!.capacityUnits;
+  FluidRateUnits get fluidRateUnits => _settings!.fluidRateUnits;
   int get numOfPages => _settings!.pages.length;
   bool get muted => _notifications.entries.any((element) => element.value.mute);
 
@@ -299,6 +300,17 @@ class BoatInstrumentController {
         return value / 219.969248;
       case CapacityUnits.usGallon:
         return value / 264.172052;
+    }
+  }
+
+  double fluidRateToDisplay(double value) {
+    switch (fluidRateUnits) {
+      case FluidRateUnits.litersPerHour:
+        return value * 3600000;
+      case FluidRateUnits.gallonsPerHour:
+        return value * 791889.293877;
+      case FluidRateUnits.usGallonsPerHour:
+        return value * 951019.388489;
     }
   }
 

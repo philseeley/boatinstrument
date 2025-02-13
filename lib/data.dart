@@ -598,6 +598,19 @@ enum CapacityUnits implements EnumMenuEntry {
   const CapacityUnits(this._displayName, this.unit);
 }
 
+enum FluidRateUnits implements EnumMenuEntry {
+  litersPerHour('Liters per Hour', 'L/h'),
+  gallonsPerHour('Gallons per Hour', 'gal/h'),
+  usGallonsPerHour('US Gallons per Hour', 'US gal/h');
+
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
+  final String unit;
+
+  const FluidRateUnits(this._displayName, this.unit);
+}
+
 enum PortStarboardColors implements EnumMenuEntry {
   none('None', Colors.black, Colors.white), // These are just placeholders and not used.
   redGreen('Red/Green', Colors.red, Colors.green),
@@ -641,6 +654,7 @@ class _Settings {
   AirPressureUnits airPressureUnits;
   OilPressureUnits oilPressureUnits;
   CapacityUnits capacityUnits;
+  FluidRateUnits fluidRateUnits;
   PortStarboardColors portStarboardColors;
   late List<_Page> pages;
   late Map<String, dynamic> boxSettings;
@@ -676,6 +690,7 @@ class _Settings {
     this.airPressureUnits = AirPressureUnits.millibar,
     this.oilPressureUnits = OilPressureUnits.kpa,
     this.capacityUnits = CapacityUnits.liter,
+    this.fluidRateUnits = FluidRateUnits.litersPerHour,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
     widgetSettings
