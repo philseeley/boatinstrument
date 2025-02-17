@@ -129,6 +129,7 @@ class BoatInstrumentController {
   Uri get httpApiUri => _httpApiUri;
   Uri get wsUri => _wsUri;
   int get valueSmoothing => _settings!.valueSmoothing;
+  int get dataTimeout => _settings!.dataTimeout;
   bool get darkMode => _settings!.darkMode;
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;

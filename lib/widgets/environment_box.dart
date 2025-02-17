@@ -38,7 +38,7 @@ class DepthBelowSurfaceGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  DepthBelowSurfaceGraphBackground({controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, 'environment.depth.belowSurface', smoothing: false);
+  DepthBelowSurfaceGraphBackground({controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, {'environment.depth.belowSurface'}, smoothing: false);
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -86,7 +86,7 @@ class DepthBelowKeelGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  DepthBelowKeelGraphBackground({controller}) : super(controller: controller, DepthBelowKeelGraph.sid, 'environment.depth.belowKeel', smoothing: false);
+  DepthBelowKeelGraphBackground({controller}) : super(controller: controller, DepthBelowKeelGraph.sid, {'environment.depth.belowKeel'}, smoothing: false);
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -134,7 +134,7 @@ class DepthBelowTransducerGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  DepthBelowTransducerGraphBackground({controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, 'environment.depth.belowTransducer', smoothing: false);
+  DepthBelowTransducerGraphBackground({controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, {'environment.depth.belowTransducer'}, smoothing: false);
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -192,7 +192,7 @@ class WaterTemperatureGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  WaterTemperatureGraphBackground({controller}) : super(controller: controller, WaterTemperatureGraph.sid, 'environment.water.temperature');
+  WaterTemperatureGraphBackground({controller}) : super(controller: controller, WaterTemperatureGraph.sid, {'environment.water.temperature'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -358,7 +358,7 @@ class OutsideTemperatureGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  OutsideTemperatureGraphBackground({controller}) : super(controller: controller, OutsideTemperatureGraph.sid, 'environment.outside.temperature');
+  OutsideTemperatureGraphBackground({controller}) : super(controller: controller, OutsideTemperatureGraph.sid, {'environment.outside.temperature'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -771,7 +771,7 @@ class OutsidePressureGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  OutsidePressureGraphBackground({controller}) : super(controller: controller, OutsidePressureGraph.sid, 'environment.outside.pressure');
+  OutsidePressureGraphBackground({controller}) : super(controller: controller, OutsidePressureGraph.sid, {'environment.outside.pressure'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;

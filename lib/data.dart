@@ -787,11 +787,11 @@ abstract class BackgroundData {
   double? maxValue;
   bool smoothing;
 
-  BackgroundData(String id, String path, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
+  BackgroundData(String id, Set<String> paths, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
     if(controller != null) {
       duration = Duration(minutes: _$BackgroundDataSettingsFromJson(controller!.getBoxSettingsJson(id)).dataDuration.minutes);
 
-      controller!.configure(onUpdate: processUpdates, paths: { path }, isBox: false);
+      controller!.configure(onUpdate: processUpdates, paths: paths, isBox: false);
     }
   }
 
