@@ -1,4 +1,5 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -255,6 +256,43 @@ class _EngineOilPressureState extends DoubleValueSemiGaugeBoxState<EngineOilPres
 
     return super.build(context);
   }
+}
+
+class EngineFuelRateBox extends DoubleValueBox {
+  static const sid = 'propulsion-fuel-rate';
+  @override
+  String get id => sid;
+
+  final _EngineSettings _settings;
+
+  const EngineFuelRateBox._init(this._settings, super.config, super.title, super.path, {super.key, super.minLen, super.precision});
+
+  factory EngineFuelRateBox.fromSettings(config, {key}) {
+    _EngineSettings s = _$EngineSettingsFromJson(config.settings);
+
+    return EngineFuelRateBox._init(s, config, 'Fuel Rate:${s.id}', 'propulsion.${s.id}.fuel.rate', minLen: 1, precision: 2, key: key);
+  }
+
+  @override
+  double convert(double value) {
+    return config.controller.fluidRateToDisplay(value);
+  }
+  
+  @override
+  String units(double value) {
+    return config.controller.fluidRateUnits.unit;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _EngineSettingsWidget(config.controller, _settings);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.fuel.rate" the ID is "port"');
 }
 
 class _EngineSettingsWidget extends BoxSettingsWidget {

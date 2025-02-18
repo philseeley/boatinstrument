@@ -32,7 +32,7 @@ class CrossTrackErrorGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, 'navigation.*.crossTrackError');
+  CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -174,7 +174,7 @@ class SpeedOverGroundGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  SpeedOverGroundGraphBackground({controller}) : super(controller: controller, SpeedOverGroundGraph.sid, 'navigation.speedOverGround');
+  SpeedOverGroundGraphBackground({controller}) : super(controller: controller, SpeedOverGroundGraph.sid, {'navigation.speedOverGround'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;

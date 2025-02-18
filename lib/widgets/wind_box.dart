@@ -223,7 +223,7 @@ class TrueWindSpeedGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  TrueWindSpeedGraphBackground({controller}) : super(controller: controller, TrueWindSpeedGraph.sid, 'environment.wind.speedTrue');
+  TrueWindSpeedGraphBackground({controller}) : super(controller: controller, TrueWindSpeedGraph.sid, {'environment.wind.speedTrue'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;
@@ -268,7 +268,7 @@ class ApparentWindSpeedGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, 'environment.wind.speedApparent');
+  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, {'environment.wind.speedApparent'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;

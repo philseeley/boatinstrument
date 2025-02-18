@@ -22,7 +22,7 @@ class SpeedThroughWaterGraphBackground extends BackgroundData {
   static double? _value;
   static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
-  SpeedThroughWaterGraphBackground({controller}) : super(controller: controller, SpeedThroughWaterGraph.sid, 'navigation.speedThroughWater');
+  SpeedThroughWaterGraphBackground({controller}) : super(controller: controller, SpeedThroughWaterGraph.sid, {'navigation.speedThroughWater'});
 
   @override
   CircularBuffer<DataPoint> get data => _data;

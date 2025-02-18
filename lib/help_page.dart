@@ -48,6 +48,7 @@ Boxes marked '''),
       const ListTile(leading: Icon(Icons.drag_handle), title: Text('Drag handle for reordering pages')),
       const ListTile(leading: Icon(Icons.share), title: Text('Shares/Exports the Settings')),
       const ListTile(leading: Icon(Icons.file_open), title: Text('Imports Settings from a file')),
+      const ListTile(leading: Icon(Icons.mediation), title: Text('Show the current SignalK Subscriptions')),
       const ListTile(leading: Icon(Icons.notes), title: Text('Shows the message/error log')),
       const ListTile(leading: Icon(Icons.change_history), title: Text('Shows the change log')),
     ];

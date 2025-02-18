@@ -4,6 +4,7 @@ import 'package:boatinstrument/authorization.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
+import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:format/format.dart';
 import 'package:http/http.dart' as http;
@@ -1005,5 +1006,150 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
     if(mounted) {
       setState(() {});
     }
+  }
+}
+
+class Power {
+  double voltage = 0;
+  double current = 0;
+  DateTime timestamp = DateTime.now();
+}
+
+abstract class PowerGraphBackground extends BackgroundData {
+
+  PowerGraphBackground(sid, String basePath, {controller}) : super(controller: controller, sid, {'$basePath.*.voltage', '$basePath.*.current'});
+
+  Map<String, Power> get power;
+
+  @override
+  processUpdates(List<Update>? updates) {
+    if(updates == null) {
+      power.clear();
+    } else {
+      DateTime now = DateTime.now();
+
+      for (Update u in updates) {
+        try {
+          List<String> ps = u.path.split('.');
+          String id = ps[2];
+          Power p = power.putIfAbsent(id, () => Power());
+          p.timestamp = now;
+
+          switch (ps[3]) {
+            case 'voltage':
+              p.voltage = (u.value as num).toDouble();
+              break;
+            case 'current':
+              p.current = (u.value as num).toDouble();
+              break;
+          }
+        } catch (e) {
+          controller!.l.e("Error converting $u", error: e);
+        }
+      }
+      
+      value = 0;
+      for(String id in List.from(power.keys)) {
+        Power p = power[id]!;
+        if(now.difference(p.timestamp) > Duration(milliseconds: controller!.dataTimeout)) {
+          power.remove(id);
+        } else {
+          value = value! + (p.voltage * p.current);
+        }
+      }
+    
+      if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
+        data = CircularBuffer<DataPoint>.of(data, data.capacity+BackgroundData.dataIncrement);
+      }
+      data.add(DataPoint(now, value!));
+    }
+  }
+}
+
+class BatteryPowerGraphBackground extends PowerGraphBackground {
+  static final Map<String, Power> _power = {};
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  BatteryPowerGraphBackground({controller}) : super(controller: controller, BatteryPowerGraph.sid, batteriesBasePath);
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+
+  @override
+  Map<String, Power> get power => _power;
+}
+
+class BatteryPowerGraph extends GraphBox {
+  static const String sid = 'electrical-battery-power-graph';
+  @override
+  String get id => sid;
+
+  final BatteryPowerGraphBackground background = BatteryPowerGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  BatteryPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Power Usage', step: 1000, zeroBase: false);
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return 'W';
+  }
+}
+
+class SolarPowerGraphBackground extends PowerGraphBackground {
+  static final Map<String, Power> _power = {};
+  static double? _value;
+  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
+
+  SolarPowerGraphBackground({controller}) : super(controller: controller, SolarPowerGraph.sid, solarBasePath);
+
+  @override
+  CircularBuffer<DataPoint> get data => _data;
+  @override
+  set data(CircularBuffer<DataPoint> data) => _data = data;
+
+  @override
+  double? get value => _value;
+  @override
+  set value(double? value) => _value = value;
+
+  @override
+  Map<String, Power> get power => _power;
+}
+
+class SolarPowerGraph extends GraphBox {
+  static const String sid = 'electrical-solar-power-graph';
+  @override
+  String get id => sid;
+
+  final SolarPowerGraphBackground background = SolarPowerGraphBackground();
+
+  @override
+  List<DataPoint> get data => background.data;
+
+  SolarPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Solar Power', step: 1000, zeroBase: false);
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return 'W';
   }
 }

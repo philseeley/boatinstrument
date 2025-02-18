@@ -249,6 +249,10 @@ class _SettingsState extends State<SettingsPage> {
           title: EnumDropdownMenu(CapacityUnits.values, widget._controller._settings?.capacityUnits, (v) {widget._controller._settings?.capacityUnits = v!;})
       ),
       ListTile(
+          leading: const Text("Fluid Rate:"),
+          title: EnumDropdownMenu(FluidRateUnits.values, widget._controller._settings?.fluidRateUnits, (v) {widget._controller._settings?.fluidRateUnits = v!;})
+      ),
+      ListTile(
           leading: const Text("Port/Starboard Colours:"),
           title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),
@@ -340,6 +344,7 @@ class _SettingsState extends State<SettingsPage> {
         actions: [
           IconButton(icon: const Icon(Icons.share), onPressed: _share),
           IconButton(icon: const Icon(Icons.file_open), onPressed: _import),
+          IconButton(icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
           IconButton(icon: const Icon(Icons.help), onPressed: _showHelpPage),
           IconButton(icon: const Icon(Icons.notes),onPressed: _showLog)
         ],
@@ -379,5 +384,40 @@ class _SettingsState extends State<SettingsPage> {
         widget._controller.l.e('Failed to import settings', error: e);
       }
     }
+  }
+
+  void _showPathSubscriptions () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _PathSubscriptionsPage(widget._controller);
+    }));
+  }
+}
+
+class _PathSubscriptionsPage extends StatelessWidget {
+  final BoatInstrumentController _controller;
+
+  const _PathSubscriptionsPage(this._controller);
+  
+  @override
+  Widget build(BuildContext context) {
+    List<ListTile> list = [];
+
+    for(var path in _controller.paths) {
+      list.add(ListTile(dense: true, leading: Text(path)));
+    }
+
+    list.add(const ListTile(title: Text('Static Data', textAlign: TextAlign.center)));
+
+    for(var path in _controller.staticPaths) {
+      list.add(ListTile(dense: true, leading: Text(path)));
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Subscriptions'),
+      ),
+      body: ListView(children: list)
+    );
   }
 }

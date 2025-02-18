@@ -116,6 +116,9 @@ class BoatInstrumentController {
   AudioPlayer? _audioPlayer;
   final Map<String, _NotificationStatus> _notifications = {};
   final Set<String> _backgroundIDs = {};
+  final Set<String> _paths = {};
+  final Set<String> _staticPaths = {};
+
 
   BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
@@ -126,6 +129,7 @@ class BoatInstrumentController {
   Uri get httpApiUri => _httpApiUri;
   Uri get wsUri => _wsUri;
   int get valueSmoothing => _settings!.valueSmoothing;
+  int get dataTimeout => _settings!.dataTimeout;
   bool get darkMode => _settings!.darkMode;
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
@@ -140,8 +144,11 @@ class BoatInstrumentController {
   AirPressureUnits get airPressureUnits => _settings!.airPressureUnits;
   OilPressureUnits get oilPressureUnits => _settings!.oilPressureUnits;
   CapacityUnits get capacityUnits => _settings!.capacityUnits;
+  FluidRateUnits get fluidRateUnits => _settings!.fluidRateUnits;
   int get numOfPages => _settings!.pages.length;
   bool get muted => _notifications.entries.any((element) => element.value.mute);
+  Set<String> get paths => _paths;
+  Set<String> get staticPaths => _staticPaths;
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
     if(_settings!.portStarboardColors == PortStarboardColors.none) {
@@ -302,13 +309,24 @@ class BoatInstrumentController {
     }
   }
 
+  double fluidRateToDisplay(double value) {
+    switch (fluidRateUnits) {
+      case FluidRateUnits.litersPerHour:
+        return value * 3600000;
+      case FluidRateUnits.gallonsPerHour:
+        return value * 791889.293877;
+      case FluidRateUnits.usGallonsPerHour:
+        return value * 951019.388489;
+    }
+  }
+
   _loadDefaultConfig(bool portrait) async {
     String config = portrait ?
       'default-config-portrait.json' :
       'default-config-landscape.json';
     String s = await rootBundle.loadString('assets/$config');
     _settings = _Settings.fromJson(jsonDecode(s));
-}
+  }
 
   loadSettings(bool portrait) async {
     try {
@@ -341,6 +359,13 @@ class BoatInstrumentController {
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
   void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, bool dataTimeout = true, bool isBox = true}) {
+
+    // ============= PATH MAPPING =============
+    // String pathsString = '';
+    // for(String p in paths??{}) pathsString='${pathsString.isNotEmpty?'$pathsString<br>':''}$p';
+    // print('$pathsString|');
+    // ============= PATH MAPPING =============
+
     if(!isBox) {
       ++_boxesOnPage;
     }
@@ -434,6 +459,16 @@ class BoatInstrumentController {
                 position: DecorationPosition.foreground,
                 decoration: BoxDecoration(border: Border.all(color: Colors.grey, width: 2)),
                 child: LayoutBuilder(builder: (context, constraints) {
+
+                  // ============= PATH MAPPING =============
+                  // List<BoxWidget> stack = [];
+                  // for(BoxDetails bd in boxDetails) {
+                  //   print('|${bd.id}|${bd.description}|');
+                  //   stack.add(bd.build(BoxWidgetConfig(this, box.settings, constraints, false)));
+                  // }
+                  // return Stack(children: stack);
+                  // ============= PATH MAPPING =============
+
                   return getBoxDetails(box.id).build(BoxWidgetConfig(this, box.settings, constraints, false));
                 }))));
       }
@@ -693,22 +728,23 @@ class BoatInstrumentController {
 
   void _subscribe() {
     if(_boxData.length == _boxesOnPage) {
-      Set<String> paths = {'navigation.datetime'};
-      Set<String> staticPaths = {};
+      _paths.clear();
+      _paths.add('navigation.datetime');
+      _staticPaths.clear();
 
       // Find all the unique paths.
       for (_BoxData bd in _boxData) {
-        paths.addAll(bd.paths);
-        staticPaths.addAll(bd.staticPaths);
+        _paths.addAll(bd.paths);
+        _staticPaths.addAll(bd.staticPaths);
       }
 
-      _getStaticData(staticPaths);
+      _getStaticData(_staticPaths);
 
       _unsubscribe();
 
       List<Map<String, String>> subscribe = [];
 
-      for(String path in paths) {
+      for(String path in _paths) {
         subscribe.add({
           "path": path,
           "policy": 'instant',

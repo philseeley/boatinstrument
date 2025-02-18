@@ -73,6 +73,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(EngineTempBox.sid, 'Engine Temp', gauge: true, (config) {return EngineTempBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineExhaustTempBox.sid, 'Engine Exhaust Temp', gauge: true, (config) {return EngineExhaustTempBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(EngineOilPressureBox.sid, 'Engine Oil Pressure', gauge: true, (config) {return EngineOilPressureBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(EngineFuelRateBox.sid, 'Fuel Rate', (config) {return EngineFuelRateBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(TanksBox.sid, 'Tanks', (config) {return TanksBox(config, key: UniqueKey());}),
   BoxDetails(FreshWaterTankBox.sid, 'Fresh Water', gauge: true, (config) {return FreshWaterTankBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(GreyWaterTankBox.sid, 'Grey Water', gauge: true, (config) {return GreyWaterTankBox.fromSettings(config, key: UniqueKey());}),
@@ -100,6 +101,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RPiMemoryUtilisationBox.sid, 'RPi Memory Utilisation', gauge: true, (config) {return RPiMemoryUtilisationBox(config, key: UniqueKey());}),
   BoxDetails(RPiSDUtilisationBox.sid, 'RPi SD Utilisation', gauge: true, (config) {return RPiSDUtilisationBox(config, key: UniqueKey());}),
   BoxDetails(RaspberryPiBox.sid, 'Raspberry Pi', experimental: true, (config) {return RaspberryPiBox(config, key: UniqueKey());}),
+  BoxDetails(BatteryPowerGraph.sid, 'Power Usage', graph: true, experimental: true, background: (ctrl) {BatteryPowerGraphBackground(controller: ctrl);}, (config) {return BatteryPowerGraph(config, key: UniqueKey());}),
+  BoxDetails(SolarPowerGraph.sid, 'Solar Power', graph: true, experimental: true, background: (ctrl) {SolarPowerGraphBackground(controller: ctrl);}, (config) {return SolarPowerGraph(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -201,6 +204,7 @@ class _EditPageState extends State<_EditPage> {
       ]),
       _widgetSubMenuEntry(box, 'Electrical', [
         _widgetMenuEntry(BatteriesBox.sid),
+        _widgetMenuEntry(BatteryPowerGraph.sid),
         _widgetMenuEntry(BatteryVoltMeterBox.sid),
         _widgetMenuEntry(BatteryVoltageBox.sid),
         _widgetMenuEntry(BatteryCurrentBox.sid),
@@ -208,6 +212,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(InverterCurrentBox.sid),
         _widgetMenuEntry(SolarVoltageBox.sid),
         _widgetMenuEntry(SolarCurrentBox.sid),
+        _widgetMenuEntry(SolarPowerGraph.sid),
         _widgetMenuEntry(ElectricalSwitchesBox.sid),
         _widgetMenuEntry(ElectricalSwitchBox.sid),
       ]),
@@ -224,6 +229,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(EngineTempBox.sid),
         _widgetMenuEntry(EngineOilPressureBox.sid),
         _widgetMenuEntry(EngineExhaustTempBox.sid),
+        _widgetMenuEntry(EngineFuelRateBox.sid),
       ]),
       _widgetSubMenuEntry(box, 'Raspberry Pi', [
         _widgetMenuEntry(RPiCPUTemperatureBox.sid),

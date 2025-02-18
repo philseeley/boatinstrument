@@ -1,4 +1,37 @@
+  * 0.5.0 Added experimental support for Graphs.
+          Added Kelvin to Temperature units.
+          The current SignalK Subscriptions can now be listed.
 
+          Added Boxes for:
+            VNC - Experimental
+            Raspberry Pi Info
+            Exhaust Temperature
+            Battery Temperature
+            Fuel Rate
+
+          Added Graphs for:
+            True and Apparent Wind Speed
+            Water and Outside Temperature
+            Speed and SOG
+            Outside Pressure
+            Cross Track Error
+            Depths
+            Battery and Solar Power
+
+          Box changes:
+            Wind Rose - the Speed Boxes can now be Maximized
+            Tank Boxes - now show percentage
+            
+          Custom Boxes:
+            Added Data Timeout toggle
+
+          Bug fixes:
+            Timers are now disposed of properly.
+            We now always subscribe to navigation.datetime so that that we don't
+              reconnect if only static data is displayed.
+            When editing Boxes, we now cope with devices that have restricted
+              areas of the screen.
+            The Roll Gauge now show negative values.
   * 0.4.0 Added option for enabling Experimental Boxes.
   
           We now handle notifications in a more sane way so we don't continually
