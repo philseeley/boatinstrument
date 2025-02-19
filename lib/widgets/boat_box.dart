@@ -15,7 +15,23 @@ class SpeedThroughWaterBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const SpeedThroughWaterBox(config, {super.key}) : super(config, 'Speed', 'navigation.speedThroughWater');
+  const SpeedThroughWaterBox(config, {super.valueToDisplay, super.key}) : super(config, 'Speed', 'navigation.speedThroughWater');
+}
+
+class MaxSpeedThroughWaterBox extends SpeedThroughWaterBox {
+  static double _extremeValue = 0;
+
+  static const String sid = 'boat-speed-through-water-max';
+  @override
+  String get id => sid;
+
+  const MaxSpeedThroughWaterBox(super.config, {super.valueToDisplay = ValueToDisplay.maximumValue, super.key});
+
+  @override
+  double get extremeValue => _extremeValue;
+  
+  @override
+  set extremeValue(double maximumValue) => _extremeValue = maximumValue;
 }
 
 class SpeedThroughWaterGraphBackground extends BackgroundData {

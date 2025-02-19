@@ -13,7 +13,7 @@ part 'environment_box.g.dart';
 
 abstract class DepthBox extends DoubleValueBox {
 
-  const DepthBox(super.config, super.title, super.path, {super.key}) : super(maxValue: 1000.0, smoothing: false);
+  const DepthBox(super.config, super.title, super.path, {super.valueToDisplay, super.key}) : super(maxValue: 1000.0, smoothing: false);
 
   @override
   double convert(double value) {
@@ -31,7 +31,23 @@ class DepthBelowSurfaceBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowSurfaceBox(config, {super.key}) : super(config, 'Depth', 'environment.depth.belowSurface');
+  const DepthBelowSurfaceBox(config, {super.valueToDisplay, super.key}) : super(config, 'Depth', 'environment.depth.belowSurface');
+}
+
+class MinDepthBelowSurfaceBox extends DepthBelowSurfaceBox {
+  static double _extremeValue = double.infinity;
+
+  static const String sid = 'environment-depth-belowSurface-min';
+  @override
+  String get id => sid;
+
+  const MinDepthBelowSurfaceBox(super.config, {super.valueToDisplay = ValueToDisplay.minimumValue, super.key});
+  
+  @override
+  double get extremeValue => _extremeValue;
+  
+  @override
+  set extremeValue(double extremeValue) => _extremeValue = extremeValue;
 }
 
 class DepthBelowSurfaceGraphBackground extends BackgroundData {
@@ -79,7 +95,23 @@ class DepthBelowKeelBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowKeelBox(config, {super.key}) : super(config, 'Depth below Keel', 'environment.depth.belowKeel');
+  const DepthBelowKeelBox(config, {super.valueToDisplay, super.key}) : super(config, 'DBK', 'environment.depth.belowKeel');
+}
+
+class MinDepthBelowKeelBox extends DepthBelowKeelBox {
+  static double _extremeValue = double.infinity;
+
+  static const String sid = 'environment-depth-belowKeel-min';
+  @override
+  String get id => sid;
+
+  const MinDepthBelowKeelBox(super.config, {super.valueToDisplay = ValueToDisplay.minimumValue, super.key});
+  
+  @override
+  double get extremeValue => _extremeValue;
+  
+  @override
+  set extremeValue(double extremeValue) => _extremeValue = extremeValue;
 }
 
 class DepthBelowKeelGraphBackground extends BackgroundData {
@@ -127,7 +159,23 @@ class DepthBelowTransducerBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowTransducerBox(config, {super.key}) : super(config, 'DBT', 'environment.depth.belowTransducer');
+  const DepthBelowTransducerBox(config, {super.valueToDisplay, super.key}) : super(config, 'DBT', 'environment.depth.belowTransducer');
+}
+
+class MinDepthBelowTransducerBox extends DepthBelowTransducerBox {
+  static double _extremeValue = double.infinity;
+
+  static const String sid = 'environment-depth-belowTransducer-min';
+  @override
+  String get id => sid;
+
+  const MinDepthBelowTransducerBox(super.config, {super.valueToDisplay = ValueToDisplay.minimumValue, super.key});
+  
+  @override
+  double get extremeValue => _extremeValue;
+  
+  @override
+  set extremeValue(double extremeValue) => _extremeValue = extremeValue;
 }
 
 class DepthBelowTransducerGraphBackground extends BackgroundData {

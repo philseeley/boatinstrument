@@ -4,7 +4,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 
 abstract class SpeedBox extends DoubleValueBox {
 
-  const SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1);
+  const SpeedBox(super.config, super.title, super.path, {super.valueToDisplay, super.key}) : super(minLen: 1);
 
   @override
   double convert(double value) {
@@ -158,7 +158,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
 
   void _resetExtremeValue() {
     setState(() {
-      widget.extremeValue = 0;
+      widget.extremeValue = (widget.valueToDisplay == ValueToDisplay.minimumValue) ? double.infinity : 0;
     });
   }
 }

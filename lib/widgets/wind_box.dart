@@ -66,7 +66,7 @@ class WindSpeedApparentBox extends WindSpeedBox {
 }
 
 class MaxWindSpeedApparentBox extends WindSpeedApparentBox {
-  static double _maximumValue = 0;
+  static double _extremeValue = 0;
 
   static const String sid = 'wind-speed-apparent-max';
   @override
@@ -75,10 +75,10 @@ class MaxWindSpeedApparentBox extends WindSpeedApparentBox {
   const MaxWindSpeedApparentBox(super.config, {super.key, super.valueToDisplay = ValueToDisplay.maximumValue});
   
   @override
-  double get extremeValue => _maximumValue;
+  double get extremeValue => _extremeValue;
   
   @override
-  set extremeValue(double maximumValue) => _maximumValue = maximumValue;
+  set extremeValue(double maximumValue) => _extremeValue = maximumValue;
 }
 
 class WindSpeedTrueBox extends WindSpeedBox {
@@ -90,7 +90,7 @@ class WindSpeedTrueBox extends WindSpeedBox {
 }
 
 class MaxWindSpeedTrueBox extends WindSpeedTrueBox {
-  static double _maximumValue = 0;
+  static double _extremeValue = 0;
 
   static const String sid = 'wind-speed-true-max';
   @override
@@ -99,10 +99,10 @@ class MaxWindSpeedTrueBox extends WindSpeedTrueBox {
   const MaxWindSpeedTrueBox(super.config, {super.key, super.valueToDisplay = ValueToDisplay.maximumValue});
   
   @override
-  double get extremeValue => _maximumValue;
+  double get extremeValue => _extremeValue;
   
   @override
-  set extremeValue(double maximumValue) => _maximumValue = maximumValue;
+  set extremeValue(double maximumValue) => _extremeValue = maximumValue;
 }
 
 abstract class WindSpeedBox extends DoubleValueBox {

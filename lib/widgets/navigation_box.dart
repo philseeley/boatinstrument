@@ -167,7 +167,23 @@ class SpeedOverGroundBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+  const SpeedOverGroundBox(config, {super.valueToDisplay, super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+}
+
+class MaxSpeedOverGroundBox extends SpeedOverGroundBox {
+  static double _extremeValue = 0;
+
+  static const String sid = 'navigation-speed-over-ground-max';
+  @override
+  String get id => sid;
+
+  const MaxSpeedOverGroundBox(super.config, {super.valueToDisplay = ValueToDisplay.maximumValue, super.key});
+  
+  @override
+  double get extremeValue => _extremeValue;
+  
+  @override
+  set extremeValue(double maximumValue) => _extremeValue = maximumValue;
 }
 
 class SpeedOverGroundGraphBackground extends BackgroundData {
