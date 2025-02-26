@@ -17,21 +17,9 @@ abstract class SpeedBox extends DoubleValueBox {
   }
 }
 
-enum ValueToDisplay implements EnumMenuEntry {
-  value('Value', ''),
-  minimumValue('Minimum', 'Min '),
-  maximumValue('Maximum', 'Max ');
-
-  @override
-  String get displayName => _displayName;
-
-  final String _displayName;
-  final String title;
-
-  const ValueToDisplay(this._displayName, this.title);
-}
-
 abstract class DoubleValueBox extends BoxWidget {
+  static final Map<String, double> extremeValues = {};
+
   final String title;
   final String path;
   final int precision;
@@ -43,7 +31,7 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool smoothing;
   final bool portStarboard;
   final bool dataTimeout;
-  final ValueToDisplay valueToDisplay;
+  final DoubleValueToDisplay valueToDisplay;
 
   const DoubleValueBox(super.config, this.title, this.path, {
     this.precision = 1,
@@ -55,7 +43,7 @@ abstract class DoubleValueBox extends BoxWidget {
     this.smoothing = true,
     this.portStarboard = false,
     this.dataTimeout = true,
-    this.valueToDisplay = ValueToDisplay.value,
+    this.valueToDisplay = DoubleValueToDisplay.value,
     super.key});
 
   @override
@@ -69,8 +57,8 @@ abstract class DoubleValueBox extends BoxWidget {
 
   String units(double value);
 
-  double get extremeValue => throw UnimplementedError();
-  set extremeValue(double value) => throw UnimplementedError();
+  double get extremeValue => extremeValues.putIfAbsent(id, () => valueToDisplay == DoubleValueToDisplay.minimumValue?double.infinity:0);
+  set extremeValue(double value) => extremeValues[id] = value;
 }
 
 class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
@@ -103,7 +91,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
-        if(widget.valueToDisplay != ValueToDisplay.value) IconButton(icon: Icon(Icons.restore), onPressed: _resetExtremeValue)
+        if(widget.valueToDisplay != DoubleValueToDisplay.value) IconButton(icon: Icon(Icons.restore), onPressed: _resetExtremeValue)
       ])),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
@@ -134,11 +122,11 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
 
         if ((widget.minValue != null && value! < widget.minValue!) ||
             (widget.maxValue != null && value! > widget.maxValue!)) {
-          if(widget.valueToDisplay == ValueToDisplay.value) displayValue = null;
+          if(widget.valueToDisplay == DoubleValueToDisplay.value) displayValue = null;
         } else {
           displayValue = widget.convert(value!);
-          if(widget.valueToDisplay != ValueToDisplay.value) {
-            if(widget.valueToDisplay == ValueToDisplay.minimumValue) {
+          if(widget.valueToDisplay != DoubleValueToDisplay.value) {
+            if(widget.valueToDisplay == DoubleValueToDisplay.minimumValue) {
               widget.extremeValue = (displayValue! < widget.extremeValue) ? displayValue! : widget.extremeValue;
             } else {
               widget.extremeValue = (displayValue! > widget.extremeValue) ? displayValue! : widget.extremeValue;
@@ -158,7 +146,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
 
   void _resetExtremeValue() {
     setState(() {
-      widget.extremeValue = (widget.valueToDisplay == ValueToDisplay.minimumValue) ? double.infinity : 0;
+      widget.extremeValue = (widget.valueToDisplay == DoubleValueToDisplay.minimumValue) ? double.infinity : 0;
     });
   }
 }

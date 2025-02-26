@@ -35,19 +35,11 @@ class DepthBelowSurfaceBox extends DepthBox {
 }
 
 class MinDepthBelowSurfaceBox extends DepthBelowSurfaceBox {
-  static double _extremeValue = double.infinity;
-
   static const String sid = 'environment-depth-belowSurface-min';
   @override
   String get id => sid;
 
-  const MinDepthBelowSurfaceBox(super.config, {super.valueToDisplay = ValueToDisplay.minimumValue, super.key});
-  
-  @override
-  double get extremeValue => _extremeValue;
-  
-  @override
-  set extremeValue(double extremeValue) => _extremeValue = extremeValue;
+  const MinDepthBelowSurfaceBox(super.config, {super.valueToDisplay = DoubleValueToDisplay.minimumValue, super.key});
 }
 
 class DepthBelowSurfaceGraphBackground extends BackgroundData {
@@ -99,19 +91,11 @@ class DepthBelowKeelBox extends DepthBox {
 }
 
 class MinDepthBelowKeelBox extends DepthBelowKeelBox {
-  static double _extremeValue = double.infinity;
-
   static const String sid = 'environment-depth-belowKeel-min';
   @override
   String get id => sid;
 
-  const MinDepthBelowKeelBox(super.config, {super.valueToDisplay = ValueToDisplay.minimumValue, super.key});
-  
-  @override
-  double get extremeValue => _extremeValue;
-  
-  @override
-  set extremeValue(double extremeValue) => _extremeValue = extremeValue;
+  const MinDepthBelowKeelBox(super.config, {super.valueToDisplay = DoubleValueToDisplay.minimumValue, super.key});
 }
 
 class DepthBelowKeelGraphBackground extends BackgroundData {
@@ -163,19 +147,11 @@ class DepthBelowTransducerBox extends DepthBox {
 }
 
 class MinDepthBelowTransducerBox extends DepthBelowTransducerBox {
-  static double _extremeValue = double.infinity;
-
   static const String sid = 'environment-depth-belowTransducer-min';
   @override
   String get id => sid;
 
-  const MinDepthBelowTransducerBox(super.config, {super.valueToDisplay = ValueToDisplay.minimumValue, super.key});
-  
-  @override
-  double get extremeValue => _extremeValue;
-  
-  @override
-  set extremeValue(double extremeValue) => _extremeValue = extremeValue;
+  const MinDepthBelowTransducerBox(super.config, {super.valueToDisplay = DoubleValueToDisplay.minimumValue, super.key});
 }
 
 class DepthBelowTransducerGraphBackground extends BackgroundData {

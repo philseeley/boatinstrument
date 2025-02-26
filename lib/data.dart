@@ -626,6 +626,20 @@ enum PortStarboardColors implements EnumMenuEntry {
   const PortStarboardColors(this._displayName, this.portColor, this.starboardColor);
 }
 
+enum DoubleValueToDisplay implements EnumMenuEntry {
+  value('Value', ''),
+  minimumValue('Minimum', 'Min '),
+  maximumValue('Maximum', 'Max ');
+
+  @override
+  String get displayName => _displayName;
+
+  final String _displayName;
+  final String title;
+
+  const DoubleValueToDisplay(this._displayName, this.title);
+}
+
 @JsonSerializable()
 class _Settings {
   int version;
