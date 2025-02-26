@@ -91,7 +91,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
-        if(widget.valueToDisplay != DoubleValueToDisplay.value) IconButton(icon: Icon(Icons.restore), onPressed: _resetExtremeValue)
+        if(widget.valueToDisplay != DoubleValueToDisplay.value) IconButton(iconSize: style.fontSize, icon: Icon(Icons.restore), constraints: BoxConstraints.tightFor(height: style.fontSize!), visualDensity: VisualDensity(vertical: VisualDensity.minimumDensity), onPressed: _resetExtremeValue)
       ])),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
