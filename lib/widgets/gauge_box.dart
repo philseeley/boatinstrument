@@ -728,8 +728,14 @@ class GraphBoxState extends State<GraphBox> {
     const double pad = 5.0;
     double currentValue = widget.backgroundData.data.lastOrNull?.value??0;
     double displayValue = widget.convert(currentValue);
+    String kUnits = '';
+    if(displayValue.abs() >= 1000) {
+      displayValue = displayValue/1000;
+      kUnits = 'k';
+    }
+
     String currentValueString =
-          fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f} ${widget.units(currentValue)}', displayValue);
+          fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f} $kUnits${widget.units(currentValue)}', displayValue);
 
     return Column(children: [
       Padding(padding: const EdgeInsets.only(left: pad, right: pad), child: Row(children: [
