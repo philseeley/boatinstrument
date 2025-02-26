@@ -137,7 +137,6 @@ class _SpeedPainter extends CustomPainter with DoubleValeBoxPainter {
   Offset _trueSpeedLoc = Offset(0, 0);
 
   static const double _hubWidth = 12;
-  static const double _pad = 5;
   final BoatInstrumentController _controller;
   final BuildContext _context;
   final bool _close;
@@ -188,8 +187,6 @@ class _SpeedPainter extends CustomPainter with DoubleValeBoxPainter {
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
-    Color fg = Theme.of(_context).colorScheme.onSurface;
-    Color bg = Theme.of(_context).colorScheme.surface;
     double centre = min(canvasSize.width, canvasSize.height)/2;
     TextStyle style = Theme.of(_context).textTheme.bodyMedium!.copyWith(height: 1.0);
 
