@@ -144,7 +144,7 @@ class _EditPageState extends State<_EditPage> {
           Navigator.pop(context);
         });
       },
-      child: ListTile(title: Text(text), trailing: const Icon(Icons.arrow_right)),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(text), const Icon(Icons.arrow_right)]),
     ));
   }
 
