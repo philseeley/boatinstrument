@@ -1068,20 +1068,8 @@ abstract class PowerGraphBackground extends BackgroundData {
 
 class BatteryPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
   BatteryPowerGraphBackground({controller}) : super(controller: controller, BatteryPowerGraph.sid, batteriesBasePath);
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 
   @override
   Map<String, Power> get power => _power;
@@ -1092,12 +1080,7 @@ class BatteryPowerGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final BatteryPowerGraphBackground background = BatteryPowerGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  BatteryPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Power Usage', step: 1000, zeroBase: false);
+  BatteryPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Power Usage', BatteryPowerGraphBackground(), step: 1000, zeroBase: false);
 
   @override
   double convert(double value) {
@@ -1112,20 +1095,8 @@ class BatteryPowerGraph extends GraphBox {
 
 class SolarPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
 
   SolarPowerGraphBackground({controller}) : super(controller: controller, SolarPowerGraph.sid, solarBasePath);
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 
   @override
   Map<String, Power> get power => _power;
@@ -1136,12 +1107,7 @@ class SolarPowerGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final SolarPowerGraphBackground background = SolarPowerGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  SolarPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Solar Power', step: 1000, zeroBase: false);
+  SolarPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Solar Power', SolarPowerGraphBackground(), step: 1000, zeroBase: false);
 
   @override
   double convert(double value) {

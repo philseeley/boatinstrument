@@ -651,6 +651,7 @@ class _GraphSettings {
 
 abstract class GraphBox extends BoxWidget {
   late final _GraphSettings _settings;
+  final BackgroundData backgroundData;
 
   final String title;
   final double step;
@@ -661,12 +662,10 @@ abstract class GraphBox extends BoxWidget {
   final bool mirror;
   final List<GaugeRange> ranges;
 
-  GraphBox(super.config, this.title, 
+  GraphBox(super.config, this.title, this.backgroundData,
     {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.vertical = false, this.mirror = false, this.ranges = const [], super.key}) {
     _settings = _$GraphSettingsFromJson(config.settings);
   }
-
-  List<DataPoint> get data;
 
   double convert(double value);
 
@@ -727,7 +726,7 @@ class GraphBoxState extends State<GraphBox> {
   @override
   Widget build(BuildContext context) {
     const double pad = 5.0;
-    double currentValue = widget.data.lastOrNull?.value??0;
+    double currentValue = widget.backgroundData.data.lastOrNull?.value??0;
     double displayValue = widget.convert(currentValue);
     String currentValueString =
           fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f} ${widget.units(currentValue)}', displayValue);
@@ -744,7 +743,7 @@ class GraphBoxState extends State<GraphBox> {
       Expanded(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _GraphPainter(context, widget, widget.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
+          painter: _GraphPainter(context, widget, widget.backgroundData.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
       )))),
     ]);
   }

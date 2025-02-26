@@ -1,7 +1,6 @@
 import 'dart:math' as m;
 
 import 'package:boatinstrument/widgets/gauge_box.dart';
-import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:format/format.dart' as fmt;
@@ -43,20 +42,7 @@ class MinDepthBelowSurfaceBox extends DepthBelowSurfaceBox {
 }
 
 class DepthBelowSurfaceGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   DepthBelowSurfaceGraphBackground({controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, {'environment.depth.belowSurface'}, smoothing: false);
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class DepthBelowSurfaceGraph extends GraphBox {
@@ -64,12 +50,7 @@ class DepthBelowSurfaceGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final DepthBelowSurfaceGraphBackground background = DepthBelowSurfaceGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  DepthBelowSurfaceGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Depth', step: 10, precision: 1, mirror: true);
+  DepthBelowSurfaceGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Depth', DepthBelowSurfaceGraphBackground(), step: 10, precision: 1, mirror: true);
 
   @override
   double convert(double value) {
@@ -99,20 +80,7 @@ class MinDepthBelowKeelBox extends DepthBelowKeelBox {
 }
 
 class DepthBelowKeelGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   DepthBelowKeelGraphBackground({controller}) : super(controller: controller, DepthBelowKeelGraph.sid, {'environment.depth.belowKeel'}, smoothing: false);
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class DepthBelowKeelGraph extends GraphBox {
@@ -122,10 +90,7 @@ class DepthBelowKeelGraph extends GraphBox {
 
   final DepthBelowKeelGraphBackground background = DepthBelowKeelGraphBackground();
 
-  @override
-  List<DataPoint> get data => background.data;
-
-  DepthBelowKeelGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Depth below Keel', step: 10, precision: 1, mirror: true);
+  DepthBelowKeelGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Depth below Keel', DepthBelowKeelGraphBackground(), step: 10, precision: 1, mirror: true);
 
   @override
   double convert(double value) {
@@ -155,33 +120,14 @@ class MinDepthBelowTransducerBox extends DepthBelowTransducerBox {
 }
 
 class DepthBelowTransducerGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   DepthBelowTransducerGraphBackground({controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, {'environment.depth.belowTransducer'}, smoothing: false);
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class DepthBelowTransducerGraph extends GraphBox {
   static const String sid = 'environment-depth-belowTransducer-graph';
   @override
   String get id => sid;
-
-  final DepthBelowTransducerGraphBackground background = DepthBelowTransducerGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  DepthBelowTransducerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'DBT', step: 10, precision: 1, mirror: true);
+  DepthBelowTransducerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'DBT', DepthBelowTransducerGraphBackground(), step: 10, precision: 1, mirror: true);
 
   @override
   double convert(double value) {
@@ -213,20 +159,7 @@ class WaterTemperatureBox extends DoubleValueBox {
 }
 
 class WaterTemperatureGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   WaterTemperatureGraphBackground({controller}) : super(controller: controller, WaterTemperatureGraph.sid, {'environment.water.temperature'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class WaterTemperatureGraph extends GraphBox {
@@ -234,12 +167,7 @@ class WaterTemperatureGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final WaterTemperatureGraphBackground background = WaterTemperatureGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  WaterTemperatureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Water Temp', step: 1+kelvinOffset, zeroBase: false);
+  WaterTemperatureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Water Temp', WaterTemperatureGraphBackground(), step: 1+kelvinOffset, zeroBase: false);
 
   @override
   double convert(double value) {
@@ -379,20 +307,7 @@ class OutsideTemperatureBox extends DoubleValueBox {
 }
 
 class OutsideTemperatureGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   OutsideTemperatureGraphBackground({controller}) : super(controller: controller, OutsideTemperatureGraph.sid, {'environment.outside.temperature'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class OutsideTemperatureGraph extends GraphBox {
@@ -400,12 +315,7 @@ class OutsideTemperatureGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final OutsideTemperatureGraphBackground background = OutsideTemperatureGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  OutsideTemperatureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Outside Temp', step: 1+kelvinOffset, zeroBase: false);
+  OutsideTemperatureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Outside Temp', OutsideTemperatureGraphBackground(), step: 1+kelvinOffset, zeroBase: false);
 
   @override
   double convert(double value) {
@@ -792,20 +702,7 @@ class _MoonPerBoxSettingsState extends State<_MoonPerBoxSettingsWidget> {
 }
 
 class OutsidePressureGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   OutsidePressureGraphBackground({controller}) : super(controller: controller, OutsidePressureGraph.sid, {'environment.outside.pressure'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class OutsidePressureGraph extends GraphBox {
@@ -813,12 +710,7 @@ class OutsidePressureGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final OutsidePressureGraphBackground background = OutsidePressureGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  OutsidePressureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Pressure', step: millibar2pascal(5), zeroBase: false);
+  OutsidePressureGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Pressure', OutsidePressureGraphBackground(), step: millibar2pascal(5), zeroBase: false);
 
   @override
   double convert(double value) {

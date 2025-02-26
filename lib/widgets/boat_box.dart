@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -27,20 +26,7 @@ class MaxSpeedThroughWaterBox extends SpeedThroughWaterBox {
 }
 
 class SpeedThroughWaterGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   SpeedThroughWaterGraphBackground({controller}) : super(controller: controller, SpeedThroughWaterGraph.sid, {'navigation.speedThroughWater'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class SpeedThroughWaterGraph extends GraphBox {
@@ -48,12 +34,7 @@ class SpeedThroughWaterGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final SpeedThroughWaterGraphBackground background = SpeedThroughWaterGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  SpeedThroughWaterGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Speed', step: kts2ms(1), zeroBase: false);
+  SpeedThroughWaterGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Speed', SpeedThroughWaterGraphBackground(), step: kts2ms(1), zeroBase: false);
 
   @override
   double convert(double value) {
