@@ -57,6 +57,8 @@ dependencies:
   latlong2:
   args:
   flutter_rfb:
+  actions_menu_appbar:
+    path: ../actions_menu_appbar
 
 dev_dependencies:
   flutter_test:

@@ -14,6 +14,13 @@ packages:
     description: dart
     source: sdk
     version: "0.3.3"
+  actions_menu_appbar:
+    dependency: "direct main"
+    description:
+      path: "../actions_menu_appbar"
+      relative: true
+    source: path
+    version: "0.0.1"
   analyzer:
     dependency: transitive
     description:
@@ -1251,5 +1258,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.6.0 <4.0.0"
+  dart: ">=3.6.2 <4.0.0"
   flutter: ">=3.24.0"
