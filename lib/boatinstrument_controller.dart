@@ -106,6 +106,7 @@ class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
   final bool _noAudio;
   final bool _noBrightnessControls;
+  final bool _enableExit;
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
@@ -120,7 +121,7 @@ class BoatInstrumentController {
   final Set<String> _staticPaths = {};
 
 
-  BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
+  BoatInstrumentController(this._noAudio, this._noBrightnessControls, this._enableExit) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
   }
 

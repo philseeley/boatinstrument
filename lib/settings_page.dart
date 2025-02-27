@@ -342,6 +342,7 @@ class _SettingsState extends State<SettingsPage> {
       appBar: AppBar(
         title: const Text("Settings"),
         actions: [
+          if(widget._controller._enableExit) IconButton(icon: const Icon(Icons.power_settings_new), onPressed: _exit),
           IconButton(icon: const Icon(Icons.share), onPressed: _share),
           IconButton(icon: const Icon(Icons.file_open), onPressed: _import),
           IconButton(icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
@@ -353,6 +354,10 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
+  _exit () async {
+    if(await widget._controller.askToConfirm(context, 'Exit?', alwaysAsk: true)) exit(0);
+  }
+  
   _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
