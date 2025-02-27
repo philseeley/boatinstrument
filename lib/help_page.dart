@@ -18,9 +18,11 @@ The contents of each Box is selected through the '''),
         WidgetSpan(child: Icon(Icons.list, color: Colors.blue)),
         TextSpan(text: ''' button. If the Box has settings these are set through the '''),
         WidgetSpan(child: Icon(Icons.settings)),
-        TextSpan(text: ''' buttons in the top right of the Box. The Blue button sets the Per-Box settings and the White/Black button sets the Box Type settings that are shared between all instances of the Box.
-
-The sizes of the Page elements can be adjusted by dragging the coloured Box borders. If the last Box in a Row or Column is deleted, the Row or Column is also deleted.
+        TextSpan(text: ''' buttons in the top right of the Box. The Blue button sets the Per-Box settings and the White/Black button sets the Box Type settings that are shared between all instances of the Box. Boxes containing dial or other controls are marked '''),
+        WidgetSpan(child: Icon(Icons.speed)),
+        TextSpan(text: ''' and Graphs marked '''),
+        WidgetSpan(child: Icon(Icons.show_chart)),
+        TextSpan(text: '''. The sizes of the Page elements can be adjusted by dragging the coloured Box borders. If the last Box in a Row or Column is deleted, the Row or Column is also deleted.
 
 Whilst in "Edit Mode" dummy values are shown, usually the value "12.3". This allows you to gauge what the Boxes will look like when running.
 
