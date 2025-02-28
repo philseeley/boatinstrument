@@ -1,6 +1,7 @@
 #!/bin/bash
 
 [ -f /boot/boatinstrument.json ] && mv /boot/boatinstrument.json /
+[ -f /boot/boatinstrument.config ] && mv /boot/boatinstrument.config /etc/boatinstrument-fpi/config
 
 . /etc/boatinstrument-fpi/config
 
