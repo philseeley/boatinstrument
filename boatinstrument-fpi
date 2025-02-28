@@ -8,3 +8,4 @@ export BOAT_INSTRUMENT_ARGS
 
 /usr/bin/flutter-pi $FLUTTER_PI_ARGS /usr/share/boatinstrument-fpi
 
+cp /boatinstrument.json /boot/boatinstrument.json.running
