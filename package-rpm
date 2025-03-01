@@ -1,0 +1,23 @@
+#!/bin/bash
+
+name=boatinstrument
+
+version=$(awk -F '[ :+]*' '/^version:/ {print $2}' pubspec.yaml)
+
+mkdir -p packages
+
+flutter build linux
+
+rm -rf rpm
+mkdir -p rpm/SOURCES
+
+m4 -D__NAME__=${name} -D__VERSION__=$version rpm.spec > rpm/rpm.spec
+
+(
+  cd rpm
+  export QA_RPATHS=0x0002
+  rpmbuild -bb --quiet rpm.spec
+)
+
+mv rpm/RPMS/x86_64/*.rpm packages
+
