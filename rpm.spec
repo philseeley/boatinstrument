@@ -11,7 +11,7 @@ License:	GPL >= v3
 BuildArch:	x86_64
 BuildRoot:	%{_builddir}
 Packager:	Phil Seeley <phil.seeley@gmail.com>
-Requires:	gtk3
+Requires:	gtk3, gstreamer1-plugins-good
 
 %description
 A Boat Instrument for displaying data in fully configurable Boxes. The data is
