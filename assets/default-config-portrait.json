@@ -10,7 +10,7 @@
     "notificationMuteTimeout": 15,
     "demoMode": false,
     "darkMode": true,
-    "wrapPages": false,
+    "wrapPages": true,
     "brightnessControl": false,
     "keepAwake": true,
     "autoConfirmActions": false,
