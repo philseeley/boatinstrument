@@ -863,6 +863,7 @@ class BoatInstrumentController {
 
   _getStaticData(Set<String> staticPaths) {
     Uri uri = httpApiUri;
+    if(uri.host.isEmpty) return; // We're not connected.
     try {
       List<String> basePathSegments = [...uri.pathSegments]
         ..removeLast()
