@@ -16,8 +16,16 @@ https://apps.microsoft.com/detail/9plncxg5wh39
 
 ## Linux
 
+### Debian
+
 https://philseeley.github.io/debian-ppa/
 
-For the Linux builds there are two flavours, one for Desktops and one for dedicated devices. The latter uses the flutter-pi engine to render to the console frame-buffer directly, without the need to install X11/Wayland.
+For the Debian builds there are two flavours, one for Desktops and one for dedicated devices. The latter uses the flutter-pi engine to render to the console frame-buffer directly, without the need to install X11/Wayland.
 
 Debian Bullseye(11) and Bookworm(12) are supported.
+
+### Fedora
+
+https://philseeley.github.io/fedora-repo/
+
+Fedora 41 is supported.

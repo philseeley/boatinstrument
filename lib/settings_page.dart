@@ -339,20 +339,27 @@ class _SettingsState extends State<SettingsPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: ActionsMenuAppBar(
+        actionsPercent: 0.5,
+        context: context,
         title: const Text("Settings"),
         actions: [
-          IconButton(icon: const Icon(Icons.share), onPressed: _share),
-          IconButton(icon: const Icon(Icons.file_open), onPressed: _import),
-          IconButton(icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
-          IconButton(icon: const Icon(Icons.help), onPressed: _showHelpPage),
-          IconButton(icon: const Icon(Icons.notes),onPressed: _showLog)
+          if(widget._controller._enableExit) IconButton(icon: const Icon(Icons.power_settings_new, semanticLabel: 'Exit'), onPressed: _exit),
+          IconButton(icon: const Icon(Icons.share, semanticLabel: 'Export'), onPressed: _share),
+          IconButton(icon: const Icon(Icons.file_open, semanticLabel: 'Import'), onPressed: _import),
+          IconButton(icon: const Icon(Icons.mediation, semanticLabel: 'Subscriptions'),onPressed: _showPathSubscriptions),
+          IconButton(icon: const Icon(Icons.help, semanticLabel: 'Help'), onPressed: _showHelpPage),
+          IconButton(icon: const Icon(Icons.notes, semanticLabel: 'Log'),onPressed: _showLog)
         ],
       ),
       body: ListView(children: list)
     );
   }
 
+  _exit () async {
+    if(await widget._controller.askToConfirm(context, 'Exit?', alwaysAsk: true)) exit(0);
+  }
+  
   _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {

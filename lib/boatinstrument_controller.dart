@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:actions_menu_appbar/actions_menu_appbar.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/anchor_box.dart';
@@ -106,6 +107,7 @@ class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
   final bool _noAudio;
   final bool _noBrightnessControls;
+  final bool _enableExit;
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
@@ -120,7 +122,7 @@ class BoatInstrumentController {
   final Set<String> _staticPaths = {};
 
 
-  BoatInstrumentController(this._noAudio, this._noBrightnessControls) {
+  BoatInstrumentController(this._noAudio, this._noBrightnessControls, this._enableExit) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
   }
 
@@ -861,6 +863,7 @@ class BoatInstrumentController {
 
   _getStaticData(Set<String> staticPaths) {
     Uri uri = httpApiUri;
+    if(uri.host.isEmpty) return; // We're not connected.
     try {
       List<String> basePathSegments = [...uri.pathSegments]
         ..removeLast()

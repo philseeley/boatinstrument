@@ -4,7 +4,7 @@ import 'package:boatinstrument/boatinstrument_controller.dart';
 
 abstract class SpeedBox extends DoubleValueBox {
 
-  const SpeedBox(super.config, super.title, super.path, {super.key}) : super(minLen: 1);
+  const SpeedBox(super.config, super.title, super.path, {super.valueToDisplay, super.key}) : super(minLen: 1);
 
   @override
   double convert(double value) {
@@ -18,6 +18,8 @@ abstract class SpeedBox extends DoubleValueBox {
 }
 
 abstract class DoubleValueBox extends BoxWidget {
+  static final Map<String, double> extremeValues = {};
+
   final String title;
   final String path;
   final int precision;
@@ -29,8 +31,20 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool smoothing;
   final bool portStarboard;
   final bool dataTimeout;
+  final DoubleValueToDisplay valueToDisplay;
 
-  const DoubleValueBox(super.config, this.title, this.path, {this.precision = 1, this.minLen =  2, this.minValue, this.maxValue, this.angle = false, this.relativeAngle = false, this.smoothing = true, this.portStarboard = false, this.dataTimeout = true, super.key});
+  const DoubleValueBox(super.config, this.title, this.path, {
+    this.precision = 1,
+    this.minLen =  2,
+    this.minValue,
+    this.maxValue,
+    this.angle = false,
+    this.relativeAngle = false,
+    this.smoothing = true,
+    this.portStarboard = false,
+    this.dataTimeout = true,
+    this.valueToDisplay = DoubleValueToDisplay.value,
+    super.key});
 
   @override
   State<DoubleValueBox> createState() => DoubleValueBoxState();
@@ -42,6 +56,9 @@ abstract class DoubleValueBox extends BoxWidget {
   double convert(double value);
 
   String units(double value);
+
+  double get extremeValue => extremeValues.putIfAbsent(id, () => valueToDisplay == DoubleValueToDisplay.minimumValue?double.infinity:0);
+  set extremeValue(double value) => extremeValues[id] = value;
 }
 
 class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
@@ -72,7 +89,10 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style))]),
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
+        if(widget.valueToDisplay != DoubleValueToDisplay.value) IconButton(iconSize: style.fontSize, icon: Icon(Icons.restore), constraints: BoxConstraints.tightFor(height: style.fontSize!), visualDensity: VisualDensity(vertical: VisualDensity.minimumDensity), onPressed: _resetExtremeValue)
+      ])),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
           child: Text(valueText, textScaler: TextScaler.noScaling,
@@ -102,9 +122,17 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
 
         if ((widget.minValue != null && value! < widget.minValue!) ||
             (widget.maxValue != null && value! > widget.maxValue!)) {
-          displayValue = null;
+          if(widget.valueToDisplay == DoubleValueToDisplay.value) displayValue = null;
         } else {
           displayValue = widget.convert(value!);
+          if(widget.valueToDisplay != DoubleValueToDisplay.value) {
+            if(widget.valueToDisplay == DoubleValueToDisplay.minimumValue) {
+              widget.extremeValue = (displayValue! < widget.extremeValue) ? displayValue! : widget.extremeValue;
+            } else {
+              widget.extremeValue = (displayValue! > widget.extremeValue) ? displayValue! : widget.extremeValue;
+            }
+            displayValue = widget.extremeValue;
+          }
         }
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
@@ -114,5 +142,11 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
     if(mounted) {
       setState(() {});
     }
+  }
+
+  void _resetExtremeValue() {
+    setState(() {
+      widget.extremeValue = (widget.valueToDisplay == DoubleValueToDisplay.minimumValue) ? double.infinity : 0;
+    });
   }
 }

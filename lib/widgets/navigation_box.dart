@@ -1,6 +1,5 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
-import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 // import 'package:great_circle_distance_calculator/great_circle_distance_calculator.dart';
 import 'package:intl/intl.dart';
@@ -29,20 +28,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
 }
 
 class CrossTrackErrorGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class CrossTrackErrorGraph extends GraphBox {
@@ -50,15 +36,11 @@ class CrossTrackErrorGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final CrossTrackErrorGraphBackground background = CrossTrackErrorGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
   CrossTrackErrorGraph(BoxWidgetConfig config, {super.key}) :
     super(
       config,
       'XTE',
+      CrossTrackErrorGraphBackground(),
       step: nm2m(1),
       precision: 2,
       zeroBase: false,
@@ -167,24 +149,19 @@ class SpeedOverGroundBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const SpeedOverGroundBox(config, {super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+  const SpeedOverGroundBox(config, {super.valueToDisplay, super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+}
+
+class MaxSpeedOverGroundBox extends SpeedOverGroundBox {
+  static const String sid = 'navigation-speed-over-ground-max';
+  @override
+  String get id => sid;
+
+  const MaxSpeedOverGroundBox(super.config, {super.valueToDisplay = DoubleValueToDisplay.maximumValue, super.key});
 }
 
 class SpeedOverGroundGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   SpeedOverGroundGraphBackground({controller}) : super(controller: controller, SpeedOverGroundGraph.sid, {'navigation.speedOverGround'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class SpeedOverGroundGraph extends GraphBox {
@@ -192,12 +169,7 @@ class SpeedOverGroundGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final SpeedOverGroundGraphBackground background = SpeedOverGroundGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  SpeedOverGroundGraph(BoxWidgetConfig config, {super.key}) : super(config, 'SOG', step: kts2ms(1), zeroBase: false);
+  SpeedOverGroundGraph(BoxWidgetConfig config, {super.key}) : super(config, 'SOG', SpeedOverGroundGraphBackground(), step: kts2ms(1), zeroBase: false);
 
   @override
   double convert(double value) {

@@ -21,6 +21,9 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       step: (json['step'] as num?)?.toDouble() ?? 1,
       portStarboard: json['portStarboard'] as bool? ?? false,
       dataTimeout: json['dataTimeout'] as bool? ?? true,
+      valueToDisplay: $enumDecodeNullable(
+              _$DoubleValueToDisplayEnumMap, json['valueToDisplay']) ??
+          DoubleValueToDisplay.value,
     );
 
 Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
@@ -38,7 +41,14 @@ Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
       'step': instance.step,
       'portStarboard': instance.portStarboard,
       'dataTimeout': instance.dataTimeout,
+      'valueToDisplay': _$DoubleValueToDisplayEnumMap[instance.valueToDisplay]!,
     };
+
+const _$DoubleValueToDisplayEnumMap = {
+  DoubleValueToDisplay.value: 'value',
+  DoubleValueToDisplay.minimumValue: 'minimumValue',
+  DoubleValueToDisplay.maximumValue: 'maximumValue',
+};
 
 _DebugSettings _$DebugSettingsFromJson(Map<String, dynamic> json) =>
     _DebugSettings(

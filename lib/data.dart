@@ -352,14 +352,13 @@ class _HelpBoxState extends State<HelpBox> {
 
 class BoxDetails {
   final String id;
-  final String description;
   final bool gauge;
   final bool graph;
   final bool experimental;
   final BoxWidget Function(BoxWidgetConfig config) build;
   final void Function(BoatInstrumentController controller)? background;
 
-  BoxDetails(this.id, this.description, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.background});
+  BoxDetails(this.id, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.background});
 }
 
 BoxDetails getBoxDetails(String id) {
@@ -626,6 +625,20 @@ enum PortStarboardColors implements EnumMenuEntry {
   const PortStarboardColors(this._displayName, this.portColor, this.starboardColor);
 }
 
+enum DoubleValueToDisplay implements EnumMenuEntry {
+  value('Value', ''),
+  minimumValue('Minimum', 'Min '),
+  maximumValue('Maximum', 'Max ');
+
+  @override
+  String get displayName => _displayName;
+
+  final String _displayName;
+  final String title;
+
+  const DoubleValueToDisplay(this._displayName, this.title);
+}
+
 @JsonSerializable()
 class _Settings {
   int version;
@@ -778,16 +791,21 @@ class BackgroundDataSettings {
   BackgroundDataSettings({this.dataDuration = BackgroundDataDuration.thirtyMinutes});
 }
 
+typedef BackgroundDataBuffer = CircularBuffer<DataPoint>;
+
 abstract class BackgroundData {
   static const int dataIncrement = 1000;
+  static final Map<String, BackgroundDataBuffer> dataBuffers = {};
+  static final Map<String, double?> values = {};
 
+  String id;
   BoatInstrumentController? controller;
   late Duration duration;
   double? minValue;
   double? maxValue;
   bool smoothing;
 
-  BackgroundData(String id, Set<String> paths, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
+  BackgroundData(this.id, Set<String> paths, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
     if(controller != null) {
       duration = Duration(minutes: _$BackgroundDataSettingsFromJson(controller!.getBoxSettingsJson(id)).dataDuration.minutes);
 
@@ -795,11 +813,11 @@ abstract class BackgroundData {
     }
   }
 
-  CircularBuffer<DataPoint> get data;
-  set data(CircularBuffer<DataPoint> data);
+  BackgroundDataBuffer get data => dataBuffers.putIfAbsent(id, () => CircularBuffer(BackgroundData.dataIncrement));
+  set data(BackgroundDataBuffer data) => dataBuffers[id] = data;
 
-  double? get value;
-  set value(double? value);
+  double? get value => values[id];
+  set value(double? value) => values[id] = value;
 
   processUpdates(List<Update>? updates) {
     if(updates != null) {

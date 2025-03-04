@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:boatinstrument/widgets/gauge_box.dart';
-import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
 import 'package:format/format.dart' as fmt;
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -62,7 +61,15 @@ class WindSpeedApparentBox extends WindSpeedBox {
   @override
   String get id => sid;
 
-  const WindSpeedApparentBox(config, {super.key}) : super(config, 'AWS', 'environment.wind.speedApparent');
+  const WindSpeedApparentBox(config, {super.valueToDisplay, super.key}) : super(config, 'AWS', 'environment.wind.speedApparent');
+}
+
+class MaxWindSpeedApparentBox extends WindSpeedApparentBox {
+  static const String sid = 'wind-speed-apparent-max';
+  @override
+  String get id => sid;
+
+  const MaxWindSpeedApparentBox(super.config, {super.key, super.valueToDisplay = DoubleValueToDisplay.maximumValue});
 }
 
 class WindSpeedTrueBox extends WindSpeedBox {
@@ -70,12 +77,20 @@ class WindSpeedTrueBox extends WindSpeedBox {
   @override
   String get id => sid;
 
-  const WindSpeedTrueBox(config, {super.key}) : super(config, 'TWS', 'environment.wind.speedTrue');
+  const WindSpeedTrueBox(config, {super.valueToDisplay, super.key}) : super(config, 'TWS', 'environment.wind.speedTrue');
+}
+
+class MaxWindSpeedTrueBox extends WindSpeedTrueBox {
+  static const String sid = 'wind-speed-true-max';
+  @override
+  String get id => sid;
+
+  const MaxWindSpeedTrueBox(super.config, {super.key, super.valueToDisplay = DoubleValueToDisplay.maximumValue});
 }
 
 abstract class WindSpeedBox extends DoubleValueBox {
 
-  const WindSpeedBox(super.config, super.title, super.path, {super.key});
+  const WindSpeedBox(super.config, super.title, super.path, {super.valueToDisplay, super.key});
 
   @override
   double convert(double value) {
@@ -220,20 +235,7 @@ class WindAngleApparentBox extends DoubleValueBox {
 }
 
 class TrueWindSpeedGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   TrueWindSpeedGraphBackground({controller}) : super(controller: controller, TrueWindSpeedGraph.sid, {'environment.wind.speedTrue'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class TrueWindSpeedGraph extends GraphBox {
@@ -241,12 +243,7 @@ class TrueWindSpeedGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final TrueWindSpeedGraphBackground background = TrueWindSpeedGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  TrueWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'TWS', step: kts2ms(5),
+  TrueWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'TWS', TrueWindSpeedGraphBackground(), step: kts2ms(5),
   ranges: [
         GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
         GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
@@ -265,20 +262,7 @@ class TrueWindSpeedGraph extends GraphBox {
 }
 
 class ApparentWindSpeedGraphBackground extends BackgroundData {
-  static double? _value;
-  static CircularBuffer<DataPoint> _data = CircularBuffer(BackgroundData.dataIncrement);
-
   ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, {'environment.wind.speedApparent'});
-
-  @override
-  CircularBuffer<DataPoint> get data => _data;
-  @override
-  set data(CircularBuffer<DataPoint> data) => _data = data;
-
-  @override
-  double? get value => _value;
-  @override
-  set value(double? value) => _value = value;
 }
 
 class ApparentWindSpeedGraph extends GraphBox {
@@ -286,12 +270,7 @@ class ApparentWindSpeedGraph extends GraphBox {
   @override
   String get id => sid;
 
-  final ApparentWindSpeedGraphBackground background = ApparentWindSpeedGraphBackground();
-
-  @override
-  List<DataPoint> get data => background.data;
-
-  ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', step: kts2ms(5),
+  ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', ApparentWindSpeedGraphBackground(), step: kts2ms(5),
   ranges: [
         GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
         GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),

@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:format/format.dart';
 
 part 'wind_rose_box.g.dart';
 
@@ -132,13 +131,12 @@ class _RosePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _SpeedPainter extends CustomPainter {
+class _SpeedPainter extends CustomPainter with DoubleValeBoxPainter {
   static GaugeOrientation? _orientation;
   Offset _apparentSpeedLoc = Offset(0, 0);
   Offset _trueSpeedLoc = Offset(0, 0);
 
   static const double _hubWidth = 12;
-  static const double _pad = 5;
   final BoatInstrumentController _controller;
   final BuildContext _context;
   final bool _close;
@@ -189,8 +187,6 @@ class _SpeedPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
-    Color fg = Theme.of(_context).colorScheme.onSurface;
-    Color bg = Theme.of(_context).colorScheme.surface;
     double centre = min(canvasSize.width, canvasSize.height)/2;
     TextStyle style = Theme.of(_context).textTheme.bodyMedium!.copyWith(height: 1.0);
 
@@ -236,46 +232,10 @@ class _SpeedPainter extends CustomPainter {
 
     _calcSpeedLoc(centre, speedSize);
 
-    _paintSpeedBox(_controller, canvas, 'AWS', _apparentSpeed, _apparentSpeedLoc, speedSize, fg, bg, style);
+    paintDoubleBox(canvas, _context, 'AWS', _controller.windSpeedUnits.unit, 2, 0, _apparentSpeed, _apparentSpeedLoc, speedSize);
+
     if(_showTrueWind) {
-      _paintSpeedBox(_controller, canvas, 'TWS', _trueSpeed, _trueSpeedLoc, speedSize, fg, bg, style);
-    }
-  }
-
-  void _paintSpeedBox(BoatInstrumentController controller, Canvas canvas, String title, double? speed, Offset loc, double size, Color fg, Color bg, TextStyle style) {
-    String speedText = '-';
-    if(speed != null) {
-      speedText = format('{:2d}', controller.windSpeedToDisplay(speed).round());
-    }
-
-    Paint paint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = bg
-      ..strokeWidth = 2.0;
-
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromPoints(loc, loc+Offset(size, size)), const Radius.circular(10)), paint);
-    paint..style = PaintingStyle.stroke
-      ..color = fg;
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromPoints(loc, loc+Offset(size, size)), const Radius.circular(10)), paint);
-
-    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
-    try {
-      double fontSize = maxFontSize(speedText, style, size-(2*_pad), size-style.fontSize!-(3*_pad));
-
-      tp.text = TextSpan(
-          text: '$title ${_controller.windSpeedUnits.unit}',
-          style: style);
-      tp.layout();
-      tp.paint(canvas, loc+const Offset(_pad,_pad));
-
-      tp.text = TextSpan(
-          text: speedText,
-          style: style.copyWith(fontSize: fontSize));
-      tp.layout();
-      Offset o = loc+Offset(_pad, size-fontSize-_pad);
-      tp.paint(canvas, o);
-    } finally {
-      tp.dispose();
+      paintDoubleBox(canvas, _context, 'TWS', _controller.windSpeedUnits.unit, 2, 0, _trueSpeed, _trueSpeedLoc, speedSize); 
     }
   }
 

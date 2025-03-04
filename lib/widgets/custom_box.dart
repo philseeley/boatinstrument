@@ -28,6 +28,7 @@ class _CustomSettings {
   double step;
   bool portStarboard;
   bool dataTimeout;
+  DoubleValueToDisplay valueToDisplay;
 
   _CustomSettings({
     this.title = 'title',
@@ -42,7 +43,8 @@ class _CustomSettings {
     this.multiplier = 1,
     this.step = 1,
     this.portStarboard = false,
-    this.dataTimeout = true
+    this.dataTimeout = true,
+    this.valueToDisplay = DoubleValueToDisplay.value
   });
 }
 
@@ -51,16 +53,17 @@ class CustomDoubleValueBox extends DoubleValueBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.dataTimeout, super.key});
+  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.dataTimeout, super.valueToDisplay, super.key});
 
   factory CustomDoubleValueBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, dataTimeout: s.dataTimeout, key: key);
+    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, dataTimeout: s.dataTimeout, valueToDisplay: s.valueToDisplay, key: key);
   }
 
   static String sid = 'custom-double-value';
   @override
   String get id => sid;
+  String get fullID => '$id-$title-${units(0)}-${valueToDisplay.displayName}';
 
   @override
   bool get hasPerBoxSettings => true;
@@ -79,6 +82,11 @@ class CustomDoubleValueBox extends DoubleValueBox {
   String units(double value) {
     return _unitsString;
   }
+
+  @override
+  double get extremeValue => DoubleValueBox.extremeValues.putIfAbsent(fullID, () => valueToDisplay == DoubleValueToDisplay.minimumValue?double.infinity:0);
+  @override
+  set extremeValue(double value) => DoubleValueBox.extremeValues[fullID] = value;
 }
 
 class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
@@ -273,6 +281,10 @@ class _SettingsState extends State<_SettingsWidget> {
         title: TextFormField(
             initialValue: s.step.toString(),
             onChanged: (value) => s.step = double.tryParse(value)??1),
+      ),
+      ListTile(
+          leading: const Text("Value to Display:"),
+          title: EnumDropdownMenu(DoubleValueToDisplay.values, s.valueToDisplay, (v) {s.valueToDisplay = v!;})
       ),
       SwitchListTile(title: const Text("Is Angle:"),
           value: s.angle,
