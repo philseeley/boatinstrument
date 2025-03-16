@@ -7,7 +7,7 @@
             server, rather then going into demo mode.
           The row of buttons in the header bar of the Settings page now collapse
             into a menu on narrower screens.
-          Minor updates to in-app help.
+          Updates to in-app help.
           Data handling in graphs has been simplified.
           Graphs now display the current value in 'k' if over 1000.
 
@@ -17,6 +17,9 @@
 
           Custom Boxes:
             Added option to show Max/Min values to Custom Boxes.
+          Bug fixes:
+            Graphs now average over a whole number of seconds to stop the scales changing unnecessarily.
+
   * 0.5.0 Added experimental support for Graphs.
           Added Kelvin to Temperature units.
           The current SignalK Subscriptions can now be listed.
