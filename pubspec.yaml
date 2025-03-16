@@ -57,6 +57,7 @@ dependencies:
   latlong2:
   args:
   flutter_rfb:
+  rive:
   actions_menu_appbar:
     path: ../actions_menu_appbar
 

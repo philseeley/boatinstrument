@@ -110,6 +110,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RaspberryPiBox.sid, experimental: true, (config) {return RaspberryPiBox(config, key: UniqueKey());}),
   BoxDetails(BatteryPowerGraph.sid, graph: true, experimental: true, background: (ctrl) {BatteryPowerGraphBackground(controller: ctrl);}, (config) {return BatteryPowerGraph(config, key: UniqueKey());}),
   BoxDetails(SolarPowerGraph.sid, graph: true, experimental: true, background: (ctrl) {SolarPowerGraphBackground(controller: ctrl);}, (config) {return SolarPowerGraph(config, key: UniqueKey());}),
+  BoxDetails(RiveTestBox.sid, experimental: true, (config) {return RiveTestBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -305,6 +306,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CustomDoubleValueCircularGaugeBox.sid, 'Circular Gauge'),
         _widgetMenuEntry(CustomDoubleValueBarGaugeBox.sid, 'Bar Gauge'),
         _widgetMenuEntry(DebugBox.sid, 'Debug'),
+        _widgetMenuEntry(RiveTestBox.sid, 'Rive Test'),
       ]),
     ];
 
