@@ -470,36 +470,43 @@ class _GraphPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size canvasSize) {
     ThemeData theme = Theme.of(_context);
-    double w = canvasSize.width;
-    double h = canvasSize.height;
+    double w = canvasSize.width.roundToDouble();
+    double h = canvasSize.height.roundToDouble();
     if(_vertical) (h, w) = (w, h);
-    List<double?> values = List.filled(w.toInt(), null);
 
     if(_data.isEmpty) {
       return;
     }
 
-    int duration = _minutes*60*1000;
-    int slice = (duration/w).round();
+    int slice = ((_minutes*60)/w).ceil();
+    List<double?> values = List.filled(((_minutes*60)/slice).ceil(), null);
     DateTime now = DateTime.now();
-    DateTime end = now;
+    DateTime start = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute,
+      now.second - (now.second % slice),
+    );
 
     double minDisplay = _zeroBase ? 0 : double.infinity;
     double maxDisplay = 0;
+
     int dp=_data.length-1;
     for(int i=values.length-1; i>=0; --i) {
       double total = 0;
       int count = 0;
 
-      DateTime start = end.subtract(Duration(milliseconds: slice));
+      start = start.subtract(Duration(seconds: slice));
       while(dp >= 0 && _data[dp].date.isAfter(start)) {
-        total += _widget.convert(_data[dp].value);
+        total += _data[dp].value;
         ++count;
         --dp;
       }
-      end = start;
+
       if(count > 0) {
-        double displayValue = total/count;
+        double displayValue = _widget.convert(total)/count;
         values[i] = displayValue;
         if(displayValue < minDisplay) minDisplay = displayValue;
         if(displayValue > maxDisplay) maxDisplay = displayValue;
@@ -597,13 +604,14 @@ class _GraphPainter extends CustomPainter {
 
     bool first = true;
     Path p = Path();
+    double scale = w/values.length;
     for(int i=0; i<values.length; ++i) {
       if(values[i] != null) {
         if(first) {
           first = false;
-          p.moveTo(i.toDouble(), h-(hStep*(values[i]!-minDisplay)));
+          p.moveTo(i*scale, h-(hStep*(values[i]!-minDisplay)));
         } else {
-          p.lineTo(i.toDouble(), h-(hStep*(values[i]!-minDisplay)));
+          p.lineTo(i*scale, h-(hStep*(values[i]!-minDisplay)));
         }
       }
     }
