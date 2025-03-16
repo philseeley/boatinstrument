@@ -707,7 +707,7 @@ class GraphBoxState extends State<GraphBox> {
 
     _displayStep = widget.convert(widget.step).round();
 
-    _update();
+    _updateTimer = Timer.periodic(Duration(seconds: 1), _update);
   }
 
   @override
@@ -716,11 +716,10 @@ class GraphBoxState extends State<GraphBox> {
     super.dispose();
   }
 
-  _update() {
+  _update(_) {
     if(mounted) {
       setState(() {});
     }
-    _updateTimer = Timer(Duration(seconds: 1), _update);
   }
 
   @override
