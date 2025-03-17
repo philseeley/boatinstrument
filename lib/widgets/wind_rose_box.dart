@@ -232,10 +232,10 @@ class _SpeedPainter extends CustomPainter with DoubleValeBoxPainter {
 
     _calcSpeedLoc(centre, speedSize);
 
-    paintDoubleBox(canvas, _context, 'AWS', _controller.windSpeedUnits.unit, 2, 0, _apparentSpeed, _apparentSpeedLoc, speedSize);
+    paintDoubleBox(canvas, _context, 'AWS', _controller.windSpeedUnits.unit, 2, 0, (_apparentSpeed == null)?_apparentSpeed:_controller.windSpeedToDisplay(_apparentSpeed), _apparentSpeedLoc, speedSize);
 
     if(_showTrueWind) {
-      paintDoubleBox(canvas, _context, 'TWS', _controller.windSpeedUnits.unit, 2, 0, _trueSpeed, _trueSpeedLoc, speedSize); 
+      paintDoubleBox(canvas, _context, 'TWS', _controller.windSpeedUnits.unit, 2, 0, (_trueSpeed == null)?_trueSpeed:_controller.windSpeedToDisplay(_trueSpeed), _trueSpeedLoc, speedSize); 
     }
   }
 
