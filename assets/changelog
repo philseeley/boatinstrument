@@ -18,7 +18,6 @@
           Custom Boxes:
             Added option to show Max/Min values to Custom Boxes.
           Bug fixes:
-            Wind Rose now converts speeds to correct units.
             Graphs now average over a whole number of seconds to stop the scales changing unnecessarily.
 
   * 0.5.0 Added experimental support for Graphs.
