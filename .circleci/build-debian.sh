@@ -25,7 +25,7 @@ docker exec --privileged -ti $DOCKER_CONTAINER_ID apt-get -y install dpkg-dev de
   libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 
 docker exec --privileged -ti "$DOCKER_CONTAINER_ID" /bin/bash -xec \
-  "cd ci-source/.circleci; chmod -v u+w *.sh; /bin/bash -xe ./flutter-build.sh $APP_TYPE"
+  "git clone --depth 1 https://github.com/philseeley/actions_menu_appbar.git; cd ci-source/.circleci; chmod -v u+w *.sh; /bin/bash -xe ./flutter-build.sh $APP_TYPE"
 
 echo "Stopping"
 docker ps -a
