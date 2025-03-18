@@ -1,0 +1,99 @@
+---
+version: 2.1
+orbs:
+  flutter-orb: circleci/flutter@2.1.0         # see: https://circleci.com/developer/orbs/orb/circleci/flutter
+  android: circleci/android@3.1.0             # see: https://circleci.com/developer/orbs/orb/circleci/android
+  macos: circleci/macos@2.5.2                 # see: https://circleci.com/developer/orbs/orb/circleci/macos
+
+executors:   # see: https://circleci.com/docs/sample-config/
+  boot-linux:
+    machine:
+      resource_class: large
+      image: ubuntu-2204:2024.11.1
+  boot-linux-arm:
+    machine:
+      resource_class: arm.large
+      image: ubuntu-2204:2024.11.1
+  boot-android:
+    machine:
+      image: android:2024.11.1     # see: https://circleci.com/developer/machine/image/android
+  boot-windows:
+    machine:
+      image: windows-server-2022-gui:2024.12.1     # see: https://circleci.com/developer/machine/image/windows-server-2022-gui
+      resource_class: windows.medium
+      shell: powershell.exe -ExecutionPolicy Bypass
+  boot-macos:
+    macos:                           # see: https://circleci.com/docs/using-macos/
+      xcode: 16.2.0
+    resource_class: macos.m1.medium.gen1
+commands:
+  git-checkout:
+    steps:
+      - checkout
+  build-n-publish-debian:
+    steps:
+      - run: sudo apt-get -y install debhelper
+      - run: chmod a+x .circleci/*.sh
+      - run:
+          command: |
+            .circleci/build-debian.sh
+          no_output_timeout: 30m
+      - run: .circleci/publish-github.sh ${PKG_DISTRO}/${PKG_RELEASE}
+  do-all:
+    steps:
+      - git-checkout
+      - build-n-publish-debian
+jobs:
+  build-debian-bookworm-arm64:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm64v8/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=arm64
+      - APP_TYPE=linux
+    steps:
+      - do-all
+  build-debian-bookworm-amd64:
+    executor: boot-linux
+    environment:
+      - DOCKER_IMAGE=amd64/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=amd64
+      - APP_TYPE=linux
+    steps:
+      - do-all
+  build-flutterpi_arm64:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm64v8/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=arm64
+      - APP_TYPE=flutterpi_arm64
+    steps:
+      - do-all
+  build-flutterpi_arm32:
+    executor: boot-linux-arm
+    environment:
+      - DOCKER_IMAGE=arm64v8/debian:bookworm
+      - CONTAINER_DISTRO=debian:bookworm
+      - PKG_RELEASE=bookworm
+      - PKG_DISTRO=debian
+      - PKG_ARCH=arm32
+      - APP_TYPE=flutterpi_arm32
+    steps:
+      - do-all
+workflows:
+  version: 2
+  build_all:
+    jobs:
+      - build-debian-bookworm-arm64
+      - build-debian-bookworm-amd64
+      - build-flutterpi_arm32
+      - build-flutterpi_arm64
+
