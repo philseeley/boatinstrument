@@ -232,10 +232,10 @@ class _SpeedPainter extends CustomPainter with DoubleValeBoxPainter {
 
     _calcSpeedLoc(centre, speedSize);
 
-    paintDoubleBox(canvas, _context, 'AWS', _controller.windSpeedUnits.unit, 2, 0, _apparentSpeed, _apparentSpeedLoc, speedSize);
+    paintDoubleBox(canvas, _context, 'AWS', _controller.windSpeedUnits.unit, 2, 0, (_apparentSpeed == null)?_apparentSpeed:_controller.windSpeedToDisplay(_apparentSpeed), _apparentSpeedLoc, speedSize);
 
     if(_showTrueWind) {
-      paintDoubleBox(canvas, _context, 'TWS', _controller.windSpeedUnits.unit, 2, 0, _trueSpeed, _trueSpeedLoc, speedSize); 
+      paintDoubleBox(canvas, _context, 'TWS', _controller.windSpeedUnits.unit, 2, 0, (_trueSpeed == null)?_trueSpeed:_controller.windSpeedToDisplay(_trueSpeed), _trueSpeedLoc, speedSize); 
     }
   }
 
@@ -309,7 +309,9 @@ class WindRoseBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('''The Switch Button allow you to cycle through the Wind Rose types from the display.''');
+  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('''In "Auto" mode the Rose will switch between the "Normal" and "Close Haul" displays if the needle transitions over 60 degrees for more than the "Auto Switch Delay".
+  
+The Switch Button allows you to cycle through the Wind Rose types from the display. If the button is "Unlocked" the display is in "Auto" mode.''');
 }
 
 class _WindRoseBoxState extends State<WindRoseBox> {
