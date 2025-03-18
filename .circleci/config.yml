@@ -16,7 +16,7 @@ executors:   # see: https://circleci.com/docs/sample-config/
       image: ubuntu-2204:2024.11.1
   boot-android:
     machine:
-      image: android:2024.04.1     # see: https://circleci.com/developer/machine/image/android
+      image: android:2024.11.1     # see: https://circleci.com/developer/machine/image/android
   boot-windows:
     machine:
       image: windows-server-2022-gui:2024.12.1     # see: https://circleci.com/developer/machine/image/windows-server-2022-gui
