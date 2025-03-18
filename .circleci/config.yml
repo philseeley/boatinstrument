@@ -24,7 +24,7 @@ executors:   # see: https://circleci.com/docs/sample-config/
       shell: powershell.exe -ExecutionPolicy Bypass
   boot-macos:
     macos:                           # see: https://circleci.com/docs/using-macos/
-      xcode: 14.2.0
+      xcode: 16.2.0
     resource_class: macos.m1.medium.gen1
 commands:
   git-checkout:
