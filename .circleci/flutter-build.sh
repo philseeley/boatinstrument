@@ -8,7 +8,7 @@ set -x
 LMARCH="$(dpkg --print-architecture)"
 export LMARCH
 
-git clone --depth 1 --branch 3.27.3 https://github.com/flutter/flutter
+git clone --depth 1 --branch 3.24.5 https://github.com/flutter/flutter
 
 export PATH="$PATH:`pwd`/flutter/bin"
 
