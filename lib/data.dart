@@ -134,7 +134,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
 
       uri = uri.replace(pathSegments: ps);
 
-      http.Response response = await http.get(
+      http.Response response = await widget._controller.httpGet(
           uri,
           headers: {
             "accept": "application/json",

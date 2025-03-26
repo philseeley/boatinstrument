@@ -561,7 +561,7 @@ mixin SwitchCommands {
       Uri uri = config.controller.httpApiUri.replace(
           path: 'signalk/v1/api/vessels/self/electrical/switches/$id/$type');
 
-      http.Response response = await http.put(
+      http.Response response = await config.controller.httpPut(
           uri,
           headers: {
             "Content-Type": "application/json",
