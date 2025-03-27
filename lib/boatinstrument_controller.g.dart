@@ -69,11 +69,10 @@ Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
     };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      version: (json['version'] as num?)?.toInt() ?? 0,
+      version: (json['version'] as num?)?.toInt() ?? 1,
       valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
       discoverServer: json['discoverServer'] as bool? ?? true,
-      signalkHost: json['signalkHost'] as String? ?? '',
-      signalkPort: (json['signalkPort'] as num?)?.toInt() ?? 3000,
+      signalkUrl: json['signalkUrl'] as String? ?? '',
       signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 500,
       signalkConnectionTimeout:
           (json['signalkConnectionTimeout'] as num?)?.toInt() ?? 20000,
@@ -130,8 +129,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
       'valueSmoothing': instance.valueSmoothing,
       'discoverServer': instance.discoverServer,
-      'signalkHost': instance.signalkHost,
-      'signalkPort': instance.signalkPort,
+      'signalkUrl': instance.signalkUrl,
       'signalkMinPeriod': instance.signalkMinPeriod,
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
       'dataTimeout': instance.dataTimeout,

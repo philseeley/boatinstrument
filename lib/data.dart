@@ -644,8 +644,7 @@ class _Settings {
   int version;
   int valueSmoothing;
   bool discoverServer;
-  String signalkHost;
-  int signalkPort;
+  String signalkUrl;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
   int dataTimeout;
@@ -677,11 +676,10 @@ class _Settings {
   String get fileName => _store!.absolute.path;
 
   _Settings({
-    this.version = 0,
+    this.version = 1,
     this.valueSmoothing = 1,
     this.discoverServer = true,
-    this.signalkHost = '',
-    this.signalkPort = 3000,
+    this.signalkUrl = '',
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
     this.dataTimeout = 10000,
@@ -728,6 +726,13 @@ class _Settings {
   static readSettings(File f) async {
     String s = f.readAsStringSync();
     dynamic data = json.decode(s);
+    if(data['version'] == 0) {
+      String h = data['signalkHost'];
+      String url = 'http://$h:${data['signalkPort']}';
+      if(h.isEmpty) url = '';
+      data['signalkUrl'] = url;
+     data['version'] = 1;
+    }
     return _Settings.fromJson(data);
   }
 

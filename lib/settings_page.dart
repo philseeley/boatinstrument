@@ -265,19 +265,11 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       ListTile(
-          leading: const Text("Host:"),
+          leading: const Text("URL:"),
           title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
-              decoration: const InputDecoration(hintText: 'mypi.local'),
-              initialValue: settings.signalkHost,
-              onChanged: (value) => settings.signalkHost = value)
-      ),
-      ListTile(
-          leading: const Text("Port:"),
-          title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.signalkPort.toString(),
-              onChanged: (value) => settings.signalkPort = int.parse(value)),
+              decoration: const InputDecoration(hintText: 'http://mypi.local:3000'),
+              initialValue: settings.signalkUrl,
+              onChanged: (value) => settings.signalkUrl = value)
       ),
       SwitchListTile(title: const Text("Demo Mode:"),
           value: settings.demoMode,

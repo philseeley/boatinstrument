@@ -651,12 +651,16 @@ class BoatInstrumentController {
 
   _discoverServices() async {
     try {
-      String host = _settings!.signalkHost;
-      int port = _settings!.signalkPort;
+      Uri url = Uri.parse(_settings!.signalkUrl);
+      String host = url.host;
+      int port = url.port;
+      String scheme = url.scheme.isEmpty ? 'http' : url.scheme;
+      List<String> paths = [...url.pathSegments, 'signalk'];
 
       if(_settings!.demoMode) {
         host = 'demo.signalk.org';
         port = 443;
+        scheme = 'https';
       }
       else if(_settings!.discoverServer) {
         BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
@@ -683,7 +687,7 @@ class BoatInstrumentController {
         }
       }
 
-      Uri uri = Uri(scheme: _settings!.demoMode ? 'https' : 'https', host: host, port: port, path: '/signalk');//TODO forcing https for the test
+      Uri uri = Uri(scheme: scheme, host: host, port: port, pathSegments: paths);
 
       http.Response response = await httpGet(uri).timeout(const Duration(seconds: 10));
 
