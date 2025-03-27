@@ -31,12 +31,14 @@ class BoatInstrumentApp extends StatelessWidget {
     const noKeepAwake = 'no-keep-awake';
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
+    const enableSetTime = 'enable-set-time';
     final p = ArgParser()
                 ..addFlag(noAudio, negatable: false)
                 ..addFlag(noBrightnessCtrl, negatable: false)
                 ..addFlag(noKeepAwake, negatable: false)
                 ..addFlag(readOnly, negatable: false)
-                ..addFlag(enableExit, negatable: false);
+                ..addFlag(enableExit, negatable: false)
+                ..addFlag(enableSetTime, negatable: false);
 
     try {
       ArgResults r = p.parse(args);
@@ -50,7 +52,8 @@ class BoatInstrumentApp extends StatelessWidget {
           r.flag(noBrightnessCtrl),
           r.flag(noKeepAwake),
           r.flag(readOnly),
-          r.flag(enableExit)),
+          r.flag(enableExit),
+          r.flag(enableSetTime)),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
     } catch (e) {
@@ -67,8 +70,9 @@ class MainPage extends StatefulWidget {
   final bool noKeepAwake;
   final bool readOnly;
   final bool enableExit;
+  final bool enableSetTime;
 
-  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, this.readOnly, this.enableExit, {super.key});
+  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, this.readOnly, this.enableExit, this.enableSetTime, {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -103,7 +107,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
 
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl, widget.enableExit);
+    _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enableSetTime);
   }
 
   _configure () async {

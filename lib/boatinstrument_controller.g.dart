@@ -89,6 +89,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       pageTimerOnStart: json['pageTimerOnStart'] as bool? ?? false,
       enableExperimentalBoxes:
           json['enableExperimentalBoxes'] as bool? ?? false,
+      setTime: json['setTime'] as bool? ?? false,
       distanceUnits:
           $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
               DistanceUnits.nm,
@@ -144,6 +145,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'autoConfirmActions': instance.autoConfirmActions,
       'pageTimerOnStart': instance.pageTimerOnStart,
       'enableExperimentalBoxes': instance.enableExperimentalBoxes,
+      'setTime': instance.setTime,
       'distanceUnits': _$DistanceUnitsEnumMap[instance.distanceUnits]!,
       'm2nmThreshold': instance.m2nmThreshold,
       'speedUnits': _$SpeedUnitsEnumMap[instance.speedUnits]!,
