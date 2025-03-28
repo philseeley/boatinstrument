@@ -640,11 +640,27 @@ enum DoubleValueToDisplay implements EnumMenuEntry {
 }
 
 @JsonSerializable()
+class _HttpHeader {
+  String name;
+  String value;
+
+  _HttpHeader({
+    this.name = '',
+    this.value = ''});
+
+  factory _HttpHeader.fromJson(Map<String, dynamic> json) =>
+      _$HttpHeaderFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HttpHeaderToJson(this);
+}
+
+@JsonSerializable()
 class _Settings {
   int version;
   int valueSmoothing;
   bool discoverServer;
   String signalkUrl;
+  late List<_HttpHeader> httpHeaders;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
   int dataTimeout;
@@ -680,6 +696,7 @@ class _Settings {
     this.valueSmoothing = 1,
     this.discoverServer = true,
     this.signalkUrl = '',
+    this.httpHeaders = const [],
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
     this.dataTimeout = 10000,
@@ -709,6 +726,7 @@ class _Settings {
     if(pages.isEmpty) {
       pages = [_Page._newPage()];
     }
+    if(httpHeaders.isEmpty) httpHeaders = [];
   }
 
   factory _Settings.fromJson(Map<String, dynamic> json) =>

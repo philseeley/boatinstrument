@@ -632,8 +632,11 @@ class BoatInstrumentController {
 
   Map<String, String> _httpHeaders(Map<String, String>? headers) {
     Map<String, String> h = headers??{};
-    h.addAll({"CF-Access-Client-Id":"2d0443ce2a62adc8d42647103811c088.access",
-              "CF-Access-Client-Secret":"17765c1ea756aac92dc6782ac9de923fac1283003f63e195f413a4f43a16583c"});
+
+    for (var header in _settings!.httpHeaders) {
+      h[header.name] = header.value;
+    }
+
     return h;
   }
 

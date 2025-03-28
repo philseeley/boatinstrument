@@ -1,9 +1,9 @@
 {
-    "version": 0,
+    "version": 1,
     "valueSmoothing": 10,
     "discoverServer": true,
-    "signalkHost": "localhost",
-    "signalkPort": 3000,
+    "signalkUrl": "",
+    "httpHeaders": [],
     "signalkMinPeriod": 500,
     "signalkConnectionTimeout": 20000,
     "dataTimeout": 10000,

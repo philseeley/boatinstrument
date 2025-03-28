@@ -36,6 +36,8 @@ If no data is received within the "Connection Timeout" the connection is reopene
 
 If a Box receives no data within the "Data Timeout" the box is cleared and a "-" is generally displayed.
 
+You can set additional HTTP Headers if the connection to the SignalK server requires them, e.g. for proxies.
+
 In "Demo Mode" the app connects to "https://demo.signalk.org".
 
 Boxes marked '''),

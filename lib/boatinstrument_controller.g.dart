@@ -68,11 +68,26 @@ Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
       'pageRows': instance.pageRows,
     };
 
+_HttpHeader _$HttpHeaderFromJson(Map<String, dynamic> json) => _HttpHeader(
+      name: json['name'] as String? ?? '',
+      value: json['value'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$HttpHeaderToJson(_HttpHeader instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'value': instance.value,
+    };
+
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       version: (json['version'] as num?)?.toInt() ?? 1,
       valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
       discoverServer: json['discoverServer'] as bool? ?? true,
       signalkUrl: json['signalkUrl'] as String? ?? '',
+      httpHeaders: (json['httpHeaders'] as List<dynamic>?)
+              ?.map((e) => _HttpHeader.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 500,
       signalkConnectionTimeout:
           (json['signalkConnectionTimeout'] as num?)?.toInt() ?? 20000,
@@ -130,6 +145,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'valueSmoothing': instance.valueSmoothing,
       'discoverServer': instance.discoverServer,
       'signalkUrl': instance.signalkUrl,
+      'httpHeaders': instance.httpHeaders,
       'signalkMinPeriod': instance.signalkMinPeriod,
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
       'dataTimeout': instance.dataTimeout,
