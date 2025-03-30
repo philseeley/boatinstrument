@@ -745,6 +745,7 @@ class _Settings {
     String s = f.readAsStringSync();
     dynamic data = json.decode(s);
     if(data['version'] == 0) {
+      CircularLogger().i('Converting configuration from version 0 to 1');
       String h = data['signalkHost'];
       String url = 'http://$h:${data['signalkPort']}';
       if(h.isEmpty) url = '';
