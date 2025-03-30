@@ -658,6 +658,7 @@ class _Settings {
   bool autoConfirmActions;
   bool pageTimerOnStart;
   bool enableExperimentalBoxes;
+  bool setTime;
   DistanceUnits distanceUnits;
   int m2nmThreshold;
   SpeedUnits speedUnits;
@@ -694,6 +695,7 @@ class _Settings {
     this.autoConfirmActions = false,
     this.pageTimerOnStart = false,
     this.enableExperimentalBoxes = false,
+    this.setTime = false,
     this.distanceUnits = DistanceUnits.nm,
     this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,

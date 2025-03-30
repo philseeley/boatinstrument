@@ -336,6 +336,13 @@ class _SettingsState extends State<SettingsPage> {
               settings.enableExperimentalBoxes = value;
             });
           }),
+      if(widget._controller._enableSetTime) SwitchListTile(title: const Text("Set Time:"),
+          value: settings.setTime,
+          onChanged: (bool value) {
+            setState(() {
+              settings.setTime = value;
+            });
+          }),
     ];
 
     return Scaffold(

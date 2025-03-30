@@ -40,7 +40,9 @@ In "Demo Mode" the app connects to "https://demo.signalk.org".
 
 Boxes marked '''),
         WidgetSpan(child: Icon(Icons.science_outlined)),
-        TextSpan(text: ''' are experimental and may not function as expected, but any feedback will be gratefully received. You must enable Experimental Boxes in the Advanced Settings.'''),
+        TextSpan(text: ''' are experimental and may not function as expected, but any feedback will be gratefully received. You must enable Experimental Boxes in the Advanced Settings.
+        
+If setting time is enabled via the "--enable-set-time" command line option and "Set Time" is enabled in the Advanced Settings, then "sudo" will be used to set the time from "navigation.datetime".'''),
       ]))),
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness on supported platforms')),

@@ -108,6 +108,8 @@ class BoatInstrumentController {
   final bool _noAudio;
   final bool _noBrightnessControls;
   final bool _enableExit;
+  final bool _enableSetTime;
+  bool _timeSet = false;
   _Settings? _settings;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
@@ -122,7 +124,7 @@ class BoatInstrumentController {
   final Set<String> _staticPaths = {};
 
 
-  BoatInstrumentController(this._noAudio, this._noBrightnessControls, this._enableExit) {
+  BoatInstrumentController(this._noAudio, this._noBrightnessControls, this._enableExit, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
   }
 
@@ -788,16 +790,21 @@ class BoatInstrumentController {
           String source = u[r'$source'];
           // Note: the demo server has old date/times.
           if (_settings!.demoMode ||
+              (_settings!.setTime && !_timeSet) ||
               source == 'defaults' ||
               source == 'derived-data' ||
               now.difference(DateTime.parse(u['timestamp'])) <=
                   Duration(milliseconds: _settings!.dataTimeout)) {
             for (dynamic v in u['values']) {
               String path = v['path'];
+              dynamic value = v['value'];
+
+              if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
+
               for (_BoxData bd in _boxData) {
                 for (RegExp r in bd.regExpPaths) {
                   if (r.hasMatch(path)) {
-                    bd.updates.add(Update(path, v['value']));
+                    bd.updates.add(Update(path, value));
                     bd.lastUpdate = now;
                   }
                 }
@@ -879,5 +886,21 @@ class BoatInstrumentController {
     } catch (e) {
       l.e('Failed to retrieve static path', error: e);
     }
+  }
+
+  void _setTime(String timeStr) async {
+    try {
+      var r = await Process.run('/usr/bin/sudo', ['/usr/bin/date', '--utc', '--set', timeStr]);
+
+      if(r.exitCode == 0) {
+        l.i('Time set to "$timeStr" UTC');
+      } else {
+        l.e('Failed to set time to "$timeStr", exit code ${r.exitCode} output "${r.stdout}" error "${r.stderr}"');
+      }
+    } catch (e) {
+      l.e('Exception trying to set time to "$timeStr"', error: e);
+    }
+
+    _timeSet = true;
   }
 }
