@@ -12,7 +12,6 @@ class _EditPage extends StatefulWidget {
   @override
   State<_EditPage> createState() => _EditPageState();
 }
-// TODO need to make these menu names more consistent. Probably move labels into menu list so we can shorten names.
 final List<BoxDetails> boxDetails = [
   BoxDetails(BlankBox.sid, (config) {return BlankBox(config, key: UniqueKey());}), // This is the default Box.
   BoxDetails(HelpBox.sid, (config) {return HelpBox(config, key: UniqueKey());}),
