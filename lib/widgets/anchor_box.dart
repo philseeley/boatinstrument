@@ -347,26 +347,34 @@ class _AnchorState extends State<AnchorAlarmBox> {
               }
               break;
             case 'navigation.anchor.position':
-              _anchorPosition = ll.LatLng((u.value['latitude'] as num).toDouble(), (u.value['longitude'] as num).toDouble());
+              if(u.value != null) _anchorPosition = ll.LatLng((u.value['latitude'] as num).toDouble(), (u.value['longitude'] as num).toDouble());
               break;
             case 'navigation.anchor.maxRadius':
               try {
-                _maxRadius = (u.value as num).round();
+                if(u.value == null) {
+                  _maxRadius = null;
+                } else {
+                  _maxRadius = (u.value as num).round();
+                }
               } catch (_){
                 // This only happens if the Anchor Alarm webapp is used.
                 _maxRadius = int.parse(u.value as String);
               }
               break;
             case 'navigation.anchor.currentRadius':
-              _currentRadius = (u.value as num).round();
-              // Make sure we have a radius to avoid div-by-zero error.
-              _currentRadius = _currentRadius == 0 ? 1 : _currentRadius;
+              if(u.value == null) {
+                _currentRadius = null;
+              } else {
+                _currentRadius = (u.value as num).round();
+                // Make sure we have a radius to avoid div-by-zero error.
+                _currentRadius = _currentRadius == 0 ? 1 : _currentRadius;
+              }
               break;
             case 'navigation.anchor.bearingTrue':
-              _bearingTrue = (u.value as num).toDouble()-m.pi;
+              if(u.value != null) _bearingTrue = (u.value as num).toDouble()-m.pi;
               break;
             case 'navigation.anchor.apparentBearing':
-              _apparentBearing = (u.value as num).toDouble();
+              if(u.value != null) _apparentBearing = (u.value as num).toDouble();
               break;
           }
         } catch (e) {
