@@ -213,7 +213,7 @@ class _EditPageState extends State<_EditPage> {
           _widgetMenuEntry(CrossTrackErrorGraph.sid, 'XTE'),
           _widgetMenuEntry(CrossTrackErrorDeltaBox.sid, 'XTE Delta'),
         ]),
-        _widgetMenuEntry(RateOfTurnBox.sid, 'Rote of Turn'),
+        _widgetMenuEntry(RateOfTurnBox.sid, 'Rate of Turn'),
         _widgetMenuEntry(MagneticVariationBox.sid, 'Magnetic Variation'),
       ]),
       _widgetSubMenuEntry(box, 'Boat', [
