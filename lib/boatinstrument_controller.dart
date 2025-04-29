@@ -97,10 +97,11 @@ enum NotificationState {
   const NotificationState(this.error, this.count, this.soundFile);
 }
 
-class _NotificationStatus {
+class NotificationStatus {
   NotificationState state = NotificationState.normal;
   int count = 0;
   bool mute = false;
+  String message = "";
   DateTime last = DateTime.now();
 }
 
@@ -119,7 +120,7 @@ class BoatInstrumentController {
   WebSocketChannel? _channel;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
-  final Map<String, _NotificationStatus> _notifications = {};
+  final Map<String, NotificationStatus> _notifications = {};
   final Set<String> _backgroundIDs = {};
   final Set<String> _paths = {};
   final Set<String> _staticPaths = {};
@@ -151,6 +152,7 @@ class BoatInstrumentController {
   CapacityUnits get capacityUnits => _settings!.capacityUnits;
   FluidRateUnits get fluidRateUnits => _settings!.fluidRateUnits;
   int get numOfPages => _settings!.pages.length;
+  Map<String, NotificationStatus> get notifications => _notifications;
   bool get muted => _notifications.entries.any((element) => element.value.mute);
   Set<String> get paths => _paths;
   Set<String> get staticPaths => _staticPaths;
@@ -557,12 +559,13 @@ class BoatInstrumentController {
     } else {
       for(Update u in updates) {
         try {
-          _NotificationStatus notificationStatus = _notifications.putIfAbsent(u.path, () => _NotificationStatus());
+          NotificationStatus notificationStatus = _notifications.putIfAbsent(u.path, () => NotificationStatus());
           NotificationState newState = NotificationState.values.byName(
               u.value['state']);
 
           bool playSound = u.value['method'].contains('sound');
 
+          notificationStatus.message = u.value['message'];
           notificationStatus.last = now;
 
           if((newState != notificationStatus.state || notificationStatus.count < newState.count) && !notificationStatus.mute) {            
@@ -573,7 +576,7 @@ class BoatInstrumentController {
             ScaffoldMessenger.of(context).clearSnackBars();
 
             showMessage(
-                context, u.value['message'], error: newState.error,
+                context, notificationStatus.message, error: newState.error,
                 action: SnackBarAction(label: 'Mute', onPressed: () {
                   notificationStatus.mute = true;
                   _audioPlayer?.release();

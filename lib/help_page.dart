@@ -49,6 +49,7 @@ If setting time is enabled via the "--enable-set-time" command line option and "
       const ListTile(leading: Icon(Icons.mode_night), title: Text('Enables Night Mode')),
       const ListTile(leading: Icon(Icons.brightness_high), title: Text('Cycles the brightness on supported platforms')),
       const ListTile(leading: Icon(Icons.sync_alt), title: Text('Toggles the Auto-Page rotation. Set the per-page delays in the page list. Pages without delays are not shown')),
+      const ListTile(leading: Icon(Icons.format_list_bulleted), title: Text('Shows the notification log')),
       const ListTile(leading: Icon(Icons.volume_off), title: Text('Un-mutes notifications')),
       const ListTile(leading: Icon(Icons.copy), title: Text('Copy/Clone a Page')),
       const ListTile(leading: Icon(Icons.drag_handle), title: Text('Drag handle for reordering pages')),

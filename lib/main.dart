@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as m;
 
 import 'package:args/args.dart';
+import 'package:boatinstrument/log_display.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -145,32 +146,21 @@ class _MainPageState extends State<MainPage> {
 
     AppBar? appBar;
     if(_showAppBar) {
-      List<Widget> actions = [];
-      
-      if(_controller.muted) {
-        actions.add(IconButton(icon: const Icon(Icons.volume_off), onPressed: () {
-          setState(() {
-            _controller.unMute();
-          });}));
-      }
-
-      actions.addAll([
-        IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
-        IconButton(icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
-      ]);
-
-      if(_controller.brightnessControl) {
-        actions.add(IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness));
-      }
-
-      if(!widget.readOnly) {
-        actions.add(IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage));
-      }
-
       appBar = AppBar(
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
         title: Text(_controller.pageName(_pageNum)),
-        actions: actions);
+        actions: [
+          if(_controller.muted) IconButton(icon: const Icon(Icons.volume_off), onPressed: () {
+            setState(() {
+              _controller.unMute();
+            });}),
+          IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
+          IconButton(icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
+          if(_controller.brightnessControl) IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness),
+          if(_controller.notifications.isNotEmpty) IconButton(icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
+          if(!widget.readOnly) IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage)
+        ]
+      );
     }
 
     return Scaffold(
@@ -252,6 +242,13 @@ class _MainPageState extends State<MainPage> {
     });
 
     _startPageTimer();
+  }
+
+  void _showNotifications () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return NotificationLogDisplay(_controller.notifications);
+    }));
   }
 
   _showEditPagesPage () async {
