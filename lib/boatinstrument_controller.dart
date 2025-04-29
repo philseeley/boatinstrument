@@ -563,7 +563,7 @@ class BoatInstrumentController {
           NotificationState newState = NotificationState.values.byName(
               u.value['state']);
 
-          bool playSound = u.value['method'].contains('sound');
+          bool playSound = (u.value['method']??[]).contains('sound');
 
           notificationStatus.message = u.value['message'];
           notificationStatus.last = now;
