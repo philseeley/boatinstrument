@@ -249,6 +249,10 @@ class _MainPageState extends State<MainPage> {
         context, MaterialPageRoute(builder: (context) {
       return NotificationLogDisplay(_controller.notifications);
     }));
+
+    setState(() {
+      _showAppBar = false;
+    });
   }
 
   _showEditPagesPage () async {
