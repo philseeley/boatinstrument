@@ -141,7 +141,6 @@ When you drop your anchor press the '''),
         TextSpan(text: ''' button to set the alarm radius. The "Alarm Radius Fudge Factor" setting in the signalk-anchoralarm-plugin gets added to your current distance from the anchor.
 
 Once set, the anchor position can be moved by unlocking and dragging the anchor.''')]))),
-      const ListTile(leading: Icon(Icons.notifications_outlined), title: Text('Mutes the alarm')),
       const ListTile(leading: Icon(Icons.anchor), title: Text('Marks the anchor at the current boat position')),
       const ListTile(leading: Icon(Icons.lock), title: Text('Locks/Unlocks the ability to move or set the anchor')),
       const ListTile(leading: Icon(Icons.highlight_off), title: Text('Sets the alarm radius to the current boat position')),
