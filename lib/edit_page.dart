@@ -219,9 +219,9 @@ class _EditPageState extends State<_EditPage> {
       ]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetSubMenuEntry(box, 'Speed', [
-          _widgetMenuEntry(SpeedThroughWaterBox.sid, 'Speed'),
-          _widgetMenuEntry(MaxSpeedThroughWaterBox.sid, 'Max Speed'),
-          _widgetMenuEntry(SpeedThroughWaterGraph.sid, 'Speed'),
+          _widgetMenuEntry(SpeedThroughWaterBox.sid, 'STW'),
+          _widgetMenuEntry(MaxSpeedThroughWaterBox.sid, 'Max STW'),
+          _widgetMenuEntry(SpeedThroughWaterGraph.sid, 'STW'),
         ]),
         _widgetMenuEntry(RudderAngleBox.sid, 'Rudder Angle'),
         _widgetMenuEntry(AttitudeRollGaugeBox.sid, 'Roll'),
