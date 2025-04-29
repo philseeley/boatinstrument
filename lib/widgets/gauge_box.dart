@@ -623,14 +623,14 @@ class _GraphPainter extends CustomPainter {
 }
 
 enum GraphDuration implements EnumMenuEntry {
-  oneMinutes('1 Minutes', 1),
-  twoMinutes('2 Minutes', 2),
-  threeMinutes('3 Minutes', 3),
-  fourMinutes('4 Minutes', 4),
-  fiveMinutes('5 Minutes', 5),
-  tenMinutes('10 Minutes', 10),
-  fifteenMinutes('15 Minutes', 15),
-  thirtyMinutes('30 Minutes', 30),
+  oneMinutes('1 Min', 1),
+  twoMinutes('2 Mins', 2),
+  threeMinutes('3 Mins', 3),
+  fourMinutes('4 Mins', 4),
+  fiveMinutes('5 Mins', 5),
+  tenMinutes('10 Mins', 10),
+  fifteenMinutes('15 Mins', 15),
+  thirtyMinutes('30 Mins', 30),
   oneHour('1 Hour', 1*60),
   twoHours('2 Hours', 2*60),
   fourHours('4 Hours', 4*60),
