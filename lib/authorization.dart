@@ -23,7 +23,7 @@ class SignalKAuthorization {
       Uri uri = _controller.httpApiUri.replace(
         path: '${_controller.httpApiUri.path.substring(0, _controller.httpApiUri.path.length-4)}access/requests');
 
-      http.Response response = await http.post(
+      http.Response response = await _controller.httpPost(
           uri,
           headers: {
             "accept": "application/json",
@@ -50,7 +50,7 @@ class SignalKAuthorization {
     try {
       Uri uri = _controller.httpApiUri.replace(path: _authRequestHREF!);
 
-      http.Response response = await http.get(
+      http.Response response = await _controller.httpGet(
         uri,
         headers: {
           "accept": "application/json",

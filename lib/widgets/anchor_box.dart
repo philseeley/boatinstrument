@@ -305,7 +305,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       Uri uri = widget.config.controller.httpApiUri.replace(
           path: '/plugins/anchoralarm/$path');
 
-      http.Response response = await http.post(
+      http.Response response = await widget.config.controller.httpPost(
           uri,
           headers: {
             "Content-Type": "application/json",

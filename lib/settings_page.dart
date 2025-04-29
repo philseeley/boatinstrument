@@ -265,19 +265,12 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       ListTile(
-          leading: const Text("Host:"),
+          leading: const Text("URL:"),
           title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
-              decoration: const InputDecoration(hintText: 'mypi.local'),
-              initialValue: settings.signalkHost,
-              onChanged: (value) => settings.signalkHost = value)
-      ),
-      ListTile(
-          leading: const Text("Port:"),
-          title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.signalkPort.toString(),
-              onChanged: (value) => settings.signalkPort = int.parse(value)),
+              decoration: const InputDecoration(hintText: 'http://mypi.local:3000'),
+              initialValue: settings.signalkUrl,
+              onChanged: (value) => settings.signalkUrl = value),
+          trailing: OutlinedButton(onPressed: _editHttpHeaders, child: Text('Headers')),
       ),
       SwitchListTile(title: const Text("Demo Mode:"),
           value: settings.demoMode,
@@ -406,6 +399,13 @@ class _SettingsState extends State<SettingsPage> {
       return _PathSubscriptionsPage(widget._controller);
     }));
   }
+
+  void _editHttpHeaders () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _EditHttpHeaders(widget._controller._settings!.httpHeaders);
+    }));
+  }
 }
 
 class _PathSubscriptionsPage extends StatelessWidget {
@@ -433,5 +433,62 @@ class _PathSubscriptionsPage extends StatelessWidget {
       ),
       body: ListView(children: list)
     );
+  }
+}
+
+class _EditHttpHeaders extends StatefulWidget {
+  final List<_HttpHeader> _httpHeaders;
+
+  const _EditHttpHeaders(this._httpHeaders);
+
+  @override
+  createState() => _EditHttpHeadersState();
+}
+
+class _EditHttpHeadersState extends State<_EditHttpHeaders> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    List<Widget> headerList = [];
+    for(int h=0; h<widget._httpHeaders.length; ++h) {
+      var header = widget._httpHeaders[h];
+      headerList.add(ListTile(key: UniqueKey(),
+          title: Column(children: [
+            TextFormField(
+              decoration: const InputDecoration(hintText: 'name'),
+              initialValue: header.name,
+              onChanged: (value) => header.name = value),
+            TextFormField(
+              decoration: const InputDecoration(hintText: 'value'),
+              initialValue: header.value,
+              onChanged: (value) => header.value = value)
+          ]),
+          trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteHeader(h);})
+      ));
+      headerList.add(Divider(thickness: 3, color: Theme.of(context).colorScheme.secondary));
+    }
+
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("HTTP Headers"),
+          actions: [
+            IconButton(icon: const Icon(Icons.add),onPressed:  _addHeader),
+          ],
+        ),
+        body: ListView(children: headerList)
+    );
+  }
+
+  void _addHeader() {
+    setState(() {
+      widget._httpHeaders.add(_HttpHeader());
+    });
+  }
+
+  _deleteHeader(int headerNum) async {
+    setState(() {
+      widget._httpHeaders.removeAt(headerNum);
+    });
   }
 }

@@ -134,7 +134,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
 
       uri = uri.replace(pathSegments: ps);
 
-      http.Response response = await http.get(
+      http.Response response = await widget._controller.httpGet(
           uri,
           headers: {
             "accept": "application/json",
@@ -640,12 +640,27 @@ enum DoubleValueToDisplay implements EnumMenuEntry {
 }
 
 @JsonSerializable()
+class _HttpHeader {
+  String name;
+  String value;
+
+  _HttpHeader({
+    this.name = '',
+    this.value = ''});
+
+  factory _HttpHeader.fromJson(Map<String, dynamic> json) =>
+      _$HttpHeaderFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HttpHeaderToJson(this);
+}
+
+@JsonSerializable()
 class _Settings {
   int version;
   int valueSmoothing;
   bool discoverServer;
-  String signalkHost;
-  int signalkPort;
+  String signalkUrl;
+  late List<_HttpHeader> httpHeaders;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
   int dataTimeout;
@@ -678,11 +693,11 @@ class _Settings {
   String get fileName => _store!.absolute.path;
 
   _Settings({
-    this.version = 0,
+    this.version = 1,
     this.valueSmoothing = 1,
     this.discoverServer = true,
-    this.signalkHost = '',
-    this.signalkPort = 3000,
+    this.signalkUrl = '',
+    this.httpHeaders = const [],
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
     this.dataTimeout = 10000,
@@ -713,6 +728,7 @@ class _Settings {
     if(pages.isEmpty) {
       pages = [_Page._newPage()];
     }
+    if(httpHeaders.isEmpty) httpHeaders = [];
   }
 
   factory _Settings.fromJson(Map<String, dynamic> json) =>
@@ -730,6 +746,14 @@ class _Settings {
   static readSettings(File f) async {
     String s = f.readAsStringSync();
     dynamic data = json.decode(s);
+    if(data['version'] == 0) {
+      CircularLogger().i('Converting configuration from version 0 to 1');
+      String h = data['signalkHost'];
+      String url = 'http://$h:${data['signalkPort']}';
+      if(h.isEmpty) url = '';
+      data['signalkUrl'] = url;
+     data['version'] = 1;
+    }
     return _Settings.fromJson(data);
   }
 

@@ -112,7 +112,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
       Uri uri = widget.config.controller.httpApiUri.replace(
           path: '${widget.config.controller.httpApiUri.path}vessels/self/$path');
 
-      http.Response response = await http.put(
+      http.Response response = await widget.config.controller.httpPut(
           uri,
           headers: {
             "Content-Type": "application/json",

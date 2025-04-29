@@ -36,6 +36,7 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:logger/logger.dart';
 import 'package:resizable_widget/resizable_widget.dart';
 import 'package:boatinstrument/widgets/autopilot_box.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'log_display.dart';
@@ -631,14 +632,40 @@ class BoatInstrumentController {
     return '${pageNum+1}/${_settings!.pages.length} ${_settings!.pages[pageNum].name}';
   }
 
+  Map<String, String> _httpHeaders(Map<String, String>? headers) {
+    Map<String, String> h = headers??{};
+
+    for (var header in _settings!.httpHeaders) {
+      h[header.name] = header.value;
+    }
+
+    return h;
+  }
+
+  Future<http.Response> httpGet(Uri uri, {Map<String, String>? headers}) async {
+    return await http.get(uri, headers: _httpHeaders(headers));
+  }
+
+  Future<http.Response> httpPut(Uri uri, {Map<String, String>? headers, Object? body}) async {
+    return await http.put(uri, headers: _httpHeaders(headers), body: body);
+  }
+
+  Future<http.Response> httpPost(Uri uri, {Map<String, String>? headers, Object? body}) async {
+    return await http.post(uri, headers: _httpHeaders(headers), body: body);
+  }
+
   _discoverServices() async {
     try {
-      String host = _settings!.signalkHost;
-      int port = _settings!.signalkPort;
+      Uri url = Uri.parse(_settings!.signalkUrl);
+      String host = url.host;
+      int port = url.port;
+      String scheme = url.scheme.isEmpty ? 'http' : url.scheme;
+      List<String> paths = [...url.pathSegments, 'signalk'];
 
       if(_settings!.demoMode) {
         host = 'demo.signalk.org';
         port = 443;
+        scheme = 'https';
       }
       else if(_settings!.discoverServer) {
         BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
@@ -665,9 +692,10 @@ class BoatInstrumentController {
         }
       }
 
-      Uri uri = Uri(scheme: _settings!.demoMode ? 'https' : 'http', host: host, port: port, path: '/signalk');
+      Uri uri = Uri(scheme: scheme, host: host, port: port, pathSegments: paths);
 
-      http.Response response = await http.get(uri).timeout(const Duration(seconds: 10));
+      http.Response response = await httpGet(uri).timeout(const Duration(seconds: 10));
+
       dynamic data = json.decode(response.body);
       dynamic endPoints = data['endpoints']['v1'];
 
@@ -695,7 +723,7 @@ class BoatInstrumentController {
 
       l.i("Connecting to: $wsUri");
 
-      _channel = WebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'));
+      _channel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
 
       await _channel?.ready;
 
@@ -831,7 +859,7 @@ class BoatInstrumentController {
   }
 
   _processStaticData(String path, Uri uri) async {
-    http.Response response = await http.get(
+    http.Response response = await httpGet(
         uri,
         headers: {
           "accept": "application/json",
