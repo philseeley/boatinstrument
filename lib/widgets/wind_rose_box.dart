@@ -28,6 +28,7 @@ class _Settings {
   bool showSpeeds;
   bool showTrueWind;
   bool maximizeSpeedBoxes;
+  bool trueWindNeedleOnTop;
 
   _Settings({
     this.type = WindRoseType.normal,
@@ -36,7 +37,8 @@ class _Settings {
     this.autoSwitchingDelay = 15,
     this.showSpeeds = true,
     this.showTrueWind = true,
-    this.maximizeSpeedBoxes = false
+    this.maximizeSpeedBoxes = false,
+    this.trueWindNeedleOnTop = false
   });
 }
 
@@ -372,12 +374,16 @@ class _WindRoseBoxState extends State<WindRoseBox> {
       CustomPaint(size: Size.infinite, painter: _RosePainter(widget.config.controller, context, widget._settings, _displayType))
     ];
 
-    if(widget._settings.showTrueWind && _windAngleTrue != null) {
+    if(widget._settings.showTrueWind && _windAngleTrue != null && !widget._settings.trueWindNeedleOnTop) {
       stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, _windAngleTrue!)));
     }
 
     if(widget._settings.showSpeeds) {
       stack.add(CustomPaint(size: Size.infinite, painter: _SpeedPainter(widget.config.controller, context, _displayType, widget._settings.showTrueWind, widget._settings.maximizeSpeedBoxes, _windAngleApparent??0, _windSpeedApparent, _windSpeedTrue)));
+    }
+
+    if(widget._settings.showTrueWind && _windAngleTrue != null && widget._settings.trueWindNeedleOnTop) {
+      stack.add(CustomPaint(size: Size.infinite, painter: _NeedlePainter(_displayType, Colors.yellow, _windAngleTrue!)));
     }
 
     if(_windAngleApparent != null) {
@@ -485,6 +491,13 @@ class _SettingsState extends State<_SettingsWidget> {
           onChanged: (bool value) {
             setState(() {
               s.showTrueWind = value;
+            });
+          }),
+      SwitchListTile(title: const Text("True Needle on Top:"),
+          value: s.trueWindNeedleOnTop,
+          onChanged: (bool value) {
+            setState(() {
+              s.trueWindNeedleOnTop = value;
             });
           }),
       SwitchListTile(title: const Text("Show Speeds:"),

@@ -15,6 +15,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       showSpeeds: json['showSpeeds'] as bool? ?? true,
       showTrueWind: json['showTrueWind'] as bool? ?? true,
       maximizeSpeedBoxes: json['maximizeSpeedBoxes'] as bool? ?? false,
+      trueWindNeedleOnTop: json['trueWindNeedleOnTop'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
@@ -25,6 +26,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'showSpeeds': instance.showSpeeds,
       'showTrueWind': instance.showTrueWind,
       'maximizeSpeedBoxes': instance.maximizeSpeedBoxes,
+      'trueWindNeedleOnTop': instance.trueWindNeedleOnTop,
     };
 
 const _$WindRoseTypeEnumMap = {
