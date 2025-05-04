@@ -619,7 +619,7 @@ class _BoxSettingsState extends State<_BoxSettingsPage> {
   Widget build(BuildContext context) {
     List<Widget> actions = [];
     if (widget._helpWidget != null) {
-      actions.add(IconButton(onPressed: _showHelpPage, icon: const Icon(Icons.help)));
+      actions.add(IconButton(tooltip: 'Help', onPressed: _showHelpPage, icon: const Icon(Icons.help)));
     }
 
     return Scaffold(

@@ -22,16 +22,16 @@ class _LogDisplayState extends State<LogDisplay> {
       appBar: AppBar(
         title: const Text("Log"),
         actions: [
-          IconButton(icon: const Icon(Icons.share),
+          IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
               onPressed: () {
                 _share(entries);
               },
           ),
-          IconButton(icon: const Icon(Icons.refresh),
+          IconButton(tooltip: 'Refresh', icon: const Icon(Icons.refresh),
               onPressed: () {
                 setState(() {});();
               }),
-          IconButton(icon: const Icon(Icons.delete_sweep),
+          IconButton(tooltip: 'Clear', icon: const Icon(Icons.delete_sweep),
               onPressed: () {
                 setState(() {
                   CircularLogOutput.clearLog();

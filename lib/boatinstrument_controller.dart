@@ -543,7 +543,7 @@ class BoatInstrumentController {
     });
   }
 
-  void unMute() {
+  void unmute() {
     _notifications.clear();
   }
 

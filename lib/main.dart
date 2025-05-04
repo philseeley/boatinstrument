@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:actions_menu_appbar/actions_menu_appbar.dart';
 import 'package:args/args.dart';
 import 'package:boatinstrument/log_display.dart';
 import 'package:flutter/services.dart';
@@ -144,21 +145,20 @@ class _MainPageState extends State<MainPage> {
       WakelockPlus.toggle(enable: _controller.keepAwake);
     }
 
-    AppBar? appBar;
+    ActionsMenuAppBar? appBar;
     if(_showAppBar) {
-      appBar = AppBar(
+      appBar = ActionsMenuAppBar(
+        actionsPercent: 0.5,
+        context: context,
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
         title: Text(_controller.pageName(_pageNum)),
         actions: [
-          if(_controller.muted) IconButton(icon: const Icon(Icons.volume_off), onPressed: () {
-            setState(() {
-              _controller.unMute();
-            });}),
-          IconButton(icon: const Icon(Icons.mode_night),onPressed:  _nightMode),
-          IconButton(icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
-          if(_controller.brightnessControl) IconButton(icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness),
-          if(_controller.notifications.isNotEmpty) IconButton(icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
-          if(!widget.readOnly) IconButton(icon: const Icon(Icons.web), onPressed: _showEditPagesPage)
+          if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
+          IconButton(tooltip: 'Night Mode', icon: const Icon(Icons.mode_night), onPressed:  _nightMode),
+          IconButton(tooltip: 'Auto Page', icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
+          if(_controller.brightnessControl) IconButton(tooltip: 'Brightness', icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness),
+          if(_controller.notifications.isNotEmpty) IconButton(tooltip: 'Notifications', icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
+          if(!widget.readOnly) IconButton(tooltip: 'Edit Pages', icon: const Icon(Icons.web), onPressed: _showEditPagesPage)
         ]
       );
     }
@@ -200,6 +200,12 @@ class _MainPageState extends State<MainPage> {
   void _nightMode() {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     themeProvider.toggleNightMode(_controller.darkMode);
+  }
+
+  void _unmute() {
+    setState(() {
+      _controller.unmute();
+    });
   }
 
   void _togglePageTimer() {

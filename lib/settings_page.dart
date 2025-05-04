@@ -42,8 +42,8 @@ class _EditPagesState extends State<EditPagesPage> {
         appBar: AppBar(
           title: const Text("Pages"),
           actions: [
-            IconButton(icon: const Icon(Icons.add),onPressed:  _addPage),
-            IconButton(icon: const Icon(Icons.settings), onPressed: _showSettingsPage),
+            IconButton(tooltip: 'Add Page', icon: const Icon(Icons.add),onPressed:  _addPage),
+            IconButton(tooltip: 'Settings', icon: const Icon(Icons.settings), onPressed: _showSettingsPage),
           ],
         ),
         body: ReorderableListView(buildDefaultDragHandles: false, children: pageList, onReorder: (oldIndex, newIndex) {
@@ -344,12 +344,12 @@ class _SettingsState extends State<SettingsPage> {
         context: context,
         title: const Text("Settings"),
         actions: [
-          if(widget._controller._enableExit) IconButton(icon: const Icon(Icons.power_settings_new, semanticLabel: 'Exit'), onPressed: _exit),
-          IconButton(icon: const Icon(Icons.share, semanticLabel: 'Export'), onPressed: _share),
-          IconButton(icon: const Icon(Icons.file_open, semanticLabel: 'Import'), onPressed: _import),
-          IconButton(icon: const Icon(Icons.mediation, semanticLabel: 'Subscriptions'),onPressed: _showPathSubscriptions),
-          IconButton(icon: const Icon(Icons.help, semanticLabel: 'Help'), onPressed: _showHelpPage),
-          IconButton(icon: const Icon(Icons.notes, semanticLabel: 'Log'),onPressed: _showLog)
+          if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.power_settings_new), onPressed: _exit),
+          IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
+          IconButton(tooltip: 'Import', icon: const Icon(Icons.file_open), onPressed: _import),
+          IconButton(tooltip: 'Subscriptions', icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
+          IconButton(tooltip: 'Help', icon: const Icon(Icons.help), onPressed: _showHelpPage),
+          IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: _showLog)
         ],
       ),
       body: ListView(children: list)
@@ -473,7 +473,7 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
         appBar: AppBar(
           title: const Text("HTTP Headers"),
           actions: [
-            IconButton(icon: const Icon(Icons.add),onPressed:  _addHeader),
+            IconButton(tooltip: 'Add Header', icon: const Icon(Icons.add),onPressed:  _addHeader),
           ],
         ),
         body: ListView(children: headerList)
