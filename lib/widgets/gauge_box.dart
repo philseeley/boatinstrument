@@ -366,9 +366,10 @@ class _BarGaugePainter extends CustomPainter {
   final int _maxValue;
   final int _step;
   final List<GaugeRange> _ranges;
+  final Color _barColor;
   final double? _value;
 
-  _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._ranges, this._value);
+  _BarGaugePainter(this._context, this._minValue, this._maxValue, this._step, this._ranges, this._barColor, this._value);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -387,7 +388,7 @@ class _BarGaugePainter extends CustomPainter {
     }
 
     if(_value != null) {
-      paint.color = Colors.blue;
+      paint.color = _barColor;
       canvas.drawRect(Rect.fromLTRB(35, h-(step*(_value-_minValue)), w, h), paint);
     }
 
@@ -418,9 +419,10 @@ class _BarGaugePainter extends CustomPainter {
 
 abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
   final bool showPercent;
+  final Color barColor;
 
   const DoubleValueBarGaugeBox(super.config, super.title, super.path,
-    {this.showPercent = false, super.minValue = 0, required super.maxValue, required super.step,
+    {this.showPercent = false, this.barColor = Colors.blue, super.minValue = 0, required super.maxValue, required super.step,
     super.ranges, super.smoothing, super.dataTimeout, super.key});
 
   @override
@@ -438,7 +440,7 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
       Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _BarGaugePainter(context, minDisplay, maxDisplay, _displayStep, _displayRanges, displayValue)
+          painter: _BarGaugePainter(context, minDisplay, maxDisplay, _displayStep, _displayRanges, widget.barColor, displayValue)
       )))),
       Row(children: [Padding(padding: const EdgeInsets.all(pad), child: Text(widget.units(value??0), style: style))]),
     ]);

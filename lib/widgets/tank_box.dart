@@ -19,7 +19,7 @@ abstract class TankBox extends DoubleValueBarGaugeBox {
   final _TankSettings _settings;
   final String _type;
 
-  const TankBox._init(this._settings, config, title, this._type, id, {super.key, required super.maxValue}) :
+  const TankBox._init(this._settings, config, title, this._type, id, {super.key, required super.barColor, required super.maxValue}) :
     super(config, '$title:$id', 'tanks.$_type.$id.currentLevel', step: 0.1, dataTimeout: false, showPercent: true);
 
   @override
@@ -55,9 +55,13 @@ class _TankState extends DoubleValueBarGaugeBoxState<TankBox> {
       value = 0.5;
     }
 
-    displayValue = maxDisplay * (value??0);
+    if(widget._settings.id.isEmpty) {
+      return Center(child: Text('Please choose the\ntank in the Settings'));
+    } else {
+      displayValue = maxDisplay * (value??0);
 
-    return super.build(context);
+      return super.build(context);
+    }
   }
 }
 
@@ -67,7 +71,7 @@ class FreshWaterTankBox extends TankBox {
   String get id => sid;
 
   const FreshWaterTankBox._init(s, config, id, {super.key, super.maxValue}) :
-    super._init(s, config, 'Fresh', 'freshWater', id);
+    super._init(s, config, 'Fresh', 'freshWater', id, barColor: Colors.blue);
 
   factory FreshWaterTankBox.fromSettings(config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
@@ -82,7 +86,7 @@ class GreyWaterTankBox extends TankBox {
   String get id => sid;
 
   const GreyWaterTankBox._init(s, config, id, {super.key, super.maxValue}) :
-    super._init(s, config, 'Grey', 'wasteWater', id);
+    super._init(s, config, 'Grey', 'wasteWater', id, barColor: Colors.orange);
 
   factory GreyWaterTankBox.fromSettings(config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
@@ -97,7 +101,7 @@ class BlackWaterTankBox extends TankBox {
   String get id => sid;
 
   const BlackWaterTankBox._init(s, config, id, {super.key, super.maxValue}) :
-    super._init(s, config, 'Black', 'blackWater', id);
+    super._init(s, config, 'Black', 'blackWater', id, barColor: Colors.red);
 
   factory BlackWaterTankBox.fromSettings(config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
@@ -112,7 +116,7 @@ class FuelTankBox extends TankBox {
   String get id => sid;
 
   const FuelTankBox._init(s, config, id, {super.key, super.maxValue}) :
-    super._init(s, config, 'Fuel', 'fuel', id);
+    super._init(s, config, 'Fuel', 'fuel', id, barColor: Colors.green);
 
   factory FuelTankBox.fromSettings(config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
@@ -127,7 +131,7 @@ class LubricationTankBox extends TankBox {
   String get id => sid;
 
   const LubricationTankBox._init(s, config, id, {super.key, super.maxValue}) :
-    super._init(s, config, 'Lube', 'lubrication', id);
+    super._init(s, config, 'Lube', 'lubrication', id, barColor: Colors.yellow);
 
   factory LubricationTankBox.fromSettings(config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
