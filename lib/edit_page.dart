@@ -54,8 +54,9 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(SetAndDriftBox.sid, (config) {return SetAndDriftBox(config, key: UniqueKey());}),
   BoxDetails(HeadingBox.sid, (config) {return HeadingBox(config, key: UniqueKey());}),
   BoxDetails(NextPointDistanceBox.sid, (config) {return NextPointDistanceBox(config, key: UniqueKey());}),
+  BoxDetails(NextPointBearingBox.sid, (config) {return NextPointBearingBox(config, key: UniqueKey());}),
   BoxDetails(NextPointVelocityMadeGoodBox.sid, (config) {return NextPointVelocityMadeGoodBox(config, key: UniqueKey());}),
-  BoxDetails(WaypointTimeToGoBox.sid, (config) {return WaypointTimeToGoBox(config, key: UniqueKey());}),
+  BoxDetails(NextPointTimeToGoBox.sid, (config) {return NextPointTimeToGoBox(config, key: UniqueKey());}),
   // BoxDetails(RouteTimeToGoBox.sid, (config) {return RouteTimeToGoBox(config, key: UniqueKey());}),
   BoxDetails(AttitudeRollGaugeBox.sid, gauge: true, (config) {return AttitudeRollGaugeBox(config, key: UniqueKey());}),
   BoxDetails(CrossTrackErrorDeltaBox.sid, gauge: true, (config) {return CrossTrackErrorDeltaBox(config, key: UniqueKey());}),
@@ -205,7 +206,8 @@ class _EditPageState extends State<_EditPage> {
         _widgetSubMenuEntry(box, 'Next Waypoint', [
           _widgetMenuEntry(NextPointDistanceBox.sid, 'Distance'),
           _widgetMenuEntry(NextPointVelocityMadeGoodBox.sid, 'VMG'),
-          _widgetMenuEntry(WaypointTimeToGoBox.sid, 'Time'),
+          _widgetMenuEntry(NextPointTimeToGoBox.sid, 'Time'),
+          _widgetMenuEntry(NextPointBearingBox.sid, 'Bearing'),
         ]),
         // _widgetMenuEntry(RouteTimeToGoBox.sid),
         _widgetSubMenuEntry(box, 'Cross Track Error', [

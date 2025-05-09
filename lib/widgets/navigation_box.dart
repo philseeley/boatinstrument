@@ -28,7 +28,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
 }
 
 class CrossTrackErrorGraphBackground extends BackgroundData {
-  CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'});
+  CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'}, smoothing: false);
 }
 
 class CrossTrackErrorGraph extends GraphBox {
@@ -218,6 +218,24 @@ class NextPointDistanceBox extends DoubleValueBox {
   }
 }
 
+class NextPointBearingBox extends DoubleValueBox {
+  static const String sid = 'navigation-next-point-bearing';
+  @override
+  String get id => sid;
+
+  const NextPointBearingBox(config, {super.key}) : super(config, 'WPT Bearing', 'navigation.*.nextPoint.bearingTrue', minLen: 3, precision: 0, angle: true);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value) * 1.0;
+  }
+
+  @override
+  String units(double value) {
+    return degreesUnits;
+  }
+}
+
 class NextPointVelocityMadeGoodBox extends SpeedBox {
   static const String sid = 'navigation-next-point-velocity-made-good';
   @override
@@ -310,9 +328,9 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
   }
 }
 
-class WaypointTimeToGoBox extends TimeToGoBox {
+class NextPointTimeToGoBox extends TimeToGoBox {
 
-  WaypointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
+  NextPointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
 
   static String sid = 'navigation-next-point-time-to-go';
   @override
