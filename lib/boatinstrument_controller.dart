@@ -335,9 +335,9 @@ class BoatInstrumentController {
     _settings = _Settings.fromJson(jsonDecode(s));
   }
 
-  loadSettings(bool portrait) async {
+  loadSettings(String configFile, bool portrait) async {
     try {
-      _settings = await _Settings.load();
+      _settings = await _Settings.load(configFile);
     } on Exception catch (e) {
       l.e('Exception loading Settings', error: e);
       await _loadDefaultConfig(portrait);

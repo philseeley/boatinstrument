@@ -34,13 +34,19 @@ class BoatInstrumentApp extends StatelessWidget {
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
     const enableSetTime = 'enable-set-time';
+    const configFile = 'config-file';
+
     final p = ArgParser()
                 ..addFlag(noAudio, negatable: false)
                 ..addFlag(noBrightnessCtrl, negatable: false)
                 ..addFlag(noKeepAwake, negatable: false)
                 ..addFlag(readOnly, negatable: false)
                 ..addFlag(enableExit, negatable: false)
-                ..addFlag(enableSetTime, negatable: false);
+                ..addFlag(enableSetTime, negatable: false)
+                ..addOption(configFile,
+                    defaultsTo: 'boatinstrument.json',
+                    valueHelp: 'filename',
+                    help: 'If the <filename> does not start with a "/", it is appended to the default directory');
 
     try {
       ArgResults r = p.parse(args);
@@ -55,7 +61,8 @@ class BoatInstrumentApp extends StatelessWidget {
           r.flag(noKeepAwake),
           r.flag(readOnly),
           r.flag(enableExit),
-          r.flag(enableSetTime)),
+          r.flag(enableSetTime),
+          r.option(configFile)!),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
     } catch (e) {
@@ -73,8 +80,17 @@ class MainPage extends StatefulWidget {
   final bool readOnly;
   final bool enableExit;
   final bool enableSetTime;
+  final String configFile;
 
-  const MainPage(this.noAudio, this.noBrightnessControl, this.noKeepAwake, this.readOnly, this.enableExit, this.enableSetTime, {super.key});
+  const MainPage(
+    this.noAudio,
+    this.noBrightnessControl,
+    this.noKeepAwake,
+    this.readOnly,
+    this.enableExit,
+    this.enableSetTime,
+    this.configFile,
+    {super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -113,7 +129,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _configure () async {
-    await _controller.loadSettings(MediaQuery.of(context).orientation == Orientation.portrait);
+    await _controller.loadSettings(widget.configFile, MediaQuery.of(context).orientation == Orientation.portrait);
     await _controller.connect();
 
     _themeProvider.setDarkMode(_controller.darkMode);

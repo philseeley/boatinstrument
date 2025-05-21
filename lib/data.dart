@@ -736,9 +736,13 @@ class _Settings {
 
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
 
-  static Future<_Settings> load() async {
-    Directory directory = await path_provider.getApplicationDocumentsDirectory();
-    _store = File('${directory.path}/boatinstrument.json');
+  static Future<_Settings> load(String configFile) async {
+    if(configFile.startsWith('/')) {
+      _store = File(configFile);
+    } else {
+      Directory directory = await path_provider.getApplicationDocumentsDirectory();
+      _store = File('${directory.path}/$configFile');
+    }
 
     return await readSettings(_store!);
   }
