@@ -744,19 +744,34 @@ class _Settings {
   }
 
   static readSettings(File f) async {
-    String s = f.readAsStringSync();
-    dynamic data = json.decode(s);
-    if(data['version'] == 0) {
-      CircularLogger().i('Backing up configuration file');
-      f.copy('${f.path}.v0');
-      CircularLogger().i('Converting configuration from version 0 to 1');
-      String h = data['signalkHost'];
-      String url = 'http://$h:${data['signalkPort']}';
-      if(h.isEmpty) url = '';
-      data['signalkUrl'] = url;
-     data['version'] = 1;
+    var l =  CircularLogger();
+
+    _Settings settings;
+
+    try {
+      String s = f.readAsStringSync();
+      dynamic data = json.decode(s);
+
+      if(data['version'] == 0) {
+        l.i('Backing up configuration file');
+        f.copy('${f.path}.v0');
+        l.i('Converting configuration from version 0 to 1');
+        String h = data['signalkHost'];
+        String url = 'http://$h:${data['signalkPort']}';
+        if(h.isEmpty) url = '';
+        data['signalkUrl'] = url;
+      data['version'] = 1;
+      }
+
+      settings =_Settings.fromJson(data);
+    } catch (e) {
+      var backupPath = '${f.path}.bad.${DateTime.now()}';
+      l.e('Failed to decode config. Backing up to $backupPath', error: e);
+      f.copy(backupPath);
+
+      rethrow;
     }
-    return _Settings.fromJson(data);
+    return settings;
   }
 
   _save (){
