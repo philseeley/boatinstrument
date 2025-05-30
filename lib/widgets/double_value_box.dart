@@ -88,15 +88,18 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
           widget.config.constraints.maxHeight - style.fontSize! - (3 * pad),
           widget.config.constraints.maxWidth - (2 * pad));
 
-    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
-        if(widget.valueToDisplay != DoubleValueToDisplay.value) IconButton(iconSize: style.fontSize, icon: Icon(Icons.restore), constraints: BoxConstraints.tightFor(height: style.fontSize!), visualDensity: VisualDensity(vertical: VisualDensity.minimumDensity), onPressed: _resetExtremeValue)
-      ])),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
-          child: Text(valueText, textScaler: TextScaler.noScaling,
-              style: style.copyWith(fontSize: fontSize, color: widget.portStarboard ? widget.config.controller.val2PSColor(context, displayValue??0) : null)))))
+    return Stack(children: [
+      Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.only(top: pad, left: pad), child:
+          Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
+        ),
+        // We need to disable the device text scaling as this interferes with our text scaling.
+        Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
+            child: Text(valueText, textScaler: TextScaler.noScaling,
+                style: style.copyWith(fontSize: fontSize, color: widget.portStarboard ? widget.config.controller.val2PSColor(context, displayValue??0) : null)))))
+      ]),
+      if(widget.valueToDisplay != DoubleValueToDisplay.value) Positioned(top: 0, right: 0, child:
+        IconButton(icon: Icon(Icons.restore), onPressed: _resetExtremeValue))
     ]);
   }
 
