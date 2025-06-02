@@ -70,7 +70,7 @@ class CustomDoubleValueBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _SettingsWidget(config, _settings);
+    return _SettingsWidget(config, this, _settings);
   }
 
   @override
@@ -110,7 +110,7 @@ class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _SettingsWidget(config, _settings);
+    return _SettingsWidget(config, this, _settings);
   }
 
   @override
@@ -145,7 +145,7 @@ class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _SettingsWidget(config, _settings);
+    return _SettingsWidget(config, this, _settings);
   }
 
   @override
@@ -180,7 +180,7 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _SettingsWidget(config, _settings);
+    return _SettingsWidget(config, this, _settings);
   }
 
   @override
@@ -196,9 +196,10 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
 
 class _SettingsWidget extends BoxSettingsWidget {
   final BoxWidgetConfig _config;
+  final DoubleValueBox _gaugeBox;
   final _CustomSettings _settings;
 
-  const _SettingsWidget(this._config, this._settings);
+  const _SettingsWidget(this._config, this._gaugeBox, this._settings);
 
   @override
   Map<String, dynamic> getSettingsJson() {
@@ -213,6 +214,7 @@ class _SettingsState extends State<_SettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    DoubleValueBox b = widget._gaugeBox;
     _CustomSettings s = widget._settings;
 
     return ListView(children: [
@@ -248,22 +250,24 @@ class _SettingsState extends State<_SettingsWidget> {
             initialValue: s.multiplier.toString(),
             onChanged: (value) => s.multiplier = double.tryParse(value)??1),
       ),
-      ListTile(
-        leading: const Text("Precision:"),
-        title: TextFormField(
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            initialValue: s.precision.toString(),
-            onChanged: (value) => s.precision = int.tryParse(value)??0),
-      ),
-      ListTile(
-        leading: const Text("Min Length:"),
-        title: TextFormField(
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            initialValue: s.minLen.toString(),
-            onChanged: (value) => s.minLen = int.tryParse(value)??0),
-      ),
+      if({CustomDoubleValueBox}.contains(b.runtimeType))
+        ListTile(
+          leading: const Text("Precision:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: s.precision.toString(),
+              onChanged: (value) => s.precision = int.tryParse(value)??0),
+        ),
+      if({CustomDoubleValueBox}.contains(b.runtimeType))
+        ListTile(
+          leading: const Text("Min Length:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: s.minLen.toString(),
+              onChanged: (value) => s.minLen = int.tryParse(value)??0),
+        ),
       ListTile(
         leading: const Text("Min Value:"),
         title: TextFormField(
@@ -276,23 +280,26 @@ class _SettingsState extends State<_SettingsWidget> {
             initialValue: (s.maxValue??'').toString(),
             onChanged: (value) => s.maxValue = double.tryParse(value)),
       ),
-      ListTile(
-        leading: const Text("Step:"),
-        title: TextFormField(
-            initialValue: s.step.toString(),
-            onChanged: (value) => s.step = double.tryParse(value)??1),
-      ),
-      ListTile(
-          leading: const Text("Value to Display:"),
-          title: EnumDropdownMenu(DoubleValueToDisplay.values, s.valueToDisplay, (v) {s.valueToDisplay = v!;})
-      ),
-      SwitchListTile(title: const Text("Is Angle:"),
-          value: s.angle,
-          onChanged: (bool value) {
-            setState(() {
-              s.angle = value;
-            });
-          }),
+      if({CustomDoubleValueSemiGaugeBox, CustomDoubleValueCircularGaugeBox, CustomDoubleValueBarGaugeBox}.contains(b.runtimeType))
+        ListTile(
+          leading: const Text("Step:"),
+          title: TextFormField(
+              initialValue: s.step.toString(),
+              onChanged: (value) => s.step = double.tryParse(value)??1),
+        ),
+      if({CustomDoubleValueBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Value to Display:"),
+            title: EnumDropdownMenu(DoubleValueToDisplay.values, s.valueToDisplay, (v) {s.valueToDisplay = v!;})
+        ),
+      if({CustomDoubleValueBox, CustomDoubleValueSemiGaugeBox}.contains(b.runtimeType))
+        SwitchListTile(title: const Text("Is Angle:"),
+            value: s.angle,
+            onChanged: (bool value) {
+              setState(() {
+                s.angle = value;
+              });
+            }),
       SwitchListTile(title: const Text("Smoothing:"),
           value: s.smoothing,
           onChanged: (bool value) {
@@ -300,13 +307,14 @@ class _SettingsState extends State<_SettingsWidget> {
               s.smoothing = value;
             });
           }),
-      SwitchListTile(title: const Text("Port/Starboard:"),
-          value: s.portStarboard,
-          onChanged: (bool value) {
-            setState(() {
-              s.portStarboard = value;
-            });
-          }),
+      if({CustomDoubleValueBox}.contains(b.runtimeType))
+        SwitchListTile(title: const Text("Port/Starboard:"),
+            value: s.portStarboard,
+            onChanged: (bool value) {
+              setState(() {
+                s.portStarboard = value;
+              });
+            }),
       SwitchListTile(title: const Text("Data Timeout:"),
           value: s.dataTimeout,
           onChanged: (bool value) {
