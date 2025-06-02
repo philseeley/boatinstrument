@@ -57,6 +57,8 @@ dependencies:
   latlong2:
   args:
   flutter_rfb:
+  flutter_material_color_picker:
+  color_hex:
   actions_menu_appbar:
     path: ../actions_menu_appbar
 

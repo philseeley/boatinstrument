@@ -24,6 +24,9 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       valueToDisplay: $enumDecodeNullable(
               _$DoubleValueToDisplayEnumMap, json['valueToDisplay']) ??
           DoubleValueToDisplay.value,
+      color: json['color'] == null
+          ? Colors.blue
+          : _CustomSettings._string2Color(json['color'] as String),
     );
 
 Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
@@ -42,6 +45,7 @@ Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
       'portStarboard': instance.portStarboard,
       'dataTimeout': instance.dataTimeout,
       'valueToDisplay': _$DoubleValueToDisplayEnumMap[instance.valueToDisplay]!,
+      'color': _CustomSettings._color2String(instance.color),
     };
 
 const _$DoubleValueToDisplayEnumMap = {

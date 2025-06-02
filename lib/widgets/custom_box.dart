@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:boatinstrument/path_text_formatter.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
+import 'package:color_hex/color_hex.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
@@ -29,6 +31,11 @@ class _CustomSettings {
   bool portStarboard;
   bool dataTimeout;
   DoubleValueToDisplay valueToDisplay;
+  @JsonKey(
+      name: 'color',
+      fromJson: _string2Color,
+      toJson: _color2String)
+  Color color;
 
   _CustomSettings({
     this.title = 'title',
@@ -44,8 +51,15 @@ class _CustomSettings {
     this.step = 1,
     this.portStarboard = false,
     this.dataTimeout = true,
-    this.valueToDisplay = DoubleValueToDisplay.value
+    this.valueToDisplay = DoubleValueToDisplay.value,
+    this.color = Colors.blue
   });
+
+  static Color _string2Color(String inColor) =>
+      inColor.convertToColor;
+
+  static String _color2String(Color color) =>
+      color.convertToHex.hex??'#2196f3';// Colors.blue
 }
 
 class CustomDoubleValueBox extends DoubleValueBox {
@@ -164,11 +178,11 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.key});
+  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.barColor, super.key});
 
   factory CustomDoubleValueBarGaugeBox.fromSettings(config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
+    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, barColor: s.color, key: key);
   }
 
   static String sid = 'custom-gauge-bar';
@@ -322,6 +336,11 @@ class _SettingsState extends State<_SettingsWidget> {
               s.dataTimeout = value;
             });
           }),
+      if({CustomDoubleValueBarGaugeBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Colour:"),
+            title: MaterialColorPicker(circleSize: 30, spacing: 5, allowShades: false, selectedColor: s.color, onMainColorChange: (ColorSwatch<dynamic>? color) => s.color = color??Colors.blue)
+        ),
     ]);
   }
 
