@@ -365,7 +365,7 @@ class _SettingsState extends State<_SettingsWidget> {
       }
       widget._config.controller.l.e('Error Sending Email', error: e);
     } on MissingPluginException {
-      await Share.share(settings, subject: 'Boat Instrument Custom Box Settings');
+      await SharePlus.instance.share(ShareParams(text: settings, subject: 'Boat Instrument Custom Box Settings'));
     } catch (e) {
       widget._config.controller.l.e('Error Sending Email', error: e);
     }
