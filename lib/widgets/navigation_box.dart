@@ -205,7 +205,7 @@ class NextPointDistanceBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Dist', 'navigation.*.nextPoint.distance', precision: 2);
+  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Dist', 'navigation.*.nextPoint.distance', precision: 2, smoothing: false);
 
   @override
   double convert(double value) {
