@@ -442,8 +442,8 @@ class _EditPageState extends State<_EditPage> {
     return Scaffold(
       body: SafeArea(child: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows)),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        IconButton(icon: const Icon(Icons.save), onPressed: _save),
-        IconButton(icon: const Icon(Icons.close), onPressed: _close)
+        IconButton(icon: const Icon(Icons.save), style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.green)), onPressed: _save),
+        IconButton(icon: const Icon(Icons.close), style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)), onPressed: _discard)
       ])
     );
   }
@@ -562,11 +562,13 @@ class _EditPageState extends State<_EditPage> {
   void _save() {
     widget._page.pageRows = widget._editPage.pageRows;
     widget._controller.save();
-    _close();
+    Navigator.pop(context);
   }
 
-  void _close() {
-    Navigator.pop(context);
+  void _discard() async {
+    if(await widget._controller.askToConfirm(context, "Discard Changes?", alwaysAsk: true)) {
+      if(mounted) Navigator.pop(context);
+    }
   }
 
   _showSettingsPage (BoxWidget boxWidget) async {
