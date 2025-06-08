@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as m;
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -501,7 +502,7 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
         double? headingTrue = _targetHeadingTrue;
         if(headingTrue == null && (_targetHeadingMagnetic != null &&
             _magneticVariation != null)) {
-          headingTrue = _targetHeadingMagnetic! + _magneticVariation!;
+          headingTrue = (_targetHeadingMagnetic! + _magneticVariation!) % (m.pi*2);
         }
         if(headingTrue != null) {
           target = 'HDG: ${rad2Deg(headingTrue)}';
@@ -522,8 +523,8 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
         (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
         widget.config.constraints.maxWidth - (2 * pad));
 
-    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Autopilot', style: style))]),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Autopilot', style: style)),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
           child: Text(text, textScaler: TextScaler.noScaling,
