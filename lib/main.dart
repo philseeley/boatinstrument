@@ -8,14 +8,18 @@ import 'package:boatinstrument/log_display.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-void main(List<String> cmdlineArgs) {
+void main(List<String> cmdlineArgs) async {
   List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(RegExp(r'\s+')) + cmdlineArgs;
 
+  WidgetsFlutterBinding.ensureInitialized();
+  await FullScreen.ensureInitialized();
+  
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
 
@@ -115,6 +119,7 @@ class _MainPageState extends State<MainPage> {
   bool _rotatePages = false;
   Timer? _pageTimer;
   Offset _panStart = Offset.zero;
+  bool fullScreen = (Platform.isIOS || Platform.isAndroid) ? true : false;
 
   late final BoatInstrumentController _controller;
   int _pageNum = 0;
@@ -169,6 +174,7 @@ class _MainPageState extends State<MainPage> {
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
         title: Text(_controller.pageName(_pageNum)),
         actions: [
+          IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
           if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
           IconButton(tooltip: 'Night Mode', icon: const Icon(Icons.mode_night), onPressed:  _nightMode),
           IconButton(tooltip: 'Auto Page', icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
@@ -221,6 +227,13 @@ class _MainPageState extends State<MainPage> {
   void _unmute() {
     setState(() {
       _controller.unmute();
+    });
+  }
+  
+  void _toggleFullScreen() {
+    setState(() {
+      fullScreen = !fullScreen;
+      FullScreen.setFullScreen(fullScreen);
     });
   }
 

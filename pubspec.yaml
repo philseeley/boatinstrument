@@ -59,6 +59,7 @@ dependencies:
   flutter_rfb:
   flutter_material_color_picker:
   color_hex:
+  flutter_fullscreen:
   actions_menu_appbar:
     path: ../actions_menu_appbar
 
