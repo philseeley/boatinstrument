@@ -182,12 +182,30 @@ class SpeedOverGroundGraph extends GraphBox {
   }
 }
 
-class HeadingBox extends DoubleValueBox {
+class HeadingTrueBox extends DoubleValueBox {
   static const String sid = 'navigation-heading-true';
   @override
   String get id => sid;
 
-  const HeadingBox(config, {super.key}) : super(config, 'HDG', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
+  const HeadingTrueBox(config, {super.key}) : super(config, 'HDG', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value) * 1.0;
+  }
+
+  @override
+  String units(double value) {
+    return degreesUnits;
+  }
+}
+
+class HeadingMagneticBox extends DoubleValueBox {
+  static const String sid = 'navigation-heading-magnetic';
+  @override
+  String get id => sid;
+
+  const HeadingMagneticBox(config, {super.key}) : super(config, 'MHDG', 'navigation.headingMagnetic', minLen: 3, precision: 0, angle: true);
 
   @override
   double convert(double value) {
