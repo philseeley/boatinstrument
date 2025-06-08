@@ -89,7 +89,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
           widget.config.constraints.maxWidth - (2 * pad));
 
     return Stack(children: [
-      Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(padding: const EdgeInsets.only(top: pad, left: pad), child:
           Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
         ),
