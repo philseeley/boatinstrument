@@ -1,5 +1,6 @@
 PODS:
   - audioplayers_darwin (0.0.1):
+    - Flutter
     - FlutterMacOS
   - bonsoir_darwin (0.0.1):
     - Flutter
@@ -28,7 +29,7 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
-  - audioplayers_darwin (from `Flutter/ephemeral/.symlinks/plugins/audioplayers_darwin/macos`)
+  - audioplayers_darwin (from `Flutter/ephemeral/.symlinks/plugins/audioplayers_darwin/darwin`)
   - bonsoir_darwin (from `Flutter/ephemeral/.symlinks/plugins/bonsoir_darwin/darwin`)
   - file_picker (from `Flutter/ephemeral/.symlinks/plugins/file_picker/macos`)
   - flutter_inappwebview_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_inappwebview_macos/macos`)
@@ -47,7 +48,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   audioplayers_darwin:
-    :path: Flutter/ephemeral/.symlinks/plugins/audioplayers_darwin/macos
+    :path: Flutter/ephemeral/.symlinks/plugins/audioplayers_darwin/darwin
   bonsoir_darwin:
     :path: Flutter/ephemeral/.symlinks/plugins/bonsoir_darwin/darwin
   file_picker:
@@ -72,7 +73,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/window_manager/macos
 
 SPEC CHECKSUMS:
-  audioplayers_darwin: dcad41de4fbd0099cb3749f7ab3b0cb8f70b810c
+  audioplayers_darwin: 4027b33a8f471d996c13f71cb77f0b1583b5d923
   bonsoir_darwin: e3b8526c42ca46a885142df84229131dfabea842
   file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
   flutter_inappwebview_macos: bdf207b8f4ebd58e86ae06cd96b147de99a67c9b
