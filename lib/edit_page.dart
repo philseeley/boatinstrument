@@ -155,7 +155,7 @@ class _EditPageState extends State<_EditPage> {
     ));
   }
 
-  _getWidgetMenus(_Box box) {
+  List<PopupMenuEntry<BoxDetails>> _getWidgetMenus(_Box box) {
     List<PopupMenuEntry<BoxDetails>> popupMenuEntries = [
       PopupMenuItem<BoxDetails>(child: Row(children: [const Icon(Icons.arrow_left), Text('Box', style: TextStyle(decoration: TextDecoration.underline))])),
       _widgetMenuEntry(BlankBox.sid, 'Blank'),
@@ -571,7 +571,7 @@ class _EditPageState extends State<_EditPage> {
     }
   }
 
-  _showSettingsPage (BoxWidget boxWidget) async {
+  Future<void> _showSettingsPage (BoxWidget boxWidget) async {
     BoxSettingsWidget boxSettingsWidget =  boxWidget.getSettingsWidget(widget._controller.getBoxSettingsJson(boxWidget.id))!;
 
     await Navigator.push(
@@ -588,7 +588,7 @@ class _EditPageState extends State<_EditPage> {
     setState(() {});
   }
 
-  _showPerBoxSettingsPage (BoxWidget boxWidget, int pri, int ci, ri, bi) async {
+  Future<void> _showPerBoxSettingsPage (BoxWidget boxWidget, int pri, int ci, ri, bi) async {
     BoxSettingsWidget boxSettingsWidget = boxWidget.getPerBoxSettingsWidget()!;
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
@@ -600,7 +600,7 @@ class _EditPageState extends State<_EditPage> {
     setState(() {});
   }
 
-  _showHelpPage (Widget helpWidget) async {
+  Future<void> _showHelpPage (Widget helpWidget) async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return _BoxHelpPage(helpWidget);
@@ -637,7 +637,7 @@ class _BoxSettingsState extends State<_BoxSettingsPage> {
     );
   }
 
-  _showHelpPage () async {
+  Future<void> _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return _BoxHelpPage(widget._helpWidget!);

@@ -30,7 +30,7 @@ class _AutopilotControlSettings {
   String authToken;
 
   _AutopilotControlSettings({
-    clientID,
+    String? clientID,
     this.authToken = ''
   }) : clientID = clientID??'boatinstrument-autopilot-${customAlphabet('0123456789', 4)}';
 }
@@ -99,7 +99,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     super.dispose();
   }
   
-  _sendCommand(String path, String params) async {
+  Future<void> _sendCommand(String path, String params) async {
 
     if(widget.config.editMode) {
       return;
@@ -133,7 +133,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     }
   }
 
-  _unlock() {
+  Future<void> _unlock() async {
     if(_locked) {
       setState(() {
         _locked = false;
@@ -150,7 +150,6 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
       }
     });
   }
-
 }
 
 abstract class AutopilotStateControlBox extends AutopilotControlBox {
@@ -164,7 +163,7 @@ abstract class AutopilotStateControlBox extends AutopilotControlBox {
 
 class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotStateControlBox> {
 
-  _setState(AutopilotState state) async {
+  Future<void> _setState(AutopilotState state) async {
     if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
       await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
     }
@@ -208,14 +207,14 @@ class AutopilotStateControlHorizontalBox extends AutopilotStateControlBox {
 
   static const String sid = 'autopilot-control-state-horizontal';
 
-  AutopilotStateControlHorizontalBox(config, {super.key}) : super(config, false);
+  AutopilotStateControlHorizontalBox(BoxWidgetConfig config, {super.key}) : super(config, false);
 }
 
 class AutopilotStateControlVerticalBox extends AutopilotStateControlBox {
 
   static const String sid = 'autopilot-control-state-vertical';
 
-  AutopilotStateControlVerticalBox(config, {super.key}) : super(config, true);
+  AutopilotStateControlVerticalBox(BoxWidgetConfig config, {super.key}) : super(config, true);
 }
 
 abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
@@ -225,11 +224,11 @@ abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
 
 abstract class _AutopilotHeadingControlBoxState<T extends AutopilotHeadingControlBox> extends AutopilotControlBoxState<T> {
 
-  _adjustHeading(int direction) async {
+  Future<void> _adjustHeading(int direction) async {
     await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
   }
 
-  _autoTack(String direction) async {
+  Future<void> _autoTack(String direction) async {
     if(await widget.config.controller.askToConfirm(context, 'Tack to "$direction"?')) {
       await _sendCommand("steering/autopilot/actions/tack", '{"value": "$direction"}');
     }
@@ -532,7 +531,7 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
     ]);
   }
 
-  _processData(List<Update>? updates) {
+  void _processData(List<Update>? updates) {
     if(updates == null) {
       _autopilotState = null;
     } else {

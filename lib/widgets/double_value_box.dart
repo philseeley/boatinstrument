@@ -103,7 +103,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
     ]);
   }
 
-  processUpdates(List<Update>? updates) {
+  void processUpdates(List<Update>? updates) {
     if(updates == null) {
       value = displayValue = null;
     } else {

@@ -21,7 +21,7 @@ class _AnchorAlarmSettings {
   int recordPoints;
 
   _AnchorAlarmSettings({
-    clientID,
+    String? clientID,
     this.authToken = '',
     this.recordSeconds = 10,
     this.recordPoints = 1000
@@ -301,7 +301,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
   }
 
-  _sendCommand(String path, String params) async {
+  Future<void> _sendCommand(String path, String params) async {
     if(widget.config.editMode) {
       return;
     }

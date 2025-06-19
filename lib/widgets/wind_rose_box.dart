@@ -410,7 +410,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     });
   }
 
-  _processData(List<Update>? updates) {
+  void _processData(List<Update>? updates) {
     if(updates == null) {
       _windAngleApparent = _windAngleTrue = _windSpeedApparent = _windSpeedTrue = null;
     } else {

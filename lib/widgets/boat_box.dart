@@ -14,7 +14,7 @@ class SpeedThroughWaterBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const SpeedThroughWaterBox(config, {super.valueToDisplay, super.key}) : super(config, 'STW', 'navigation.speedThroughWater');
+  const SpeedThroughWaterBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'STW', 'navigation.speedThroughWater');
 }
 
 class MaxSpeedThroughWaterBox extends SpeedThroughWaterBox {
@@ -26,7 +26,7 @@ class MaxSpeedThroughWaterBox extends SpeedThroughWaterBox {
 }
 
 class SpeedThroughWaterGraphBackground extends BackgroundData {
-  SpeedThroughWaterGraphBackground({controller}) : super(controller: controller, SpeedThroughWaterGraph.sid, {'navigation.speedThroughWater'});
+  SpeedThroughWaterGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, SpeedThroughWaterGraph.sid, {'navigation.speedThroughWater'});
 }
 
 class SpeedThroughWaterGraph extends GraphBox {
@@ -48,7 +48,7 @@ class SpeedThroughWaterGraph extends GraphBox {
 }
 
 class AttitudeRollGaugeBox extends DoubleValueSemiGaugeBox {
-  const AttitudeRollGaugeBox(config, {super.key}) : super(
+  const AttitudeRollGaugeBox(BoxWidgetConfig config, {super.key}) : super(
     config,
     'Roll',
     GaugeOrientation.down,
@@ -176,7 +176,7 @@ class _RudderAnglePainter extends CustomPainter {
 class RudderAngleBox extends DoubleValueBox {
   late final _RudderAngleSettings _settings;
 
-  RudderAngleBox(config, {super.key}) : super(config, '', 'steering.rudderAngle', smoothing: false) {
+  RudderAngleBox(BoxWidgetConfig config, {super.key}) : super(config, '', 'steering.rudderAngle', smoothing: false) {
     _settings = _$RudderAngleSettingsFromJson(config.settings);
   }
 

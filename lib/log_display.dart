@@ -70,7 +70,7 @@ class _ChangeLogState extends State<ChangeLogPage> {
     _loadLog();
   }
   
-  _loadLog() async {
+  Future<void> _loadLog() async {
     if(_log == null) {
       String s = await rootBundle.loadString('assets/changelog');
       setState(() {

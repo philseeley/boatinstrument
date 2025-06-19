@@ -14,7 +14,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const CrossTrackErrorBox(config, {super.key}) : super(config, 'XTE', 'navigation.*.crossTrackError', precision: 2, smoothing: false, portStarboard: true);
+  const CrossTrackErrorBox(BoxWidgetConfig config, {super.key}) : super(config, 'XTE', 'navigation.*.crossTrackError', precision: 2, smoothing: false, portStarboard: true);
 
   @override
   double convert(double value) {
@@ -28,7 +28,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
 }
 
 class CrossTrackErrorGraphBackground extends BackgroundData {
-  CrossTrackErrorGraphBackground({controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'}, smoothing: false);
+  CrossTrackErrorGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'}, smoothing: false);
 }
 
 class CrossTrackErrorGraph extends GraphBox {
@@ -67,7 +67,7 @@ class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  const CrossTrackErrorDeltaBox(config, {super.key}) : super(config, 'XTE', GaugeOrientation.up, 'navigation.*.crossTrackError', minValue: -2, maxValue: 2);
+  const CrossTrackErrorDeltaBox(BoxWidgetConfig config, {super.key}) : super(config, 'XTE', GaugeOrientation.up, 'navigation.*.crossTrackError', minValue: -2, maxValue: 2);
 
   @override
   double convert(double value) {
@@ -131,7 +131,7 @@ class CourseOverGroundBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const CourseOverGroundBox(config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true);
+  const CourseOverGroundBox(BoxWidgetConfig config, {super.key}) : super(config, 'COG', 'navigation.courseOverGroundTrue', minLen: 3, precision: 0, angle: true);
 
   @override
   double convert(double value) {
@@ -149,7 +149,7 @@ class SpeedOverGroundBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const SpeedOverGroundBox(config, {super.valueToDisplay, super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
+  const SpeedOverGroundBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'SOG', 'navigation.speedOverGround');
 }
 
 class MaxSpeedOverGroundBox extends SpeedOverGroundBox {
@@ -161,7 +161,7 @@ class MaxSpeedOverGroundBox extends SpeedOverGroundBox {
 }
 
 class SpeedOverGroundGraphBackground extends BackgroundData {
-  SpeedOverGroundGraphBackground({controller}) : super(controller: controller, SpeedOverGroundGraph.sid, {'navigation.speedOverGround'});
+  SpeedOverGroundGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, SpeedOverGroundGraph.sid, {'navigation.speedOverGround'});
 }
 
 class SpeedOverGroundGraph extends GraphBox {
@@ -187,7 +187,7 @@ class HeadingTrueBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const HeadingTrueBox(config, {super.key}) : super(config, 'HDG', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
+  const HeadingTrueBox(BoxWidgetConfig config, {super.key}) : super(config, 'HDG', 'navigation.headingTrue', minLen: 3, precision: 0, angle: true);
 
   @override
   double convert(double value) {
@@ -205,7 +205,7 @@ class HeadingMagneticBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const HeadingMagneticBox(config, {super.key}) : super(config, 'MHDG', 'navigation.headingMagnetic', minLen: 3, precision: 0, angle: true);
+  const HeadingMagneticBox(BoxWidgetConfig config, {super.key}) : super(config, 'MHDG', 'navigation.headingMagnetic', minLen: 3, precision: 0, angle: true);
 
   @override
   double convert(double value) {
@@ -223,7 +223,7 @@ class NextPointDistanceBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const NextPointDistanceBox(config, {super.key}) : super(config, 'WPT Dist', 'navigation.*.nextPoint.distance', precision: 2, smoothing: false);
+  const NextPointDistanceBox(BoxWidgetConfig config, {super.key}) : super(config, 'WPT Dist', 'navigation.*.nextPoint.distance', precision: 2, smoothing: false);
 
   @override
   double convert(double value) {
@@ -241,7 +241,7 @@ class NextPointBearingBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const NextPointBearingBox(config, {super.key}) : super(config, 'WPT BRG', 'navigation.*.nextPoint.bearingTrue', minLen: 3, precision: 0, angle: true);
+  const NextPointBearingBox(BoxWidgetConfig config, {super.key}) : super(config, 'WPT BRG', 'navigation.*.nextPoint.bearingTrue', minLen: 3, precision: 0, angle: true);
 
   @override
   double convert(double value) {
@@ -259,7 +259,7 @@ class NextPointVelocityMadeGoodBox extends SpeedBox {
   @override
   String get id => sid;
 
-  const NextPointVelocityMadeGoodBox(config, {super.key}) : super(config, 'WPT VMG', 'navigation.*.nextPoint.velocityMadeGood');
+  const NextPointVelocityMadeGoodBox(BoxWidgetConfig config, {super.key}) : super(config, 'WPT VMG', 'navigation.*.nextPoint.velocityMadeGood');
 }
 
 abstract class TimeToGoBox extends BoxWidget {
@@ -329,7 +329,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
     ]);
   }
 
-  processData(List<Update>? updates) {
+  void processData(List<Update>? updates) {
     if(updates == null) {
       _timeToGo = null;
     } else {
@@ -348,7 +348,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
 
 class NextPointTimeToGoBox extends TimeToGoBox {
 
-  NextPointTimeToGoBox(config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
+  NextPointTimeToGoBox(BoxWidgetConfig config, {super.key}) : super(config, 'WPT', {'navigation.*.nextPoint.timeToGo'});
 
   static String sid = 'navigation-next-point-time-to-go';
   @override
@@ -490,7 +490,7 @@ class _PositionBoxState extends State<PositionBox> {
     ]);
   }
 
-  _processData(List<Update>? updates) {
+  void _processData(List<Update>? updates) {
     if(updates == null) {
       _latitude = _longitude = null;
     } else {
@@ -552,7 +552,7 @@ class MagneticVariationBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const MagneticVariationBox(config, {super.key}) : super(config, 'Mag Var', 'navigation.magneticVariation', precision: 0, smoothing: false);
+  const MagneticVariationBox(BoxWidgetConfig config, {super.key}) : super(config, 'Mag Var', 'navigation.magneticVariation', precision: 0, smoothing: false);
 
   @override
   double convert(double value) {
@@ -570,7 +570,7 @@ class RateOfTurnBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const RateOfTurnBox(config, {super.key}) : super(config, 'Turn Rate', 'navigation.rateOfTurn', precision: 0, portStarboard: true);
+  const RateOfTurnBox(BoxWidgetConfig config, {super.key}) : super(config, 'Turn Rate', 'navigation.rateOfTurn', precision: 0, portStarboard: true);
 
   @override
   double convert(double value) {

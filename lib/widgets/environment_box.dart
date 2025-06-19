@@ -30,7 +30,7 @@ class DepthBelowSurfaceBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowSurfaceBox(config, {super.valueToDisplay, super.key}) : super(config, 'Depth', 'environment.depth.belowSurface');
+  const DepthBelowSurfaceBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'Depth', 'environment.depth.belowSurface');
 }
 
 class MinDepthBelowSurfaceBox extends DepthBelowSurfaceBox {
@@ -42,7 +42,7 @@ class MinDepthBelowSurfaceBox extends DepthBelowSurfaceBox {
 }
 
 class DepthBelowSurfaceGraphBackground extends BackgroundData {
-  DepthBelowSurfaceGraphBackground({controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, {'environment.depth.belowSurface'}, smoothing: false);
+  DepthBelowSurfaceGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, {'environment.depth.belowSurface'}, smoothing: false);
 }
 
 class DepthBelowSurfaceGraph extends GraphBox {
@@ -68,7 +68,7 @@ class DepthBelowKeelBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowKeelBox(config, {super.valueToDisplay, super.key}) : super(config, 'DBK', 'environment.depth.belowKeel');
+  const DepthBelowKeelBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'DBK', 'environment.depth.belowKeel');
 }
 
 class MinDepthBelowKeelBox extends DepthBelowKeelBox {
@@ -80,7 +80,7 @@ class MinDepthBelowKeelBox extends DepthBelowKeelBox {
 }
 
 class DepthBelowKeelGraphBackground extends BackgroundData {
-  DepthBelowKeelGraphBackground({controller}) : super(controller: controller, DepthBelowKeelGraph.sid, {'environment.depth.belowKeel'}, smoothing: false);
+  DepthBelowKeelGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, DepthBelowKeelGraph.sid, {'environment.depth.belowKeel'}, smoothing: false);
 }
 
 class DepthBelowKeelGraph extends GraphBox {
@@ -108,7 +108,7 @@ class DepthBelowTransducerBox extends DepthBox {
   @override
   String get id => sid;
 
-  const DepthBelowTransducerBox(config, {super.valueToDisplay, super.key}) : super(config, 'DBT', 'environment.depth.belowTransducer');
+  const DepthBelowTransducerBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'DBT', 'environment.depth.belowTransducer');
 }
 
 class MinDepthBelowTransducerBox extends DepthBelowTransducerBox {
@@ -120,7 +120,7 @@ class MinDepthBelowTransducerBox extends DepthBelowTransducerBox {
 }
 
 class DepthBelowTransducerGraphBackground extends BackgroundData {
-  DepthBelowTransducerGraphBackground({controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, {'environment.depth.belowTransducer'}, smoothing: false);
+  DepthBelowTransducerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, {'environment.depth.belowTransducer'}, smoothing: false);
 }
 
 class DepthBelowTransducerGraph extends GraphBox {
@@ -145,7 +145,7 @@ class WaterTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const WaterTemperatureBox(config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature');
+  const WaterTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'Water Temp', 'environment.water.temperature');
 
   @override
   double convert(double value) {
@@ -159,7 +159,7 @@ class WaterTemperatureBox extends DoubleValueBox {
 }
 
 class WaterTemperatureGraphBackground extends BackgroundData {
-  WaterTemperatureGraphBackground({controller}) : super(controller: controller, WaterTemperatureGraph.sid, {'environment.water.temperature'});
+  WaterTemperatureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, WaterTemperatureGraph.sid, {'environment.water.temperature'});
 }
 
 class WaterTemperatureGraph extends GraphBox {
@@ -185,7 +185,7 @@ class OutsideHumidityBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const OutsideHumidityBox(config, {super.key}) : super(config, 'Humidity Out', 'environment.outside.relativeHumidity', precision: 0);
+  const OutsideHumidityBox(BoxWidgetConfig config, {super.key}) : super(config, 'Humidity Out', 'environment.outside.relativeHumidity', precision: 0);
 
   @override
   double convert(double value) {
@@ -203,7 +203,7 @@ class InsideHumidityBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const InsideHumidityBox(config, {super.key}) : super(config, 'Humidity In', 'environment.inside.relativeHumidity', precision: 0);
+  const InsideHumidityBox(BoxWidgetConfig config, {super.key}) : super(config, 'Humidity In', 'environment.inside.relativeHumidity', precision: 0);
 
   @override
   double convert(double value) {
@@ -264,7 +264,7 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
     ]);
   }
 
-  _processData(List<Update>? updates) {
+  void _processData(List<Update>? updates) {
     if(updates == null) {
       _set = _drift = _displayDrift = null;
     } else {
@@ -293,7 +293,7 @@ class OutsideTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const OutsideTemperatureBox(config, {super.key}) : super(config, 'Outside Temp', 'environment.outside.temperature');
+  const OutsideTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'Outside Temp', 'environment.outside.temperature');
 
   @override
   double convert(double value) {
@@ -307,7 +307,7 @@ class OutsideTemperatureBox extends DoubleValueBox {
 }
 
 class OutsideTemperatureGraphBackground extends BackgroundData {
-  OutsideTemperatureGraphBackground({controller}) : super(controller: controller, OutsideTemperatureGraph.sid, {'environment.outside.temperature'});
+  OutsideTemperatureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, OutsideTemperatureGraph.sid, {'environment.outside.temperature'});
 }
 
 class OutsideTemperatureGraph extends GraphBox {
@@ -333,7 +333,7 @@ class OutsidePressureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const OutsidePressureBox(config, {super.key}) : super(config, 'Pressure', 'environment.outside.pressure');
+  const OutsidePressureBox(BoxWidgetConfig config, {super.key}) : super(config, 'Pressure', 'environment.outside.pressure');
 
   @override
   double convert(double value) {
@@ -702,7 +702,7 @@ class _MoonPerBoxSettingsState extends State<_MoonPerBoxSettingsWidget> {
 }
 
 class OutsidePressureGraphBackground extends BackgroundData {
-  OutsidePressureGraphBackground({controller}) : super(controller: controller, OutsidePressureGraph.sid, {'environment.outside.pressure'});
+  OutsidePressureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, OutsidePressureGraph.sid, {'environment.outside.pressure'});
 }
 
 class OutsidePressureGraph extends GraphBox {

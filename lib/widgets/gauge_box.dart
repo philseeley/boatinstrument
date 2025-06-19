@@ -726,7 +726,7 @@ class GraphBoxState extends State<GraphBox> {
     super.dispose();
   }
 
-  _update(_) {
+  void _update(Timer _) {
     if(mounted) {
       setState(() {});
     }

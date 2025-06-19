@@ -327,7 +327,7 @@ class BoatInstrumentController {
     }
   }
 
-  _loadDefaultConfig(bool portrait) async {
+  Future<void> _loadDefaultConfig(bool portrait) async {
     String config = portrait ?
       'default-config-portrait.json' :
       'default-config-landscape.json';
@@ -335,7 +335,7 @@ class BoatInstrumentController {
     _settings = _Settings.fromJson(jsonDecode(s));
   }
 
-  loadSettings(String configFile, bool portrait) async {
+  Future<void> loadSettings(String configFile, bool portrait) async {
     try {
       _settings = await _Settings.load(configFile);
     } on Exception catch (e) {
@@ -547,7 +547,7 @@ class BoatInstrumentController {
     _notifications.clear();
   }
 
-  _onNotification(BuildContext context, List<Update>? updates) {
+  void _onNotification(BuildContext context, List<Update>? updates) {
     DateTime now = DateTime.now();
 
     _notifications.removeWhere((path, notification) {
@@ -657,7 +657,7 @@ class BoatInstrumentController {
     return await http.post(uri, headers: _httpHeaders(headers), body: body);
   }
 
-  _discoverServices() async {
+  Future<void> _discoverServices() async {
     try {
       Uri url = Uri.parse(_settings!.signalkUrl);
       String host = url.host;
@@ -710,7 +710,7 @@ class BoatInstrumentController {
     }
   }
 
-  connect() async {
+  Future<void> connect() async {
     try {
       for(_BoxData bd in _boxData) {
         if(bd.onUpdate != null) {
@@ -803,7 +803,7 @@ class BoatInstrumentController {
     _networkTimer = Timer(Duration(milliseconds: _settings!.signalkConnectionTimeout), connect);
   }
 
-  _processData(data) {
+  void _processData(dynamic data) {
     _networkTimeout();
 
     DateTime now = DateTime.now().toUtc();
@@ -861,7 +861,7 @@ class BoatInstrumentController {
     }
   }
 
-  _processStaticData(String path, Uri uri) async {
+  Future<void> _processStaticData(String path, Uri uri) async {
     http.Response response = await httpGet(
         uri,
         headers: {
@@ -899,7 +899,7 @@ class BoatInstrumentController {
     }
   }
 
-  _getStaticData(Set<String> staticPaths) {
+  void _getStaticData(Set<String> staticPaths) {
     Uri uri = httpApiUri;
     if(uri.host.isEmpty) return; // We're not connected.
     try {

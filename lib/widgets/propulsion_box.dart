@@ -37,7 +37,7 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
   EngineRPMBox._init(this._settings, config, title, path, {super.key, super.maxValue, super.ranges}) :
     super(config, title, path, step: rpmK2Revolutions(1));
 
-  factory EngineRPMBox.fromSettings(config, {key}) {
+  factory EngineRPMBox.fromSettings(BoxWidgetConfig config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
     return EngineRPMBox._init(s, config, 'RPM:${s.id}', 'propulsion.${s.id}.revolutions',
@@ -93,7 +93,7 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
   const EngineTempBox._init(this._settings, config, title, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
     super(config, title, GaugeOrientation.up, path, step: 20);
 
-  factory EngineTempBox.fromSettings(config, {key}) {
+  factory EngineTempBox.fromSettings(BoxWidgetConfig config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
     return EngineTempBox._init(s, config, 'Temp:${s.id}', 'propulsion.${s.id}.temperature',
@@ -152,7 +152,7 @@ class EngineExhaustTempBox extends DoubleValueSemiGaugeBox {
   const EngineExhaustTempBox._init(this._settings, config, title, path, {super.key, super.minValue,  super.maxValue, super.ranges}) :
     super(config, title, GaugeOrientation.up, path, step: 100);
 
-  factory EngineExhaustTempBox.fromSettings(config, {key}) {
+  factory EngineExhaustTempBox.fromSettings(BoxWidgetConfig config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
     return EngineExhaustTempBox._init(s, config, 'Exhaust Temp:${s.id}', 'propulsion.${s.id}.exhaustTemperature',
@@ -211,7 +211,7 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
   const EngineOilPressureBox._init(this._settings, config, title, path, {super.key, super.maxValue, super.ranges}) :
     super(config, title, GaugeOrientation.up, path, step: 50000);
 
-  factory EngineOilPressureBox.fromSettings(config, {key}) {
+  factory EngineOilPressureBox.fromSettings(BoxWidgetConfig config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
     return EngineOilPressureBox._init(s, config, 'Oil:${s.id}', 'propulsion.${s.id}.oilPressure',
@@ -267,7 +267,7 @@ class EngineFuelRateBox extends DoubleValueBox {
 
   const EngineFuelRateBox._init(this._settings, super.config, super.title, super.path, {super.key, super.minLen, super.precision});
 
-  factory EngineFuelRateBox.fromSettings(config, {key}) {
+  factory EngineFuelRateBox.fromSettings(BoxWidgetConfig config, {key}) {
     _EngineSettings s = _$EngineSettingsFromJson(config.settings);
 
     return EngineFuelRateBox._init(s, config, 'Fuel Rate:${s.id}', 'propulsion.${s.id}.fuel.rate', minLen: 1, precision: 2, key: key);

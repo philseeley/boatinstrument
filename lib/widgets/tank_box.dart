@@ -70,10 +70,10 @@ class FreshWaterTankBox extends TankBox {
   @override
   String get id => sid;
 
-  const FreshWaterTankBox._init(s, config, id, {super.key, super.maxValue}) :
+  const FreshWaterTankBox._init(_TankSettings s, config, id, {super.key, super.maxValue}) :
     super._init(s, config, 'Fresh', 'freshWater', id, barColor: Colors.blue);
 
-  factory FreshWaterTankBox.fromSettings(config, {key}) {
+  factory FreshWaterTankBox.fromSettings(BoxWidgetConfig config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
 
     return FreshWaterTankBox._init(s, config, s.id, maxValue: s.capacity, key: key);
@@ -85,10 +85,10 @@ class GreyWaterTankBox extends TankBox {
   @override
   String get id => sid;
 
-  const GreyWaterTankBox._init(s, config, id, {super.key, super.maxValue}) :
+  const GreyWaterTankBox._init(_TankSettings s, config, id, {super.key, super.maxValue}) :
     super._init(s, config, 'Grey', 'wasteWater', id, barColor: Colors.orange);
 
-  factory GreyWaterTankBox.fromSettings(config, {key}) {
+  factory GreyWaterTankBox.fromSettings(BoxWidgetConfig config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
 
     return GreyWaterTankBox._init(s, config, s.id, maxValue: s.capacity, key: key);
@@ -100,10 +100,10 @@ class BlackWaterTankBox extends TankBox {
   @override
   String get id => sid;
 
-  const BlackWaterTankBox._init(s, config, id, {super.key, super.maxValue}) :
+  const BlackWaterTankBox._init(_TankSettings s, config, id, {super.key, super.maxValue}) :
     super._init(s, config, 'Black', 'blackWater', id, barColor: Colors.red);
 
-  factory BlackWaterTankBox.fromSettings(config, {key}) {
+  factory BlackWaterTankBox.fromSettings(BoxWidgetConfig config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
 
     return BlackWaterTankBox._init(s, config, s.id, maxValue: s.capacity, key: key);
@@ -115,10 +115,10 @@ class FuelTankBox extends TankBox {
   @override
   String get id => sid;
 
-  const FuelTankBox._init(s, config, id, {super.key, super.maxValue}) :
+  const FuelTankBox._init(_TankSettings s, config, id, {super.key, super.maxValue}) :
     super._init(s, config, 'Fuel', 'fuel', id, barColor: Colors.green);
 
-  factory FuelTankBox.fromSettings(config, {key}) {
+  factory FuelTankBox.fromSettings(BoxWidgetConfig config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
 
     return FuelTankBox._init(s, config, s.id, maxValue: s.capacity, key: key);
@@ -130,10 +130,10 @@ class LubricationTankBox extends TankBox {
   @override
   String get id => sid;
 
-  const LubricationTankBox._init(s, config, id, {super.key, super.maxValue}) :
+  const LubricationTankBox._init(_TankSettings s, config, id, {super.key, super.maxValue}) :
     super._init(s, config, 'Lube', 'lubrication', id, barColor: Colors.yellow);
 
-  factory LubricationTankBox.fromSettings(config, {key}) {
+  factory LubricationTankBox.fromSettings(BoxWidgetConfig config, {key}) {
     _TankSettings s = _$TankSettingsFromJson(config.settings);
 
     return LubricationTankBox._init(s, config, s.id, maxValue: s.capacity, key: key);

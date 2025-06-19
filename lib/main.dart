@@ -133,7 +133,7 @@ class _MainPageState extends State<MainPage> {
     _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enableSetTime);
   }
 
-  _configure () async {
+  Future<void> _configure () async {
     await _controller.loadSettings(widget.configFile, MediaQuery.of(context).orientation == Orientation.portrait);
     await _controller.connect();
 
@@ -267,7 +267,7 @@ class _MainPageState extends State<MainPage> {
     _pageTimer = null;
   }
 
-  _rotatePage() {
+  void _rotatePage() {
     int pageNum;
     int? timeout;
     setState(() {
@@ -290,7 +290,7 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  _showEditPagesPage () async {
+  Future<void> _showEditPagesPage () async {
     _stopPageTimer();
 
     await Navigator.push(

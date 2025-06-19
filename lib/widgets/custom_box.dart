@@ -69,7 +69,7 @@ class CustomDoubleValueBox extends DoubleValueBox {
 
   const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.dataTimeout, super.valueToDisplay, super.key});
 
-  factory CustomDoubleValueBox.fromSettings(config, {key}) {
+  factory CustomDoubleValueBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
     return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, dataTimeout: s.dataTimeout, valueToDisplay: s.valueToDisplay, key: key);
   }
@@ -110,7 +110,7 @@ class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
 
   const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.step, super.angle, super.smoothing, super.dataTimeout, super.key});
 
-  factory CustomDoubleValueSemiGaugeBox.fromSettings(config, {key}) {
+  factory CustomDoubleValueSemiGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
     return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, angle: s.angle, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
   }
@@ -145,7 +145,7 @@ class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
 
   const CustomDoubleValueCircularGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.key});
 
-  factory CustomDoubleValueCircularGaugeBox.fromSettings(config, {key}) {
+  factory CustomDoubleValueCircularGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
     return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
   }
@@ -180,7 +180,7 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
 
   const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.barColor, super.key});
 
-  factory CustomDoubleValueBarGaugeBox.fromSettings(config, {key}) {
+  factory CustomDoubleValueBarGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
     return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, barColor: s.color, key: key);
   }

@@ -119,7 +119,7 @@ class _DateTimeBoxState extends State<DateTimeBox> {
     ]);
   }
 
-  _processData(List<Update>? updates) {
+  void _processData(List<Update>? updates) {
     if(updates == null) {
       _dateTime = null;
     } else {

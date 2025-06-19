@@ -10,7 +10,7 @@ part 'wind_box.g.dart';
 
 class WindSpeedTrueBeaufortBox extends DoubleValueBox {
 
-  const WindSpeedTrueBeaufortBox(config, {super.key}) : super(config, 'True Wind', 'environment.wind.speedTrue');
+  const WindSpeedTrueBeaufortBox(BoxWidgetConfig config, {super.key}) : super(config, 'True Wind', 'environment.wind.speedTrue');
 
   @override
   DoubleValueBoxState<WindSpeedTrueBeaufortBox> createState() => _WindSpeedTrueBeaufortBoxState();
@@ -61,7 +61,7 @@ class WindSpeedApparentBox extends WindSpeedBox {
   @override
   String get id => sid;
 
-  const WindSpeedApparentBox(config, {super.valueToDisplay, super.key}) : super(config, 'AWS', 'environment.wind.speedApparent');
+  const WindSpeedApparentBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'AWS', 'environment.wind.speedApparent');
 }
 
 class MaxWindSpeedApparentBox extends WindSpeedApparentBox {
@@ -77,7 +77,7 @@ class WindSpeedTrueBox extends WindSpeedBox {
   @override
   String get id => sid;
 
-  const WindSpeedTrueBox(config, {super.valueToDisplay, super.key}) : super(config, 'TWS', 'environment.wind.speedTrue');
+  const WindSpeedTrueBox(BoxWidgetConfig config, {super.valueToDisplay, super.key}) : super(config, 'TWS', 'environment.wind.speedTrue');
 }
 
 class MaxWindSpeedTrueBox extends WindSpeedTrueBox {
@@ -113,7 +113,7 @@ class _WindDirectionSettings {
 class WindDirectionTrueBox extends DoubleValueBox {
   late final _WindDirectionSettings _settings;
 
-  WindDirectionTrueBox(config, {super.key}) : super(config, 'TWD', 'environment.wind.directionTrue', angle: true) {
+  WindDirectionTrueBox(BoxWidgetConfig config, {super.key}) : super(config, 'TWD', 'environment.wind.directionTrue', angle: true) {
     _settings = _$WindDirectionSettingsFromJson(config.settings);
   }
 
@@ -221,7 +221,7 @@ class WindAngleApparentBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const WindAngleApparentBox(config, {super.key}) : super(config, 'AWA', 'environment.wind.angleApparent', minLen: 3, precision: 0, angle: true, relativeAngle: true, portStarboard: true);
+  const WindAngleApparentBox(BoxWidgetConfig config, {super.key}) : super(config, 'AWA', 'environment.wind.angleApparent', minLen: 3, precision: 0, angle: true, relativeAngle: true, portStarboard: true);
 
   @override
   double convert(double value) {
@@ -235,7 +235,7 @@ class WindAngleApparentBox extends DoubleValueBox {
 }
 
 class TrueWindSpeedGraphBackground extends BackgroundData {
-  TrueWindSpeedGraphBackground({controller}) : super(controller: controller, TrueWindSpeedGraph.sid, {'environment.wind.speedTrue'});
+  TrueWindSpeedGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, TrueWindSpeedGraph.sid, {'environment.wind.speedTrue'});
 }
 
 class TrueWindSpeedGraph extends GraphBox {
@@ -262,7 +262,7 @@ class TrueWindSpeedGraph extends GraphBox {
 }
 
 class ApparentWindSpeedGraphBackground extends BackgroundData {
-  ApparentWindSpeedGraphBackground({controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, {'environment.wind.speedApparent'});
+  ApparentWindSpeedGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, {'environment.wind.speedApparent'});
 }
 
 class ApparentWindSpeedGraph extends GraphBox {

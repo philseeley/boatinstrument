@@ -42,7 +42,7 @@ class PathTextFormatter {
     RegExp(r'^\{.[^\}]*\}'), // 1
   ];
 
-  _parseFormat() {
+  void _parseFormat() {
     String todo = _format;
 
     while (todo.isNotEmpty) {

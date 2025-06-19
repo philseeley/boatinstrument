@@ -80,7 +80,7 @@ class _EditPagesState extends State<EditPagesPage> {
       }));
   }
 
-  _copyPage(int pageNum, _Page page) {
+  void _copyPage(int pageNum, _Page page) {
     setState(() {
       widget._controller._settings?.pages.insert(pageNum+1, page.clone());
       if (widget._controller._settings!.pages.isEmpty) {
@@ -89,7 +89,7 @@ class _EditPagesState extends State<EditPagesPage> {
     });
   }
 
-  _deletePage(int pageNum) async {
+  Future<void> _deletePage(int pageNum) async {
     if(await widget._controller.askToConfirm(context, 'Delete page "${widget._controller._settings?.pages[pageNum].name}"', alwaysAsk: true)) {
       setState(() {
         widget._controller._settings?.pages.removeAt(pageNum);
@@ -356,11 +356,11 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
-  _exit () async {
+  Future<void> _exit () async {
     if(await widget._controller.askToConfirm(context, 'Exit?', alwaysAsk: true)) exit(0);
   }
   
-  _showHelpPage () async {
+  Future<void> _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return _HelpPage();
@@ -486,7 +486,7 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
     });
   }
 
-  _deleteHeader(int headerNum) async {
+  Future<void> _deleteHeader(int headerNum) async {
     setState(() {
       widget._httpHeaders.removeAt(headerNum);
     });

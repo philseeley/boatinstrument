@@ -103,7 +103,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
     getPaths();
   }
 
-  _paths(String path, Map<String, dynamic> data, bool add, List<String> paths) {
+  void _paths(String path, Map<String, dynamic> data, bool add, List<String> paths) {
     if(add) {
       paths.add(path);
     }
@@ -341,7 +341,7 @@ class _HelpBoxState extends State<HelpBox> {
     ]);
   }
 
-  _showHelpPage () async {
+  Future<void> _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
           return _HelpPage();
@@ -747,7 +747,7 @@ class _Settings {
     return await readSettings(_store!);
   }
 
-  static readSettings(File f) async {
+  static Future<_Settings> readSettings(File f) async {
     var l =  CircularLogger();
 
     _Settings settings;
@@ -778,7 +778,7 @@ class _Settings {
     return settings;
   }
 
-  _save (){
+  void _save (){
     _store?.writeAsStringSync(json.encode(toJson()));
   }
 }
@@ -866,7 +866,7 @@ abstract class BackgroundData {
   double? get value => values[id];
   set value(double? value) => values[id] = value;
 
-  processUpdates(List<Update>? updates) {
+  void processUpdates(List<Update>? updates) {
     if(updates != null) {
       try {
         double next =(updates[0].value as num).toDouble();

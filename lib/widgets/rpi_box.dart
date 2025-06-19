@@ -12,7 +12,7 @@ class RPiCPUTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const RPiCPUTemperatureBox(config, {super.key}) : super(config, 'RPi CPU Temp', 'environment.rpi.cpu.temperature', dataTimeout: false);
+  const RPiCPUTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'RPi CPU Temp', 'environment.rpi.cpu.temperature', dataTimeout: false);
 
   @override
   double convert(double value) {
@@ -33,7 +33,7 @@ class RPiGPUTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const RPiGPUTemperatureBox(config, {super.key}) : super(config, 'RPi GPU Temp', 'environment.rpi.gpu.temperature', dataTimeout: false);
+  const RPiGPUTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'RPi GPU Temp', 'environment.rpi.gpu.temperature', dataTimeout: false);
 
   @override
   double convert(double value) {
@@ -54,7 +54,7 @@ class RPiCPUUtilisationBox extends DoubleValueSemiGaugeBox {
   @override
   String get id => sid;
 
-  const RPiCPUUtilisationBox(config, {super.key}) : super(
+  const RPiCPUUtilisationBox(BoxWidgetConfig config, {super.key}) : super(
     config,
     'RPi CPU',
     GaugeOrientation.up,
@@ -88,7 +88,7 @@ class RPiMemoryUtilisationBox extends DoubleValueBarGaugeBox {
   @override
   String get id => sid;
 
-  const RPiMemoryUtilisationBox(config, {super.key}) : super(
+  const RPiMemoryUtilisationBox(BoxWidgetConfig config, {super.key}) : super(
     config,
     'RPi Memory',
     'environment.rpi.memory.utilisation',
@@ -120,7 +120,7 @@ class RPiSDUtilisationBox extends DoubleValueBarGaugeBox {
   @override
   String get id => sid;
 
-  const RPiSDUtilisationBox(config, {super.key}) : super(
+  const RPiSDUtilisationBox(BoxWidgetConfig config, {super.key}) : super(
     config,
     'RPi SD',
     'environment.rpi.sd.utilisation',
