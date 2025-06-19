@@ -235,6 +235,10 @@ class HelpTextWidget extends StatelessWidget {
   }
 }
 
+class HeaderText extends Text {
+  const HeaderText(super.text, {super.style, super.textAlign, super.key}) : super(softWrap: false, overflow: TextOverflow.ellipsis);
+}
+
 abstract class BoxWidget extends StatefulWidget {
   final BoxWidgetConfig config;
 

@@ -91,7 +91,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends State<T> {
     return Stack(children: [
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(padding: const EdgeInsets.only(top: pad, left: pad), child:
-          Text('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
+          HeaderText('${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}', style: style),
         ),
         // We need to disable the device text scaling as this interferes with our text scaling.
         Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),

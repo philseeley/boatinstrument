@@ -257,8 +257,8 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
         (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
         widget.config.constraints.maxWidth - (2 * pad));
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Row(children: [Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Set&Drift deg-${widget.config.controller.speedUnits.unit}', style: style))]),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Set&Drift deg-${widget.config.controller.speedUnits.unit}', style: style)),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);
@@ -469,8 +469,8 @@ class _SunlightBox extends State<SunlightBox> {
         timeWidgets.add(Text('${t.name} ${fmt.format(t.time)}', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize, decoration: d)));
       }
     }
-    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Sunlight', style: style)])),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Sunlight', style: style)),
       Padding(padding: const EdgeInsets.all(pad), child: Column(children: timeWidgets))]);
   }
 
@@ -628,8 +628,8 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
           painter: _MoonPainter(_fraction??0)))));
     }
 
-    stack.add(Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Moon', style: style)])),
+    stack.add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Moon', style: style)),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize))])),
     ]));

@@ -453,8 +453,8 @@ class _BatteriesBoxState extends State<BatteriesBox> {
       }
     }
 
-    return Column(children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Batteries', style: style)])),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Batteries', style: style)),
       Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
   }
 
@@ -726,8 +726,8 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with Swit
       l.add(lt);
     }
 
-    return Column(children: [
-        Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text('Switches', style: style)])),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.all(pad), child: HeaderText('Switches', style: style)),
         Expanded(child: ListView(children: l))
       ]);
   }
@@ -952,8 +952,8 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
             _setSwitchState(value);
       });
 
-    return Column(children: [
-        Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text('Switch ${_switch.name??_switch.id}', style: style)])),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.all(pad), child: HeaderText('Switch ${_switch.name??_switch.id}', style: style)),
         Center(child: toggleSwitch),
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: dimmerList)
       ]);

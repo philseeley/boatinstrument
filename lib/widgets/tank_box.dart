@@ -233,8 +233,8 @@ class _TanksBoxState extends State<TanksBox> {
       }
     }
 
-    return Column(children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Row(children: [Text('Tanks ${c.capacityUnits.unit}', style: style)])),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Tanks ${c.capacityUnits.unit}', style: style)),
       Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
   }
 
