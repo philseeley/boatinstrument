@@ -206,8 +206,8 @@ class _AnchorState extends State<AnchorAlarmBox> {
     Color dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
     Color raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
 
-    List<Widget> col = [
-      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+    return Padding(padding: const EdgeInsets.all(5), child: Column(children: [
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         IconButton(onPressed: _toggleLocked, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
         IconButton(onPressed: _maxRadius == null ? _drop : null, icon: Icon(Icons.anchor, color: dropColor)),
         IconButton(onPressed: (_currentRadius != null && _maxRadius == null) ? _setMaxRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
@@ -215,24 +215,24 @@ class _AnchorState extends State<AnchorAlarmBox> {
         IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(5);}, icon: Icon(Icons.add, color: dropColor)),
         IconButton(onPressed: _unlocked ? _raise : null, icon: Stack(children: [Icon(Icons.anchor, color: raiseColor), Icon(Icons.close, color: raiseColor)])),
       ]),
-    ];
-
-    if(_currentRadius != null) {
-      col.add(Expanded(
-          child: GestureDetector(onPanDown: _unlocked ? _startDrag : null, onPanEnd: _unlocked ? _stopDrag : null,
-              child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
-                painter: _AnchorPainter(
-                    widget.config.controller,
-                    context,
-                    _maxRadius,
-                    _currentRadius!,
-                    _bearingTrue,
-                    _apparentBearing??0,
-                    _anchorPosition,
-                    _positions))))),
-      );
-    }
-    return Padding(padding: const EdgeInsets.all(5), child: Column(children: col));
+      if(_currentRadius != null)
+        Expanded(child: GestureDetector(onPanDown: _unlocked ? _startDrag : null, onPanEnd: _unlocked ? _stopDrag : null,
+          child: ClipRect(
+            child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
+              painter: _AnchorPainter(
+                widget.config.controller,
+                context,
+                _maxRadius,
+                _currentRadius!,
+                _bearingTrue,
+                _apparentBearing??0,
+                _anchorPosition,
+                _positions
+              )
+            ))
+          )
+        ))
+    ]));
   }
 
   void _startDrag(DragDownDetails details) {
