@@ -565,7 +565,7 @@ class BoatInstrumentController {
 
           bool playSound = (u.value['method']??[]).contains('sound');
 
-          notificationStatus.message = u.value['message'];
+          notificationStatus.message = u.value['message']??'"${u.path}" has no message';
           notificationStatus.last = now;
 
           if((newState != notificationStatus.state || notificationStatus.count < newState.count) && !notificationStatus.mute) {            
