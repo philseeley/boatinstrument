@@ -284,6 +284,35 @@ abstract class BoxWidget extends StatefulWidget {
   Widget? getPerBoxSettingsHelp() => null;
 }
 
+class HeadedBoxState<T extends BoxWidget> extends State<T> {
+  static const double pad = 5.0;
+
+  String header = '';
+  String text = '';
+  int lines = 1;
+  Alignment alignment = Alignment.center;
+  Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+
+    double fontSize = maxFontSize(text, style,
+      ((widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / lines),
+      widget.config.constraints.maxWidth - (2 * pad));
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child:
+        HeaderText(header, style: style),
+      ),
+      // We need to disable the device text scaling as this interferes with our text scaling.
+      Expanded(child: Align(alignment: alignment, child: Padding(padding: const EdgeInsets.all(pad),
+          child: Text(text, textScaler: TextScaler.noScaling,
+              style: style.copyWith(fontSize: fontSize, color: color)))))
+      ]);
+  }
+}
+
 abstract class BoxSettingsWidget extends StatefulWidget {
   const BoxSettingsWidget({super.key});
 

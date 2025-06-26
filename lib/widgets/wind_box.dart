@@ -51,7 +51,6 @@ class _WindSpeedTrueBeaufortBoxState extends DoubleValueBoxState<WindSpeedTrueBe
       Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText(widget.title, style: style)),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(force, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
-
     ]);
   }
 }

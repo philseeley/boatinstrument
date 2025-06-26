@@ -587,7 +587,7 @@ class MoonBox extends CelestialBox {
   State<MoonBox> createState() => _MoonBox();
 }
 
-class _MoonBox extends State<MoonBox> {
+class _MoonBox extends HeadedBoxState<MoonBox> {
 
   DateTime? _rise, _set;
   double? _fraction;
@@ -595,6 +595,7 @@ class _MoonBox extends State<MoonBox> {
 
   @override
   void initState() {
+    alignment = Alignment.topCenter;
     super.initState();
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataTimeout: false);
   }
@@ -603,38 +604,28 @@ class _MoonBox extends State<MoonBox> {
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
 
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
-
     if(widget.config.editMode) {
       _rise = _set = DateTime.now();
       _fraction = 1.0;
       _phaseName = 'Full';
     }
 
-    String text =
+    header = 'Moon';
+
+    text =
 '''Rise:  ${(_rise == null) ? '-' : fmt.format(_rise!)}
 Set:   ${(_set == null) ? '-' : fmt.format(_set!)}
 Phase: ${(_fraction == null) ? '-' : (_fraction!*100).toInt()}%
 ${(_phaseName == null) ? '-' : _phaseName}''';
 
-    double fontSize = maxFontSize(text, style,
-        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 4,
-        widget.config.constraints.maxWidth - (2 * pad));
+    lines = 4;
 
-    List<Widget> stack = [];
-    if(widget._perBoxSettings.showMoon) {
-      stack.add(Padding(padding: const EdgeInsets.all(pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
-          painter: _MoonPainter(_fraction??0)))));
-    }
-
-    stack.add(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Moon', style: style)),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Padding(padding: const EdgeInsets.all(pad), child: Row(children: [Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize))])),
-    ]));
-
-    return Stack(children: stack);
+    return Stack(children: [
+      if(widget._perBoxSettings.showMoon)
+        Padding(padding: const EdgeInsets.all(HeadedBoxState.pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
+          painter: _MoonPainter(_fraction??0)))),
+      super.build(context)
+    ]);
   }
 
   void _onUpdate(List<Update>? updates) {

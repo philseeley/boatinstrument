@@ -272,7 +272,7 @@ abstract class TimeToGoBox extends BoxWidget {
   State<TimeToGoBox> createState() => TimeToGoBoxState();
 }
 
-class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
+class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
   int? _timeToGo;
 
   @override
@@ -283,14 +283,11 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
-
     if(widget.config.editMode) {
       _timeToGo = 123;
     }
 
-    String ttgString = '-';
+    text = '-';
     String etaString = '';
 
     if(_timeToGo != null) {
@@ -299,11 +296,11 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
       int hours = int.parse(parts[0]);
       int days = hours~/24;
       if(days > 0) {
-        ttgString = '${days}d${hours%24}h';
+        text = '${days}d${hours%24}h';
       } else if(hours > 0) {
-        ttgString = '${hours}h${parts[1]}m';
+        text = '${hours}h${parts[1]}m';
       } else {
-        ttgString = '${parts[1]}m${parts[2]}s';
+        text = '${parts[1]}m${parts[2]}s';
       }
 
       DateTime now = DateTime.now();
@@ -314,19 +311,12 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends State<T> {
       } else if(eta.month != now.month || eta.day != now.day) {
         fmt = 'MMM-dd ';
       }
-      etaString = DateFormat('${fmt}HH:mm').format(DateTime.now().add(ttg));
+      etaString = DateFormat('${fmt}HH:mm').format(now.add(ttg));
     }
 
-    double fontSize = maxFontSize(ttgString, style,
-        widget.config.constraints.maxHeight - style.fontSize! - (3 * pad),
-        widget.config.constraints.maxWidth - (2 * pad));
+    header = '${widget._title} TTG $etaString';
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('${widget._title} TTG $etaString', style: style)),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(ttgString, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
-
-    ]);
+    return super.build(context);
   }
 
   void processData(List<Update>? updates) {
@@ -452,7 +442,7 @@ class PositionBox extends BoxWidget {
   Widget? getSettingsHelp() => const HelpTextWidget('For a full list of formats see https://pub.dev/packages/latlong_formatter');
 }
 
-class _PositionBoxState extends State<PositionBox> {
+class _PositionBoxState extends HeadedBoxState<PositionBox> {
   _PositionSettings _settings = _PositionSettings();
   LatLongFormatter _llf = LatLongFormatter('');
   double? _latitude;
@@ -468,26 +458,16 @@ class _PositionBoxState extends State<PositionBox> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
-
     if(widget.config.editMode) {
       _latitude = _longitude = 0;
     }
-    String text = (_latitude == null || _longitude == null) ?
+
+    text = (_latitude == null || _longitude == null) ?
     '--- --.--- -\n--- --.--- -' :
     _llf.format(LatLong(_latitude!, _longitude!));
 
-    double fontSize = maxFontSize(text, style,
-        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
-        widget.config.constraints.maxWidth - (2 * pad));
-
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Position', style: style)),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
-
-    ]);
+    header = 'Position';
+    return super.build(context);
   }
 
   void _processData(List<Update>? updates) {

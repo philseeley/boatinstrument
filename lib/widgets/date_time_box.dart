@@ -66,7 +66,7 @@ class DateTimeBox extends BoxWidget {
   Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
 }
 
-class _DateTimeBoxState extends State<DateTimeBox> {
+class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
   _DateTimeSettings _settings = _DateTimeSettings();
   DateTime? _dateTime;
 
@@ -81,42 +81,33 @@ class _DateTimeBoxState extends State<DateTimeBox> {
   Widget build(BuildContext context) {
     _DateTimePerBoxSettings perBoxSettings = widget._perBoxSettings;
 
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
-
     if(widget.config.editMode) {
       _dateTime = DateTime.now();
     }
 
-    String dateTimeString = '';
-    int lines = 1;
+    text = '';
+    lines = 1;
 
     if(_dateTime == null) {
-      dateTimeString = '-';
+      text = '-';
     } else {
       DateTime dt = perBoxSettings.utc ? _dateTime!.toUtc() : _dateTime!.toLocal();
 
       if(perBoxSettings.showDate) {
-        dateTimeString += DateFormat(_settings.dateFormat).format(dt);
+        text += DateFormat(_settings.dateFormat).format(dt);
       }
       if(perBoxSettings.showTime) {
         if(perBoxSettings.showDate) {
           ++lines;
-          dateTimeString += '\n';
+          text += '\n';
         }
-        dateTimeString += DateFormat(perBoxSettings.timeFormat).format(dt);
+        text += DateFormat(perBoxSettings.timeFormat).format(dt);
       }
     }
 
-    double fontSize = maxFontSize(dateTimeString, style,
-        ((widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / lines),
-        widget.config.constraints.maxWidth - (2 * pad));
+    header = '${perBoxSettings.showDate?'Date${perBoxSettings.showTime?'/':''}':''}${perBoxSettings.showTime?'Time':''}${perBoxSettings.utc ? ' UTC':''}';
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('${perBoxSettings.showDate?'Date${perBoxSettings.showTime?'/':''}':''}${perBoxSettings.showTime?'Time':''}${perBoxSettings.utc ? ' UTC':''}', style: style)),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(dateTimeString, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
-    ]);
+    return super.build(context);
   }
 
   void _processData(List<Update>? updates) {
