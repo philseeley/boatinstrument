@@ -441,7 +441,7 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
-    final now = DateTime.now().toLocal();
+    final now = widget.config.controller.now().toLocal();
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
@@ -605,7 +605,7 @@ class _MoonBox extends HeadedBoxState<MoonBox> {
     final fmt = DateFormat(widget._settings.timeFormat);
 
     if(widget.config.editMode) {
-      _rise = _set = DateTime.now();
+      _rise = _set = widget.config.controller.now().toLocal();
       _fraction = 1.0;
       _phaseName = 'Full';
     }

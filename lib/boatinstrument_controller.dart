@@ -120,6 +120,8 @@ class BoatInstrumentController {
   WebSocketChannel? _channel;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
+  DateTime? _time;
+  DateTime _timeReceived = DateTime.now();
   final Map<String, NotificationStatus> _notifications = {};
   final Set<String> _backgroundIDs = {};
   final Set<String> _paths = {};
@@ -156,6 +158,12 @@ class BoatInstrumentController {
   bool get muted => _notifications.entries.any((element) => element.value.mute);
   Set<String> get paths => _paths;
   Set<String> get staticPaths => _staticPaths;
+
+  DateTime now() {
+    DateTime now = DateTime.now();
+    if(_time != null) return _time!.add(now.difference(_timeReceived));
+    return now;
+  }
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
     if(_settings!.portStarboardColors == PortStarboardColors.none) {
@@ -377,7 +385,7 @@ class BoatInstrumentController {
       ++_boxesOnPage;
     }
 
-    _BoxData bd = _BoxData(onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataTimeout);
+    _BoxData bd = _BoxData(now(), onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataTimeout);
     _boxData.add(bd);
 
     for(String path in bd.paths) {
@@ -548,7 +556,7 @@ class BoatInstrumentController {
   }
 
   void _onNotification(BuildContext context, List<Update>? updates) {
-    DateTime now = DateTime.now();
+    DateTime now = this.now();
 
     _notifications.removeWhere((path, notification) {
       return now.difference(notification.last) > Duration(minutes: _settings!.notificationMuteTimeout);
@@ -764,7 +772,7 @@ class BoatInstrumentController {
   void _subscribe() {
     if(_boxData.length == _boxesOnPage) {
       _paths.clear();
-      _paths.add('navigation.datetime');
+      _paths.add('navigation.datetime'); // Keep alive test.
       _staticPaths.clear();
 
       // Find all the unique paths.
@@ -806,7 +814,8 @@ class BoatInstrumentController {
   void _processData(dynamic data) {
     _networkTimeout();
 
-    DateTime now = DateTime.now().toUtc();
+    DateTime now = this.now();
+    Duration dataTimeout = Duration(milliseconds: _settings!.dataTimeout);
 
     dynamic d = json.decode(data);
 
@@ -819,16 +828,22 @@ class BoatInstrumentController {
       for (dynamic u in d['updates']) {
         try {
           String source = u[r'$source'];
+          DateTime timeStamp = DateTime.parse(u['timestamp']);
+          if(_time == null) {
+            _timeSync(timeStamp);
+            now = this.now();
+          }
+
           // Note: the demo server has old date/times.
           if (_settings!.demoMode ||
-              (_settings!.setTime && !_timeSet) ||
               source == 'defaults' ||
               source == 'derived-data' ||
-              now.difference(DateTime.parse(u['timestamp'])) <=
-                  Duration(milliseconds: _settings!.dataTimeout)) {
+              now.difference(timeStamp) <= dataTimeout) {
             for (dynamic v in u['values']) {
               String path = v['path'];
               dynamic value = v['value'];
+
+              _timeSync(timeStamp);
 
               if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
 
@@ -841,6 +856,8 @@ class BoatInstrumentController {
                 }
               }
             }
+          } else {
+            l.i('Discarding old data for "$u"');
           }
         } catch (e) {
           l.e("Error converting $u", error: e);
@@ -850,15 +867,21 @@ class BoatInstrumentController {
       for(_BoxData bd in _boxData) {
         if(bd.onUpdate != null) {
           if (bd.updates.isNotEmpty) {
+            // Send updates to Box.
             bd.onUpdate!(bd.updates);
-          } else if (bd.dataTimeout && now.difference(bd.lastUpdate) >
-              Duration(milliseconds: _settings!.dataTimeout)) {
+          } else if (bd.dataTimeout && now.difference(bd.lastUpdate) > dataTimeout) {
+            // We've not seen an update for this Box for a while.
             bd.onUpdate!(null);
             bd.lastUpdate = now;
           }
         }
       }
     }
+  }
+
+  void _timeSync(DateTime timeStamp) {
+    _time = timeStamp;
+    _timeReceived = DateTime.now();
   }
 
   Future<void> _processStaticData(String path, Uri uri) async {

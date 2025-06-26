@@ -1012,7 +1012,8 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
 class Power {
   double voltage = 0;
   double current = 0;
-  DateTime timestamp = DateTime.now();
+  DateTime timestamp;
+  Power(this.timestamp);
 }
 
 abstract class PowerGraphBackground extends BackgroundData {
@@ -1026,13 +1027,13 @@ abstract class PowerGraphBackground extends BackgroundData {
     if(updates == null) {
       power.clear();
     } else {
-      DateTime now = DateTime.now();
+      DateTime now = controller!.now();
 
       for (Update u in updates) {
         try {
           List<String> ps = u.path.split('.');
           String id = ps[2];
-          Power p = power.putIfAbsent(id, () => Power());
+          Power p = power.putIfAbsent(id, () => Power(now));
           p.timestamp = now;
 
           switch (ps[3]) {

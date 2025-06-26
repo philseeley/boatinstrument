@@ -303,7 +303,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
         text = '${parts[1]}m${parts[2]}s';
       }
 
-      DateTime now = DateTime.now();
+      DateTime now = widget.config.controller.now().toLocal();
       DateTime eta = now.add(ttg);
       String fmt = '';
       if(eta.year != now.year) {

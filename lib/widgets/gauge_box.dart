@@ -481,9 +481,11 @@ class _GraphPainter extends CustomPainter {
     }
 
     int slice = ((_minutes*60)/w).ceil();
+    Duration sliceDuration = Duration(seconds: slice);
+
     List<double?> values = List.filled(((_minutes*60)/slice).ceil(), null);
-    DateTime now = DateTime.now();
-    DateTime start = DateTime(
+    DateTime now = _widget.config.controller.now();
+    DateTime start = DateTime.utc(
       now.year,
       now.month,
       now.day,
@@ -500,7 +502,7 @@ class _GraphPainter extends CustomPainter {
       double total = 0;
       int count = 0;
 
-      start = start.subtract(Duration(seconds: slice));
+      start = start.subtract(sliceDuration);
       while(dp >= 0 && _data[dp].date.isAfter(start)) {
         total += _data[dp].value;
         ++count;

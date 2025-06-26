@@ -427,11 +427,11 @@ class _BoxData {
   final bool dataTimeout;
   List<RegExp> regExpPaths = [];
   List<RegExp> regExpStaticPaths = [];
-  DateTime lastUpdate = DateTime.now();
+  DateTime lastUpdate;
   List<Update> updates = [];
   List<Update> staticUpdates = [];
 
-  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataTimeout);
+  _BoxData(this.lastUpdate, this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataTimeout);
 }
 
 class _Resizable {
@@ -912,7 +912,7 @@ abstract class BackgroundData {
           } else {
             value = next;
           }
-          DateTime now = DateTime.now();
+          DateTime now = controller!.now();
           if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
             data = CircularBuffer<DataPoint>.of(data, data.capacity+dataIncrement);
           }

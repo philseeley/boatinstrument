@@ -176,11 +176,13 @@ class _AnchorState extends State<AnchorAlarmBox> {
   Offset _startDragOffset = Offset.zero;
   Timer? _lockTimer;
   static final List<ll.LatLng> _positions = [];
-  DateTime _lastPositionTime = DateTime.now();
+  late DateTime _lastPositionTime;
 
   @override
   void initState() {
     super.initState();
+    _lastPositionTime = widget.config.controller.now();
+
     _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {
       'navigation.position',
@@ -338,7 +340,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         try {
           switch (u.path) {
             case 'navigation.position':
-              DateTime now = DateTime.now();
+              DateTime now = widget.config.controller.now();
               if(now.difference(_lastPositionTime) >= Duration(seconds: _settings.recordSeconds)) {
                 _lastPositionTime = now;
 
@@ -417,7 +419,7 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
 
     List<Widget> list = [
       ListTile(
-        leading: const Text("Record Period:"),
+        leading: const Text("Record Position Period:"),
         title: Slider(
             min: 1,
             max: 60,

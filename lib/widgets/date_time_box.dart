@@ -82,7 +82,7 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
     _DateTimePerBoxSettings perBoxSettings = widget._perBoxSettings;
 
     if(widget.config.editMode) {
-      _dateTime = DateTime.now();
+      _dateTime = widget.config.controller.now();
     }
 
     text = '';
