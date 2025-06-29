@@ -463,9 +463,9 @@ class _PositionBoxState extends HeadedBoxState<PositionBox> {
     }
 
     text = (_latitude == null || _longitude == null) ?
-    '--- --.--- -\n--- --.--- -' :
-    _llf.format(LatLong(_latitude!, _longitude!));
-
+      '--- --.--- -\n--- --.--- -' :
+      _llf.format(LatLong(_latitude!, _longitude!));
+    lines = 2;
     header = 'Position';
     return super.build(context);
   }

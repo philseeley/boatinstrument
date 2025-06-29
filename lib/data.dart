@@ -298,7 +298,7 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     double fontSize = maxFontSize(text, style,
-      ((widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / lines),
+      (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / lines,
       widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
