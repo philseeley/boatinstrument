@@ -6,7 +6,8 @@ FLUTTER_PI_ARGS="--release"
 #   --no-audio           Disables loading audio support
 #   --no-brightness-ctrl Disables loading brightness control support
 #   --no-keep-awake      Disables loading Keep Screen Awake support
+#   --no-full-screen     Disables Full Screen support
 #   --read-only          Disables the ability to change the configuration
 #   --enable-exit        Enables an Exit button on the setting page and systemd will restart the instrument
 #   --enable-set-time    Enables the option to set the system time from the 'navigation.datetime' path
-BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake --enable-exit --enable-set-time"
+BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake --no-full-screen --enable-exit --enable-set-time"

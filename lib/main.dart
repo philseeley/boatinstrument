@@ -14,11 +14,10 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'theme_provider.dart';
 
-void main(List<String> cmdlineArgs) async {
+void main(List<String> cmdlineArgs) {
   List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(RegExp(r'\s+')) + cmdlineArgs;
 
   WidgetsFlutterBinding.ensureInitialized();
-  await FullScreen.ensureInitialized();
   
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
@@ -35,6 +34,7 @@ class BoatInstrumentApp extends StatelessWidget {
     const noAudio = 'no-audio';
     const noBrightnessCtrl = 'no-brightness-ctrl';
     const noKeepAwake = 'no-keep-awake';
+    const noFullScreen = 'no-full-screen';
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
     const enableSetTime = 'enable-set-time';
@@ -44,6 +44,7 @@ class BoatInstrumentApp extends StatelessWidget {
                 ..addFlag(noAudio, negatable: false)
                 ..addFlag(noBrightnessCtrl, negatable: false)
                 ..addFlag(noKeepAwake, negatable: false)
+                ..addFlag(noFullScreen, negatable: false)
                 ..addFlag(readOnly, negatable: false)
                 ..addFlag(enableExit, negatable: false)
                 ..addFlag(enableSetTime, negatable: false)
@@ -63,6 +64,7 @@ class BoatInstrumentApp extends StatelessWidget {
           r.flag(noAudio),
           r.flag(noBrightnessCtrl),
           r.flag(noKeepAwake),
+          r.flag(noFullScreen),
           r.flag(readOnly),
           r.flag(enableExit),
           r.flag(enableSetTime),
@@ -81,6 +83,7 @@ class MainPage extends StatefulWidget {
   final bool noAudio;
   final bool noBrightnessControl;
   final bool noKeepAwake;
+  final bool noFullScreen;
   final bool readOnly;
   final bool enableExit;
   final bool enableSetTime;
@@ -90,6 +93,7 @@ class MainPage extends StatefulWidget {
     this.noAudio,
     this.noBrightnessControl,
     this.noKeepAwake,
+    this.noFullScreen,
     this.readOnly,
     this.enableExit,
     this.enableSetTime,
@@ -134,6 +138,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _configure () async {
+    if(!widget.noFullScreen) await FullScreen.ensureInitialized();
     await _controller.loadSettings(widget.configFile, MediaQuery.of(context).orientation == Orientation.portrait);
     await _controller.connect();
 
@@ -174,7 +179,7 @@ class _MainPageState extends State<MainPage> {
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
         title: Text(_controller.pageName(_pageNum)),
         actions: [
-          IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
+          if(!widget.noFullScreen) IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
           if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
           IconButton(tooltip: 'Night Mode', icon: const Icon(Icons.mode_night), onPressed:  _nightMode),
           IconButton(tooltip: 'Auto Page', icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
