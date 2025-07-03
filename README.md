@@ -4,7 +4,7 @@ A Boat Instrument for displaying data in fully configurable Boxes. The data is r
 
 [<img src="media/youtube.png" width="200">](https://youtu.be/muNMslGeSYQ)
 
-For first-time users see the [installation](install.md) instructions.
+For first-time users see the [installation](install.md) instructions and further [documentation](https://philseeley.github.io/docs/boatinstrument/main.html).
 
 # OS Support
 The Boat Instrument is built on the Flutter framework and therefore runs on all Flutter supported platforms. It has been mainly tested on an Android Tablet, but all the following screenshots show it functioning on other platforms.
