@@ -466,7 +466,7 @@ class AutopilotStatusBox extends BoxWidget {
   String get id => sid;
 }
 
-class _AutopilotStatusState extends State<AutopilotStatusBox> {
+class _AutopilotStatusState extends HeadedBoxState<AutopilotStatusBox> {
   AutopilotState? _autopilotState;
   double? _targetWindAngleApparent;
   double? _targetHeadingTrue;
@@ -489,13 +489,12 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
 
   @override
   Widget build(BuildContext context) {
-    const double pad = 5.0;
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-
+    color = null;
     String target = '';
     switch(_autopilotState) {
       case null:
       case AutopilotState.standby:
+        color = Colors.red;
         break;
       case AutopilotState.auto:
         double? headingTrue = _targetHeadingTrue;
@@ -516,19 +515,11 @@ class _AutopilotStatusState extends State<AutopilotStatusBox> {
         break;
     }
 
-    String text = 'State: ${_autopilotState?.displayName ?? '-'}\n$target';
+    header = 'Autopilot';
+    text = '${_autopilotState?.displayName ?? '-'}\n$target';
+    lines = 2;
 
-    double fontSize = maxFontSize(text, style,
-        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
-        widget.config.constraints.maxWidth - (2 * pad));
-
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: Text('Autopilot', style: style)),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad),
-          child: Text(text, textScaler: TextScaler.noScaling,
-              style: style.copyWith(fontSize: fontSize)))))
-    ]);
+    return super.build(context);
   }
 
   void _processData(List<Update>? updates) {
