@@ -834,7 +834,8 @@ class BoatInstrumentController {
             now = this.now();
           }
 
-          // Note: the demo server has old date/times.
+          // Note: the demo server has old timestamps on replayed data, but
+          // current timestamps on notifications.
           if (_settings!.demoMode ||
               source == 'defaults' ||
               source == 'derived-data' ||

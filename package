@@ -53,7 +53,7 @@ then
   mkdir -p debian/usr/share/applications
   mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
   cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
-  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0
+  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0, sudo
 fi
 
 # ================================ fpi ======================================
