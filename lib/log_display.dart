@@ -6,6 +6,13 @@ import 'package:share_plus/share_plus.dart';
 
 class LogDisplay extends StatefulWidget {
 
+  static void show (BuildContext context) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return const LogDisplay();
+    }));
+  }
+
   const LogDisplay({super.key});
 
   @override

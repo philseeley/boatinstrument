@@ -185,7 +185,8 @@ class _MainPageState extends State<MainPage> {
           IconButton(tooltip: 'Auto Page', icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
           if(_controller.brightnessControl) IconButton(tooltip: 'Brightness', icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness),
           if(_controller.notifications.isNotEmpty) IconButton(tooltip: 'Notifications', icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
-          if(!widget.readOnly) IconButton(tooltip: 'Edit Pages', icon: const Icon(Icons.web), onPressed: _showEditPagesPage)
+          if(!widget.readOnly) IconButton(tooltip: 'Edit Pages', icon: const Icon(Icons.web), onPressed: _showEditPagesPage),
+          if(widget.readOnly) IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: () {LogDisplay.show(context);})
         ]
       );
     }

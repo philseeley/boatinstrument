@@ -349,7 +349,7 @@ class _SettingsState extends State<SettingsPage> {
           IconButton(tooltip: 'Import', icon: const Icon(Icons.file_open), onPressed: _import),
           IconButton(tooltip: 'Subscriptions', icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
           IconButton(tooltip: 'Help', icon: const Icon(Icons.help), onPressed: _showHelpPage),
-          IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: _showLog)
+          IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: () {LogDisplay.show(context);})
         ],
       ),
       body: ListView(children: list)
@@ -366,13 +366,6 @@ class _SettingsState extends State<SettingsPage> {
       return _HelpPage();
     })
     );
-  }
-
-  void _showLog () async {
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) {
-      return const LogDisplay();
-    }));
   }
 
   void _share () async {
