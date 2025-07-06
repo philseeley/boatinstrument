@@ -76,10 +76,10 @@ class _SemiGaugePainter extends CustomPainter {
       ..color = theme.colorScheme.onSurface
       ..strokeWidth = 2.0;
 
-    double base = w;
+    double base = min(w, h*2);
     if(_orientation == GaugeOrientation.left ||
        _orientation == GaugeOrientation.right) {
-      base = h;
+      base = min(h, w*2);
     }
 
     canvas.save();
@@ -148,10 +148,10 @@ class _SemiGaugeNeedlePainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..color = Colors.blue;
 
-    double base = w;
+    double base = min(w, h*2);
     if(_orientation == GaugeOrientation.left ||
-        _orientation == GaugeOrientation.right) {
-      base = h;
+       _orientation == GaugeOrientation.right) {
+      base = min(h, w*2);
     }
 
     Path needle = Path()
