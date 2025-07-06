@@ -30,7 +30,7 @@ abstract class DoubleValueBox extends BoxWidget {
   final bool relativeAngle;
   final bool smoothing;
   final bool portStarboard;
-  final bool dataTimeout;
+  final SignalKDataType dataType;
   final DoubleValueToDisplay valueToDisplay;
 
   const DoubleValueBox(super.config, this.title, this.path, {
@@ -42,7 +42,7 @@ abstract class DoubleValueBox extends BoxWidget {
     this.relativeAngle = false,
     this.smoothing = true,
     this.portStarboard = false,
-    this.dataTimeout = true,
+    this.dataType = SignalKDataType.realTime,
     this.valueToDisplay = DoubleValueToDisplay.value,
     super.key});
 
@@ -68,7 +68,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: processUpdates, paths: {widget.path}, dataTimeout: widget.dataTimeout);
+    widget.config.controller.configure(onUpdate: processUpdates, paths: {widget.path}, dataType: widget.dataType);
   }
 
   @override

@@ -29,7 +29,7 @@ class _CustomSettings {
   double multiplier;
   double step;
   bool portStarboard;
-  bool dataTimeout;
+  SignalKDataType dataType;
   DoubleValueToDisplay valueToDisplay;
   @JsonKey(
       name: 'color',
@@ -50,7 +50,7 @@ class _CustomSettings {
     this.multiplier = 1,
     this.step = 1,
     this.portStarboard = false,
-    this.dataTimeout = true,
+    this.dataType = SignalKDataType.realTime,
     this.valueToDisplay = DoubleValueToDisplay.value,
     this.color = Colors.blue
   });
@@ -67,11 +67,11 @@ class CustomDoubleValueBox extends DoubleValueBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.dataTimeout, super.valueToDisplay, super.key});
+  const CustomDoubleValueBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.precision, super.minLen, super.minValue, super.maxValue, super.angle, super.smoothing, super.portStarboard, super.dataType, super.valueToDisplay, super.key});
 
   factory CustomDoubleValueBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, dataTimeout: s.dataTimeout, valueToDisplay: s.valueToDisplay, key: key);
+    return CustomDoubleValueBox._init(s, s.units, s.multiplier, config, s.title, s.path, precision: s.precision, minLen: s.minLen, minValue: s.minValue, maxValue: s.maxValue, angle: s.angle, smoothing: s.smoothing, portStarboard: s.portStarboard, dataType: s.dataType, valueToDisplay: s.valueToDisplay, key: key);
   }
 
   static String sid = 'custom-double-value';
@@ -108,11 +108,11 @@ class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.step, super.angle, super.smoothing, super.dataTimeout, super.key});
+  const CustomDoubleValueSemiGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.orientation, super.path, {super.minValue, super.maxValue, super.step, super.angle, super.smoothing, super.dataType, super.key});
 
   factory CustomDoubleValueSemiGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, angle: s.angle, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
+    return CustomDoubleValueSemiGaugeBox._init(s, s.units, s.multiplier, config, s.title, GaugeOrientation.up, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, angle: s.angle, smoothing: s.smoothing, dataType: s.dataType, key: key);
   }
 
   static String sid = 'custom-gauge-semi';
@@ -143,11 +143,11 @@ class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueCircularGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.key});
+  const CustomDoubleValueCircularGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataType, super.key});
 
   factory CustomDoubleValueCircularGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, key: key);
+    return CustomDoubleValueCircularGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataType: s.dataType, key: key);
   }
 
   static String sid = 'custom-gauge-circular';
@@ -178,11 +178,11 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
   final String _unitsString;
   final double _multiplier;
 
-  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataTimeout, super.barColor, super.key});
+  const CustomDoubleValueBarGaugeBox._init(this._settings, this._unitsString, this._multiplier, super.config, super.title, super.path, {super.minValue, super.maxValue, required super.step, super.smoothing, super.dataType, super.barColor, super.key});
 
   factory CustomDoubleValueBarGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _CustomSettings s = _$CustomSettingsFromJson(config.settings);
-    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataTimeout: s.dataTimeout, barColor: s.color, key: key);
+    return CustomDoubleValueBarGaugeBox._init(s, s.units, s.multiplier, config, s.title, s.path, minValue: s.minValue, maxValue: s.maxValue, step: s.step, smoothing: s.smoothing, dataType: s.dataType, barColor: s.color, key: key);
   }
 
   static String sid = 'custom-gauge-bar';
@@ -329,13 +329,10 @@ class _SettingsState extends State<_SettingsWidget> {
                 s.portStarboard = value;
               });
             }),
-      SwitchListTile(title: const Text("Data Timeout:"),
-          value: s.dataTimeout,
-          onChanged: (bool value) {
-            setState(() {
-              s.dataTimeout = value;
-            });
-          }),
+      ListTile(
+          leading: const Text("Data Type:"),
+          title: EnumDropdownMenu(SignalKDataType.values, s.dataType, (v) {s.dataType = v!;})
+      ),
       if({CustomDoubleValueBarGaugeBox}.contains(b.runtimeType))
         ListTile(
             leading: const Text("Colour:"),

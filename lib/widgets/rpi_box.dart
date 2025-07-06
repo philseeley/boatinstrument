@@ -12,7 +12,7 @@ class RPiCPUTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const RPiCPUTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'RPi CPU Temp', 'environment.rpi.cpu.temperature', dataTimeout: false);
+  const RPiCPUTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'RPi CPU Temp', 'environment.rpi.cpu.temperature', dataType: SignalKDataType.infrequent);
 
   @override
   double convert(double value) {
@@ -33,7 +33,7 @@ class RPiGPUTemperatureBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const RPiGPUTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'RPi GPU Temp', 'environment.rpi.gpu.temperature', dataTimeout: false);
+  const RPiGPUTemperatureBox(BoxWidgetConfig config, {super.key}) : super(config, 'RPi GPU Temp', 'environment.rpi.gpu.temperature', dataType: SignalKDataType.infrequent);
 
   @override
   double convert(double value) {
@@ -61,7 +61,7 @@ class RPiCPUUtilisationBox extends DoubleValueSemiGaugeBox {
     'environment.rpi.cpu.utilisation',
     maxValue: 1,
     step: 0.25,
-    dataTimeout: false,
+    dataType: SignalKDataType.infrequent,
     smoothing: false,
     ranges: const [
       GaugeRange(0, 0.5, Colors.green),
@@ -94,7 +94,7 @@ class RPiMemoryUtilisationBox extends DoubleValueBarGaugeBox {
     'environment.rpi.memory.utilisation',
     maxValue: 1,
     step: 0.2,
-    dataTimeout: false,
+    dataType: SignalKDataType.infrequent,
     smoothing: false,
     ranges: const [
       GaugeRange(0, 0.9, Colors.green),
@@ -126,7 +126,7 @@ class RPiSDUtilisationBox extends DoubleValueBarGaugeBox {
     'environment.rpi.sd.utilisation',
     maxValue: 1,
     step: 0.1,
-    dataTimeout: false,
+    dataType: SignalKDataType.infrequent,
     smoothing: false,
     ranges: const [
       GaugeRange(0, 0.7, Colors.green),
@@ -196,7 +196,7 @@ class _RaspberryPiBoxState extends State<RaspberryPiBox> with DoubleValeBoxPaint
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: { 'environment.rpi.*' }, dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: { 'environment.rpi.*' }, dataType: SignalKDataType.infrequent);
   }
 
   @override

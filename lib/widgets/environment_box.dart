@@ -435,7 +435,7 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataType: SignalKDataType.infrequent);
   }
 
   @override
@@ -597,7 +597,7 @@ class _MoonBox extends HeadedBoxState<MoonBox> {
   void initState() {
     alignment = Alignment.topCenter;
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataType: SignalKDataType.infrequent);
   }
 
   @override

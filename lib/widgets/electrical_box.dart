@@ -1050,9 +1050,10 @@ abstract class PowerGraphBackground extends BackgroundData {
       }
       
       value = 0;
+      Duration d = Duration(milliseconds: controller!.realTimeDataTimeout);
       for(String id in List.from(power.keys)) {
         Power p = power[id]!;
-        if(now.difference(p.timestamp) > Duration(milliseconds: controller!.dataTimeout)) {
+        if(now.difference(p.timestamp) > d) {
           power.remove(id);
         } else {
           value = value! + (p.voltage * p.current);

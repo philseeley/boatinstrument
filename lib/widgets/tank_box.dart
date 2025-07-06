@@ -20,7 +20,7 @@ abstract class TankBox extends DoubleValueBarGaugeBox {
   final String _type;
 
   const TankBox._init(this._settings, config, title, this._type, id, {super.key, required super.barColor, required super.maxValue}) :
-    super(config, '$title:$id', 'tanks.$_type.$id.currentLevel', step: 0.1, dataTimeout: false, showPercent: true);
+    super(config, '$title:$id', 'tanks.$_type.$id.currentLevel', step: 0.1, dataType: SignalKDataType.infrequent, showPercent: true);
 
   @override
   double convert(double value) {
@@ -181,7 +181,7 @@ class _TanksBoxState extends State<TanksBox> {
   @override
   void initState() {
     super.initState();
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'tanks.*'}, dataTimeout: false);
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'tanks.*'}, dataType: SignalKDataType.infrequent);
   }
 
   @override

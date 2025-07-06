@@ -298,12 +298,21 @@ class _SettingsState extends State<SettingsPage> {
           trailing: const Text('ms')
       ),
       ListTile(
-          leading: const Text("Data Timeout:"),
+          leading: const Text("Real-time Data Timeout:"),
           title: TextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.dataTimeout.toString(),
-              onChanged: (value) => settings.dataTimeout = int.parse(value)),
+              initialValue: settings.realTimeDataTimeout.toString(),
+              onChanged: (value) => settings.realTimeDataTimeout = int.parse(value)),
+          trailing: const Text('ms')
+      ),
+      ListTile(
+          leading: const Text("Infrequent Data Timeout:"),
+          title: TextFormField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              initialValue: settings.infrequentDataTimeout.toString(),
+              onChanged: (value) => settings.infrequentDataTimeout = int.parse(value)),
           trailing: const Text('ms')
       ),
       _Divider('Advanced'), //=====================================================

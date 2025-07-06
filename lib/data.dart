@@ -417,6 +417,18 @@ class Update {
   }
 }
 
+enum SignalKDataType implements EnumMenuEntry {
+  realTime('Realtime'),
+  infrequent('Infrequent'),
+  static('Static');
+  
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
+
+  const SignalKDataType(this._displayName);
+}
+
 typedef OnUpdate = Function(List<Update>? updates);
 
 class _BoxData {
@@ -424,14 +436,14 @@ class _BoxData {
   final Set<String> paths;
   final OnUpdate? onStaticUpdate;
   final Set<String> staticPaths;
-  final bool dataTimeout;
+  final SignalKDataType dataType;
   List<RegExp> regExpPaths = [];
   List<RegExp> regExpStaticPaths = [];
   DateTime lastUpdate;
   List<Update> updates = [];
   List<Update> staticUpdates = [];
 
-  _BoxData(this.lastUpdate, this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataTimeout);
+  _BoxData(this.lastUpdate, this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType);
 }
 
 class _Resizable {
@@ -696,7 +708,8 @@ class _Settings {
   late List<_HttpHeader> httpHeaders;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
-  int dataTimeout;
+  int realTimeDataTimeout;
+  int infrequentDataTimeout;
   int notificationMuteTimeout; //Minutes
   bool demoMode;
   bool darkMode;
@@ -733,7 +746,8 @@ class _Settings {
     this.httpHeaders = const [],
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
-    this.dataTimeout = 10000,
+    this.realTimeDataTimeout = 10000,
+    this.infrequentDataTimeout = 90000,
     this.notificationMuteTimeout = 15,
     this.demoMode = false,
     this.darkMode = true,
@@ -793,11 +807,30 @@ class _Settings {
         l.i('Backing up configuration file');
         f.copy('${f.path}.v0');
         l.i('Converting configuration from version 0 to 1');
+
+        // New format for specifying SignalK server.
         String h = data['signalkHost'];
         String url = 'http://$h:${data['signalkPort']}';
         if(h.isEmpty) url = '';
         data['signalkUrl'] = url;
-      data['version'] = 1;
+
+        // Custom Box settings have change of type from bool(dataTimeout) to Enum(SignalKDataType).
+        for(dynamic p in data['pages']) {
+          for(dynamic pageRow in p['pageRows']) {
+            for(dynamic column in pageRow['columns']) {
+              for(dynamic row in column['rows']) {
+                for(dynamic box in row['boxes']) {
+                  dynamic settings = box['settings'];
+                  if(settings['dataTimeout'] != null) {
+                    settings['dataType'] = (settings['dataTimeout'] as bool) ? SignalKDataType.realTime.name : SignalKDataType.static.name;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        data['version'] = 1;
       }
 
       settings =_Settings.fromJson(data);

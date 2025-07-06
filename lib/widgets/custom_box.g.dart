@@ -20,7 +20,9 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       multiplier: (json['multiplier'] as num?)?.toDouble() ?? 1,
       step: (json['step'] as num?)?.toDouble() ?? 1,
       portStarboard: json['portStarboard'] as bool? ?? false,
-      dataTimeout: json['dataTimeout'] as bool? ?? true,
+      dataType:
+          $enumDecodeNullable(_$SignalKDataTypeEnumMap, json['dataType']) ??
+              SignalKDataType.realTime,
       valueToDisplay: $enumDecodeNullable(
               _$DoubleValueToDisplayEnumMap, json['valueToDisplay']) ??
           DoubleValueToDisplay.value,
@@ -43,10 +45,16 @@ Map<String, dynamic> _$CustomSettingsToJson(_CustomSettings instance) =>
       'multiplier': instance.multiplier,
       'step': instance.step,
       'portStarboard': instance.portStarboard,
-      'dataTimeout': instance.dataTimeout,
+      'dataType': _$SignalKDataTypeEnumMap[instance.dataType]!,
       'valueToDisplay': _$DoubleValueToDisplayEnumMap[instance.valueToDisplay]!,
       'color': _CustomSettings._color2String(instance.color),
     };
+
+const _$SignalKDataTypeEnumMap = {
+  SignalKDataType.realTime: 'realTime',
+  SignalKDataType.infrequent: 'infrequent',
+  SignalKDataType.static: 'static',
+};
 
 const _$DoubleValueToDisplayEnumMap = {
   DoubleValueToDisplay.value: 'value',

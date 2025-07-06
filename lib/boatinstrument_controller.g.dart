@@ -91,7 +91,10 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       signalkMinPeriod: (json['signalkMinPeriod'] as num?)?.toInt() ?? 500,
       signalkConnectionTimeout:
           (json['signalkConnectionTimeout'] as num?)?.toInt() ?? 20000,
-      dataTimeout: (json['dataTimeout'] as num?)?.toInt() ?? 10000,
+      realTimeDataTimeout:
+          (json['realTimeDataTimeout'] as num?)?.toInt() ?? 10000,
+      infrequentDataTimeout:
+          (json['infrequentDataTimeout'] as num?)?.toInt() ?? 90000,
       notificationMuteTimeout:
           (json['notificationMuteTimeout'] as num?)?.toInt() ?? 15,
       demoMode: json['demoMode'] as bool? ?? false,
@@ -149,7 +152,8 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'httpHeaders': instance.httpHeaders,
       'signalkMinPeriod': instance.signalkMinPeriod,
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
-      'dataTimeout': instance.dataTimeout,
+      'realTimeDataTimeout': instance.realTimeDataTimeout,
+      'infrequentDataTimeout': instance.infrequentDataTimeout,
       'notificationMuteTimeout': instance.notificationMuteTimeout,
       'demoMode': instance.demoMode,
       'darkMode': instance.darkMode,

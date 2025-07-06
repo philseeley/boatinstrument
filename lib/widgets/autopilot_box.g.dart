@@ -9,7 +9,7 @@ part of 'autopilot_box.dart';
 _AutopilotControlSettings _$AutopilotControlSettingsFromJson(
         Map<String, dynamic> json) =>
     _AutopilotControlSettings(
-      clientID: json['clientID'],
+      clientID: json['clientID'] as String?,
       authToken: json['authToken'] as String? ?? '',
     );
 

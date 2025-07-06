@@ -8,7 +8,7 @@ part of 'anchor_box.dart';
 
 _AnchorAlarmSettings _$AnchorAlarmSettingsFromJson(Map<String, dynamic> json) =>
     _AnchorAlarmSettings(
-      clientID: json['clientID'],
+      clientID: json['clientID'] as String?,
       authToken: json['authToken'] as String? ?? '',
       recordSeconds: (json['recordSeconds'] as num?)?.toInt() ?? 10,
       recordPoints: (json['recordPoints'] as num?)?.toInt() ?? 1000,

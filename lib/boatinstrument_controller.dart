@@ -118,6 +118,7 @@ class BoatInstrumentController {
   int _boxesOnPage = 0;
   final List<_BoxData> _boxData = [];
   WebSocketChannel? _channel;
+  StreamSubscription? _streamSubscription;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
   DateTime? _time;
@@ -137,7 +138,8 @@ class BoatInstrumentController {
   Uri get httpApiUri => _httpApiUri;
   Uri get wsUri => _wsUri;
   int get valueSmoothing => _settings!.valueSmoothing;
-  int get dataTimeout => _settings!.dataTimeout;
+  int get realTimeDataTimeout => _settings!.realTimeDataTimeout;
+  int get infrequentDataTimeout => _settings!.infrequentDataTimeout;
   bool get darkMode => _settings!.darkMode;
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
@@ -373,7 +375,7 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, bool dataTimeout = true, bool isBox = true}) {
+  void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, SignalKDataType dataType = SignalKDataType.realTime, bool isBox = true}) {
 
     // ============= PATH MAPPING =============
     // String pathsString = '';
@@ -385,7 +387,7 @@ class BoatInstrumentController {
       ++_boxesOnPage;
     }
 
-    _BoxData bd = _BoxData(now(), onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataTimeout);
+    _BoxData bd = _BoxData(now(), onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataType);
     _boxData.add(bd);
 
     for(String path in bd.paths) {
@@ -524,6 +526,7 @@ class BoatInstrumentController {
       clear();
 
       configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
+
       for(var id in _backgroundIDs) {
         getBoxDetails(id).background!.call(this);
       }
@@ -726,7 +729,8 @@ class BoatInstrumentController {
         }
       }
 
-      _channel?.sink.close();
+      await _streamSubscription?.cancel();
+      await _channel?.sink.close();
       _channel = null;
 
       _networkTimeout();
@@ -738,7 +742,7 @@ class BoatInstrumentController {
 
       await _channel?.ready;
 
-      _channel?.stream.listen(
+      _streamSubscription = _channel?.stream.listen(
           _processData,
           onError: (e) {
             l.e('WebSocket stream error', error: e);
@@ -815,7 +819,8 @@ class BoatInstrumentController {
     _networkTimeout();
 
     DateTime now = this.now();
-    Duration dataTimeout = Duration(milliseconds: _settings!.dataTimeout);
+    Duration realTimeDuration = Duration(milliseconds: realTimeDataTimeout);
+    Duration infrequentDuration = Duration(milliseconds: infrequentDataTimeout);
 
     dynamic d = json.decode(data);
 
@@ -827,38 +832,44 @@ class BoatInstrumentController {
 
       for (dynamic u in d['updates']) {
         try {
-          String source = u[r'$source'];
           DateTime timeStamp = DateTime.parse(u['timestamp']);
           if(_time == null) {
             _timeSync(timeStamp);
             now = this.now();
           }
 
-          // Note: the demo server has old timestamps on replayed data, but
-          // current timestamps on notifications.
-          if (_settings!.demoMode ||
-              source == 'defaults' ||
-              source == 'derived-data' ||
-              now.difference(timeStamp) <= dataTimeout) {
-            for (dynamic v in u['values']) {
-              String path = v['path'];
-              dynamic value = v['value'];
+          for (dynamic v in u['values']) {
+            String path = v['path'];
+            for (_BoxData bd in _boxData) {
+              for (RegExp r in bd.regExpPaths) {
+                if (r.hasMatch(path)) {
+                  Duration d = now.difference(timeStamp);
+                  if (
+                    // Note: the demo server has old timestamps on replayed data, but
+                    // current timestamps on notifications.
+                    _settings!.demoMode ||
+                    bd.dataType == SignalKDataType.static ||
+                    (
+                      (bd.dataType == SignalKDataType.realTime) && d < realTimeDuration
+                    ) ||
+                    (
+                      (bd.dataType == SignalKDataType.infrequent) && d < infrequentDuration
+                    )
+                  ) {
+                    dynamic value = v['value'];
 
-              _timeSync(timeStamp);
+                    _timeSync(timeStamp);
 
-              if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
+                    if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
 
-              for (_BoxData bd in _boxData) {
-                for (RegExp r in bd.regExpPaths) {
-                  if (r.hasMatch(path)) {
-                    bd.updates.add(Update(path, value));
+                    bd.updates.add(Update(path,value));
                     bd.lastUpdate = now;
+                  } else {
+                   l.i('Discarding old data for "$u"');
                   }
                 }
               }
             }
-          } else {
-            l.i('Discarding old data for "$u"');
           }
         } catch (e) {
           l.e("Error converting $u", error: e);
@@ -870,10 +881,15 @@ class BoatInstrumentController {
           if (bd.updates.isNotEmpty) {
             // Send updates to Box.
             bd.onUpdate!(bd.updates);
-          } else if (bd.dataTimeout && now.difference(bd.lastUpdate) > dataTimeout) {
-            // We've not seen an update for this Box for a while.
-            bd.onUpdate!(null);
-            bd.lastUpdate = now;
+          } else {
+            Duration d = now.difference(bd.lastUpdate);
+            if (
+            ((bd.dataType == SignalKDataType.realTime) && d > realTimeDuration) ||
+            ((bd.dataType == SignalKDataType.infrequent) && d > infrequentDuration)
+            ) {
+              bd.onUpdate!(null);
+              bd.lastUpdate = now;
+            }
           }
         }
       }
@@ -881,8 +897,10 @@ class BoatInstrumentController {
   }
 
   void _timeSync(DateTime timeStamp) {
-    _time = timeStamp;
-    _timeReceived = DateTime.now();
+    if(_time == null || timeStamp.isAfter(_time!)) {
+      _time = timeStamp;
+      _timeReceived = DateTime.now();
+    }
   }
 
   Future<void> _processStaticData(String path, Uri uri) async {
