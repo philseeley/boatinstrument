@@ -480,6 +480,8 @@ class _SunlightBox extends State<SunlightBox> {
     } else {
       for (Update u in updates) {
         try {
+          if(u.value == null) continue;
+          
           DateTime dt = DateTime.parse(u.value).toLocal();
 
           switch (u.path) {
