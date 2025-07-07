@@ -430,6 +430,7 @@ class _Time {
 
 class _SunlightBox extends State<SunlightBox> {
   static const int _numTimes = 7;
+  bool _utc = false;
   List<_Time?> _times = List.filled(_numTimes, null);
 
   @override
@@ -441,7 +442,7 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
-    final now = widget.config.controller.now().toLocal();
+    final now = widget.config.controller.now();
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
@@ -450,7 +451,7 @@ class _SunlightBox extends State<SunlightBox> {
       _times = List.filled(_numTimes, _Time('Time:    ', now));
     }
 
-    String textSample = "'Time:    ' ${fmt.format(now)}";
+    String textSample = 'Time:     ${fmt.format(now)}';
     double fontSize = maxFontSize(textSample, style,
         (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / _numTimes,
         widget.config.constraints.maxWidth - (2 * pad));
@@ -466,12 +467,21 @@ class _SunlightBox extends State<SunlightBox> {
         if(i < _times.length-1 && now.compareTo(t.time) >= 0 && now.compareTo(_times[i+1]?.time??now) < 0) {
           d = TextDecoration.underline;
         }
-        timeWidgets.add(Text('${t.name} ${fmt.format(t.time)}', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize, decoration: d)));
+        timeWidgets.add(Text('${t.name} ${fmt.format(_utc?t.time.toUtc():t.time.toLocal())}', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize, decoration: d)));
       }
     }
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Sunlight', style: style)),
-      Padding(padding: const EdgeInsets.all(pad), child: Column(children: timeWidgets))]);
+    return Stack(children: [
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Sunlight', style: style)),
+        Padding(padding: const EdgeInsets.all(pad), child: Column(children: timeWidgets))]),
+      Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
+    ]);
+  }
+
+  void _toggleUTC() {
+    setState(() {
+      _utc = !_utc;
+    });
   }
 
   void _onUpdate(List<Update>? updates) {
@@ -482,7 +492,7 @@ class _SunlightBox extends State<SunlightBox> {
         try {
           if(u.value == null) continue;
           
-          DateTime dt = DateTime.parse(u.value).toLocal();
+          DateTime dt = DateTime.parse(u.value);
 
           switch (u.path) {
             case 'environment.sunlight.times.nauticalDawn':
@@ -590,7 +600,7 @@ class MoonBox extends CelestialBox {
 }
 
 class _MoonBox extends HeadedBoxState<MoonBox> {
-
+  bool _utc = false;
   DateTime? _rise, _set;
   double? _fraction;
   String? _phaseName;
@@ -605,6 +615,7 @@ class _MoonBox extends HeadedBoxState<MoonBox> {
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     if(widget.config.editMode) {
       _rise = _set = widget.config.controller.now().toLocal();
@@ -615,8 +626,8 @@ class _MoonBox extends HeadedBoxState<MoonBox> {
     header = 'Moon';
 
     text =
-'''Rise:  ${(_rise == null) ? '-' : fmt.format(_rise!)}
-Set:   ${(_set == null) ? '-' : fmt.format(_set!)}
+'''Rise:  ${(_rise == null) ? '-' : fmt.format(_utc?_rise!.toUtc():_rise!.toLocal())}
+Set:   ${(_set == null) ? '-' : fmt.format(_utc?_set!.toUtc():_set!.toLocal())}
 Phase: ${(_fraction == null) ? '-' : (_fraction!*100).toInt()}%
 ${(_phaseName == null) ? '-' : _phaseName}''';
 
@@ -626,10 +637,17 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
       if(widget._perBoxSettings.showMoon)
         Padding(padding: const EdgeInsets.all(HeadedBoxState.pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
           painter: _MoonPainter(_fraction??0)))),
-      super.build(context)
+      super.build(context),
+      Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
     ]);
   }
 
+  void _toggleUTC() {
+    setState(() {
+      _utc = !_utc;
+    });
+  }
+  
   void _onUpdate(List<Update>? updates) {
     if(updates == null) {
       _rise = _set = _fraction = _phaseName = null;
@@ -638,10 +656,10 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
         try {
           switch (u.path) {
             case 'environment.moon.times.rise':
-              _rise = DateTime.parse(u.value).toLocal();
+              _rise = DateTime.parse(u.value);
               break;
             case 'environment.moon.times.set':
-              _set = DateTime.parse(u.value).toLocal();
+              _set = DateTime.parse(u.value);
               break;
             case 'environment.moon.fraction':
               _fraction = (u.value as num).toDouble();
