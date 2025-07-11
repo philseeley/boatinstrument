@@ -20,12 +20,14 @@ class _DateTimePerBoxSettings {
   bool showTime;
   bool utc;
   String timeFormat;
+  bool showUTCButton;
 
   _DateTimePerBoxSettings({
     this.showDate = true,
     this.showTime = true,
     this.utc = false,
-    this.timeFormat = 'HH:mm:ss'
+    this.timeFormat = 'HH:mm:ss',
+    this.showUTCButton = false
   });
 }
 
@@ -69,17 +71,20 @@ class DateTimeBox extends BoxWidget {
 class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
   _DateTimeSettings _settings = _DateTimeSettings();
   DateTime? _dateTime;
+  bool _utc = false;
 
   @override
   void initState() {
     super.initState();
     _settings = _$DateTimeSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _processData, paths: {'navigation.datetime'});
+    _utc = widget._perBoxSettings.utc;
   }
 
   @override
   Widget build(BuildContext context) {
     _DateTimePerBoxSettings perBoxSettings = widget._perBoxSettings;
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     if(widget.config.editMode) {
       _dateTime = widget.config.controller.now();
@@ -91,7 +96,7 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
     if(_dateTime == null) {
       text = '-';
     } else {
-      DateTime dt = perBoxSettings.utc ? _dateTime!.toUtc() : _dateTime!.toLocal();
+      DateTime dt = _utc ? _dateTime!.toUtc() : _dateTime!.toLocal();
 
       if(perBoxSettings.showDate) {
         text += DateFormat(_settings.dateFormat).format(dt);
@@ -105,11 +110,20 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
       }
     }
 
-    header = '${perBoxSettings.showDate?'Date${perBoxSettings.showTime?'/':''}':''}${perBoxSettings.showTime?'Time':''}${perBoxSettings.utc ? ' UTC':''}';
+    header = '${perBoxSettings.showDate?'Date${perBoxSettings.showTime?'/':''}':''}${perBoxSettings.showTime?'Time':''}${(_utc && !widget._perBoxSettings.showUTCButton) ? ' UTC':''}';
 
-    return super.build(context);
+    return Stack(children: [
+      super.build(context),
+      if(widget._perBoxSettings.showUTCButton) Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
+    ]);
   }
 
+  void _toggleUTC() {
+    setState(() {
+      _utc = !_utc;
+    });
+  }
+  
   void _processData(List<Update>? updates) {
     if(updates == null) {
       _dateTime = null;
@@ -198,6 +212,13 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
           onChanged: (bool value) {
             setState(() {
               s.utc = value;
+            });
+          }),
+      SwitchListTile(title: const Text('Show UTC Button:'),
+          value: s.showUTCButton,
+          onChanged: (bool value) {
+            setState(() {
+              s.showUTCButton = value;
             });
           }),
       ListTile(

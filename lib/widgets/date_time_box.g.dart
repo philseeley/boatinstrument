@@ -23,6 +23,7 @@ _DateTimePerBoxSettings _$DateTimePerBoxSettingsFromJson(
       showTime: json['showTime'] as bool? ?? true,
       utc: json['utc'] as bool? ?? false,
       timeFormat: json['timeFormat'] as String? ?? 'HH:mm:ss',
+      showUTCButton: json['showUTCButton'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$DateTimePerBoxSettingsToJson(
@@ -32,4 +33,5 @@ Map<String, dynamic> _$DateTimePerBoxSettingsToJson(
       'showTime': instance.showTime,
       'utc': instance.utc,
       'timeFormat': instance.timeFormat,
+      'showUTCButton': instance.showUTCButton,
     };
