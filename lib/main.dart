@@ -139,7 +139,7 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> _configure () async {
     if(!widget.noFullScreen) await FullScreen.ensureInitialized();
-    await _controller.loadSettings(widget.configFile, MediaQuery.of(context).orientation == Orientation.portrait);
+    if(mounted) await _controller.loadSettings(widget.configFile, MediaQuery.of(context).orientation == Orientation.portrait);
     await _controller.connect();
 
     _themeProvider.setDarkMode(_controller.darkMode);
