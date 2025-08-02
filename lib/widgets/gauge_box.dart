@@ -154,12 +154,15 @@ class _SemiGaugeNeedlePainter extends CustomPainter {
       base = min(h, w*2);
     }
 
+    double nW = base/20;
+    nW = min(nW, 10);
+
     Path needle = Path()
-      ..moveTo(-10.0, 0.0)
+      ..moveTo(-nW, 0.0)
       ..lineTo(0.0, base/2)
-      ..lineTo(10.0, 0.0)
+      ..lineTo(nW, 0.0)
       ..moveTo(0.0, 0.0)
-      ..addArc(const Offset(-10, -10.0) & const Size(20.0, 20.0), 0.0, -pi)
+      ..addArc(Offset(-nW, -nW) & Size(nW*2, nW*2), 0.0, -pi)
       ..close();
 
     canvas.translate(base*_orientation.xm, base*_orientation.ym);
@@ -302,16 +305,19 @@ class _CircularGaugeNeedlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size canvasSize) {
     double size = min(canvasSize.width, canvasSize.height);
+    double nW = size/20;
+    nW = min(nW, 10);
+
     Paint paint = Paint()
       ..style = PaintingStyle.fill
       ..color = Colors.blue;
 
     Path needle = Path()
-      ..moveTo(-10.0, 0.0)
+      ..moveTo(-nW, 0.0)
       ..lineTo(0.0, -size/2)
-      ..lineTo(10.0, 0.0)
+      ..lineTo(nW, 0.0)
       ..moveTo(0.0, 0.0)
-      ..addArc(const Offset(-10, -10.0) & const Size(20.0, 20.0), 0.0, pi)
+      ..addArc(Offset(-nW, -nW) & Size(nW*2, nW*2), 0.0, pi)
       ..close();
 
     canvas.translate(size/2, size/2);
