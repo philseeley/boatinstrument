@@ -191,14 +191,16 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
   @override
   Widget build(BuildContext context) {
     GaugeOrientation o = widget.orientation;
+    const double pad = 5.0;
+    final double fontPad = Theme.of(context).textTheme.titleMedium!.fontSize! - pad;
 
     List<Widget> stack = [
       Positioned(top: o.titleTop, bottom: o.titleBottom, left: o.titleLeft, right: o.titleRight, child: Text(widget.title)),
       Positioned(top: o.unitsTop, bottom: o.unitsBottom, left: o.unitsLeft, right: o.unitsRight, child: Text(widget.units(displayValue??0.0))),
-      CustomPaint(
+      Container(padding: EdgeInsets.all(fontPad), child: CustomPaint(
           size: Size.infinite,
           painter: _SemiGaugePainter(context, o, widget.mirror, minDisplay, maxDisplay, _displayStep, _displayRanges)
-      )
+      ))
     ];
 
     if(displayValue != null) {
@@ -206,13 +208,13 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       if(widget.mirror) {
         angle = (pi*2)-angle;
       }
-      stack.add(CustomPaint(
+      stack.add(Container(padding: EdgeInsets.all(fontPad), child:CustomPaint(
           size: Size.infinite,
           painter: _SemiGaugeNeedlePainter(o, angle)
-      ));
+      )));
     }
 
-    return Container(padding: const EdgeInsets.all(15.0), child: RepaintBoundary(child: Stack(children: stack)));
+    return Container(padding: const EdgeInsets.all(pad), child: RepaintBoundary(child: Stack(children: stack)));
   }
 }
 
