@@ -129,11 +129,11 @@ class _EditPageState extends State<_EditPage> {
       c.add(const Icon(Icons.science_outlined));
     }
 
-    return PopupMenuItem<BoxDetails>(enabled: !bd.experimental || widget._controller.enableExperimentalBoxes, value: bd, child: Row(children: c));
+    return PopupMenuItem<BoxDetails>(enabled: !bd.experimental || widget._controller.enableExperimentalBoxes, height: 0, value: bd, child: Row(children: c));
   }
 
   PopupMenuItem<BoxDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<BoxDetails>> subMenuEntries) {
-    return PopupMenuItem(child: PopupMenuButton<BoxDetails>(
+    return PopupMenuItem(height: 0, child: PopupMenuButton<BoxDetails>(
       tooltip: '',
       shape: Border.all(color: Colors.grey),
       itemBuilder: (context) {
