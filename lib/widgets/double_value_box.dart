@@ -64,6 +64,7 @@ abstract class DoubleValueBox extends BoxWidget {
 class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
   double? value;
   double? displayValue;
+  int inRange = 0;
 
   @override
   void initState() {
@@ -77,13 +78,17 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
       displayValue = 12.3;
     }
 
-    text = (displayValue == null) ?
-      '-' :
-      fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', widget.portStarboard ? displayValue!.abs() : displayValue!);
-
     header = '${widget.valueToDisplay.title}${widget.title} ${widget.units(value??0)} ${widget.portStarboard ? val2PS(displayValue??0):''}';
-
+    text = '-';
     color = widget.portStarboard ? widget.config.controller.val2PSColor(context, displayValue??0) : null;
+
+    if (displayValue != null) {
+      text = fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', widget.portStarboard ? displayValue!.abs() : displayValue!);
+    }
+    else if(inRange != 0) {
+      text = inRange < 0 ? '\u2193' : '\u2191';
+      color = Colors.red;
+    }
 
     return Stack(children: [
       super.build(context),
@@ -95,6 +100,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
   void processUpdates(List<Update>? updates) {
     if(updates == null) {
       value = displayValue = null;
+      inRange = 0;
     } else {
       try {
         double next = widget.extractValue(updates[0]);
@@ -112,9 +118,17 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
           value = next;
         }
 
-        if ((widget.minValue != null && value! < widget.minValue!) ||
-            (widget.maxValue != null && value! > widget.maxValue!)) {
-          if(widget.valueToDisplay == DoubleValueToDisplay.value) displayValue = null;
+        inRange = 0;
+        if (widget.minValue != null && value! < widget.minValue!) {
+          if(widget.valueToDisplay == DoubleValueToDisplay.value) {
+            inRange = -1;
+            displayValue = null;
+          }
+        } else if (widget.maxValue != null && value! > widget.maxValue!) {
+          if(widget.valueToDisplay == DoubleValueToDisplay.value) {
+            inRange = 1;
+            displayValue = null;
+          }
         } else {
           displayValue = widget.convert(value!);
           if(widget.valueToDisplay != DoubleValueToDisplay.value) {

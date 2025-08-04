@@ -93,6 +93,8 @@ class _CrossTrackErrorDeltaBoxState extends DoubleValueSemiGaugeBoxState<CrossTr
       _lastValue = value!;
       if (diff < widget.minValue! || diff > widget.maxValue!) {
         value = displayValue = null;
+        inRange = -1;
+        if(diff > widget.maxValue!) inRange = 1;
       }
       else {
         value = displayValue = diff;
@@ -109,6 +111,7 @@ class _CrossTrackErrorDeltaBoxState extends DoubleValueSemiGaugeBoxState<CrossTr
   processUpdates(List<Update>? updates) {
     if(updates == null) {
       value = displayValue = null;
+      inRange = 0;
     } else {
       try {
         double next = widget.extractValue(updates[0]);

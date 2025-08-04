@@ -136,8 +136,9 @@ class _SemiGaugePainter extends CustomPainter {
 class _SemiGaugeNeedlePainter extends CustomPainter {
   final GaugeOrientation _orientation;
   final double _angle;
+  final Color _color;
 
-  _SemiGaugeNeedlePainter(this._orientation, this._angle);
+  _SemiGaugeNeedlePainter(this._orientation, this._angle, this._color);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -146,7 +147,7 @@ class _SemiGaugeNeedlePainter extends CustomPainter {
 
     Paint paint = Paint()
       ..style = PaintingStyle.fill
-      ..color = Colors.blue;
+      ..color = _color;
 
     double base = min(w, h*2);
     if(_orientation == GaugeOrientation.left ||
@@ -206,14 +207,22 @@ class DoubleValueSemiGaugeBoxState<T extends DoubleValueSemiGaugeBox> extends Do
       ))
     ];
 
+    double? angle;
+    Color color = Colors.blue;
     if(displayValue != null) {
-      double angle = ((pi/((widget.maxValue??_defaultMax) - (widget.minValue??0))) * (value! - (widget.minValue??0))) - pi/2;
+      angle = ((pi/((widget.maxValue??_defaultMax) - (widget.minValue??0))) * (value! - (widget.minValue??0))) - pi/2;
       if(widget.mirror) {
         angle = (pi*2)-angle;
       }
+    } else if (inRange != 0) {
+      angle = (pi/2) * inRange;
+      color = Colors.red;
+    }
+
+    if(angle != null) {
       stack.add(Container(padding: EdgeInsets.all(fontPad), child:CustomPaint(
-          size: Size.infinite,
-          painter: _SemiGaugeNeedlePainter(o, angle)
+        size: Size.infinite,
+        painter: _SemiGaugeNeedlePainter(o, angle, color)
       )));
     }
 
@@ -299,8 +308,9 @@ class _CircularGaugePainter extends CustomPainter {
 
 class _CircularGaugeNeedlePainter extends CustomPainter {
   final double _angle;
+  final Color _color;
 
-  _CircularGaugeNeedlePainter(this._angle);
+  _CircularGaugeNeedlePainter(this._angle, this._color);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -310,7 +320,7 @@ class _CircularGaugeNeedlePainter extends CustomPainter {
 
     Paint paint = Paint()
       ..style = PaintingStyle.fill
-      ..color = Colors.blue;
+      ..color = _color;
 
     Path needle = Path()
       ..moveTo(-nW, 0.0)
@@ -352,15 +362,22 @@ class DoubleValueCircularGaugeBoxState<T extends DoubleValueCircularGaugeBox> ex
       )
     ];
 
+    double steps = (widget.maxValue??_defaultMax) - (widget.minValue??0);
+    double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
+    double? angle;
+    Color color = Colors.blue;
     if(displayValue != null) {
-      double steps = (widget.maxValue??_defaultMax) - (widget.minValue??0);
-      double angleStep = (2*pi-(circularGaugeOffset*2))/steps;
+      angle = angleStep * (value! - (widget.minValue??0));
+    }
+    else if(inRange != 0) {
+      angle = (inRange < 0) ? (2*pi) : (2*pi)-(circularGaugeOffset*2);
+      color = Colors.red;
+    }
 
-      double angle = angleStep * (value! - (widget.minValue??0));
-
+    if(angle != null) {
       stack.add(CustomPaint(
           size: Size.infinite,
-          painter: _CircularGaugeNeedlePainter(angle)
+          painter: _CircularGaugeNeedlePainter(angle, color)
       ));
     }
 
