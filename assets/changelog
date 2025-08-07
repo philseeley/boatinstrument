@@ -1,3 +1,63 @@
+  * 0.7.0 Application time is now taken from the SignalK server. This ensures
+            timestamps are handled correctly even on devices not correctly
+            time synchronised.
+          Added Notifications Log display.
+          If we fails to read the config we back it up before reverting to
+            the default.
+          Added --enable-set-time command line option to allow setting
+            the OS time from 'navigation.datetime'.
+          Added --config-file command line option to allow multiple instances
+            to be run with different configs.
+          Added --no-full-screen command line option to disable Full Screen
+            functionality on flutter-pi builds.
+          In "Read Only" mode the Error Log can now be displayed.
+          The Box selection menu is now more compact.
+          To allow for more complex SignalK setups, the SignalK Server
+            is now specified as a URL rather than host and port. The config is
+            automatically updated to the new format and a backup kept in
+            boatinstrument.json.v0.
+          HTTP headers can now be added in the setting to allow auth/proxy
+              headers to be added.
+              Thanks to James P for the idea and testing.
+          Added "Full Screen" button.
+            Thanks to Eric S for the idea.
+          The Save/Discard buttons on the Page Edit screen are now more
+            prominent and you have to confirm when discarding changes.
+            Thanks to Eric S for the feedback.
+          SignalK data can now be designated "Real Time", "Infrequent" or "Static"
+            and there are now separate "Real Time" and "Infrequent" timeout values.
+          We now handle notifications that don't include "method"s or "message"s.
+          Updated Box header formatting.
+          Updated all dependent packages.
+
+          New Boxes:
+            Next Waypoint Bearing.
+            Magnetic Heading.
+
+          Box updates:
+            Tank Boxes are coloured depending upon type/contents.
+              Thanks to Mikhail G for the idea.
+            Graphs are no longer marked Experimental.
+            Date/Time: added option to show a UTC conversion button.
+            Sun/Moonlight boxes now have a UTC conversion button.
+            WindRose: added option to allow the true wind needle to be on top of the speed boxes and
+              the pointer scale down on smaller roses.
+            Graphs: shorten units from "Minutes" to "Mins" to cope with small displays better.
+            Anchor: we now check for anchor raising values so that other instruments reflect the anchor state.
+              The sizes are now rendered last so that they are always readable.
+            Replaced "Speed" with "STW".
+            WPT Distance: remove smoothing.
+            XTE Graph: remove smoothing, as restarting/resetting caused odd effects.
+            Custom Boxes now only show the Settings relevant to Box type.
+            Custom Bar Gauges can now set the bar colour.
+            Engine Boxes now only show the Settings relevant to Box type.
+            Autopilot Status: cleaned up display and it's now Red on Standby and
+              fixed issue with calculating HDG from MHDG and Mag Variation.
+            Anchor Alarm: now clips its display.
+            SunlightBox: we now don't log errors when times are not all set.
+            Semi Gauge Boxes now scale to their containing Box.
+            Gauge pointers now scale down on small gauges and show red when the 
+              value is out of range.
   * 0.6.0 Restructured the Box selection menu.
           For the flutter-pi install, you can now exit the instrument
             from the Setting page and the config is then copied to
@@ -19,7 +79,6 @@
             Added option to show Max/Min values to Custom Boxes.
           Bug fixes:
             Graphs now average over a whole number of seconds to stop the scales changing unnecessarily.
-
   * 0.5.0 Added experimental support for Graphs.
           Added Kelvin to Temperature units.
           The current SignalK Subscriptions can now be listed.
