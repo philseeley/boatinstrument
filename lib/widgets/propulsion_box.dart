@@ -61,7 +61,7 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _EngineSettingsWidget(config.controller, _settings);
+    return _EngineSettingsWidget(config.controller, this, _settings);
   }
 
   @override
@@ -119,7 +119,7 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _EngineSettingsWidget(config.controller, _settings);
+    return _EngineSettingsWidget(config.controller, this, _settings);
   }
 
   @override
@@ -178,7 +178,7 @@ class EngineExhaustTempBox extends DoubleValueSemiGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _EngineSettingsWidget(config.controller, _settings);
+    return _EngineSettingsWidget(config.controller, this, _settings);
   }
 
   @override
@@ -235,7 +235,7 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _EngineSettingsWidget(config.controller, _settings);
+    return _EngineSettingsWidget(config.controller, this, _settings);
   }
 
   @override
@@ -288,7 +288,7 @@ class EngineFuelRateBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _EngineSettingsWidget(config.controller, _settings);
+    return _EngineSettingsWidget(config.controller, this, _settings);
   }
 
   @override
@@ -297,9 +297,10 @@ class EngineFuelRateBox extends DoubleValueBox {
 
 class _EngineSettingsWidget extends BoxSettingsWidget {
   final BoatInstrumentController _controller;
+  final DoubleValueBox _box;
   final _EngineSettings _settings;
 
-  const _EngineSettingsWidget(this._controller, this._settings);
+  const _EngineSettingsWidget(this._controller, this._box, this._settings);
 
   @override
   createState() => _EngineSettingsState();
@@ -315,6 +316,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
   @override
   Widget build(BuildContext context) {
     BoatInstrumentController c = widget._controller;
+    DoubleValueBox b = widget._box;
     _EngineSettings s = widget._settings;
 
     List<Widget> list = [
@@ -322,51 +324,56 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
           leading: const Text("Engine ID:"),
           title: SignalkPathDropdownMenu(c, s.id, 'propulsion', (value) => s.id = value)
       ),
-      ListTile(
-          leading: const Text("Max RPM:"),
-          title: TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: s.maxRPM.toString(),
-              onChanged: (value) => s.maxRPM = int.parse(value)),
-          trailing: const Text('rpm')
-      ),
-      ListTile(
-          leading: const Text("Redline:"),
-          title: TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: s.rpmRedLine.toString(),
-              onChanged: (value) => s.rpmRedLine = int.parse(value)),
-          trailing: const Text('rpm')
-      ),
-      ListTile(
-          leading: const Text("Max Temp:"),
-          title: TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: c.temperatureToDisplay(s.maxTemp).toInt().toString(),
-              onChanged: (value) => s.maxTemp = c.temperatureFromDisplay(double.parse(value))),
-          trailing: Text(c.temperatureUnits.unit)
-      ),
-      ListTile(
-          leading: const Text("Max Oil Pressure:"),
-          title: TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: c.oilPressureToDisplay(s.maxOilPressure).toInt().toString(),
-              onChanged: (value) => s.maxOilPressure = c.oilPressureFromDisplay(double.parse(value))),
-          trailing: Text(c.oilPressureUnits.unit)
-      ),
-      ListTile(
-          leading: const Text("Max Exhaust Temp:"),
-          title: TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: c.temperatureToDisplay(s.maxExhaustTemp).toInt().toString(),
-              onChanged: (value) => s.maxExhaustTemp = c.temperatureFromDisplay(double.parse(value))),
-          trailing: Text(c.temperatureUnits.unit)
-      ),
+      if({EngineRPMBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Max RPM:"),
+            title: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                initialValue: s.maxRPM.toString(),
+                onChanged: (value) => s.maxRPM = int.parse(value)),
+            trailing: const Text('rpm')
+        ),
+      if({EngineRPMBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Redline:"),
+            title: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                initialValue: s.rpmRedLine.toString(),
+                onChanged: (value) => s.rpmRedLine = int.parse(value)),
+            trailing: const Text('rpm')
+        ),
+      if({EngineTempBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Max Temp:"),
+            title: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                initialValue: c.temperatureToDisplay(s.maxTemp).toInt().toString(),
+                onChanged: (value) => s.maxTemp = c.temperatureFromDisplay(double.parse(value))),
+            trailing: Text(c.temperatureUnits.unit)
+        ),
+      if({EngineOilPressureBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Max Oil Pressure:"),
+            title: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                initialValue: c.oilPressureToDisplay(s.maxOilPressure).toInt().toString(),
+                onChanged: (value) => s.maxOilPressure = c.oilPressureFromDisplay(double.parse(value))),
+            trailing: Text(c.oilPressureUnits.unit)
+        ),
+      if({EngineExhaustTempBox}.contains(b.runtimeType))
+        ListTile(
+            leading: const Text("Max Exhaust Temp:"),
+            title: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                initialValue: c.temperatureToDisplay(s.maxExhaustTemp).toInt().toString(),
+                onChanged: (value) => s.maxExhaustTemp = c.temperatureFromDisplay(double.parse(value))),
+            trailing: Text(c.temperatureUnits.unit)
+        ),
     ];
 
     return ListView(children: list);
