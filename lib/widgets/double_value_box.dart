@@ -86,7 +86,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
       text = fmt.format('{:${widget.minLen+(widget.precision > 0?1:0)+widget.precision}.${widget.precision}f}', widget.portStarboard ? displayValue!.abs() : displayValue!);
     }
     else if(inRange != 0) {
-      text = inRange < 0 ? '\u2193' : '\u2191';
+      text = inRange < 0 ? '\u2193' : '\u2191'; // Down and Up arrows.
       color = Colors.red;
     }
 

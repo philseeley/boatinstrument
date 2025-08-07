@@ -23,6 +23,18 @@ abstract class DepthBox extends DoubleValueBox {
   String units(double value) {
     return config.controller.depthUnits.unit;
   }
+
+  @override
+  DoubleValueBoxState<DepthBox> createState() => _DepthBoxState();
+}
+
+class _DepthBoxState extends DoubleValueBoxState<DepthBox> {
+  @override
+  Widget build(BuildContext context) {
+    inRange *= -1; // Make exceeding max depth show a down arrow rather than up.
+    
+    return super.build(context);
+  }
 }
 
 class DepthBelowSurfaceBox extends DepthBox {
