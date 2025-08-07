@@ -493,6 +493,7 @@ class _AutopilotStatusState extends HeadedBoxState<AutopilotStatusBox> {
     String target = '';
     switch(_autopilotState) {
       case null:
+        break;
       case AutopilotState.standby:
         color = Colors.red;
         break;
