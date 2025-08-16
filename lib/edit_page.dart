@@ -111,6 +111,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RaspberryPiBox.sid, experimental: true, (config) {return RaspberryPiBox(config, key: UniqueKey());}),
   BoxDetails(BatteryPowerGraph.sid, graph: true, background: (ctrl) {BatteryPowerGraphBackground(controller: ctrl);}, (config) {return BatteryPowerGraph(config, key: UniqueKey());}),
   BoxDetails(SolarPowerGraph.sid, graph: true, background: (ctrl) {SolarPowerGraphBackground(controller: ctrl);}, (config) {return SolarPowerGraph(config, key: UniqueKey());}),
+  BoxDetails(CompassRoseBox.sid, gauge: true, (config) {return CompassRoseBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -196,6 +197,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(MoonBox.sid, 'Moonlight'),
       ]),
       _widgetSubMenuEntry(box, 'Navigation', [
+        _widgetMenuEntry(CompassRoseBox.sid, 'Compass Rose'),
         _widgetSubMenuEntry(box, 'Speed', [
           _widgetMenuEntry(SpeedOverGroundBox.sid, 'Over Ground'),
           _widgetMenuEntry(MaxSpeedOverGroundBox.sid, 'Max SOG'),

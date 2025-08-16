@@ -8,6 +8,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/anchor_box.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
+import 'package:boatinstrument/widgets/compass_rose_box.dart';
 import 'package:boatinstrument/widgets/custom_box.dart';
 import 'package:boatinstrument/widgets/date_time_box.dart';
 import 'package:boatinstrument/widgets/electrical_box.dart';
