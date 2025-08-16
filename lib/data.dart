@@ -999,16 +999,16 @@ class _BackgroundDataSettingsState extends State<BackgroundDataSettingsWidget> {
 mixin DoubleValeBoxPainter {
   static const double _pad = 5.0;
 
-  void paintDoubleBox(Canvas canvas, BuildContext context, String title, String units, int minLen, int precision, double? value, Offset loc, double size) {
+  void paintDoubleBox(Canvas canvas, BuildContext context, String title, String units, int minLen, int precision, double? value, Offset loc, double size, {bool fill = true}) {
     Color fg = Theme.of(context).colorScheme.onSurface;
     Color bg = Theme.of(context).colorScheme.surface;
-    TextStyle style = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0);
+    TextStyle style = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0, backgroundColor: bg);
 
     String speedText = '-';
     if(value != null) speedText = fmt.format('{:${minLen+(precision > 0?1:0)+precision}.${precision}f}', value);
 
     Paint paint = Paint()
-      ..style = PaintingStyle.fill
+      ..style = fill ? PaintingStyle.fill : PaintingStyle.stroke
       ..color = bg
       ..strokeWidth = 2.0;
 
