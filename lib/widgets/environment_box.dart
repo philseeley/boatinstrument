@@ -270,7 +270,7 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Set&Drift deg-${widget.config.controller.speedUnits.unit}', style: style)),
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Set&Drift $degreesUnits-${widget.config.controller.speedUnits.unit}', style: style)),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
     ]);

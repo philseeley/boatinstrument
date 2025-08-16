@@ -1,6 +1,6 @@
 part of 'boatinstrument_controller.dart';
 
-const String degreesUnits = 'deg';
+const String degreesUnits = '\u00B0T'; // degrees symbol.
 const double kelvinOffset = 273.15;
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();

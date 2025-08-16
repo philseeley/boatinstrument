@@ -175,7 +175,7 @@ class _WindDirectionTrueBoxState extends DoubleValueBoxState<WindDirectionTrueBo
         widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('${widget.title} deg $subText', style: style)),
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('${widget.title} $subText $degreesUnits', style: style)),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(primaryText, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
 
