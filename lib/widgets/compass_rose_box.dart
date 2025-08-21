@@ -1,14 +1,39 @@
-import 'dart:math';
+import 'dart:math' as m;
 
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'compass_rose_box.g.dart';
+
+@JsonSerializable()
+class _Settings {
+  bool showCardinal;
+  bool showDegrees;
+
+  _Settings({
+    this.showCardinal = true,
+    this.showDegrees = false
+  });
+}
 
 abstract class CompassBox extends BoxWidget {
+  late final _Settings _settings;
 
-  const CompassBox(super.config, {super.key});
+  CompassBox(super.config, {super.key}) {
+    _settings = _$SettingsFromJson(config.settings);
+  }
 
   @override
   Widget? getHelp(BuildContext context) => HelpTextWidget('The Blue marker shows your "Course Over Ground" and the Yellow marker the "Bearing to Next Waypoint".');
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _SettingsWidget(_settings);
+  }
 }
 
 abstract class CompassBoxState<T> extends State<CompassBox> {
@@ -65,17 +90,18 @@ abstract class CompassBoxState<T> extends State<CompassBox> {
 
 class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
   final BuildContext _context;
+  final _Settings _settings;
   final double _headingTrue;
   final double? _courseOverGroundTrue;
   final double? _nextWaypointBearing;
 
-  _RosePainter(this._context, this._headingTrue, this._courseOverGroundTrue, this._nextWaypointBearing);
+  _RosePainter(this._context, this._settings, this._headingTrue, this._courseOverGroundTrue, this._nextWaypointBearing);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
     Color fg = Theme.of(_context).colorScheme.onSurface;
     Color bg = Theme.of(_context).colorScheme.surface;
-    double size = min(canvasSize.width, canvasSize.height);
+    double size = m.min(canvasSize.width, canvasSize.height);
 
     Paint paint = Paint()
       ..style = PaintingStyle.stroke
@@ -84,40 +110,38 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
     canvas.drawCircle(Offset(size/2, size/2), size/2, paint);
     paint.strokeWidth = 4.0;
-    canvas.drawLine(Offset(size/2, 0), Offset(size/2, size), paint);
-    canvas.drawLine(Offset(0, size/2), Offset(size, size/2), paint);
-    canvas.drawLine(Offset(size*0.2, size*0.2), Offset(size*0.8, size*0.8), paint);
-    canvas.drawLine(Offset(size*0.2, size*0.8), Offset(size*0.8, size*0.2), paint);
+    canvas.drawLine(Offset(size/2, 0), Offset(size/2, size/2), paint);
 
-    paintDoubleBox(canvas, _context, 'HDG', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(size/3, size/3), size/3);
+    paintDoubleBox(canvas, _context, 'HDG ${rad2Cardinal(_headingTrue)}', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(size/3, size/3), size/3);
 
-    for(int a = 0; a < 360; a += 10) {
+    for(double a = 0; a < 360; a += 22.5) {
       paint.strokeWidth = 10.0;
       double width = 0.01;
-      if (a % 30 == 0) {
+      if (a % 90 == 0) {
         paint.strokeWidth = 20.0;
         width = 0.02;
       }
     
-      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(a)-_headingTrue-(pi/2)-(width/2), width, false, paint);
+      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(a.toInt()) -_headingTrue-(m.pi/2)-(width/2), width, false, paint);
     }
 
+    _paintMarker(canvas, 0, size, fg, 40);
     _paintMarker(canvas, _nextWaypointBearing, size, Colors.yellow, 30);
     _paintMarker(canvas, _courseOverGroundTrue, size, Colors.blue, 20);
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
       canvas.translate(size / 2, size / 2);
-      for (int a = 0; a < 360; a += 30) {
+      for (double a = 0; a < 360; a += 22.5) {
         tp.text = TextSpan(
-            text: a.toString(),
+            text: '${_settings.showCardinal ? '${rad2Cardinal(deg2Rad(a.toInt()))}${_settings.showDegrees?'\n':''}' : ''}${_settings.showDegrees ? '${a.toInt()}' : ''}',
             style: Theme.of(_context).textTheme.bodyMedium!.copyWith(backgroundColor: bg));
+        tp.textAlign = TextAlign.center;
         tp.layout();
   
-        double x = cos(deg2Rad(a)-_headingTrue - (pi / 2)) * (size / 2 - 40.0);
-        double y = sin(deg2Rad(a)-_headingTrue - (pi / 2)) * (size / 2 - 40.0);
-        tp.paint(
-            canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+        double x = m.cos(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - 40.0);
+        double y = m.sin(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - 40.0);
+        tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
       }
     } finally {
       tp.dispose();
@@ -145,14 +169,14 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
       canvas.restore();
     }
   }
-  
+
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class CompassRoseBox extends CompassBox {
 
-  const CompassRoseBox(super.config, {super.key});
+  CompassRoseBox(super.config, {super.key});
 
   @override
   CompassBoxState<CompassRoseBox> createState() => _CompassRoseBoxState();
@@ -173,18 +197,19 @@ class _CompassRoseBoxState extends CompassBoxState<CompassRoseBox> {
     return Container(padding: const EdgeInsets.all(5.0), child:
       _headingTrue == null ?
         Center(child: Text('-', style: Theme.of(context).textTheme.displayLarge)) :
-        RepaintBoundary(child: CustomPaint(size: Size.infinite, painter: _RosePainter(context, _headingTrue!, _courseOverGroundTrue, _nextWaypointBearing)))
+        RepaintBoundary(child: CustomPaint(size: Size.infinite, painter: _RosePainter(context, widget._settings, _headingTrue!, _courseOverGroundTrue, _nextWaypointBearing)))
     );
   }
 }
 
 class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
   final BuildContext _context;
+  final _Settings _settings;
   final double _headingTrue;
   final double? _courseOverGroundTrue;
   final double? _nextWaypointBearing;
 
-  _GaugePainter(this._context, this._headingTrue, this._courseOverGroundTrue, this._nextWaypointBearing);
+  _GaugePainter(this._context, this._settings, this._headingTrue, this._courseOverGroundTrue, this._nextWaypointBearing);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -199,26 +224,28 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
       ..strokeWidth = 2.0;
 
     double m = w/180;
-    for(int a = 0; a < 360; a += 10) {
+    for(double a = 0; a < 360; a += 22.5) {
       paint.strokeWidth = 2.0;
-      if (a % 30 == 0) {
+      if (a % 90 == 0) {
         paint.strokeWidth = 4.0;
       }
       double x = (a+90-rad2Deg(_headingTrue))%360*m;
       if(x > 0 && x < w) canvas.drawLine(Offset(x, 0.0), Offset(x, h), paint);
     }
 
+    _paintMarker(canvas, 0, w, h, m, fg, 1.0);
     _paintMarker(canvas, _nextWaypointBearing, w, h, m, Colors.yellow, 0.8);
     _paintMarker(canvas, _courseOverGroundTrue, w, h, m, Colors.blue, 0.6);
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
-      for(int a = 0; a < 360; a += 10) {
+      for(double a = 0; a < 360; a += 22.5) {
         double x = (a+90-rad2Deg(_headingTrue))%360*m;
         if(x > 0 && x < w) {
           tp.text = TextSpan(
-            text: a.toString(),
-            style: Theme.of(_context).textTheme.bodyMedium!.copyWith(backgroundColor: bg));
+              text: '${_settings.showCardinal ? '${rad2Cardinal(deg2Rad(a.toInt()))}${_settings.showDegrees?'\n':''}' : ''}${_settings.showDegrees ? '${a.toInt()}' : ''}',
+              style: Theme.of(_context).textTheme.bodyMedium!.copyWith(backgroundColor: bg));
+          tp.textAlign = TextAlign.center;
           tp.layout();
     
           tp.paint(canvas, Offset(x-(tp.size.width)/2, (h-tp.size.height)/2));
@@ -266,7 +293,7 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
 
 class CompassGaugeBox extends CompassBox {
 
-  const CompassGaugeBox(super.config, {super.key});
+  CompassGaugeBox(super.config, {super.key});
 
   @override
   CompassBoxState<CompassGaugeBox> createState() => _CompassGaugeBoxState();
@@ -287,7 +314,47 @@ class _CompassGaugeBoxState extends CompassBoxState<CompassGaugeBox> {
     return Container(padding: const EdgeInsets.all(5.0), child:
       _headingTrue == null ?
         Center(child: Text('-', style: Theme.of(context).textTheme.displayLarge)) :
-        RepaintBoundary(child: CustomPaint(size: Size.infinite, painter: _GaugePainter(context, _headingTrue!, _courseOverGroundTrue, _nextWaypointBearing)))
+        RepaintBoundary(child: CustomPaint(size: Size.infinite, painter: _GaugePainter(context, widget._settings, _headingTrue!, _courseOverGroundTrue, _nextWaypointBearing)))
     );
   }
 }
+
+class _SettingsWidget extends BoxSettingsWidget {
+  final _Settings _settings;
+
+  const _SettingsWidget(this._settings);
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$SettingsToJson(_settings);
+  }
+
+  @override
+  createState() => _SettingsState();
+}
+
+class _SettingsState extends State<_SettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _Settings s = widget._settings;
+
+    return ListView(children: [
+      SwitchListTile(title: const Text("Display Cardinal Values:"),
+          value: s.showCardinal,
+          onChanged: (bool value) {
+            setState(() {
+              s.showCardinal = value;
+            });
+          }),
+      SwitchListTile(title: const Text("Display Degrees:"),
+          value: s.showDegrees,
+          onChanged: (bool value) {
+            setState(() {
+              s.showDegrees = value;
+            });
+          }),
+    ]);
+  }
+}
+

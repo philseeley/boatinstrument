@@ -143,11 +143,6 @@ class WindDirectionTrueBox extends DoubleValueBox {
 }
 
 class _WindDirectionTrueBoxState extends DoubleValueBoxState<WindDirectionTrueBox> {
-  static const List<String> _cardinalDirections = [
-    'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S',
-    'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N'
-  ];
-
   @override
   Widget build(BuildContext context) {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
@@ -160,8 +155,7 @@ class _WindDirectionTrueBoxState extends DoubleValueBoxState<WindDirectionTrueBo
     String direction = (displayValue == null) ?
     '-' : fmt.format('{:${3}d}', rad2Deg(displayValue));
 
-    const f = (2*pi)/16;
-    String cardinal = (displayValue == null) ? '-' : _cardinalDirections[((displayValue!+(f/2))/f).toInt()];
+    String cardinal = rad2Cardinal(displayValue);
 
     String primaryText = direction;
     String subText = cardinal;
