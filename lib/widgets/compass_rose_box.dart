@@ -99,8 +99,9 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
-    Color fg = Theme.of(_context).colorScheme.onSurface;
-    Color bg = Theme.of(_context).colorScheme.surface;
+    ThemeData td = Theme.of(_context);
+    Color fg = td.colorScheme.onSurface;
+    Color bg = td.colorScheme.surface;
     double size = m.min(canvasSize.width, canvasSize.height);
 
     Paint paint = Paint()
@@ -114,15 +115,25 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
     paintDoubleBox(canvas, _context, 'HDG ${rad2Cardinal(_headingTrue)}', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(size/3, size/3), size/3);
 
-    for(double a = 0; a < 360; a += 22.5) {
+    double step = 22.5;
+    int highlight = 45;
+    if(_settings.showDegrees) {
+      step = 10;
+      highlight = 30;
+    }
+
+    for(double a = 0; a < 360; a += step) {
       paint.strokeWidth = 10.0;
       double width = 0.01;
       if (a % 90 == 0) {
+        paint.strokeWidth = 30.0;
+        width = 0.03;
+      } else if (a % highlight == 0) {
         paint.strokeWidth = 20.0;
         width = 0.02;
       }
     
-      canvas.drawArc(const Offset(10.0, 10.0) & Size(size-20.0, size-20.0), deg2Rad(a.toInt()) -_headingTrue-(m.pi/2)-(width/2), width, false, paint);
+      canvas.drawArc(const Offset(15.0, 15.0) & Size(size-30.0, size-30.0), deg2Rad(a.toInt()) -_headingTrue-(m.pi/2)-(width/2), width, false, paint);
     }
 
     _paintMarker(canvas, 0, size, fg, 40);
@@ -131,17 +142,30 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
+      TextStyle styleLarge = td.textTheme.displaySmall!.copyWith(backgroundColor: bg);
+      TextStyle styleSmall = td.textTheme.bodyLarge!.copyWith(backgroundColor: bg);
+      
       canvas.translate(size / 2, size / 2);
-      for (double a = 0; a < 360; a += 22.5) {
-        tp.text = TextSpan(
-            text: '${_settings.showCardinal ? '${rad2Cardinal(deg2Rad(a.toInt()))}${_settings.showDegrees?'\n':''}' : ''}${_settings.showDegrees ? '${a.toInt()}' : ''}',
-            style: Theme.of(_context).textTheme.bodyMedium!.copyWith(backgroundColor: bg));
-        tp.textAlign = TextAlign.center;
-        tp.layout();
-  
-        double x = m.cos(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - 40.0);
-        double y = m.sin(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - 40.0);
-        tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+      for (double a = 0; a < 360; a += step) {
+        TextStyle ts = styleSmall;
+        if((_settings.showDegrees && a % 30 == 0) ||
+           (!_settings.showDegrees && _settings.showCardinal)) {
+          String t = a.toInt().toString();
+          if(!_settings.showDegrees) t = rad2Cardinal(deg2Rad(a.toInt()));
+          if(a % 90 == 0) {
+            if(_settings.showCardinal) t = rad2Cardinal(deg2Rad(a.toInt()));
+            ts = styleLarge;
+          }
+          tp.text = TextSpan(
+              text: t,
+              style: ts);
+          tp.textAlign = TextAlign.center;
+          tp.layout();
+    
+          double x = m.cos(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - ts.fontSize!-30);
+          double y = m.sin(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - ts.fontSize!-30);
+          tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+        }
       }
     } finally {
       tp.dispose();
