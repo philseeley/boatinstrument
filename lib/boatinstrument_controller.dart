@@ -481,7 +481,7 @@ class BoatInstrumentController {
                   // ============= PATH MAPPING =============
                   // List<BoxWidget> stack = [];
                   // for(BoxDetails bd in boxDetails) {
-                  //   print('|${bd.id}|${bd.description}|');
+                  //   print('|${bd.id}|');
                   //   stack.add(bd.build(BoxWidgetConfig(this, box.settings, constraints, false)));
                   // }
                   // return Stack(children: stack);
