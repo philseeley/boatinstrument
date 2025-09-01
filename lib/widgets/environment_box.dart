@@ -276,8 +276,8 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
     ]);
   }
 
-  void _processData(List<Update>? updates) {
-    if(updates == null) {
+  void _processData(List<Update> updates) {
+    if(updates[0].value == null) {
       _set = _drift = _displayDrift = null;
     } else {
       try {
@@ -496,8 +496,8 @@ class _SunlightBox extends State<SunlightBox> {
     });
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
+  void _onUpdate(List<Update> updates) {
+    if(updates[0].value == null) {
       _times = List.filled(_numTimes, null);
     } else {
       for (Update u in updates) {
@@ -660,8 +660,8 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
     });
   }
   
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
+  void _onUpdate(List<Update> updates) {
+    if(updates[0].value == null) {
       _rise = _set = _fraction = _phaseName = null;
     } else {
       for (Update u in updates) {

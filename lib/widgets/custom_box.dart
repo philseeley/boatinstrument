@@ -440,19 +440,15 @@ class _DebugBoxState extends State<DebugBox> {
     });
   }
 
-  void _onUpdate(List<Update>? updates) {
+  void _onUpdate(List<Update> updates) {
     if(_pause) {
       return;
     }
 
-    if (updates == null) {
-      _data = null;
-    } else {
-      if(mounted) {
-          setState(() {
-          _data = '${_data??''}\n${updates.toString()}';
-        });
-      }
+    if(mounted) {
+        setState(() {
+        _data = '${_data??''}\n${updates.toString()}';
+      });
     }
   }
 }
@@ -562,15 +558,13 @@ class _CustomTextBoxState extends State<CustomTextBox> {
     return Center(child: Text(lines.join('\n'), textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates != null) {
-      if(mounted) {
-        setState(() {
-          for(Update u in updates) {
-            _pathData[u.path] = u.value.toString();
-          }
-        });
-      }
+  void _onUpdate(List<Update> updates) {
+    if(mounted) {
+      setState(() {
+        for(Update u in updates) {
+          _pathData[u.path] = (u.value == null) ? '' : u.value.toString();
+        }
+      });
     }
   }
 }

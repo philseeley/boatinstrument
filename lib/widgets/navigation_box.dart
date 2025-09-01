@@ -108,8 +108,8 @@ class _CrossTrackErrorDeltaBoxState extends DoubleValueSemiGaugeBoxState<CrossTr
   // We override this because we don't want to check min and max as the gauge needs these to
   // be adjusted for the diff, not the absolute value.
   @override
-  processUpdates(List<Update>? updates) {
-    if(updates == null) {
+  processUpdates(List<Update> updates) {
+    if(updates[0].value == null) {
       value = displayValue = null;
       inRange = 0;
     } else {
@@ -322,8 +322,8 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
     return super.build(context);
   }
 
-  void processData(List<Update>? updates) {
-    if(updates == null) {
+  void processData(List<Update> updates) {
+    if(updates[0].value == null) {
       _timeToGo = null;
     } else {
       try {
@@ -473,8 +473,8 @@ class _PositionBoxState extends HeadedBoxState<PositionBox> {
     return super.build(context);
   }
 
-  void _processData(List<Update>? updates) {
-    if(updates == null) {
+  void _processData(List<Update> updates) {
+    if(updates[0].value == null) {
       _latitude = _longitude = null;
     } else {
       try {

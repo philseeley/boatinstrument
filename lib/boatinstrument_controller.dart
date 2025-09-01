@@ -388,7 +388,7 @@ class BoatInstrumentController {
       ++_boxesOnPage;
     }
 
-    _BoxData bd = _BoxData(now(), onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataType);
+    _BoxData bd = _BoxData(onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataType);
     _boxData.add(bd);
 
     for(String path in bd.paths) {
@@ -526,7 +526,7 @@ class BoatInstrumentController {
     return LayoutBuilder(builder: (context, constraints) {
       clear();
 
-      configure(onUpdate: (List<Update>? updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
+      configure(onUpdate: (List<Update> updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
 
       for(var id in _backgroundIDs) {
         getBoxDetails(id).background!.call(this);
@@ -559,17 +559,17 @@ class BoatInstrumentController {
     _notifications.clear();
   }
 
-  void _onNotification(BuildContext context, List<Update>? updates) {
+  void _onNotification(BuildContext context, List<Update> updates) {
     DateTime now = this.now();
 
     _notifications.removeWhere((path, notification) {
       return now.difference(notification.last) > Duration(minutes: _settings!.notificationMuteTimeout);
     });
 
-    if (updates == null) {
-      _audioPlayer?.release();
-    } else {
-      for(Update u in updates) {
+    for(Update u in updates) {
+      if (u.value == null) {
+        _audioPlayer?.release();
+      } else {
         try {
           NotificationStatus notificationStatus = _notifications.putIfAbsent(u.path, () => NotificationStatus());
           NotificationState newState = NotificationState.values.byName(
@@ -726,7 +726,12 @@ class BoatInstrumentController {
     try {
       for(_BoxData bd in _boxData) {
         if(bd.onUpdate != null) {
-          bd.onUpdate!(null);
+          bd.updates.clear();
+          for(String path in bd.pathTimestamps.keys) {
+            bd.updates.add(Update(path, null));
+          }
+          bd.pathTimestamps.clear();
+          if(bd.updates.isNotEmpty) bd.onUpdate!(bd.updates);
         }
       }
 
@@ -864,7 +869,7 @@ class BoatInstrumentController {
                     if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
 
                     bd.updates.add(Update(path,value));
-                    bd.lastUpdate = now;
+                    bd.pathTimestamps[path] = now;
                   } else {
                    l.i('Discarding old data for "$u"');
                   }
@@ -879,18 +884,20 @@ class BoatInstrumentController {
 
       for(_BoxData bd in _boxData) {
         if(bd.onUpdate != null) {
-          if (bd.updates.isNotEmpty) {
-            // Send updates to Box.
-            bd.onUpdate!(bd.updates);
-          } else {
-            Duration d = now.difference(bd.lastUpdate);
+          var pt = bd.pathTimestamps;
+          for(String path in pt.keys.toSet()) { // We make a copy of the keys as we might remove some.
+            Duration d = now.difference(pt[path]!);
             if (
             ((bd.dataType == SignalKDataType.realTime) && d > realTimeDuration) ||
             ((bd.dataType == SignalKDataType.infrequent) && d > infrequentDuration)
             ) {
-              bd.onUpdate!(null);
-              bd.lastUpdate = now;
+              bd.updates.add(Update(path, null));
+              bd.pathTimestamps.remove(path);
             }
+          }
+          if (bd.updates.isNotEmpty) {
+            // Send updates to Box.
+            bd.onUpdate!(bd.updates);
           }
         }
       }

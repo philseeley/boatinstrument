@@ -97,8 +97,8 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
     ]);
   }
 
-  void processUpdates(List<Update>? updates) {
-    if(updates == null) {
+  void processUpdates(List<Update> updates) {
+    if(updates[0].value == null) {
       value = displayValue = null;
       inRange = 0;
     } else {

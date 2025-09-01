@@ -213,10 +213,10 @@ class _RaspberryPiBoxState extends State<RaspberryPiBox> with DoubleValeBoxPaint
     return Container(padding: const EdgeInsets.all(5.0), child: RepaintBoundary(child: Stack(children: stack)));
   }
 
-  void _onUpdate(List<Update>? updates) {
+  void _onUpdate(List<Update> updates) {
     BoatInstrumentController controller = widget.config.controller;
 
-    if(updates == null) {
+    if(updates[0].value == null) {
       _cpuTemperature = _gpuTemperature = _cpuUtilisation = _memoryUtilisation = null;
     } else {
       for (Update u in updates) {

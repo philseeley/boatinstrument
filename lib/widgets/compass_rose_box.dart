@@ -52,33 +52,29 @@ abstract class CompassBoxState<T> extends State<CompassBox> {
     });
   }
 
-  void _processData(List<Update>? updates) {
-    if(updates == null) {
-      _headingTrue = _courseOverGroundTrue = _nextWaypointBearing = null;
-    } else {
-      for (Update u in updates) {
-        try {
-          double next = (u.value as num).toDouble();
+  void _processData(List<Update> updates) {
+    for (Update u in updates) {
+      try {
+        double next = (u.value == null) ? 0 : (u.value as num).toDouble();
 
-          switch (u.path) {
-            case 'navigation.headingTrue':
-              _headingTrue = averageAngle(_headingTrue ?? next, next,
+        switch (u.path) {
+          case 'navigation.headingTrue':
+            _headingTrue = (u.value == null) ? null : averageAngle(_headingTrue ?? next, next,
+              smooth: widget.config.controller.valueSmoothing);
+            break;
+          case 'navigation.courseOverGroundTrue':
+            _courseOverGroundTrue = (u.value == null) ? null : averageAngle(_courseOverGroundTrue ?? next, next,
+              smooth: widget.config.controller.valueSmoothing);
+            break;
+          default:
+            if(u.path.endsWith('.nextPoint.bearingTrue')) {
+              _nextWaypointBearing = (u.value == null) ? null : averageAngle(_nextWaypointBearing ?? next, next,
                 smooth: widget.config.controller.valueSmoothing);
-              break;
-            case 'navigation.courseOverGroundTrue':
-              _courseOverGroundTrue = averageAngle(_courseOverGroundTrue ?? next, next,
-                smooth: widget.config.controller.valueSmoothing);
-              break;
-            default:
-              if(u.path.endsWith('.nextPoint.bearingTrue')) {
-                _nextWaypointBearing = averageAngle(_nextWaypointBearing ?? next, next,
-                  smooth: widget.config.controller.valueSmoothing);
-              }
-              break;
-          }
-        } catch (e) {
-          widget.config.controller.l.e("Error converting $u", error: e);
+            }
+            break;
         }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 

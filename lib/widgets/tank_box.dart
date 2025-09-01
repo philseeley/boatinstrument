@@ -238,8 +238,8 @@ class _TanksBoxState extends State<TanksBox> {
       Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
+  void _onUpdate(List<Update> updates) {
+    if(updates[0].value == null) {
       _tanks = [];
     } else {
       for (Update u in updates) {

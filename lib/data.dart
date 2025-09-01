@@ -439,7 +439,7 @@ enum SignalKDataType implements EnumMenuEntry {
   const SignalKDataType(this._displayName);
 }
 
-typedef OnUpdate = Function(List<Update>? updates);
+typedef OnUpdate = Function(List<Update> updates);
 
 class _BoxData {
   final OnUpdate? onUpdate;
@@ -449,11 +449,11 @@ class _BoxData {
   final SignalKDataType dataType;
   List<RegExp> regExpPaths = [];
   List<RegExp> regExpStaticPaths = [];
-  DateTime lastUpdate;
   List<Update> updates = [];
+  final Map<String, DateTime> pathTimestamps = {};
   List<Update> staticUpdates = [];
 
-  _BoxData(this.lastUpdate, this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType);
+  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType);
 }
 
 class _Resizable {
@@ -942,8 +942,8 @@ abstract class BackgroundData {
   double? get value => values[id];
   set value(double? value) => values[id] = value;
 
-  void processUpdates(List<Update>? updates) {
-    if(updates != null) {
+  void processUpdates(List<Update> updates) {
+    if(updates[0].value != null) {
       try {
         double next =(updates[0].value as num).toDouble();
 

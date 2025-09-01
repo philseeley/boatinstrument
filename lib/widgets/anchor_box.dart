@@ -332,14 +332,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
-      _maxRadius = _currentRadius = _bearingTrue = _apparentBearing = null;
-    } else {
-      for (Update u in updates) {
-        try {
-          switch (u.path) {
-            case 'navigation.position':
+  void _onUpdate(List<Update> updates) {
+    for (Update u in updates) {
+      try {
+        switch (u.path) {
+          case 'navigation.position':
+            if(u.value != null) {
               DateTime now = widget.config.controller.now();
               if(now.difference(_lastPositionTime) >= Duration(seconds: _settings.recordSeconds)) {
                 _lastPositionTime = now;
@@ -352,41 +350,41 @@ class _AnchorState extends State<AnchorAlarmBox> {
                   _positions.removeRange(0, _settings.recordPoints ~/ 10);
                 }
               }
-              break;
-            case 'navigation.anchor.position':
-              if(u.value != null) _anchorPosition = ll.LatLng((u.value['latitude'] as num).toDouble(), (u.value['longitude'] as num).toDouble());
-              break;
-            case 'navigation.anchor.maxRadius':
-              try {
-                if(u.value == null) {
-                  _maxRadius = null;
-                } else {
-                  _maxRadius = (u.value as num).round();
-                }
-              } catch (_){
-                // This only happens if the Anchor Alarm webapp is used.
-                _maxRadius = int.parse(u.value as String);
-              }
-              break;
-            case 'navigation.anchor.currentRadius':
+            }
+            break;
+          case 'navigation.anchor.position':
+            _anchorPosition = (u.value == null) ? null : ll.LatLng((u.value['latitude'] as num).toDouble(), (u.value['longitude'] as num).toDouble());
+            break;
+          case 'navigation.anchor.maxRadius':
               if(u.value == null) {
-                _currentRadius = null;
+                _maxRadius = null;
               } else {
-                _currentRadius = (u.value as num).round();
-                // Make sure we have a radius to avoid div-by-zero error.
-                _currentRadius = _currentRadius == 0 ? 1 : _currentRadius;
+                try {
+                  _maxRadius = (u.value as num).round();
+                } catch (_){
+                  // This only happens if the Anchor Alarm webapp is used.
+                  _maxRadius = int.parse(u.value as String);
+                }
               }
-              break;
-            case 'navigation.anchor.bearingTrue':
-              if(u.value != null) _bearingTrue = (u.value as num).toDouble()-m.pi;
-              break;
-            case 'navigation.anchor.apparentBearing':
-              if(u.value != null) _apparentBearing = (u.value as num).toDouble();
-              break;
-          }
-        } catch (e) {
-          widget.config.controller.l.e("Error converting $u", error: e);
+            break;
+          case 'navigation.anchor.currentRadius':
+            if(u.value == null) {
+              _currentRadius = null;
+            } else {
+              _currentRadius = (u.value as num).round();
+              // Make sure we have a radius to avoid div-by-zero error.
+              _currentRadius = _currentRadius == 0 ? 1 : _currentRadius;
+            }
+            break;
+          case 'navigation.anchor.bearingTrue':
+            _bearingTrue = (u.value == null) ? null : (u.value as num).toDouble()-m.pi;
+            break;
+          case 'navigation.anchor.apparentBearing':
+            _apparentBearing = (u.value == null) ? null : (u.value as num).toDouble();
+            break;
         }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 

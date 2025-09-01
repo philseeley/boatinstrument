@@ -458,8 +458,8 @@ class _BatteriesBoxState extends State<BatteriesBox> {
       Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
+  void _onUpdate(List<Update> updates) {
+    if(updates[0].value == null) {
       _batteries = [];
     } else {
       for (Update u in updates) {
@@ -748,8 +748,8 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with Swit
     _sendCommand(widget.config, context, _settings.authToken, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
+  void _onUpdate(List<Update> updates) {
+    if(updates[0].value == null) {
       _switches = [];
     } else {
       for (Update u in updates) {
@@ -975,8 +975,8 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
     _sendCommand(widget.config, context, _settings.authToken, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
   }
 
-  void _onUpdate(List<Update>? updates) {
-    if(updates == null) {
+  void _onUpdate(List<Update> updates) {
+    if(updates[0].value == null) {
       _switch.state = _switch.dimmingLevel = null;
     } else {
       for (Update u in updates) {
@@ -1023,8 +1023,8 @@ abstract class PowerGraphBackground extends BackgroundData {
   Map<String, Power> get power;
 
   @override
-  processUpdates(List<Update>? updates) {
-    if(updates == null) {
+  processUpdates(List<Update> updates) {
+    if(updates[0].value == null) {
       power.clear();
     } else {
       DateTime now = controller!.now();

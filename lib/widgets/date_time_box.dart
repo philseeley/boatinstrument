@@ -124,8 +124,8 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
     });
   }
   
-  void _processData(List<Update>? updates) {
-    if(updates == null) {
+  void _processData(List<Update> updates) {
+    if(updates[0].value == null) {
       _dateTime = null;
     } else {
       try {
