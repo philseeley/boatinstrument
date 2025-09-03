@@ -138,26 +138,35 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
-      TextStyle styleLarge = td.textTheme.displaySmall!.copyWith(backgroundColor: bg);
-      TextStyle styleSmall = td.textTheme.bodyLarge!.copyWith(backgroundColor: bg);
+      TextStyle styleLarge = td.textTheme.displaySmall!;
+      TextStyle styleSmall = td.textTheme.bodyLarge!;
+      TextStyle styleLargeBg = td.textTheme.displaySmall!.copyWith(foreground: Paint()..color = bg..style = PaintingStyle.stroke..strokeWidth = 6);
+      TextStyle styleSmallBg = td.textTheme.bodyLarge!.copyWith(foreground: Paint()..color = bg..style = PaintingStyle.stroke..strokeWidth = 6);
       
       canvas.translate(size / 2, size / 2);
       for (double a = 0; a < 360; a += step) {
         if((_settings.showDegrees && a % 30 == 0) ||
            (!_settings.showDegrees && _settings.showCardinal)) {
           TextStyle ts = styleSmall;
+          TextStyle tsBg = styleSmallBg;
           String t = a.toInt().toString();
           if(!_settings.showDegrees) t = rad2Cardinal(deg2Rad(a.toInt()));
           if(a % 90 == 0) {
             if(_settings.showCardinal) t = rad2Cardinal(deg2Rad(a.toInt()));
             ts = styleLarge;
+            tsBg = styleLargeBg;
           }
-          tp.text = TextSpan(text: t, style: ts);
-          tp.textAlign = TextAlign.center;
-          tp.layout();
     
           double x = m.cos(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - ts.fontSize!-30);
           double y = m.sin(deg2Rad(a.toInt())-_headingTrue - (m.pi / 2)) * (size / 2 - ts.fontSize!-30);
+
+          tp.text = TextSpan(text: t, style: tsBg);
+          tp.textAlign = TextAlign.center;
+          tp.layout();
+          tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
+          tp.text = TextSpan(text: t, style: ts);
+          tp.textAlign = TextAlign.center;
+          tp.layout();
           tp.paint(canvas, Offset(x - tp.size.width / 2, y - tp.size.height / 2));
         }
       }
@@ -267,8 +276,10 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
-      TextStyle styleLarge = td.textTheme.displaySmall!.copyWith(backgroundColor: bg);
-      TextStyle styleSmall = td.textTheme.bodyLarge!.copyWith(backgroundColor: bg);
+      TextStyle styleLarge = td.textTheme.displaySmall!;
+      TextStyle styleSmall = td.textTheme.bodyLarge!;
+      TextStyle styleLargeBg = td.textTheme.displaySmall!.copyWith(foreground: Paint()..color = bg..style = PaintingStyle.stroke..strokeWidth = 6);
+      TextStyle styleSmallBg = td.textTheme.bodyLarge!.copyWith(foreground: Paint()..color = bg..style = PaintingStyle.stroke..strokeWidth = 6);
 
       for(double a = 0; a < 360; a += step) {
         double x = (a+90-rad2Deg(_headingTrue))%360*m;
@@ -276,25 +287,30 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
           if((_settings.showDegrees && a % 30 == 0) ||
             (!_settings.showDegrees && _settings.showCardinal)) {
             TextStyle ts = styleSmall;
+            TextStyle tsBg = styleSmallBg;
             String t = a.toInt().toString();
             if(!_settings.showDegrees) t = rad2Cardinal(deg2Rad(a.toInt()));
             if(a % 90 == 0) {
               if(_settings.showCardinal) t = rad2Cardinal(deg2Rad(a.toInt()));
               ts = styleLarge;
+              tsBg = styleLargeBg;
             }
+            tp.text = TextSpan(text: t, style: tsBg);
+            tp.textAlign = TextAlign.center;
+            tp.layout();
+            tp.paint(canvas, Offset(x-(tp.size.width)/2, (h-tp.size.height)/2));
             tp.text = TextSpan(text: t, style: ts);
             tp.textAlign = TextAlign.center;
             tp.layout();
-      
             tp.paint(canvas, Offset(x-(tp.size.width)/2, (h-tp.size.height)/2));
-            }
+          }
         }
       }
     } finally {
       tp.dispose();
     }
 
-    paintDoubleBox(canvas, _context, 'HDG', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(w/2-h/2, 0), h, fill: false);
+    paintDoubleBox(canvas, _context, 'HDG', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(w/2-h/2, 0), h, fill: false, textBgColor: bg);
   }
 
   void _paintMarker(Canvas canvas, double? angle, double w, double h, double m, Color color, double width) {

@@ -302,6 +302,7 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
   int lines = 1;
   Alignment alignment = Alignment.center;
   Color? color;
+  Color? textBgColor;
 
   @override
   Widget build(BuildContext context) {
@@ -317,8 +318,12 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
       ),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Align(alignment: alignment, child: Padding(padding: const EdgeInsets.all(pad),
-          child: Text(text, textScaler: TextScaler.noScaling,
-              style: style.copyWith(fontSize: fontSize, color: color)))))
+          child: Stack(children: [
+            if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling,
+              style: style.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
+            Text(text, textScaler: TextScaler.noScaling,
+              style: style.copyWith(fontSize: fontSize, color: color))
+          ]))))
       ]);
   }
 }
@@ -1009,10 +1014,11 @@ class _BackgroundDataSettingsState extends State<BackgroundDataSettingsWidget> {
 mixin DoubleValeBoxPainter {
   static const double _pad = 5.0;
 
-  void paintDoubleBox(Canvas canvas, BuildContext context, String title, String units, int minLen, int precision, double? value, Offset loc, double size, {bool fill = true}) {
+  void paintDoubleBox(Canvas canvas, BuildContext context, String title, String units, int minLen, int precision, double? value, Offset loc, double size, {bool fill = true, Color? textBgColor}) {
     Color fg = Theme.of(context).colorScheme.onSurface;
     Color bg = Theme.of(context).colorScheme.surface;
-    TextStyle style = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0, backgroundColor: bg);
+    TextStyle style = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0);
+    TextStyle styleBg = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0, foreground: Paint()..color = textBgColor??Colors.black..style = PaintingStyle.stroke..strokeWidth = 6);
 
     String speedText = '-';
     if(value != null) speedText = fmt.format('{:${minLen+(precision > 0?1:0)+precision}.${precision}f}', value);
@@ -1031,11 +1037,27 @@ mixin DoubleValeBoxPainter {
     try {
       double fontSize = maxFontSize(speedText, style, size-(2*_pad), size-style.fontSize!-(3*_pad));
 
+      if(textBgColor != null) {
+        tp.text = TextSpan(
+            text: '$title $units',
+            style: styleBg);
+        tp.layout();
+        tp.paint(canvas, loc+const Offset(_pad,_pad));
+      }
       tp.text = TextSpan(
           text: '$title $units',
           style: style);
       tp.layout();
       tp.paint(canvas, loc+const Offset(_pad,_pad));
+
+      if(textBgColor != null) {
+        tp.text = TextSpan(
+            text: speedText,
+            style: styleBg.copyWith(fontSize: fontSize));
+        tp.layout();
+        Offset o = loc+Offset(_pad, size-fontSize-_pad);
+        tp.paint(canvas, o);
+      }
 
       tp.text = TextSpan(
           text: speedText,

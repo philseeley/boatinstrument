@@ -627,7 +627,10 @@ class _MoonBox extends HeadedBoxState<MoonBox> {
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+    ThemeData td = Theme.of(context);
+    TextStyle style = td.textTheme.titleMedium!.copyWith(height: 1.0);
+    
+    if(widget._perBoxSettings.showMoon) textBgColor = td.colorScheme.surface;
 
     if(widget.config.editMode) {
       _rise = _set = widget.config.controller.now().toLocal();
