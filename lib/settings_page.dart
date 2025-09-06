@@ -221,19 +221,19 @@ class _SettingsState extends State<SettingsPage> {
             }),
       ),
       ListTile(
-          leading: const Text("Speed:      "),
+          leading: const Text("Speed:       "),
           title: EnumDropdownMenu(SpeedUnits.values, widget._controller._settings?.speedUnits, (v) {widget._controller._settings?.speedUnits = v!;})
       ),
       ListTile(
-          leading: const Text("Wind Speed: "),
+          leading: const Text("Wind Speed:  "),
           title: EnumDropdownMenu(SpeedUnits.values, widget._controller._settings?.windSpeedUnits, (v) {widget._controller._settings?.windSpeedUnits = v!;})
       ),
       ListTile(
-          leading: const Text("Depth:      "),
+          leading: const Text("Depth:       "),
           title: EnumDropdownMenu(DepthUnits.values, widget._controller._settings?.depthUnits, (v) {widget._controller._settings?.depthUnits = v!;})
       ),
       ListTile(
-          leading: const Text("Temperature:"),
+          leading: const Text("Temperature: "),
           title: EnumDropdownMenu(TemperatureUnits.values, widget._controller._settings?.temperatureUnits, (v) {widget._controller._settings?.temperatureUnits = v!;})
       ),
       ListTile(
@@ -245,11 +245,11 @@ class _SettingsState extends State<SettingsPage> {
           title: EnumDropdownMenu(OilPressureUnits.values, widget._controller._settings?.oilPressureUnits, (v) {widget._controller._settings?.oilPressureUnits = v!;})
       ),
       ListTile(
-          leading: const Text("Capacities:"),
+          leading: const Text("Capacities:  "),
           title: EnumDropdownMenu(CapacityUnits.values, widget._controller._settings?.capacityUnits, (v) {widget._controller._settings?.capacityUnits = v!;})
       ),
       ListTile(
-          leading: const Text("Fluid Rate:"),
+          leading: const Text("Fluid Rate:  "),
           title: EnumDropdownMenu(FluidRateUnits.values, widget._controller._settings?.fluidRateUnits, (v) {widget._controller._settings?.fluidRateUnits = v!;})
       ),
       ListTile(
