@@ -80,7 +80,7 @@ Map<String, dynamic> _$HttpHeaderToJson(_HttpHeader instance) =>
     };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-      version: (json['version'] as num?)?.toInt() ?? 1,
+      version: (json['version'] as num?)?.toInt() ?? 2,
       valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
       discoverServer: json['discoverServer'] as bool? ?? true,
       signalkUrl: json['signalkUrl'] as String? ?? '',

@@ -413,12 +413,10 @@ class NextPointTimeToGoBox extends TimeToGoBox {
 
 @JsonSerializable()
 class _PositionSettings {
-  String latFormat;
-  String lonFormat;
+  String format;
 
   _PositionSettings({
-    this.latFormat = '0{lat0d 0m.mmm c}',
-    this.lonFormat = '{lon0d 0m.mmm c}'
+    this.format = '0{lat0d 0m.mmm c}\n{lon0d 0m.mmm c}'
   });
 }
 
@@ -456,7 +454,7 @@ class _PositionBoxState extends HeadedBoxState<PositionBox> {
     super.initState();
     _settings = _$PositionSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _processData, paths: {'navigation.position'});
-    _llf = LatLongFormatter('${_settings.latFormat}\n${_settings.lonFormat}');
+    _llf = LatLongFormatter(_settings.format);
   }
 
   @override
@@ -466,7 +464,7 @@ class _PositionBoxState extends HeadedBoxState<PositionBox> {
     }
 
     text = (_latitude == null || _longitude == null) ?
-      '--- --.--- -\n--- --.--- -' :
+      '-' :
       _llf.format(LatLong(_latitude!, _longitude!));
     header = 'Position';
     return super.build(context);
@@ -512,17 +510,14 @@ class _PositionSettingsState extends State<_PositionSettingsWidget> {
 
     List<Widget> list = [
       ListTile(
-          leading: const Text("Lat Format:"),
+          leading: const Text("Format:"),
           title: TextFormField(
-              initialValue: s.latFormat,
-              onChanged: (value) => s.latFormat = value)
-      ),
-      ListTile(
-          leading: const Text("Long Format:"),
-          title: TextFormField(
-              initialValue: s.lonFormat,
-              onChanged: (value) => s.lonFormat = value)
-      ),
+            textInputAction: TextInputAction.newline,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            initialValue: s.format,
+            onChanged: (value) => s.format = value)
+      )
     ];
 
     return ListView(children: list);

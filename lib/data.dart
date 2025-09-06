@@ -754,7 +754,7 @@ class _Settings {
   String get fileName => _store!.absolute.path;
 
   _Settings({
-    this.version = 1,
+    this.version = 2,
     this.valueSmoothing = 1,
     this.discoverServer = true,
     this.signalkUrl = '',
@@ -846,6 +846,22 @@ class _Settings {
         }
 
         data['version'] = 1;
+      }
+      
+      if(data['version'] == 1) {
+        l.i('Backing up configuration file');
+        f.copy('${f.path}.v1');
+        l.i('Converting configuration from version 1 to 2');
+
+        // PositionBox now combines the separate lat/long formats into one.
+        if(data['boxSettings'] != null &&
+           data['boxSettings']['navigation-position'] != null) {
+          data['boxSettings']['navigation-position'] = {
+            'format': '${data['boxSettings']['navigation-position']['latFormat']}\n${data['boxSettings']['navigation-position']['lonFormat']}'
+          };
+        }
+
+        data['version'] = 2;
       }
 
       settings =_Settings.fromJson(data);
