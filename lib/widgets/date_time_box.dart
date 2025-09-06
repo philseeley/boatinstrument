@@ -91,7 +91,6 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
     }
 
     text = '';
-    lines = 1;
 
     if(_dateTime == null) {
       text = '-';
@@ -103,7 +102,6 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
       }
       if(perBoxSettings.showTime) {
         if(perBoxSettings.showDate) {
-          ++lines;
           text += '\n';
         }
         text += DateFormat(perBoxSettings.timeFormat).format(dt);
