@@ -646,8 +646,6 @@ Set:   ${(_set == null) ? '-' : fmt.format(_utc?_set!.toUtc():_set!.toLocal())}
 Phase: ${(_fraction == null) ? '-' : (_fraction!*100).toInt()}%
 ${(_phaseName == null) ? '-' : _phaseName}''';
 
-    lines = 4;
-
     return Stack(children: [
       if(widget._perBoxSettings.showMoon)
         Padding(padding: const EdgeInsets.all(HeadedBoxState.pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,

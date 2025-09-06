@@ -518,7 +518,6 @@ class _AutopilotStatusState extends HeadedBoxState<AutopilotStatusBox> {
 
     header = 'Autopilot';
     text = '${_autopilotState?.displayName ?? '-'}\n$target';
-    lines = 2;
 
     return super.build(context);
   }

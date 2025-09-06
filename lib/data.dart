@@ -299,7 +299,6 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
 
   String header = '';
   String text = '';
-  int lines = 1;
   Alignment alignment = Alignment.center;
   Color? color;
   Color? textBgColor;
@@ -308,6 +307,7 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
   Widget build(BuildContext context) {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
+    int lines = LineSplitter().convert(text).length;
     double fontSize = maxFontSize(text, style,
       (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / lines,
       widget.config.constraints.maxWidth - (2 * pad));
