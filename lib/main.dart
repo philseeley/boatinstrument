@@ -12,14 +12,23 @@ import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'theme_provider.dart';
 
 void main(List<String> cmdlineArgs) {
+  FlutterError.onError = logError;
+
   List<String> args = (Platform.environment['BOAT_INSTRUMENT_ARGS']??'').split(RegExp(r'\s+')) + cmdlineArgs;
 
   WidgetsFlutterBinding.ensureInitialized();
   
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
+}
+
+void logError(FlutterErrorDetails details) async {
+  FlutterError.dumpErrorToConsole(details);
+  Directory directory = await path_provider.getApplicationDocumentsDirectory();
+  File('${directory.path}/boatinstrument-error.log').writeAsStringSync('${DateTime.now()}\n$details', mode: FileMode.append);
 }
 
 class BoatInstrumentApp extends StatelessWidget {
