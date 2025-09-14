@@ -684,19 +684,40 @@ class BoatInstrumentController {
       }
       else if(_settings!.discoverServer) {
         BonsoirDiscovery discovery = BonsoirDiscovery(type: '_signalk-http._tcp');
-        await discovery.ready;
-        discovery.start();
+        await discovery.initialize();
         Timer t = Timer(const Duration(seconds: 10), () {discovery.stop();});
+        discovery.start();
         try {
+          // discovery.eventStream!.listen((event) { // `eventStream` is not null as the discovery instance is "ready" !
+          //   switch (event) {
+          //     case BonsoirDiscoveryServiceFoundEvent():
+          //       print('Service found : ${event.service.toJson()}');
+          //       event.service.resolve(discovery.serviceResolver); // Should be called when the user wants to connect to this service.
+          //       break;
+          //     case BonsoirDiscoveryServiceResolvedEvent():
+          //       host = event.service.host!;
+          //       port = event.service.port;
+          //       print('Service resolved : ${event.service.toJson()}');
+          //       break;
+          //     case BonsoirDiscoveryServiceUpdatedEvent():
+          //       print('Service updated : ${event.service.toJson()}');
+          //       break;
+          //     case BonsoirDiscoveryServiceLostEvent():
+          //       print('Service lost : ${event.service.toJson()}');
+          //       break;
+          //     default:
+          //       print('Another event occurred : $event.');
+          //       break;
+          //   }
+          // });
           await for(BonsoirDiscoveryEvent e in discovery.eventStream!) {
-            if (e.type == BonsoirDiscoveryEventType.discoveryServiceFound) {
-              e.service!.resolve(discovery.serviceResolver);
-            } else if (e.type == BonsoirDiscoveryEventType.discoveryServiceResolved) {
-              ResolvedBonsoirService r = e.service as ResolvedBonsoirService;
-              host = r.host!;
-              port = r.port;
+            if (e is BonsoirDiscoveryServiceFoundEvent) {
+              e.service.resolve(discovery.serviceResolver);
+            } else if (e is BonsoirDiscoveryServiceResolvedEvent) {
+              host = e.service.host!;
+              port = e.service.port;
               break;
-            } else if (e.type == BonsoirDiscoveryEventType.discoveryStopped) {
+            } else if (e is BonsoirDiscoveryStoppedEvent) {
               // This should only happen if the Timer expires.
               throw Exception('Service discovery failed');
             }
