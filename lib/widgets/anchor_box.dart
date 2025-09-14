@@ -37,8 +37,9 @@ class _AnchorPainter extends CustomPainter {
   final double _apparentBearing;
   final ll.LatLng? _anchorPosition;
   final List<ll.LatLng> _positions;
+  final double? _windAngleApparent;
 
-  const _AnchorPainter(this._controller, this._context, this._maxRadius, this._currentRadius, this._bearingTrue, this._apparentBearing, this._anchorPosition, this._positions);
+  const _AnchorPainter(this._controller, this._context, this._maxRadius, this._currentRadius, this._bearingTrue, this._apparentBearing, this._anchorPosition, this._windAngleApparent, this._positions);
 
   @override
   void paint(Canvas canvas, Size canvasSize) {
@@ -74,6 +75,7 @@ class _AnchorPainter extends CustomPainter {
         canvas.translate(size, size);
         canvas.rotate(_bearingTrue! - m.pi);
         canvas.translate(0, ratio);
+        canvas.save();
         canvas.rotate((m.pi/2) - _apparentBearing);
         icon = Icons.backspace_outlined;
         tp.text = TextSpan(text: String.fromCharCode(icon.codePoint),
@@ -83,6 +85,12 @@ class _AnchorPainter extends CustomPainter {
         tp.layout();
         tp.paint(canvas, Offset(-tp.size.width / 2, -tp.size.height / 2));
         canvas.drawLine(Offset.zero, Offset(-size, 0), paint);
+        canvas.restore();
+        if(_windAngleApparent != null) {
+          paint.color = Colors.blue;
+          canvas.rotate((m.pi/2) + _windAngleApparent! - _apparentBearing);
+          canvas.drawLine(Offset.zero, Offset(-size/2, 0), paint);
+        }
         canvas.restore();
       }
 
@@ -168,6 +176,7 @@ The Client ID can be set to reflect the instrument's location, e.g. "boatinstrum
 class _AnchorState extends State<AnchorAlarmBox> {
   late final _AnchorAlarmSettings _settings;
   ll.LatLng? _anchorPosition;
+  double? _windAngleApparent;
   int? _maxRadius;
   int? _currentRadius;
   double? _bearingTrue;
@@ -186,6 +195,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {
       'navigation.position',
+      'environment.wind.angleApparent',
       'navigation.anchor.*'
     });
   }
@@ -203,6 +213,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       _currentRadius = 80;
       _bearingTrue = deg2Rad(45);
       _apparentBearing = deg2Rad(45);
+      _windAngleApparent = deg2Rad(45);
     }
 
     Color dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
@@ -229,6 +240,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
                 _bearingTrue,
                 _apparentBearing??0,
                 _anchorPosition,
+                _windAngleApparent,
                 _positions
               )
             ))
@@ -350,6 +362,15 @@ class _AnchorState extends State<AnchorAlarmBox> {
                   _positions.removeRange(0, _settings.recordPoints ~/ 10);
                 }
               }
+            }
+            break;
+          case 'environment.wind.angleApparent':
+            if(u.value == null) {
+              _windAngleApparent = null;
+            } else {
+              double v = (u.value as num).toDouble();
+              _windAngleApparent = (u.value == null) ? null : averageAngle(_windAngleApparent ?? v, v,
+                smooth: widget.config.controller.valueSmoothing, relative: true);
             }
             break;
           case 'navigation.anchor.position':
