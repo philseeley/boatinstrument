@@ -111,6 +111,10 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
     paintDoubleBox(canvas, _context, 'HDG ${rad2Cardinal(_headingTrue)}', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(size/3, size/3), size/3);
 
+    _paintMarker(canvas, 0, size, fg, 40);
+    _paintMarker(canvas, _nextWaypointBearing, size, Colors.yellow, 30);
+    _paintMarker(canvas, _courseOverGroundTrue, size, Colors.blue, 20);
+
     double step = 22.5;
     int highlight = 45;
     if(_settings.showDegrees) {
@@ -131,10 +135,6 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
     
       canvas.drawArc(const Offset(15.0, 15.0) & Size(size-30.0, size-30.0), deg2Rad(a.toInt()) -_headingTrue-(m.pi/2)-(width/2), width, false, paint);
     }
-
-    _paintMarker(canvas, 0, size, fg, 40);
-    _paintMarker(canvas, _nextWaypointBearing, size, Colors.yellow, 30);
-    _paintMarker(canvas, _courseOverGroundTrue, size, Colors.blue, 20);
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
@@ -245,11 +245,16 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
     Color bg = td.colorScheme.surface;
     double w = canvasSize.width;
     double h = canvasSize.height;
+    double m = w/180;
 
     Paint paint = Paint()
       ..style = PaintingStyle.stroke
       ..color = fg
       ..strokeWidth = 2.0;
+
+    _paintMarker(canvas, 0, w, h, m, fg, 1.0);
+    _paintMarker(canvas, _nextWaypointBearing, w, h, m, Colors.yellow, 0.8);
+    _paintMarker(canvas, _courseOverGroundTrue, w, h, m, Colors.blue, 0.6);
 
     double step = 22.5;
     int highlight = 45;
@@ -258,7 +263,6 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
       highlight = 30;
     }
 
-    double m = w/180;
     for(double a = 0; a < 360; a += step) {
       paint.strokeWidth = 2.0;
       if (a % 90 == 0) {
@@ -269,10 +273,6 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
       double x = (a+90-rad2Deg(_headingTrue))%360*m;
       if(x > 0 && x < w) canvas.drawLine(Offset(x, 0.0), Offset(x, h), paint);
     }
-
-    _paintMarker(canvas, 0, w, h, m, fg, 1.0);
-    _paintMarker(canvas, _nextWaypointBearing, w, h, m, Colors.yellow, 0.8);
-    _paintMarker(canvas, _courseOverGroundTrue, w, h, m, Colors.blue, 0.6);
 
     TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
     try {
