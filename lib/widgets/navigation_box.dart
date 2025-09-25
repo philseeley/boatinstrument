@@ -244,7 +244,7 @@ class NextPointBearingBox extends DoubleValueBox {
   @override
   String get id => sid;
 
-  const NextPointBearingBox(BoxWidgetConfig config, {super.key}) : super(config, 'WPT BRG', 'navigation.*.nextPoint.bearingTrue', minLen: 3, precision: 0, angle: true);
+  const NextPointBearingBox(BoxWidgetConfig config, {super.key}) : super(config, 'WPT BRG', 'navigation.*.nextPoint.bearingTrue', minLen: 3, precision: 0, angle: true, smoothing: false);
 
   @override
   double convert(double value) {
