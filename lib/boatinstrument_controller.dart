@@ -694,6 +694,7 @@ class BoatInstrumentController {
             } else if (e is BonsoirDiscoveryServiceResolvedEvent) {
               host = e.service.host!;
               port = e.service.port;
+              discovery.stop();
               break;
             } else if (e is BonsoirDiscoveryStoppedEvent) {
               // This should only happen if the Timer expires.
@@ -702,7 +703,6 @@ class BoatInstrumentController {
           }
         } finally {
           t.cancel();
-          discovery.stop();
         }
       }
 
