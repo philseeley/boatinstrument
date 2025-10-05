@@ -2,6 +2,7 @@ part of 'boatinstrument_controller.dart';
 
 const String degreesUnits = '\u00B0T'; // degrees symbol.
 const double kelvinOffset = 273.15;
+const String mainHelpURL = 'doc:help.md';
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
@@ -234,17 +235,6 @@ class BoxWidgetConfig {
   BoxWidgetConfig(this.controller, this.settings, this.constraints, this.editMode);
 }
 
-class HelpTextWidget extends StatelessWidget {
-  final String _text;
-
-  const HelpTextWidget(this._text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(children: [ListTile(title: Text(_text))],);
-  }
-}
-
 class HeaderText extends Text {
   const HeaderText(super.text, {super.style, super.textAlign, super.key}) : super(softWrap: false, overflow: TextOverflow.ellipsis);
 }
@@ -280,16 +270,14 @@ abstract class BoxWidget extends StatefulWidget {
     return null;
   }
 
-  // Provide any non-obvious help for the Box or its Settings. This could be a
-  // ListView with Icons, but for a simple text String you can wrap this in a
-  // HelpTextWidget:
+  // Provide a page for Any non-obvious help for the Box or its Settings. The HelpPage Widget
+  // can be used to display text in Markdown format: 
   // e.g.
   //   @override
-  //    Widget? getHelp(BuildContext context) => const HelpTextWidget('My simple help.');
+  //   Widget? getHelp(BuildContext context) => const HelpPage(text: 'My simple help.');
   Widget? getHelp(BuildContext context) => null;
 
-  // If the Settings are not obvious, these should return help Widgets.
-  // This would normally be a simple Text Widget.
+  // If the Settings are not obvious, these should return help page Widgets.
   Widget? getSettingsHelp() => null;
   Widget? getPerBoxSettingsHelp() => null;
 }
@@ -392,7 +380,7 @@ class _HelpBoxState extends State<HelpBox> {
   Future<void> _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-          return _HelpPage();
+          return HelpPage(url: mainHelpURL);
          })
     );
   }

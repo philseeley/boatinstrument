@@ -440,7 +440,7 @@ class PositionBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('For a full list of formats see https://pub.dev/packages/latlong_formatter');
+  Widget? getSettingsHelp() => const HelpPage(text: 'For a full list of formats see https://pub.dev/packages/latlong_formatter');
 }
 
 class _PositionBoxState extends HeadedBoxState<PositionBox> {

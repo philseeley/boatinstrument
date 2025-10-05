@@ -385,7 +385,7 @@ class _EditPageState extends State<_EditPage> {
 
             PopupMenuButton boxWidgetMenu = PopupMenuButton(
               routeSettings: RouteSettings(name: _boxMenuName),
-              icon: const Icon(Icons.list, color: Colors.blue),
+              icon: const Icon(Icons.format_list_bulleted, color: Colors.blue),
               tooltip: 'Box Type',
               shape: Border.all(color: Colors.grey),
               itemBuilder: (BuildContext context) {
@@ -607,7 +607,7 @@ class _EditPageState extends State<_EditPage> {
   Future<void> _showHelpPage (Widget helpWidget) async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _BoxHelpPage(helpWidget);
+      return helpWidget;
     }));
   }
 
@@ -644,29 +644,7 @@ class _BoxSettingsState extends State<_BoxSettingsPage> {
   Future<void> _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _BoxHelpPage(widget._helpWidget!);
+      return widget._helpWidget!;
     }));
-  }
-}
-
-class _BoxHelpPage extends StatefulWidget {
-  final Widget _helpWidget;
-
-  const _BoxHelpPage(this._helpWidget);
-
-  @override
-  createState() => _BoxHelpState();
-}
-
-class _BoxHelpState extends State<_BoxHelpPage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Help'),
-        ),
-        body: widget._helpWidget,
-    );
   }
 }

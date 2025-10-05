@@ -32,6 +32,8 @@ class _DateTimePerBoxSettings {
 }
 
 class DateTimeBox extends BoxWidget {
+  static const _help = 'For a full list of formats see https://pub.dev/documentation/intl/latest/intl/DateFormat-class.html';
+
   late final _DateTimePerBoxSettings _perBoxSettings;
 
   DateTimeBox(super.config, {super.key})  {
@@ -54,7 +56,7 @@ class DateTimeBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
+  Widget? getSettingsHelp() => const HelpPage(text: _help);
 
   @override
   bool get hasPerBoxSettings => true;
@@ -65,7 +67,7 @@ class DateTimeBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: _help);
 }
 
 class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {

@@ -89,7 +89,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.voltage" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.voltage" the ID is "start"');
 
   @override
   DoubleValueSemiGaugeBoxState<BatteryVoltMeterBox> createState() => _BatteryVoltMeterState();
@@ -186,7 +186,7 @@ class BatteryVoltageBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.voltage" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.voltage" the ID is "start"');
 }
 
 class BatteryCurrentBox extends DoubleValueBox {
@@ -222,7 +222,7 @@ class BatteryCurrentBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.current" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.current" the ID is "start"');
 }
 
 class BatteryTemperatureBox extends DoubleValueBox {
@@ -258,7 +258,7 @@ class BatteryTemperatureBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$batteriesBasePath.start.temperature" the ID is "start"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.temperature" the ID is "start"');
 }
 
 class InverterCurrentBox extends DoubleValueBox {
@@ -294,7 +294,7 @@ class InverterCurrentBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$invertersBasePath.1.dc.current" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$invertersBasePath.1.dc.current" the ID is "1"');
 }
 
 class SolarVoltageBox extends DoubleValueBox {
@@ -330,7 +330,7 @@ class SolarVoltageBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$solarBasePath.1.voltage" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$solarBasePath.1.voltage" the ID is "1"');
 }
 
 class SolarCurrentBox extends DoubleValueBox {
@@ -367,7 +367,7 @@ class SolarCurrentBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "$solarBasePath.1.current" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$solarBasePath.1.current" the ID is "1"');
 }
 
 class BatteriesBox extends BoxWidget {
@@ -598,12 +598,12 @@ class ElectricalSwitchesBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpTextWidget('''Note: due to the scrollable list of Switches, swipe down from the title to configure.
+  Widget? getHelp(BuildContext context) => const HelpPage(text: '''Note: due to the scrollable list of Switches, swipe down from the title to configure.
 
 This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.''');
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
 
   @override
@@ -872,7 +872,7 @@ class ElectricalSwitchBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpTextWidget('This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.');
+  Widget? getHelp(BuildContext context) => const HelpPage(text: 'This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.');
 
   @override
   bool get hasPerBoxSettings => true;
@@ -883,11 +883,11 @@ class ElectricalSwitchBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "electrical.switch.1.state" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "electrical.switch.1.state" the ID is "1"');
 
   @override
   State<ElectricalSwitchBox> createState() => _ElectricalSwitchBoxState();

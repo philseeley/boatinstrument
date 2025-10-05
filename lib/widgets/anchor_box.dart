@@ -164,7 +164,7 @@ Once set, the anchor position can be moved by unlocking and dragging the anchor.
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('''To be able to set the Anchor Alarm, the device must be given "admin" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to set the Anchor Alarm, the device must be given "admin" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
 
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-anchor-alarm-helm". Or the ID can be set to the same value for all instruments to share the same authorisation.
 ''');

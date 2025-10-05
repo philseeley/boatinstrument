@@ -31,7 +31,7 @@ class _EditPagesState extends State<EditPagesPage> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: (page.timeout??'').toString(),
                 onChanged: (value) => page.timeout = int.tryParse(value))),
-            IconButton(icon: const Icon(Icons.copy), onPressed: () {_copyPage(p, page);}),
+            IconButton(icon: const Icon(Icons.content_copy), onPressed: () {_copyPage(p, page);}),
             IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);}),
             ReorderableDragStartListener(index: p, child: const Icon(Icons.drag_handle))
           ])
@@ -372,7 +372,7 @@ class _SettingsState extends State<SettingsPage> {
   Future<void> _showHelpPage () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _HelpPage();
+      return HelpPage(url: mainHelpURL);
     })
     );
   }

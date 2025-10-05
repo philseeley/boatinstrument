@@ -387,7 +387,7 @@ abstract class CelestialBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpTextWidget('For a full list of formats see https://api.flutter.dev/flutter/intl/DateFormat-class.html');
+  Widget? getSettingsHelp() => const HelpPage(text: 'For a full list of formats see https://pub.dev/documentation/intl/latest/intl/DateFormat-class.html');
 }
 
 class _CelestialSettingsWidget extends BoxSettingsWidget {
@@ -427,7 +427,7 @@ class SunlightBox extends CelestialBox {
   SunlightBox(super.config, {super.key});
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpTextWidget('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.sunlight.times.*" is enabled.');
+  Widget? getHelp(BuildContext context) => const HelpPage(text: 'Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.sunlight.times.*" is enabled.');
 
   @override
   State<SunlightBox> createState() => _SunlightBox();
@@ -597,7 +597,7 @@ class MoonBox extends CelestialBox {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpTextWidget('Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.moon.*" is enabled.');
+  Widget? getHelp(BuildContext context) => const HelpPage(text: 'Ensure the signalk-derived-data plugin is installed on signalk and the "Sets environment.moon.*" is enabled.');
 
   @override
   bool get hasPerBoxSettings => true;

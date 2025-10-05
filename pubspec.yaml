@@ -56,6 +56,8 @@ dependencies:
   audioplayers:
   latlong2:
   args:
+  markdown_widget:
+  url_launcher: 
   flutter_rfb:
   flutter_material_color_picker:
   color_hex:
@@ -85,6 +87,10 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
+    - assets/doc/
+    - assets/icons/
+    - assets/icons/dark/
+    - assets/icons/light/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

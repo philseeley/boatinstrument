@@ -65,7 +65,7 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.revolutions" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "propulsion.port.revolutions" the ID is "port"');
 
   @override
   DoubleValueCircularGaugeBoxState<EngineRPMBox> createState() => _EngineRPMState();
@@ -123,7 +123,7 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.temperature" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "propulsion.port.temperature" the ID is "port"');
 
   @override
   DoubleValueSemiGaugeBoxState<EngineTempBox> createState() => _EngineTempState();
@@ -182,7 +182,7 @@ class EngineExhaustTempBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.exhaustTemperature" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "propulsion.port.exhaustTemperature" the ID is "port"');
 
   @override
   DoubleValueSemiGaugeBoxState<EngineExhaustTempBox> createState() => _EngineExhaustTempState();
@@ -239,7 +239,7 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.oilPressure" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "propulsion.port.oilPressure" the ID is "port"');
 
   @override
   DoubleValueSemiGaugeBoxState<EngineOilPressureBox> createState() => _EngineOilPressureState();
@@ -292,7 +292,7 @@ class EngineFuelRateBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('For a path of "propulsion.port.fuel.rate" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "propulsion.port.fuel.rate" the ID is "port"');
 }
 
 class _EngineSettingsWidget extends BoxSettingsWidget {

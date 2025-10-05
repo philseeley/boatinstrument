@@ -41,7 +41,7 @@ abstract class TankBox extends DoubleValueBarGaugeBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => HelpTextWidget('For a path of "tanks.$_type.port.currentLevel" the ID is "port"');
+  Widget? getPerBoxSettingsHelp() => HelpPage(text: 'For a path of "tanks.$_type.port.currentLevel" the ID is "port"');
 
   @override
   DoubleValueBarGaugeBoxState<TankBox> createState() => _TankState();

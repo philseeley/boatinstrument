@@ -196,7 +196,7 @@ class RudderAngleBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpTextWidget('Auto Scaling will temporarily extend the Max Angle if it is exceeded. If Auto Scaling is disabled and Max Angle is exceeded, a line will indicate further rudder movement');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'Auto Scaling will temporarily extend the Max Angle if it is exceeded. If Auto Scaling is disabled and Max Angle is exceeded, a line will indicate further rudder movement');
 
   @override
   double convert(double value) {
