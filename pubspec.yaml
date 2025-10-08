@@ -62,6 +62,7 @@ dependencies:
   flutter_material_color_picker:
   color_hex:
   flutter_fullscreen:
+  text_scroll:
   actions_menu_appbar:
     path: ../actions_menu_appbar
 

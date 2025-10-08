@@ -245,8 +245,31 @@ class BoxWidgetConfig {
   BoxWidgetConfig(this.controller, this.settings, this.constraints, this.editMode);
 }
 
-class HeaderText extends Text {
-  const HeaderText(super.text, {super.style, super.textAlign, super.key}) : super(softWrap: false, overflow: TextOverflow.ellipsis);
+class HeaderText extends StatelessWidget {
+  final String _text;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+  final bool scrolling;
+
+  const HeaderText(this._text, {this.style, this.textAlign, this.scrolling = false, super.key});//}, {super.style, super.textAlign, super.key}) {
+
+
+  @override
+  Widget build(BuildContext context) {
+    if(scrolling) {
+      return TextScroll(
+        _text,
+        style: style,
+        textAlign: textAlign,
+        mode: TextScrollMode.bouncing,
+        pauseOnBounce: const Duration(seconds: 2),
+        pauseBetween: const Duration(seconds: 2),
+        velocity: const Velocity(pixelsPerSecond: Offset(10, 0))
+      );
+    }
+
+    return Text(_text, style: style, textAlign: textAlign, softWrap: false, overflow: TextOverflow.ellipsis);
+  }
 }
 
 abstract class BoxWidget extends StatefulWidget {
@@ -295,11 +318,14 @@ abstract class BoxWidget extends StatefulWidget {
 class HeadedBoxState<T extends BoxWidget> extends State<T> {
   static const double pad = 5.0;
 
+  bool scrolling;
   String header = '';
   String text = '';
   Alignment alignment = Alignment.center;
   Color? color;
   Color? textBgColor;
+
+  HeadedBoxState({this.scrolling = false});
 
   @override
   Widget build(BuildContext context) {
@@ -311,8 +337,8 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
       widget.config.constraints.maxWidth - (2 * pad));
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child:
-        HeaderText(header, style: style),
+      Padding(padding: const EdgeInsets.only(top: pad, left: pad, right: pad), child:
+        HeaderText(header, style: style, scrolling: scrolling),
       ),
       // We need to disable the device text scaling as this interferes with our text scaling.
       Expanded(child: Align(alignment: alignment, child: Padding(padding: const EdgeInsets.all(pad),
