@@ -187,7 +187,7 @@ class RaspberryPiBox extends BoxWidget {
   Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
 }
 
-class _RaspberryPiBoxState extends State<RaspberryPiBox> with DoubleValeBoxPainter {
+class _RaspberryPiBoxState extends State<RaspberryPiBox> {
   double? _cpuTemperature;
   double? _gpuTemperature;
   double? _cpuUtilisation;
