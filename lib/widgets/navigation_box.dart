@@ -278,6 +278,8 @@ abstract class TimeToGoBox extends BoxWidget {
 class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
   int? _timeToGo;
 
+  TimeToGoBoxState() : super(scrolling: true);
+  
   @override
   void initState() {
     super.initState();
