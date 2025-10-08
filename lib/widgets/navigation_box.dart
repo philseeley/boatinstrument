@@ -295,16 +295,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
 
     if(_timeToGo != null) {
       Duration ttg = Duration(seconds: _timeToGo!);
-      List<String> parts = ttg.toString().split(RegExp('[.:]'));
-      int hours = int.parse(parts[0]);
-      int days = hours~/24;
-      if(days > 0) {
-        text = '${days}d${hours%24}h';
-      } else if(hours > 0) {
-        text = '${hours}h${parts[1]}m';
-      } else {
-        text = '${parts[1]}m${parts[2]}s';
-      }
+      text = duration2String(ttg);
 
       DateTime now = widget.config.controller.now().toLocal();
       DateTime eta = now.add(ttg);

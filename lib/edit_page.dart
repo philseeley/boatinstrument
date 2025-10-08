@@ -113,6 +113,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(SolarPowerGraph.sid, graph: true, background: (ctrl) {SolarPowerGraphBackground(controller: ctrl);}, (config) {return SolarPowerGraph(config, key: UniqueKey());}),
   BoxDetails(CompassRoseBox.sid, gauge: true, (config) {return CompassRoseBox(config, key: UniqueKey());}),
   BoxDetails(CompassGaugeBox.sid, gauge: true, (config) {return CompassGaugeBox(config, key: UniqueKey());}),
+  BoxDetails(StarlinkBox.sid, (config) {return StarlinkBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -292,6 +293,9 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(EngineOilPressureBox.sid, 'Oil Pressure'),
         _widgetMenuEntry(EngineExhaustTempBox.sid, 'Exhaust Temp'),
         _widgetMenuEntry(EngineFuelRateBox.sid, 'Fuel Rate'),
+      ]),
+      _widgetSubMenuEntry(box, 'Network', [
+        _widgetMenuEntry(StarlinkBox.sid, 'Starlink'),
       ]),
       _widgetSubMenuEntry(box, 'Raspberry Pi', [
         _widgetMenuEntry(RPiCPUTemperatureBox.sid, 'CPU Temp'),

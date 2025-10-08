@@ -23,7 +23,17 @@ String rad2Cardinal(double? direction) {
 
   return  (direction == null) ? '-' : cardinalDirections[((direction+(f/2))/f).toInt()];
 }
-
+String duration2String (Duration d) {
+  List<String> parts = d.toString().split(RegExp('[.:]'));
+  int hours = int.parse(parts[0]);
+  int days = hours~/24;
+  if(days > 0) {
+    return '${days}d${hours%24}h';
+  } else if(hours > 0) {
+    return '${hours}h${parts[1]}m';
+  }
+  return '${parts[1]}m${parts[2]}s';
+}
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
   vm.Vector2 v1 = vm.Vector2(m.sin(current) * smooth, m.cos(current) * smooth);
