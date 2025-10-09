@@ -598,12 +598,12 @@ class ElectricalSwitchesBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: '''Note: due to the scrollable list of Switches, swipe down from the title to configure.
+  Widget? getHelp(BuildContext context) => const HelpPage(text: '''**Note:** due to the scrollable list of Switches, swipe down from the title to configure.
 
-This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.''');
+This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.''');
 
   @override
-  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
+  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an **Auth Token** and without closing the settings page authorise the device in the signalk web interface. When the **Auth Token** is shown, the settings page can be closed.
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
 
   @override
@@ -872,7 +872,7 @@ class ElectricalSwitchBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: 'This Box requires digital switching plugins that allow PUT requests, e.g. signalk-empirbusnxt-plugin.');
+  Widget? getHelp(BuildContext context) => const HelpPage(text: 'This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.');
 
   @override
   bool get hasPerBoxSettings => true;
@@ -883,8 +883,8 @@ class ElectricalSwitchBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an Auth Token and without closing the settings page authorise the device in the signalk web interface. When the Auth Token is shown, the settings page can be closed.
-The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
+  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an **Auth Token** and without closing the settings page authorise the device in the signalk web interface. When the **Auth Token** is shown, the settings page can be closed.
+The **Client ID** can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the **ID** can be set to the same value for all instruments to share the same authorisation.''');
 
   @override
   Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "electrical.switch.1.state" the ID is "1"');

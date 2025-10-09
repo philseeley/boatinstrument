@@ -516,7 +516,7 @@ class CustomTextBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''Add SignalK Path data by selecting the Path and pressing "+" to append to the template.
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''Add SignalK **Path** data by selecting the Path and pressing ![Image](assets/icons/__THEME__/add.png) to append to the template.
 
 Note: as this Box is intended to display static data like vessel Name or MMSI, the data items are only retrieved once from SignalK.''');
 

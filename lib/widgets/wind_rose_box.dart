@@ -314,9 +314,9 @@ class WindRoseBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''In "Auto" mode the Rose will switch between the "Normal" and "Close Haul" displays if the needle transitions over 60 degrees for more than the "Auto Switch Delay".
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''In **Auto** mode the Rose will switch between the "Normal" and "Close Haul" displays if the needle transitions over 60 degrees for more than the **Auto Switch Delay**.
   
-The Switch Button allows you to cycle through the Wind Rose types from the display. If the button is "Unlocked" the display is in "Auto" mode.''');
+The **Switch Button** allows you to cycle through the Wind Rose types from the display. If the button is "Unlocked" the display is in "Auto" mode.''');
 }
 
 class _WindRoseBoxState extends State<WindRoseBox> {

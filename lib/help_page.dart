@@ -35,9 +35,7 @@ class HelpPageState extends State<HelpPage> {
     Uri uri = Uri.parse(urlString);
     if(uri.scheme == 'doc') {
       _text = await rootBundle.loadString('assets/doc/${uri.path}');
-      if(mounted) {
-        _text = _text!.replaceAll('__THEME__', Theme.of(context).brightness.name);
-      }
+
       if(add) {
         _history.add(urlString);
       }
@@ -62,6 +60,8 @@ class HelpPageState extends State<HelpPage> {
       loadData(widget.url!, true);
       return Container();
     }
+
+    _text = _text!.replaceAll('__THEME__', Theme.of(context).brightness.name);
 
     return Scaffold(
       appBar: AppBar(

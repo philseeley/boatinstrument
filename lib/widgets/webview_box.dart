@@ -36,7 +36,7 @@ class WebViewBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''Enter the full URL of the Web Page to display.''');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''Enter the full **URL** of the Web Page to display.''');
 }
 
 class _WebViewBoxState extends State<WebViewBox> {

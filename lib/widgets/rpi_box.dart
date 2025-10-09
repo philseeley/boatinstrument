@@ -5,7 +5,7 @@ import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:flutter/material.dart';
 
-const String _help = 'Ensure the signalk-raspberry-pi-monitoring plugin is installed on signalk.';
+const String _help = 'Ensure the **signalk-raspberry-pi-monitoring** plugin is installed on signalk.';
 
 class RPiCPUTemperatureBox extends DoubleValueBox {
   static const String sid = 'rpi-cpu-temperature';
