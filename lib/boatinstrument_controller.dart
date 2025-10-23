@@ -5,6 +5,8 @@ import 'dart:math' as m;
 
 import 'package:actions_menu_appbar/actions_menu_appbar.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:boatinstrument/authorization.dart';
+import 'package:boatinstrument/main.dart';
 import 'package:boatinstrument/theme_provider.dart';
 import 'package:boatinstrument/widgets/anchor_box.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
@@ -16,6 +18,7 @@ import 'package:boatinstrument/widgets/environment_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/network.dart';
 import 'package:boatinstrument/widgets/propulsion_box.dart';
+import 'package:boatinstrument/widgets/remote_box.dart';
 import 'package:boatinstrument/widgets/rpi_box.dart';
 import 'package:boatinstrument/widgets/tank_box.dart';
 import 'package:boatinstrument/widgets/vnc_box.dart';
@@ -28,6 +31,7 @@ import 'package:format/format.dart' as fmt;
 import 'package:flutter/services.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:markdown_widget/markdown_widget.dart';
+import 'package:nanoid/nanoid.dart';
 import 'package:text_scroll/text_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
@@ -116,14 +120,18 @@ class BoatInstrumentController {
   final bool _noBrightnessControls;
   final bool _enableExit;
   final bool _enableSetTime;
+  final MainPageState _mainPageState;
   bool _timeSet = false;
   _Settings? _settings;
+  int _pageNum = 0;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
   int _boxesOnPage = 0;
   final List<_BoxData> _boxData = [];
-  WebSocketChannel? _channel;
-  StreamSubscription? _streamSubscription;
+  WebSocketChannel? _dataChannel;
+  WebSocketChannel? _controlChannel;
+  StreamSubscription? _dataStreamSubscription;
+  StreamSubscription? _controlStreamSubscription;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
   DateTime? _time;
@@ -131,10 +139,11 @@ class BoatInstrumentController {
   final Map<String, NotificationStatus> _notifications = {};
   final Set<String> _backgroundIDs = {};
   final Set<String> _paths = {};
+  final Set<String> _controlPaths = {};
   final Set<String> _staticPaths = {};
 
 
-  BoatInstrumentController(this._noAudio, this._noBrightnessControls, this._enableExit, this._enableSetTime) {
+  BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
   }
 
@@ -160,10 +169,10 @@ class BoatInstrumentController {
   OilPressureUnits get oilPressureUnits => _settings!.oilPressureUnits;
   CapacityUnits get capacityUnits => _settings!.capacityUnits;
   FluidRateUnits get fluidRateUnits => _settings!.fluidRateUnits;
-  int get numOfPages => _settings!.pages.length;
   Map<String, NotificationStatus> get notifications => _notifications;
   bool get muted => _notifications.entries.any((element) => element.value.mute);
   Set<String> get paths => _paths;
+  Set<String> get controlPaths => _controlPaths;
   Set<String> get staticPaths => _staticPaths;
 
   DateTime now() {
@@ -368,7 +377,7 @@ class BoatInstrumentController {
     }
   }
 
-  void clear() {
+  void _clear() {
     _unsubscribe();
     _boxesOnPage = 0;
     _boxData.clear();
@@ -380,8 +389,8 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, SignalKDataType dataType = SignalKDataType.realTime, bool isBox = true}) {
-
+  void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, SignalKDataType dataType = SignalKDataType.realTime, bool isBox = true, bool onControlChannel = false}) {
+  
     // ============= PATH MAPPING =============
     // String pathsString = '';
     // for(String p in paths??{}) pathsString='${pathsString.isNotEmpty?'$pathsString<br>':''}$p';
@@ -392,7 +401,7 @@ class BoatInstrumentController {
       ++_boxesOnPage;
     }
 
-    _BoxData bd = _BoxData(onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataType);
+    _BoxData bd = _BoxData(onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataType, onControlChannel);
     _boxData.add(bd);
 
     for(String path in bd.paths) {
@@ -410,7 +419,7 @@ class BoatInstrumentController {
     }
 
     if(isBox) {
-      _subscribe();
+      _subscribe(false);
     }
   }
 
@@ -524,13 +533,15 @@ class BoatInstrumentController {
     });
   }
 
-  Widget buildPage(int pageNum) {
-    _Page page = _settings!.pages[pageNum];
+  Widget buildPage() {
+    _Page page = _settings!.pages[_pageNum];
 
     return LayoutBuilder(builder: (context, constraints) {
-      clear();
+      _clear();
 
       configure(onUpdate: (List<Update> updates) {_onNotification(context, updates);}, paths: {'notifications.*'}, isBox: false);
+
+      _addRemoteControlSubscriptions();
 
       for(var id in _backgroundIDs) {
         getBoxDetails(id).background!.call(this);
@@ -561,6 +572,16 @@ class BoatInstrumentController {
 
   void unmute() {
     _notifications.clear();
+  }
+
+  void _addRemoteControlSubscriptions() {
+    if(_settings!.allowRemoteControl) {
+      Set<String> actionPaths = {};
+      if(_settings!.clientID.isNotEmpty) actionPaths.add('$bi.devices.${_settings!.clientID}.action');
+      if(_settings!.groupID.isNotEmpty) actionPaths.add('$bi.groups.${_settings!.groupID}.action');
+
+      if(actionPaths.isNotEmpty) configure(onUpdate: _onRemoteControl, paths: actionPaths, isBox: false, onControlChannel: true);
+    }
   }
 
   void _onNotification(BuildContext context, List<Update> updates) {
@@ -609,51 +630,110 @@ class BoatInstrumentController {
     }
   }
 
-  int nextPageNum(int currentPage) {
-    if(_settings!.pages.isEmpty) {
-      _settings?.pages = [_Page._newPage()];
-      return 0;
+  void _onRemoteControl(List<Update> updates) {
+    for (Update u in updates) {
+      try {
+        if(u.value == null) return;
+
+        switch(u.value['id']) {
+          case 'gotoPage':
+            gotoPage(u.value['page']);
+            break;
+          case 'firstPage':
+            firstPage();
+            break;
+          case 'decPage':
+            prevPage();
+            break;
+          case 'incPage':
+            nextPage();
+            break;
+          case 'lastPage':
+            lastPage();
+            break;
+        }
+      } catch (e) {
+        l.e("Error converting $u", error: e);
+      }
     }
-    ++currentPage;
-    if(_settings!.wrapPages) {
-      return currentPage %= _settings!.pages.length;
-    }
-    return (currentPage >= _settings!.pages.length) ? _settings!.pages.length-1 : currentPage;
   }
 
-  int prevPageNum(int currentPage) {
-    --currentPage;
-    if(_settings!.wrapPages) {
-      return currentPage %= _settings!.pages.length;
-    }
-    return (currentPage < 0) ? 0 : currentPage;
+  void firstPage() {
+    int lastPage = _pageNum;
+    _pageNum = 0;    
+    if (lastPage != _pageNum) _mainPageState.rebuild();
   }
 
-  (int, int?) rotatePageNum(int currentPage) {
+  void nextPage() {
+    int lastPage = _pageNum;
     if(_settings!.pages.isEmpty) {
       _settings?.pages = [_Page._newPage()];
-      return (0, null);
+      _mainPageState.rebuild();
+      return;
+    }
+    ++_pageNum;
+    if(_settings!.wrapPages) {
+      _pageNum %= _settings!.pages.length;
+    }
+    _pageNum = (_pageNum >= _settings!.pages.length) ? _settings!.pages.length-1 : _pageNum;
+    
+    if (lastPage != _pageNum) _mainPageState.rebuild();
+  }
+
+  void prevPage() {
+    int lastPage = _pageNum;
+    --_pageNum;
+    if(_settings!.wrapPages) {
+      _pageNum %= _settings!.pages.length;
+    }
+    _pageNum = (_pageNum < 0) ? 0 : _pageNum;
+
+    if (lastPage != _pageNum) _mainPageState.rebuild();
+  }
+
+  void lastPage() {
+    int lastPage = _pageNum;
+    _pageNum = _settings!.pages.length-1;    
+    if (lastPage != _pageNum) _mainPageState.rebuild();
+  }
+
+  void gotoPage(String pageName) {
+    int pageNum = _settings!.pages.indexWhere((page) {return page.name == pageName;});
+    if(pageNum != -1 && pageNum != _pageNum) {
+      _pageNum = pageNum;
+      _mainPageState.rebuild();
+    }
+  }
+
+  int? rotatePageNum() {
+    if(_settings!.pages.isEmpty) {
+      _settings?.pages = [_Page._newPage()];
+      return null;
     }
     int i = 0;
     do {
-      ++currentPage;
-      currentPage %= _settings!.pages.length;
-      int? timeout = _settings!.pages[currentPage].timeout;
+      ++_pageNum;
+      _pageNum %= _settings!.pages.length;
+      int? timeout = _settings!.pages[_pageNum].timeout;
       if(timeout != null) {
-        return (currentPage, timeout);
+        return timeout;
       }
     } while (++i < _settings!.pages.length);
     // There are no pages with timeouts.
-    return (0, null);
+    return null;
   }
 
-  String pageName(int pageNum) {
-    return '${pageNum+1}/${_settings!.pages.length} ${_settings!.pages[pageNum].name}';
+  String pageName() {
+    return '${_pageNum+1}/${_settings!.pages.length} ${_settings!.pages[_pageNum].name}';
   }
 
   Map<String, String> _httpHeaders(Map<String, String>? headers) {
     Map<String, String> h = headers??{};
 
+    if(_settings!.authToken.isNotEmpty) {
+      h['Authorization'] = 'Bearer ${_settings!.authToken}';
+    }
+    
     for (var header in _settings!.httpHeaders) {
       h[header.name] = header.value;
     }
@@ -738,20 +818,24 @@ class BoatInstrumentController {
         }
       }
 
-      await _streamSubscription?.cancel();
-      await _channel?.sink.close();
-      _channel = null;
+      await _dataStreamSubscription?.cancel();
+      await _controlStreamSubscription?.cancel();
+      await _dataChannel?.sink.close();
+      await _controlChannel?.sink.close();
+      _dataChannel = _controlChannel = null;
 
       _networkTimeout();
       await _discoverServices();
 
       l.i("Connecting to: $wsUri");
 
-      _channel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
+      _dataChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
+      _controlChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
 
-      await _channel?.ready;
+      await _dataChannel?.ready;
+      await _controlChannel?.ready;
 
-      _streamSubscription = _channel?.stream.listen(
+      _dataStreamSubscription = _dataChannel?.stream.listen(
           _processData,
           onError: (e) {
             l.e('WebSocket stream error', error: e);
@@ -761,7 +845,21 @@ class BoatInstrumentController {
           }
       );
 
-      _subscribe();
+      _controlStreamSubscription = _controlChannel?.stream.listen(
+          _processData,
+          onError: (e) {
+            l.e('WebSocket stream error', error: e);
+          },
+          onDone: () {
+            l.w('WebSocket closed');
+          }
+      );
+
+      _publishDeviceDetails();
+
+      _addRemoteControlSubscriptions();
+      
+      _subscribe(true);
 
       l.i("Connected to: $wsUri");
     } catch (e) {
@@ -770,7 +868,7 @@ class BoatInstrumentController {
   }
 
   void _unsubscribe() {
-    _channel?.sink.add(
+    _dataChannel?.sink.add(
       jsonEncode(
           {
             "context": "*",
@@ -782,17 +880,22 @@ class BoatInstrumentController {
     );
   }
 
-  void _subscribe() {
-    if(_boxData.length == _boxesOnPage) {
-      _paths.clear();
-      _paths.add('navigation.datetime'); // Keep alive test.
-      _staticPaths.clear();
-
-      // Find all the unique paths.
-      for (_BoxData bd in _boxData) {
+  void _subscribe(bool connecting) {
+    // Find all the unique paths.
+    _paths.clear();
+    _controlPaths.clear();
+    _staticPaths.clear();
+    for (_BoxData bd in _boxData) {
+      if(bd.onControlChannel) {
+        _controlPaths.addAll(bd.paths);
+      } else {
         _paths.addAll(bd.paths);
-        _staticPaths.addAll(bd.staticPaths);
       }
+      _staticPaths.addAll(bd.staticPaths);
+    }
+
+    if(_boxData.length == _boxesOnPage) {
+      _paths.add('navigation.datetime'); // Keep alive test.
 
       _getStaticData(_staticPaths);
 
@@ -808,7 +911,7 @@ class BoatInstrumentController {
         });
       }
 
-      _channel?.sink.add(
+      _dataChannel?.sink.add(
         jsonEncode(
           {
             "context": "vessels.self",
@@ -817,6 +920,86 @@ class BoatInstrumentController {
         ),
       );
     }
+
+    if(connecting) {
+      List<Map<String, String>> subscribe = [];
+
+      for(String path in _controlPaths) {
+        subscribe.add({
+          "path": path,
+          "policy": 'instant',
+          "minPeriod": _settings!.signalkMinPeriod.toString()
+        });
+      }
+
+      _controlChannel?.sink.add(
+        jsonEncode(
+          {
+            "context": "vessels.self",
+            "subscribe": subscribe
+          },
+        ),
+      );
+    }
+  }
+
+  void _publishDeviceDetails() {
+    if(_settings!.allowRemoteControl) {
+      List<String> pageNames = [];
+      for(_Page page in _settings!.pages) {
+        pageNames.add(page.name);
+      }
+
+      if(_settings!.clientID.isNotEmpty) {
+        // If we don't have permission, then this is ignored.
+        _dataChannel?.sink.add(jsonEncode(
+            {
+              "updates": [{
+                "values": [
+                  {
+                    "path": "$bi.devices.${_settings!.clientID}.pages",
+                    "value": pageNames
+                  },
+                  {
+                    "path": "$bi.devices.${_settings!.clientID}.group",
+                    "value": _settings!.groupID
+                  }
+                ]
+              }]
+            }
+        ));
+      }
+
+      if(_settings!.groupID.isNotEmpty) {
+        _dataChannel?.sink.add(jsonEncode(
+            {
+              "updates": [{
+                "values": [
+                  {
+                    "path": "$bi.groups.${_settings!.groupID}.pages",
+                    "value": pageNames
+                  }
+                ]
+              }]
+            }
+        ));
+      }
+    }
+  }
+
+  void sendUpdate(String path, Map<String, dynamic>? value) {
+    _dataChannel?.sink.add(jsonEncode(
+        {
+          "updates": [{
+            "values": [
+              {
+                "path": path,
+                "value": value
+              }
+            ]
+          }]
+        }
+    ));
   }
 
   void _networkTimeout () {

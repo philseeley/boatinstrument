@@ -95,6 +95,10 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
           (json['realTimeDataTimeout'] as num?)?.toInt() ?? 10000,
       infrequentDataTimeout:
           (json['infrequentDataTimeout'] as num?)?.toInt() ?? 90000,
+      clientID: json['clientID'] as String?,
+      groupID: json['groupID'] as String? ?? '',
+      allowRemoteControl: json['allowRemoteControl'] as bool? ?? false,
+      authToken: json['authToken'] as String? ?? '',
       notificationMuteTimeout:
           (json['notificationMuteTimeout'] as num?)?.toInt() ?? 15,
       demoMode: json['demoMode'] as bool? ?? false,
@@ -142,7 +146,8 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
               ?.map((e) => _Page.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-    )..boxSettings = json['boxSettings'] as Map<String, dynamic>;
+      boxSettings: json['boxSettings'] as Map<String, dynamic>?,
+    );
 
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'version': instance.version,
@@ -154,6 +159,10 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'signalkConnectionTimeout': instance.signalkConnectionTimeout,
       'realTimeDataTimeout': instance.realTimeDataTimeout,
       'infrequentDataTimeout': instance.infrequentDataTimeout,
+      'clientID': instance.clientID,
+      'groupID': instance.groupID,
+      'allowRemoteControl': instance.allowRemoteControl,
+      'authToken': instance.authToken,
       'notificationMuteTimeout': instance.notificationMuteTimeout,
       'demoMode': instance.demoMode,
       'darkMode': instance.darkMode,

@@ -823,7 +823,7 @@ class _ElectricalSwitchesSettingsState extends State<_ElectricalSwitchesSettings
           title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
       ),
       ListTile(
-          leading: const Text("Auth token:"),
+          leading: const Text("Auth Token:"),
           title: Text(s.authToken)
       ),
     ];

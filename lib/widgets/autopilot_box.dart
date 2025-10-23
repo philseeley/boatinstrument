@@ -370,7 +370,7 @@ class _AutopilotControlSettingsState extends State<_AutopilotControlSettingsWidg
           title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
       ),
       ListTile(
-          leading: const Text("Auth token:"),
+          leading: const Text("Auth Token:"),
           title: Text(s.authToken)
       ),
     ];

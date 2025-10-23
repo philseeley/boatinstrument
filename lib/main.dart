@@ -110,10 +110,10 @@ class MainPage extends StatefulWidget {
     {super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<MainPage> createState() => MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class MainPageState extends State<MainPage> {
   static const Image _icon = Image(image: AssetImage('assets/icon.png'));
 
   late final ThemeProvider _themeProvider;
@@ -135,7 +135,6 @@ class _MainPageState extends State<MainPage> {
   bool fullScreen = (Platform.isIOS || Platform.isAndroid) ? true : false;
 
   late final BoatInstrumentController _controller;
-  int _pageNum = 0;
   int? _pageTimeout = 0;
 
   @override
@@ -143,7 +142,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
 
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    _controller = BoatInstrumentController(widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enableSetTime);
+    _controller = BoatInstrumentController(this, widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enableSetTime);
   }
 
   Future<void> _configure () async {
@@ -166,6 +165,10 @@ class _MainPageState extends State<MainPage> {
       _togglePageTimer();
     }
 
+    rebuild();
+  }
+
+  void rebuild() {
     setState(() {});
   }
 
@@ -186,7 +189,7 @@ class _MainPageState extends State<MainPage> {
         actionsPercent: 0.5,
         context: context,
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
-        title: Text(_controller.pageName(_pageNum)),
+        title: Text(_controller.pageName()),
         actions: [
           if(!widget.noFullScreen) IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
           if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
@@ -218,7 +221,7 @@ class _MainPageState extends State<MainPage> {
             _displayAppBar(diff.dy);
           }
         },
-        child: _controller.buildPage(_pageNum),
+        child: _controller.buildPage(),
       )),
     );
   }
@@ -283,11 +286,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _rotatePage() {
-    int pageNum;
     int? timeout;
     setState(() {
-      (pageNum, timeout) = _controller.rotatePageNum(_pageNum);
-      _pageNum = pageNum;
+      timeout = _controller.rotatePageNum();
       _pageTimeout = timeout;
     });
 
@@ -319,9 +320,6 @@ class _MainPageState extends State<MainPage> {
 
     setState(() {
       _showAppBar = false;
-      if(_pageNum >= _controller.numOfPages) {
-        _pageNum = _controller.numOfPages-1;
-      }
     });
 
     _startPageTimer();
@@ -330,16 +328,10 @@ class _MainPageState extends State<MainPage> {
   void _movePage (double direction) {
     _startPageTimer();
 
-    int newPage = 0;
     if (direction > 0.0) {
-      newPage = _controller.prevPageNum(_pageNum);
+      _controller.prevPage();
     } else {
-      newPage = _controller.nextPageNum(_pageNum);
-    }
-    if(newPage != _pageNum) {
-      setState(() {
-        _pageNum = newPage;
-      });
+      _controller.nextPage();
     }
   }
 

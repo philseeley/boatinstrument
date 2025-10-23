@@ -315,6 +315,38 @@ class _SettingsState extends State<SettingsPage> {
               onChanged: (value) => settings.infrequentDataTimeout = int.parse(value)),
           trailing: const Text('ms')
       ),
+      _Divider('Authentication'), //=====================================================
+      ListTile(
+          leading: const Text("Client ID:"),
+          title: TextFormField(
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9a-zA-Z]'))],
+            initialValue: settings.clientID,
+            onChanged: (value) => settings.clientID = value)
+      ),
+      ListTile(
+          leading: const Text("Group ID:"),
+          title: TextFormField(
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9a-zA-Z]'))],
+            initialValue: settings.groupID,
+            onChanged: (value) => settings.groupID = value)
+      ),
+      SwitchListTile(title: const Text("Allow Remote Control:"),
+          value: settings.allowRemoteControl,
+          onChanged: (bool value) {
+            setState(() {
+              settings.allowRemoteControl = value;
+            });
+          }),
+      ListTile(
+          leading: const Text("Request Auth Token:"),
+          title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login)),
+          trailing: IconButton(onPressed: _showAuthHelpPage, icon: const Icon(Icons.help)),
+      ),
+      ListTile(
+          leading: const Text("Auth Token:"),
+          title: Text(settings.authToken),
+          trailing: IconButton(onPressed: _deleteAuthToken, icon: const Icon(Icons.delete))
+      ),
       _Divider('Advanced'), //=====================================================
       ListTile(
         leading: const Text("Notification Mute Timeout:"),
@@ -377,6 +409,14 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
+  Future<void> _showAuthHelpPage () async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return HelpPage(url: 'doc:authentication.md');
+    })
+    );
+  }
+
   void _share () async {
     await SharePlus.instance.share(ShareParams(files: [XFile(widget._controller._settings!.fileName)], subject: 'Boat Instrument Settings'));
   }
@@ -408,6 +448,32 @@ class _SettingsState extends State<SettingsPage> {
       return _EditHttpHeaders(widget._controller._settings!.httpHeaders);
     }));
   }
+
+  void _requestAuthToken() async {
+    SignalKAuthorization(widget._controller).request(widget._controller._settings!.clientID, "Boat Instrument",
+            (authToken) {
+          setState(() {
+            widget._controller._settings!.authToken = authToken;
+          });
+        },
+            (msg) {
+          if (mounted) {
+            setState(() {
+              widget._controller._settings!.authToken = msg;
+            });
+          }
+        });
+
+    setState(() {
+      widget._controller._settings!.authToken = 'PENDING - keep this page open until request approved';
+    });
+  }
+
+  void _deleteAuthToken()  {
+    setState(() {
+      widget._controller._settings!.authToken = '';
+    });
+  }
 }
 
 class _PathSubscriptionsPage extends StatelessWidget {
@@ -419,7 +485,15 @@ class _PathSubscriptionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<ListTile> list = [];
 
+    list.add(const ListTile(title: Text('Data Subscriptions', textAlign: TextAlign.center)));
+
     for(var path in _controller.paths) {
+      list.add(ListTile(dense: true, leading: Text(path)));
+    }
+
+    list.add(const ListTile(title: Text('Control Subscriptions', textAlign: TextAlign.center)));
+
+    for(var path in _controller.controlPaths) {
       list.add(ListTile(dense: true, leading: Text(path)));
     }
 

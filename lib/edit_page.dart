@@ -114,6 +114,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(CompassRoseBox.sid, gauge: true, (config) {return CompassRoseBox(config, key: UniqueKey());}),
   BoxDetails(CompassGaugeBox.sid, gauge: true, (config) {return CompassGaugeBox(config, key: UniqueKey());}),
   BoxDetails(StarlinkBox.sid, (config) {return StarlinkBox(config, key: UniqueKey());}),
+  BoxDetails(RemoteControlBox.sid, (config) {return RemoteControlBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -307,6 +308,7 @@ class _EditPageState extends State<_EditPage> {
       ]),
       _widgetMenuEntry(DateTimeBox.sid, 'Date/Time'),
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
+      _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
       _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
       _widgetSubMenuEntry(box, 'Custom', [

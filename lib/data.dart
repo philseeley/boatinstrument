@@ -1,5 +1,6 @@
 part of 'boatinstrument_controller.dart';
 
+const String bi = 'boatinstrument';
 const String degreesUnits = '\u00B0T'; // degrees symbol.
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
@@ -476,13 +477,14 @@ class _BoxData {
   final OnUpdate? onStaticUpdate;
   final Set<String> staticPaths;
   final SignalKDataType dataType;
+  final bool onControlChannel;
   List<RegExp> regExpPaths = [];
   List<RegExp> regExpStaticPaths = [];
   List<Update> updates = [];
   final Map<String, DateTime> pathTimestamps = {};
   List<Update> staticUpdates = [];
 
-  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType);
+  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType, this.onControlChannel);
 }
 
 class _Resizable {
@@ -749,6 +751,10 @@ class _Settings {
   int signalkConnectionTimeout;
   int realTimeDataTimeout;
   int infrequentDataTimeout;
+  String clientID;
+  String groupID;
+  bool allowRemoteControl;
+  String authToken;
   int notificationMuteTimeout; //Minutes
   bool demoMode;
   bool darkMode;
@@ -787,6 +793,10 @@ class _Settings {
     this.signalkConnectionTimeout = 20000,
     this.realTimeDataTimeout = 10000,
     this.infrequentDataTimeout = 90000,
+    String? clientID,
+    this.groupID = '',
+    this.allowRemoteControl = false,
+    this.authToken = '',
     this.notificationMuteTimeout = 15,
     this.demoMode = false,
     this.darkMode = true,
@@ -809,8 +819,11 @@ class _Settings {
     this.fluidRateUnits = FluidRateUnits.litersPerHour,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
-    widgetSettings
-  }) : boxSettings = widgetSettings??{} {
+    Map<String, dynamic>? boxSettings
+  }) :
+    boxSettings = boxSettings??{},
+    clientID = clientID??'boatinstrument-${customAlphabet('0123456789', 4)}'
+  {
     if(pages.isEmpty) {
       pages = [_Page._newPage()];
     }
