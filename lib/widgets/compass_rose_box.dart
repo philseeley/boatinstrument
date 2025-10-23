@@ -25,7 +25,7 @@ abstract class CompassBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => HelpPage(text: 'The **Blue** marker shows your "Course Over Ground" and the **Yellow marker** the "Bearing to Next Waypoint".');
+  Widget? getHelp() => HelpPage(text: 'The **Blue** marker shows your "Course Over Ground" and the **Yellow marker** the "Bearing to Next Waypoint".');
 
   @override
   bool get hasPerBoxSettings => true;

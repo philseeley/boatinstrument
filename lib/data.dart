@@ -308,7 +308,7 @@ abstract class BoxWidget extends StatefulWidget {
   // e.g.
   //   @override
   //   Widget? getHelp(BuildContext context) => const HelpPage(text: 'My simple help.');
-  Widget? getHelp(BuildContext context) => null;
+  Widget? getHelp() => null;
 
   // If the Settings are not obvious, these should return help page Widgets.
   Widget? getSettingsHelp() => null;

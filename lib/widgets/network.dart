@@ -12,7 +12,7 @@ class StarlinkBox extends BoxWidget {
   State<StatefulWidget> createState() => _StarlinkBoxState();
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: 'Ensure the **signalk-starlink** plugin is installed on signalk. The gauge shows the percentage of obstructions.');
+  Widget? getHelp() => const HelpPage(text: 'Ensure the **signalk-starlink** plugin is installed on signalk. The gauge shows the percentage of obstructions.');
 }
 
 class _StarlinkBoxState extends State<StarlinkBox> with DoubleValeBoxPainter {

@@ -143,7 +143,7 @@ class AnchorAlarmBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => HelpPage(url: 'doc:anchor-alarm.md');
+  Widget? getHelp() => HelpPage(url: 'doc:anchor-alarm.md');
 
   @override
   Widget? getSettingsHelp() => const HelpPage(text: '''To be able to set the Anchor Alarm, the device must be given "admin" permission to signalk. Request an **Auth Token** and without closing the settings page authorise the device in the signalk web interface. When the **Auth Token** is shown, the settings page can be closed.

@@ -25,7 +25,7 @@ class RPiCPUTemperatureBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
+  Widget? getHelp() => const HelpPage(text: _help);
 }
 
 class RPiGPUTemperatureBox extends DoubleValueBox {
@@ -46,7 +46,7 @@ class RPiGPUTemperatureBox extends DoubleValueBox {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
+  Widget? getHelp() => const HelpPage(text: _help);
 }
 
 class RPiCPUUtilisationBox extends DoubleValueSemiGaugeBox {
@@ -80,7 +80,7 @@ class RPiCPUUtilisationBox extends DoubleValueSemiGaugeBox {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
+  Widget? getHelp() => const HelpPage(text: _help);
 }
 
 class RPiMemoryUtilisationBox extends DoubleValueBarGaugeBox {
@@ -112,7 +112,7 @@ class RPiMemoryUtilisationBox extends DoubleValueBarGaugeBox {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
+  Widget? getHelp() => const HelpPage(text: _help);
 }
 
 class RPiSDUtilisationBox extends DoubleValueBarGaugeBox {
@@ -145,7 +145,7 @@ class RPiSDUtilisationBox extends DoubleValueBarGaugeBox {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
+  Widget? getHelp() => const HelpPage(text: _help);
 }
 
 class _RPiDataPainter extends CustomPainter with DoubleValeBoxPainter {
@@ -184,7 +184,7 @@ class RaspberryPiBox extends BoxWidget {
   State<StatefulWidget> createState() => _RaspberryPiBoxState();
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: _help);
+  Widget? getHelp() => const HelpPage(text: _help);
 }
 
 class _RaspberryPiBoxState extends State<RaspberryPiBox> {

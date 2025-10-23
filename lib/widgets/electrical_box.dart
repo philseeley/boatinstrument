@@ -598,7 +598,7 @@ class ElectricalSwitchesBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: '''**Note:** due to the scrollable list of Switches, swipe down from the title to configure.
+  Widget? getHelp() => const HelpPage(text: '''**Note:** due to the scrollable list of Switches, swipe down from the title to configure.
 
 This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.''');
 
@@ -872,7 +872,7 @@ class ElectricalSwitchBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp(BuildContext context) => const HelpPage(text: 'This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.');
+  Widget? getHelp() => const HelpPage(text: 'This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.');
 
   @override
   bool get hasPerBoxSettings => true;
