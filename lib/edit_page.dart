@@ -307,12 +307,12 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(RaspberryPiBox.sid, 'Raspberry Pi'),
       ]),
       _widgetMenuEntry(DateTimeBox.sid, 'Date/Time'),
+      _widgetMenuEntry(CustomTextBox.sid, 'Text'),
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
       _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
       _widgetSubMenuEntry(box, 'Custom', [
-        _widgetMenuEntry(CustomTextBox.sid, 'Text'),
         _widgetMenuEntry(CustomDoubleValueBox.sid, 'Value'),
         _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid, 'Semi Gauge'),
         _widgetMenuEntry(CustomDoubleValueCircularGaugeBox.sid, 'Circular Gauge'),
