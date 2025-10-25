@@ -4,6 +4,7 @@ const String bi = 'boatinstrument';
 const String degreesUnits = '\u00B0T'; // degrees symbol.
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
+const String idChars = '[0-9a-zA-Z_-]';
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
@@ -754,6 +755,7 @@ class _Settings {
   String clientID;
   String groupID;
   bool allowRemoteControl;
+  Set<String> supplementalGroupIDs;
   String authToken;
   int notificationMuteTimeout; //Minutes
   bool demoMode;
@@ -796,6 +798,7 @@ class _Settings {
     String? clientID,
     this.groupID = '',
     this.allowRemoteControl = false,
+    this.supplementalGroupIDs = const {},
     this.authToken = '',
     this.notificationMuteTimeout = 15,
     this.demoMode = false,

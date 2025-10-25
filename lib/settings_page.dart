@@ -319,16 +319,21 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
           leading: const Text("Client ID:"),
           title: TextFormField(
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9a-zA-Z]'))],
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
             initialValue: settings.clientID,
             onChanged: (value) => settings.clientID = value)
       ),
       ListTile(
           leading: const Text("Group ID:"),
           title: TextFormField(
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9a-zA-Z]'))],
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
             initialValue: settings.groupID,
-            onChanged: (value) => settings.groupID = value)
+            onChanged: (value) => settings.groupID = value),
+      ),
+      ListTile(
+            leading: const Text("Supplemental Group IDs:"),
+            title: Text(settings.supplementalGroupIDs.isEmpty?'':settings.supplementalGroupIDs.reduce((one, two) {return '$one, $two';})),
+            trailing: IconButton(onPressed: _editGroups, icon: Icon(Icons.edit)),
       ),
       SwitchListTile(title: const Text("Allow Remote Control:"),
           value: settings.allowRemoteControl,
@@ -449,6 +454,20 @@ class _SettingsState extends State<SettingsPage> {
     }));
   }
 
+  void _editGroups () async {
+    List<String> groupsList = widget._controller._settings!.supplementalGroupIDs.toList();
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _EditGroups(groupsList);
+    }));
+
+    setState(() {
+      // We remove any empty and duplicate groups.
+      groupsList.removeWhere((g) => g.isEmpty);
+      widget._controller._settings!.supplementalGroupIDs = groupsList.toSet();
+    });
+  }
+
   void _requestAuthToken() async {
     SignalKAuthorization(widget._controller).request(widget._controller._settings!.clientID, "Boat Instrument",
             (authToken) {
@@ -565,6 +584,53 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
   Future<void> _deleteHeader(int headerNum) async {
     setState(() {
       widget._httpHeaders.removeAt(headerNum);
+    });
+  }
+}
+
+class _EditGroups extends StatefulWidget {
+  final List<String> _groups;
+
+  const _EditGroups(this._groups);
+
+  @override
+  createState() => _EditGroupsState();
+}
+
+class _EditGroupsState extends State<_EditGroups> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Groups"),
+          actions: [
+            IconButton(tooltip: 'Add Group', icon: const Icon(Icons.add),onPressed:  _addGroup),
+          ],
+        ),
+        body: ListView.builder(itemCount: widget._groups.length, itemBuilder: (context, g) {
+          return ListTile(
+            key: UniqueKey(),
+            title: TextFormField(
+              decoration: const InputDecoration(hintText: 'group ID'),
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
+              initialValue: widget._groups[g],
+              onChanged: (value) => widget._groups[g] = value),
+            trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteGroup(g);})
+            );
+        })
+    );
+  }
+
+  void _addGroup() {
+    setState(() {
+      widget._groups.add('');
+    });
+  }
+
+  Future<void> _deleteGroup(int g) async {
+    setState(() {
+      widget._groups.removeAt(g);
     });
   }
 }

@@ -98,6 +98,10 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
       clientID: json['clientID'] as String?,
       groupID: json['groupID'] as String? ?? '',
       allowRemoteControl: json['allowRemoteControl'] as bool? ?? false,
+      supplementalGroupIDs: (json['supplementalGroupIDs'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toSet() ??
+          const {},
       authToken: json['authToken'] as String? ?? '',
       notificationMuteTimeout:
           (json['notificationMuteTimeout'] as num?)?.toInt() ?? 15,
@@ -162,6 +166,7 @@ Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
       'clientID': instance.clientID,
       'groupID': instance.groupID,
       'allowRemoteControl': instance.allowRemoteControl,
+      'supplementalGroupIDs': instance.supplementalGroupIDs.toList(),
       'authToken': instance.authToken,
       'notificationMuteTimeout': instance.notificationMuteTimeout,
       'demoMode': instance.demoMode,

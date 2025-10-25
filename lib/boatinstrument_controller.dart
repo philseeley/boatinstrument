@@ -579,6 +579,9 @@ class BoatInstrumentController {
       Set<String> actionPaths = {};
       if(_settings!.clientID.isNotEmpty) actionPaths.add('$bi.devices.${_settings!.clientID}.action');
       if(_settings!.groupID.isNotEmpty) actionPaths.add('$bi.groups.${_settings!.groupID}.action');
+      for(var gID in _settings!.supplementalGroupIDs) {
+        actionPaths.add('$bi.groups.$gID.action');
+      }
 
       if(actionPaths.isNotEmpty) configure(onUpdate: _onRemoteControl, paths: actionPaths, isBox: false, onControlChannel: true);
     }
@@ -951,7 +954,7 @@ class BoatInstrumentController {
       }
 
       if(_settings!.clientID.isNotEmpty) {
-        // If we don't have permission, then this is ignored.
+        // If we don't have permission, then updates are ignored.
         _dataChannel?.sink.add(jsonEncode(
             {
               "updates": [{
@@ -959,10 +962,6 @@ class BoatInstrumentController {
                   {
                     "path": "$bi.devices.${_settings!.clientID}.pages",
                     "value": pageNames
-                  },
-                  {
-                    "path": "$bi.devices.${_settings!.clientID}.group",
-                    "value": _settings!.groupID
                   }
                 ]
               }]
@@ -980,6 +979,25 @@ class BoatInstrumentController {
                     "value": pageNames
                   }
                 ]
+              }]
+            }
+        ));
+      }
+
+      if(_settings!.supplementalGroupIDs.isNotEmpty) {
+        List<dynamic> values = [];
+        for(var groupID in _settings!.supplementalGroupIDs) {
+          values.add({
+            "path": "$bi.groups.$groupID",
+            "value": ""
+
+          });
+        }
+
+        _dataChannel?.sink.add(jsonEncode(
+            {
+              "updates": [{
+                "values": values
               }]
             }
         ));

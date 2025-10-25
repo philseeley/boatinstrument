@@ -81,6 +81,9 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
       _unlock();
     }
 
+    // We need to set the action to null, otherwise on reconnect the
+    // receiving app could get the old value and perform the action again.
+    // All apps should get the action and then the null, which will be ignored.
     params.addAll({'id': action});
     widget.config.controller.sendUpdate('$bi.${widget._settings.isGroup?'groups':'devices'}.${widget._settings.id}.action', params);
     widget.config.controller.sendUpdate('$bi.${widget._settings.isGroup?'groups':'devices'}.${widget._settings.id}.action', null);
@@ -112,11 +115,15 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
     Color fg = Theme.of(context).colorScheme.onSurface;
     Color bg = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
 
+    if(widget.config.editMode) {
+      _pages = ['page 1', 'page 2', 'page 3'];
+    }
+
     return Padding(padding: EdgeInsetsGeometry.all(5), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       HeaderText('${s.isGroup?'GRP':'DEV'}:${s.id}'),
       Stack(alignment: Alignment.center, children: [
         Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          SizedBox(height: 50, child: ListView.separated(
+          if(_pages.isNotEmpty) SizedBox(height: 50, child: ListView.separated(
             padding: EdgeInsets.all(5),
             itemCount: _pages.length,
             scrollDirection: Axis.horizontal,
@@ -141,22 +148,24 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
   }
 
   void _processUpdates(List<Update> updates) {
-    for (Update u in updates) {
-      try {
-        if(u.path.endsWith('.pages')) {
-          _pages = (u.value as List<dynamic>).cast<String>();
+    if(updates[0].value == null) {
+      _pages = [];
+    } else {
+      for (Update u in updates) {
+        try {
+          if(u.path.endsWith('.pages')) {
+            _pages = (u.value as List<dynamic>).cast<String>();
+          }
+        } catch (e) {
+          widget.config.controller.l.e("Error converting $u", error: e);
         }
-      } catch (e) {
-        widget.config.controller.l.e("Error converting $u", error: e);
+      }
+
+      if(mounted) {
+        setState(() {});
       }
     }
-
-    if(mounted) {
-      setState(() {});
-    }
   }
-
-  void x(){}
 }
 
 class _RemoteControlSettingsWidget extends BoxSettingsWidget {
