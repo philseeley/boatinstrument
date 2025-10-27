@@ -125,6 +125,15 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
       _pages = ['page 1', 'page 2', 'page 3'];
     }
 
+    List<IconButton> brightnessButtons = [];
+    if(s.controlBrightness) {
+      brightnessButtons.add(IconButton(onPressed: () {_sendAction('nightMode', {});}, icon: Icon(Icons.mode_night)));
+      for(int i in BoatInstrumentController.brightnessIcons.keys) {
+        brightnessButtons.add(IconButton(
+          onPressed: () {_sendAction('setBrightness', {'level': i});},
+          icon: Icon(BoatInstrumentController.brightnessIcons[i])));
+      }
+    }
     return Padding(padding: EdgeInsetsGeometry.all(5), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       HeaderText('${s.isGroup?'GRP':'DEV'}:${s.id}'),
       Stack(alignment: Alignment.center, children: [
@@ -147,12 +156,7 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOn', {});}, icon: const Icon(Icons.sync_alt)),
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOff', {});}, icon: const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)])),
           ]),
-          if(s.controlBrightness) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('firstPage', {});}, icon: const Icon(Icons.first_page)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('decPage', {});}, icon: const Icon(Icons.keyboard_arrow_left)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('incPage', {});}, icon: const Icon(Icons.keyboard_arrow_right)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('lastPage', {});}, icon: const Icon(Icons.last_page)),
-          ]),
+          if(s.controlBrightness) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: brightnessButtons),
         ]),
         if(disabled) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
           text: "Unlock",

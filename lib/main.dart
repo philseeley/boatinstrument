@@ -117,18 +117,8 @@ class MainPageState extends State<MainPage> {
   static const Image _icon = Image(image: AssetImage('assets/icon.png'));
 
   late final ThemeProvider _themeProvider;
-  static const _brightnessStep = 4;
-  static const _brightnessMax = 12;
-  static final Map<int, IconData> _brightnessIcons = {
-    12: Icons.brightness_high,
-    8: Icons.brightness_medium,
-    4: Icons.brightness_low,
-    1: Icons.brightness_4_outlined,
-    0: Icons.brightness_4_outlined
-  };
 
   bool _showAppBar = false;
-  int _brightness = _brightnessMax;
   Offset _panStart = Offset.zero;
   bool fullScreen = (Platform.isIOS || Platform.isAndroid) ? true : false;
 
@@ -149,15 +139,8 @@ class MainPageState extends State<MainPage> {
 
     _themeProvider.setDarkMode(_controller.darkMode);
 
-    if(_controller.brightnessControl) {
-      // Convert the current system brightness into the closest step, rounding up.
-      // Note: We add the step as well as _setBrightness() will remove it.
-      _brightness = (await ScreenBrightness().system * _brightnessMax).ceil();
-      _brightness =
-          _brightness - (_brightness % _brightnessStep) + (_brightnessStep * 2);
-      _setBrightness();
-    }
-
+    _controller.stepBrightness(init: true);
+    
     if(_controller.pageTimerOnStart) {
       _controller.toggleRotatePages();
     }
@@ -190,9 +173,9 @@ class MainPageState extends State<MainPage> {
         actions: [
           if(!widget.noFullScreen) IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
           if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
-          IconButton(tooltip: 'Night Mode', icon: const Icon(Icons.mode_night), onPressed:  _nightMode),
+          IconButton(tooltip: 'Night Mode', icon: const Icon(Icons.mode_night), onPressed:  nightMode),
           IconButton(tooltip: 'Auto Rotate Pages', icon: _controller.arePagesRotating ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _controller.toggleRotatePages),
-          if(_controller.brightnessControl) IconButton(tooltip: 'Brightness', icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness),
+          if(_controller.brightnessControl) IconButton(tooltip: 'Brightness', icon: Icon(_controller.brightnessIcon), onPressed: _controller.stepBrightness),
           if(_controller.notifications.isNotEmpty) IconButton(tooltip: 'Notifications', icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
           if(!widget.readOnly) IconButton(tooltip: 'Edit Pages', icon: const Icon(Icons.web), onPressed: _showEditPagesPage),
           if(widget.readOnly) IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: () {LogDisplay.show(context);})
@@ -223,18 +206,7 @@ class MainPageState extends State<MainPage> {
     );
   }
 
-  void _setBrightness() {
-    setState(() {
-      _brightness = ((_brightness < _brightnessStep) || (_brightness > _brightnessMax)) ? _brightnessMax : _brightness - _brightnessStep;
-      if(Platform.isMacOS && _brightness == 0) {
-        _brightness = 1;
-      }
-    });
-
-    ScreenBrightness().setApplicationScreenBrightness(_brightness/_brightnessMax);
-  }
-
-  void _nightMode() {
+  void nightMode() {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     themeProvider.toggleNightMode(_controller.darkMode);
   }

@@ -126,6 +126,16 @@ class BoatInstrumentController {
   int _pageNum = 0;
   bool _rotatePages = false;
   Timer? _pageTimer;
+  static const _brightnessStep = 4;
+  static const _brightnessMax = 12;
+  static final Map<int, IconData> brightnessIcons = {
+    12: Icons.brightness_high,
+    8: Icons.brightness_medium,
+    4: Icons.brightness_low,
+    0: Icons.brightness_4_outlined
+  };
+  int _brightness = _brightnessMax;
+
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
   int _boxesOnPage = 0;
@@ -161,6 +171,7 @@ class BoatInstrumentController {
   bool get keepAwake => _settings!.keepAwake;
   bool get pageTimerOnStart => _settings!.pageTimerOnStart;
   bool get arePagesRotating => _rotatePages;
+  IconData get brightnessIcon => brightnessIcons[_brightness]??Icons.brightness_4_outlined; // This will only do the null substitute on MacOS.
   bool get enableExperimentalBoxes => _settings!.enableExperimentalBoxes;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   int get m2nmThreshold => _settings!.m2nmThreshold;
@@ -663,6 +674,12 @@ class BoatInstrumentController {
           case 'rotatePagesOff':
             toggleRotatePages(on: false);
             break;
+          case 'setBrightness':
+            stepBrightness(level: u.value['level']);
+            break;
+          case 'nightMode':
+            _mainPageState.nightMode();
+            break;
         }
       } catch (e) {
         l.e("Error converting $u", error: e);
@@ -757,6 +774,31 @@ class BoatInstrumentController {
         break;
       }
     } while (++i < _settings!.pages.length);
+  }
+
+  void stepBrightness({bool init = false, int? level}) async {
+
+    if(brightnessControl) {
+      if(init) {
+        // Convert the current system brightness into the closest step, rounding up.
+        // Note: We add the step as well as _setBrightness() will remove it.
+        _brightness = (await ScreenBrightness().system * _brightnessMax).ceil();
+        _brightness =
+            _brightness - (_brightness % _brightnessStep) + (_brightnessStep * 2);
+      }
+
+      if(level == null) {
+        _brightness = ((_brightness < _brightnessStep) || (_brightness > _brightnessMax)) ? _brightnessMax : _brightness - _brightnessStep;
+      } else {
+        _brightness = level;
+      }
+      if(Platform.isMacOS && _brightness == 0) {
+       _brightness = 1;
+      }
+
+      ScreenBrightness().setApplicationScreenBrightness(_brightness/_brightnessMax);
+      _mainPageState.rebuild();
+    }
   }
 
   String pageName() {
