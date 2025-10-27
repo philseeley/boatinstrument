@@ -11,12 +11,18 @@ part 'remote_box.g.dart';
 class _RemoteControlSettings {
   bool isGroup;
   String id;
+  bool controlPages;
+  bool controlRotatePages;
+  bool controlBrightness;
   bool enableLock;
   int lockSeconds;
 
   _RemoteControlSettings({
     this.isGroup = false,
     this.id = '',
+    this.controlPages = true,
+    this.controlRotatePages = true,
+    this.controlBrightness = true,
     this.enableLock = false,
     this.lockSeconds = 5
   });
@@ -123,7 +129,7 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
       HeaderText('${s.isGroup?'GRP':'DEV'}:${s.id}'),
       Stack(alignment: Alignment.center, children: [
         Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          if(_pages.isNotEmpty) SizedBox(height: 50, child: ListView.separated(
+          if(s.controlPages && _pages.isNotEmpty) SizedBox(height: 50, child: ListView.separated(
             padding: EdgeInsets.all(5),
             itemCount: _pages.length,
             scrollDirection: Axis.horizontal,
@@ -131,7 +137,17 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
               onPressed: disabled ? null : (){_sendAction('gotoPage', {'page': _pages[i]});},
               style: ElevatedButton.styleFrom(foregroundColor: fg, backgroundColor: bg),
               child: Text(_pages[i]));}, separatorBuilder: (context, i){return SizedBox(width: 10);})),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          if(s.controlPages) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('firstPage', {});}, icon: const Icon(Icons.first_page)),
+            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('decPage', {});}, icon: const Icon(Icons.keyboard_arrow_left)),
+            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('incPage', {});}, icon: const Icon(Icons.keyboard_arrow_right)),
+            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('lastPage', {});}, icon: const Icon(Icons.last_page)),
+          ]),
+          if(s.controlRotatePages) Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOn', {});}, icon: const Icon(Icons.sync_alt)),
+            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOff', {});}, icon: const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)])),
+          ]),
+          if(s.controlBrightness) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('firstPage', {});}, icon: const Icon(Icons.first_page)),
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('decPage', {});}, icon: const Icon(Icons.keyboard_arrow_left)),
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('incPage', {});}, icon: const Icon(Icons.keyboard_arrow_right)),
@@ -189,7 +205,7 @@ class _RemoteControlSettingsState extends State<_RemoteControlSettingsWidget> {
   Widget build(BuildContext context) {
     _RemoteControlSettings s = widget._settings;
 
-    List<Widget> list = [
+    return ListView(children: [
       SwitchListTile(title: const Text("Control Group:"),
         value: s.isGroup,
         onChanged: (bool value) {
@@ -199,12 +215,33 @@ class _RemoteControlSettingsState extends State<_RemoteControlSettingsWidget> {
         }),
       ListTile(
         leading: Text("${s.isGroup?'Group':'Device'} ID:"),
-        title: SignalkPathDropdownMenu(
+        title: SignalkPathDropdownMenu(key: UniqueKey(),
             widget. _controller,
             s.id,
             '$bi.${s.isGroup?'groups':'devices'}',
             (value) => s.id = value)
       ),
+      SwitchListTile(title: const Text("Control Pages:"),
+        value: s.controlPages,
+        onChanged: (bool value) {
+          setState(() {
+            s.controlPages = value;
+          });
+        }),
+      SwitchListTile(title: const Text("Control Rotate Pages:"),
+        value: s.controlRotatePages,
+        onChanged: (bool value) {
+          setState(() {
+            s.controlRotatePages = value;
+          });
+        }),
+      SwitchListTile(title: const Text("Control Brightness:"),
+        value: s.controlBrightness,
+        onChanged: (bool value) {
+          setState(() {
+            s.controlBrightness = value;
+          });
+        }),
       SwitchListTile(title: const Text("Enable Control Lock:"),
         value: s.enableLock,
         onChanged: (bool value) {
@@ -226,8 +263,6 @@ class _RemoteControlSettingsState extends State<_RemoteControlSettingsWidget> {
             });
           }),
       ),
-    ];
-
-    return ListView(children: list);
+    ]);
   }
 }

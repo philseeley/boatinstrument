@@ -199,7 +199,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
        widget._onSelected(iv);
     }
 
-    DropdownMenu menu = DropdownMenu<String>(
+    return DropdownMenu<String>(
       expandedInsets: EdgeInsets.zero,
       enableSearch: false,
       enableFilter: widget.searchable,
@@ -213,8 +213,6 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
         widget._onSelected(value??'');
       },
     );
-
-    return menu;
   }
 }
 

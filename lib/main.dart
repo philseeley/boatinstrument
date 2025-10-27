@@ -129,13 +129,10 @@ class MainPageState extends State<MainPage> {
 
   bool _showAppBar = false;
   int _brightness = _brightnessMax;
-  bool _rotatePages = false;
-  Timer? _pageTimer;
   Offset _panStart = Offset.zero;
   bool fullScreen = (Platform.isIOS || Platform.isAndroid) ? true : false;
 
   late final BoatInstrumentController _controller;
-  int? _pageTimeout = 0;
 
   @override
   void initState() {
@@ -162,7 +159,7 @@ class MainPageState extends State<MainPage> {
     }
 
     if(_controller.pageTimerOnStart) {
-      _togglePageTimer();
+      _controller.toggleRotatePages();
     }
 
     rebuild();
@@ -194,7 +191,7 @@ class MainPageState extends State<MainPage> {
           if(!widget.noFullScreen) IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
           if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
           IconButton(tooltip: 'Night Mode', icon: const Icon(Icons.mode_night), onPressed:  _nightMode),
-          IconButton(tooltip: 'Auto Page', icon: _rotatePages ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _togglePageTimer),
+          IconButton(tooltip: 'Auto Rotate Pages', icon: _controller.arePagesRotating ? const Icon(Icons.sync_alt) : const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)]), onPressed:  _controller.toggleRotatePages),
           if(_controller.brightnessControl) IconButton(tooltip: 'Brightness', icon: Icon(_brightnessIcons[_brightness]), onPressed: _setBrightness),
           if(_controller.notifications.isNotEmpty) IconButton(tooltip: 'Notifications', icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
           if(!widget.readOnly) IconButton(tooltip: 'Edit Pages', icon: const Icon(Icons.web), onPressed: _showEditPagesPage),
@@ -255,46 +252,6 @@ class MainPageState extends State<MainPage> {
     });
   }
 
-  void _togglePageTimer() {
-    setState(() {
-      _rotatePages = !_rotatePages;
-    });
-
-    if(_rotatePages) {
-      // Initially get it going.
-      _pageTimeout = _pageTimeout??0;
-    }
-
-    _startPageTimer();
-  }
-
-  void _startPageTimer() {
-    _stopPageTimer();
-
-    if(_pageTimeout == null) {
-      _rotatePages = false;
-    }
-
-    if(_rotatePages) {
-      _pageTimer = Timer(Duration(seconds: _pageTimeout!), _rotatePage);
-    }
-  }
-
-  void _stopPageTimer() {
-    _pageTimer?.cancel();
-    _pageTimer = null;
-  }
-
-  void _rotatePage() {
-    int? timeout;
-    setState(() {
-      timeout = _controller.rotatePageNum();
-      _pageTimeout = timeout;
-    });
-
-    _startPageTimer();
-  }
-
   void _showNotifications () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
@@ -307,7 +264,7 @@ class MainPageState extends State<MainPage> {
   }
 
   Future<void> _showEditPagesPage () async {
-    _stopPageTimer();
+    _controller.stopPageTimer();
 
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
@@ -322,11 +279,11 @@ class MainPageState extends State<MainPage> {
       _showAppBar = false;
     });
 
-    _startPageTimer();
+    _controller.startPageTimer();
   }
 
   void _movePage (double direction) {
-    _startPageTimer();
+    _controller.startPageTimer();
 
     if (direction > 0.0) {
       _controller.prevPage();
@@ -336,7 +293,7 @@ class MainPageState extends State<MainPage> {
   }
 
   void _displayAppBar (double direction) async {
-    _startPageTimer();
+    _controller.startPageTimer();
 
     bool showAppBar = false;
     if(direction > 0.0) {

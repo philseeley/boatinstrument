@@ -124,6 +124,8 @@ class BoatInstrumentController {
   bool _timeSet = false;
   _Settings? _settings;
   int _pageNum = 0;
+  bool _rotatePages = false;
+  Timer? _pageTimer;
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
   int _boxesOnPage = 0;
@@ -158,6 +160,7 @@ class BoatInstrumentController {
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
   bool get pageTimerOnStart => _settings!.pageTimerOnStart;
+  bool get arePagesRotating => _rotatePages;
   bool get enableExperimentalBoxes => _settings!.enableExperimentalBoxes;
   DistanceUnits get distanceUnits => _settings!.distanceUnits;
   int get m2nmThreshold => _settings!.m2nmThreshold;
@@ -654,6 +657,12 @@ class BoatInstrumentController {
           case 'lastPage':
             lastPage();
             break;
+          case 'rotatePagesOn':
+            toggleRotatePages(on: true);
+            break;
+          case 'rotatePagesOff':
+            toggleRotatePages(on: false);
+            break;
         }
       } catch (e) {
         l.e("Error converting $u", error: e);
@@ -708,10 +717,34 @@ class BoatInstrumentController {
     }
   }
 
-  int? rotatePageNum() {
+  void toggleRotatePages({bool? on}) {
+    _rotatePages = on??!_rotatePages;
+
+    if(_rotatePages) {
+      startPageTimer();
+    } else {
+      stopPageTimer();
+    }
+
+    _mainPageState.rebuild();
+  }
+
+  void startPageTimer({int timeout = 0}) {
+    stopPageTimer();
+
+    if(_rotatePages) {
+      _pageTimer = Timer(Duration(seconds: timeout), _rotatePage);
+    }
+  }
+
+  void stopPageTimer() {
+    _pageTimer?.cancel();
+    _pageTimer = null;
+  }
+
+  void _rotatePage() {
     if(_settings!.pages.isEmpty) {
       _settings?.pages = [_Page._newPage()];
-      return null;
     }
     int i = 0;
     do {
@@ -719,11 +752,11 @@ class BoatInstrumentController {
       _pageNum %= _settings!.pages.length;
       int? timeout = _settings!.pages[_pageNum].timeout;
       if(timeout != null) {
-        return timeout;
+        _mainPageState.rebuild();
+        startPageTimer(timeout: timeout);
+        break;
       }
     } while (++i < _settings!.pages.length);
-    // There are no pages with timeouts.
-    return null;
   }
 
   String pageName() {
@@ -989,7 +1022,7 @@ class BoatInstrumentController {
         for(var groupID in _settings!.supplementalGroupIDs) {
           values.add({
             "path": "$bi.groups.$groupID",
-            "value": ""
+            "value": null
 
           });
         }
