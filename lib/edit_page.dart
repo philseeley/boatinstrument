@@ -449,13 +449,13 @@ class _EditPageState extends State<_EditPage> {
       pageRowsPercent.add(pageRow.percentage);
     }
 
-    return Scaffold(
+    return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _discard();}, child: Scaffold(
       body: SafeArea(child: ResizableWidget(key: UniqueKey(), onResized: (infoList) {_onResize(infoList, widget._editPage.pageRows);}, isHorizontalSeparator: true, separatorColor: Colors.red, separatorSize: 16, percentages: pageRowsPercent, children: pageRows)),
       floatingActionButton: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         IconButton(icon: const Icon(Icons.save), style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.green)), onPressed: _save),
         IconButton(icon: const Icon(Icons.close), style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)), onPressed: _discard)
       ])
-    );
+    ));
   }
 
   void _onResize(List<WidgetSizeInfo> infoList, List<_Resizable> r) {
