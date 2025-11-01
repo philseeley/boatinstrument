@@ -497,41 +497,35 @@ class _SunlightBox extends State<SunlightBox> {
   }
 
   void _onUpdate(List<Update> updates) {
-    if(updates[0].value == null) {
-      _times = List.filled(_numTimes, null);
-    } else {
-      for (Update u in updates) {
-        try {
-          if(u.value == null) continue;
-          
-          DateTime dt = DateTime.parse(u.value);
+    for (Update u in updates) {
+      try {        
+        DateTime? dt = u.value == null?null:DateTime.parse(u.value);
 
-          switch (u.path) {
-            case 'environment.sunlight.times.nauticalDawn':
-              _times[0] = _Time('Naut Dwn:', dt);
-              break;
-            case 'environment.sunlight.times.dawn':
-              _times[1] = _Time('Dawn:    ', dt);
-              break;
-            case 'environment.sunlight.times.sunrise':
-              _times[2] = _Time('Rise:    ', dt);
-              break;
-            case 'environment.sunlight.times.solarNoon':
-              _times[3] = _Time('Sol Noon:', dt);
-              break;
-            case 'environment.sunlight.times.sunset':
-              _times[4] = _Time('Set:     ', dt);
-              break;
-            case 'environment.sunlight.times.dusk':
-              _times[5] = _Time('Dusk:    ', dt);
-              break;
-            case 'environment.sunlight.times.nauticalDusk':
-              _times[6] = _Time('Naut Dsk:', dt);
-              break;
-          }
-        } catch (e) {
-          widget.config.controller.l.e("Error converting $u", error: e);
+        switch (u.path) {
+          case 'environment.sunlight.times.nauticalDawn':
+            _times[0] = u.value == null?null:_Time('Naut Dwn:', dt!);
+            break;
+          case 'environment.sunlight.times.dawn':
+            _times[1] = u.value == null?null:_Time('Dawn:    ', dt!);
+            break;
+          case 'environment.sunlight.times.sunrise':
+            _times[2] = u.value == null?null:_Time('Rise:    ', dt!);
+            break;
+          case 'environment.sunlight.times.solarNoon':
+            _times[3] = u.value == null?null:_Time('Sol Noon:', dt!);
+            break;
+          case 'environment.sunlight.times.sunset':
+            _times[4] = u.value == null?null:_Time('Set:     ', dt!);
+            break;
+          case 'environment.sunlight.times.dusk':
+            _times[5] = u.value == null?null:_Time('Dusk:    ', dt!);
+            break;
+          case 'environment.sunlight.times.nauticalDusk':
+            _times[6] = u.value == null?null:_Time('Naut Dsk:', dt!);
+            break;
         }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 
@@ -619,7 +613,7 @@ class _MoonBox extends HeadedBoxState<MoonBox> {
 
   @override
   void initState() {
-    alignment = Alignment.topCenter;
+    alignment = Alignment.topLeft;
     super.initState();
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.moon.*'}, dataType: SignalKDataType.infrequent);
   }
@@ -662,28 +656,24 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
   }
   
   void _onUpdate(List<Update> updates) {
-    if(updates[0].value == null) {
-      _rise = _set = _fraction = _phaseName = null;
-    } else {
-      for (Update u in updates) {
-        try {
-          switch (u.path) {
-            case 'environment.moon.times.rise':
-              _rise = DateTime.parse(u.value);
-              break;
-            case 'environment.moon.times.set':
-              _set = DateTime.parse(u.value);
-              break;
-            case 'environment.moon.fraction':
-              _fraction = (u.value as num).toDouble();
-              break;
-            case 'environment.moon.phaseName':
-              _phaseName = u.value;
-              break;
-          }
-        } catch (e) {
-          widget.config.controller.l.e("Error converting $u", error: e);
+    for (Update u in updates) {
+      try {
+        switch (u.path) {
+          case 'environment.moon.times.rise':
+            _rise = (u.value == null)?null:DateTime.parse(u.value);
+            break;
+          case 'environment.moon.times.set':
+            _set = (u.value == null)?null:DateTime.parse(u.value);
+            break;
+          case 'environment.moon.fraction':
+            _fraction = (u.value == null)?null:(u.value as num).toDouble();
+            break;
+          case 'environment.moon.phaseName':
+            _phaseName = (u.value == null)?null:u.value;
+            break;
         }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 
