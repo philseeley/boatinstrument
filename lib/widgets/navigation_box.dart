@@ -320,7 +320,9 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
       _timeToGo = null;
     } else {
       try {
-        _timeToGo = (updates[0].value as num).toInt();
+        double next = (updates[0].value as num).toDouble();
+
+        _timeToGo = averageDouble(_timeToGo?.toDouble()??next, next, smooth: widget.config.controller.valueSmoothing).toInt();
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
       }
@@ -391,6 +393,7 @@ class NextPointTimeToGoBox extends TimeToGoBox {
 //               break;
 //           }
 //           //TODO Something like this when all the sections of the route are known.
+//           // Needs smoothing.
 //           _timeToGo = _routeDistance~/_waypointVMG + _waypointTTG;
 //         } catch (e) {
 //           widget.config.controller.l.e("Error converting $u", error: e);
