@@ -71,7 +71,7 @@ class HelpPageState extends State<HelpPage> {
         },),),
       body: Container(
         padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-        child: MarkdownWidget(
+        child: MarkdownWidget(key: UniqueKey(),
           config: MarkdownConfig(configs: [
             LinkConfig(
               style: TextStyle(decoration: TextDecoration.underline),
