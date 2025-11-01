@@ -1124,3 +1124,53 @@ mixin DoubleValeBoxPainter {
     }
   }
 }
+
+abstract class EditListWidget extends StatefulWidget {
+  final List<String> _list;
+  final String _title;
+  final String _type;
+  final bool restrictChars;
+
+  const EditListWidget(this._list, this._title, this._type, {this.restrictChars = false, super.key});
+
+  @override
+  createState() => _EditListWidgetState();
+}
+
+class _EditListWidgetState extends State<EditListWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget._title),
+          actions: [
+            IconButton(tooltip: 'Add ${widget._type}', icon: const Icon(Icons.add),onPressed:  _addItem),
+          ],
+        ),
+        body: ListView.builder(itemCount: widget._list.length, itemBuilder: (context, g) {
+          return ListTile(
+            key: UniqueKey(),
+            title: TextFormField(
+              decoration: InputDecoration(hintText: widget._type),
+              inputFormatters: widget.restrictChars?[FilteringTextInputFormatter.allow(RegExp(idChars))]:null,
+              initialValue: widget._list[g],
+              onChanged: (value) => widget._list[g] = value),
+            trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteItem(g);})
+            );
+        })
+    );
+  }
+
+  void _addItem() {
+    setState(() {
+      widget._list.add('');
+    });
+  }
+
+  Future<void> _deleteItem(int i) async {
+    setState(() {
+      widget._list.removeAt(i);
+    });
+  }
+}

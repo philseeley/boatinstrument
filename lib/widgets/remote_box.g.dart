@@ -11,6 +11,10 @@ _RemoteControlSettings _$RemoteControlSettingsFromJson(
     _RemoteControlSettings(
       isGroup: json['isGroup'] as bool? ?? false,
       id: json['id'] as String? ?? '',
+      manualPages: (json['manualPages'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       controlPages: json['controlPages'] as bool? ?? true,
       controlRotatePages: json['controlRotatePages'] as bool? ?? true,
       controlBrightness: json['controlBrightness'] as bool? ?? true,
@@ -23,6 +27,7 @@ Map<String, dynamic> _$RemoteControlSettingsToJson(
     <String, dynamic>{
       'isGroup': instance.isGroup,
       'id': instance.id,
+      'manualPages': instance.manualPages,
       'controlPages': instance.controlPages,
       'controlRotatePages': instance.controlRotatePages,
       'controlBrightness': instance.controlBrightness,

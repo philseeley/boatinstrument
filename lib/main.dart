@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_brightness/screen_brightness.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'theme_provider.dart';

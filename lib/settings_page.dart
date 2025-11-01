@@ -256,7 +256,7 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Port/Starboard Colours:"),
           title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),
-      _Divider('Signalk'), //=====================================================
+      _Divider('SignalK'), //=====================================================
       SwitchListTile(title: const Text("Auto Discover:"),
           value: settings.discoverServer,
           onChanged: settings.demoMode ? null : (bool value) {
@@ -317,7 +317,7 @@ class _SettingsState extends State<SettingsPage> {
       ),
       _Divider('Authentication'), //=====================================================
       ListTile(
-          leading: const Text("Client ID:"),
+          leading: const Text("App ID:"),
           title: TextFormField(
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
             initialValue: settings.clientID,
@@ -458,7 +458,7 @@ class _SettingsState extends State<SettingsPage> {
     List<String> groupsList = widget._controller._settings!.supplementalGroupIDs.toList();
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _EditGroups(groupsList);
+      return _EditSupplementaryGroups(groupsList);
     }));
 
     setState(() {
@@ -588,49 +588,6 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
   }
 }
 
-class _EditGroups extends StatefulWidget {
-  final List<String> _groups;
-
-  const _EditGroups(this._groups);
-
-  @override
-  createState() => _EditGroupsState();
-}
-
-class _EditGroupsState extends State<_EditGroups> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Groups"),
-          actions: [
-            IconButton(tooltip: 'Add Group', icon: const Icon(Icons.add),onPressed:  _addGroup),
-          ],
-        ),
-        body: ListView.builder(itemCount: widget._groups.length, itemBuilder: (context, g) {
-          return ListTile(
-            key: UniqueKey(),
-            title: TextFormField(
-              decoration: const InputDecoration(hintText: 'group ID'),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
-              initialValue: widget._groups[g],
-              onChanged: (value) => widget._groups[g] = value),
-            trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteGroup(g);})
-            );
-        })
-    );
-  }
-
-  void _addGroup() {
-    setState(() {
-      widget._groups.add('');
-    });
-  }
-
-  Future<void> _deleteGroup(int g) async {
-    setState(() {
-      widget._groups.removeAt(g);
-    });
-  }
+class _EditSupplementaryGroups extends EditListWidget {
+  const _EditSupplementaryGroups(List<String> list) : super(list, 'Supplementary Groups', 'Group ID', restrictChars: true);
 }

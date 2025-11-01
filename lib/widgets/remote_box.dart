@@ -11,6 +11,7 @@ part 'remote_box.g.dart';
 class _RemoteControlSettings {
   bool isGroup;
   String id;
+  List<String> manualPages;
   bool controlPages;
   bool controlRotatePages;
   bool controlBrightness;
@@ -20,6 +21,7 @@ class _RemoteControlSettings {
   _RemoteControlSettings({
     this.isGroup = false,
     this.id = '',
+    this.manualPages = const [],
     this.controlPages = true,
     this.controlRotatePages = true,
     this.controlBrightness = true,
@@ -127,10 +129,10 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
 
     List<IconButton> brightnessButtons = [];
     if(s.controlBrightness) {
-      brightnessButtons.add(IconButton(onPressed: () {_sendAction('nightMode', {});}, icon: Icon(Icons.mode_night)));
+      brightnessButtons.add(IconButton(onPressed: disabled ? null : () {_sendAction('nightMode', {});}, icon: Icon(Icons.mode_night)));
       for(int i in BoatInstrumentController.brightnessIcons.keys) {
         brightnessButtons.add(IconButton(
-          onPressed: () {_sendAction('setBrightness', {'level': i});},
+          onPressed: disabled ? null : () {_sendAction('setBrightness', {'level': i});},
           icon: Icon(BoatInstrumentController.brightnessIcons[i])));
       }
     }
@@ -138,15 +140,15 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
       HeaderText('${s.isGroup?'GRP':'DEV'}:${s.id}'),
       Stack(alignment: Alignment.center, children: [
         Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          if(s.controlPages && _pages.isNotEmpty) SizedBox(height: 50, child: ListView.separated(
+          if(s.controlPages && (_pages.isNotEmpty || s.manualPages.isNotEmpty)) SizedBox(height: 50, child: ListView.separated(
             padding: EdgeInsets.all(5),
-            itemCount: _pages.length,
+            itemCount: s.manualPages.isNotEmpty?s.manualPages.length:_pages.length,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, i) {return ElevatedButton(
-              onPressed: disabled ? null : (){_sendAction('gotoPage', {'page': _pages[i]});},
+              onPressed: disabled ? null : (){_sendAction('gotoPage', {'page': s.manualPages.isNotEmpty?s.manualPages[i]:_pages[i]});},
               style: ElevatedButton.styleFrom(foregroundColor: fg, backgroundColor: bg),
-              child: Text(_pages[i]));}, separatorBuilder: (context, i){return SizedBox(width: 10);})),
-          if(s.controlPages) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              child: Text(s.manualPages.isNotEmpty?s.manualPages[i]:_pages[i]));}, separatorBuilder: (context, i){return SizedBox(width: 10);})),
+          if(s.controlPages && _pages.isNotEmpty && s.manualPages.isEmpty) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('firstPage', {});}, icon: const Icon(Icons.first_page)),
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('decPage', {});}, icon: const Icon(Icons.keyboard_arrow_left)),
             IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('incPage', {});}, icon: const Icon(Icons.keyboard_arrow_right)),
@@ -225,6 +227,11 @@ class _RemoteControlSettingsState extends State<_RemoteControlSettingsWidget> {
             '$bi.${s.isGroup?'groups':'devices'}',
             (value) => s.id = value)
       ),
+      ListTile(
+        leading: const Text("Manual Pages:"),
+        title: Text(s.manualPages.isEmpty?'':s.manualPages.reduce((one, two) {return '$one, $two';})),
+        trailing: IconButton(onPressed: _editManualPages, icon: Icon(Icons.edit)),
+      ),
       SwitchListTile(title: const Text("Control Pages:"),
         value: s.controlPages,
         onChanged: (bool value) {
@@ -269,4 +276,22 @@ class _RemoteControlSettingsState extends State<_RemoteControlSettingsWidget> {
       ),
     ]);
   }
+
+  void _editManualPages () async {
+    List<String> pages = widget._settings.manualPages;
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return _EditManualPages(pages);
+    }));
+
+    setState(() {
+      // We remove any empty and duplicate groups.
+      pages.removeWhere((g) => g.isEmpty);
+      widget._settings.manualPages = pages.toSet().toList();
+    });
+  }
+}
+
+class _EditManualPages extends EditListWidget {
+  const _EditManualPages(List<String> list) : super(list, 'Manual Pages', 'Page Name');
 }
