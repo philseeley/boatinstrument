@@ -10,10 +10,12 @@ part 'compass_rose_box.g.dart';
 class _Settings {
   bool showCardinal;
   bool showDegrees;
+  bool showNorth;
 
   _Settings({
     this.showCardinal = true,
-    this.showDegrees = false
+    this.showDegrees = false,
+    this.showNorth = true
   });
 }
 
@@ -111,7 +113,7 @@ class _RosePainter extends CustomPainter with DoubleValeBoxPainter {
 
     paintDoubleBox(canvas, _context, 'HDG ${rad2Cardinal(_headingTrue)}', degreesUnits, 3, 0, rad2Deg(_headingTrue).toDouble(), Offset(size/3, size/3), size/3);
 
-    _paintMarker(canvas, 0, size, fg, 40);
+    if(_settings.showNorth) _paintMarker(canvas, 0, size, fg, 40);
     _paintMarker(canvas, _nextWaypointBearing, size, Colors.yellow, 30);
     _paintMarker(canvas, _courseOverGroundTrue, size, Colors.blue, 20);
 
@@ -252,7 +254,7 @@ class _GaugePainter extends CustomPainter with DoubleValeBoxPainter {
       ..color = fg
       ..strokeWidth = 2.0;
 
-    _paintMarker(canvas, 0, w, h, m, fg, 1.0);
+    if(_settings.showNorth) _paintMarker(canvas, 0, w, h, m, fg, 1.0);
     _paintMarker(canvas, _nextWaypointBearing, w, h, m, Colors.yellow, 0.8);
     _paintMarker(canvas, _courseOverGroundTrue, w, h, m, Colors.blue, 0.6);
 
@@ -407,6 +409,13 @@ class _SettingsState extends State<_SettingsWidget> {
           onChanged: (bool value) {
             setState(() {
               s.showDegrees = value;
+            });
+          }),
+      SwitchListTile(title: const Text("Show North:"),
+          value: s.showNorth,
+          onChanged: (bool value) {
+            setState(() {
+              s.showNorth = value;
             });
           }),
     ]);
