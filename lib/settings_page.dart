@@ -90,12 +90,15 @@ class _EditPagesState extends State<EditPagesPage> {
   }
 
   Future<void> _deletePage(int pageNum) async {
-    if(await widget._controller.askToConfirm(context, 'Delete page "${widget._controller._settings?.pages[pageNum].name}"', alwaysAsk: true)) {
+    _Settings s = widget._controller._settings!;
+
+    if(await widget._controller.askToConfirm(context, 'Delete page "${s.pages[pageNum].name}"', alwaysAsk: true)) {
       setState(() {
-        widget._controller._settings?.pages.removeAt(pageNum);
-        if (widget._controller._settings!.pages.isEmpty) {
-          widget._controller._settings?.pages.add(_Page._newPage());
+        s.pages.removeAt(pageNum);
+        if (s.pages.isEmpty) {
+          s.pages.add(_Page._newPage());
         }
+        if(widget._controller._pageNum >= s.pages.length) widget._controller._pageNum = s.pages.length-1;
       });
     }
   }

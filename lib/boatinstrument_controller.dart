@@ -548,6 +548,9 @@ class BoatInstrumentController {
   }
 
   Widget buildPage() {
+    // Sanity check
+    if(_pageNum >= _settings!.pages.length) _pageNum = _settings!.pages.length-1;
+
     _Page page = _settings!.pages[_pageNum];
 
     return LayoutBuilder(builder: (context, constraints) {
