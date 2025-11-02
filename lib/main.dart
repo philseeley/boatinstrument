@@ -27,7 +27,10 @@ void main(List<String> cmdlineArgs) {
 void logError(FlutterErrorDetails details) async {
   FlutterError.dumpErrorToConsole(details);
   Directory directory = await path_provider.getApplicationDocumentsDirectory();
-  File('${directory.path}/boatinstrument-error.log').writeAsStringSync('${DateTime.now()}\n$details', mode: FileMode.append);
+  File('${directory.path}/boatinstrument-error.log').writeAsStringSync(
+    '${DateTime.now()}\n${details.exceptionAsString()}\n${details.stack}\n',
+    mode: FileMode.append,
+    flush: true);
 }
 
 class BoatInstrumentApp extends StatelessWidget {
