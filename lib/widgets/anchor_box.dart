@@ -6,26 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart' as ll;
-import 'package:nanoid/nanoid.dart';
 
-import '../authorization.dart';
 import '../boatinstrument_controller.dart';
 
 part 'anchor_box.g.dart';
 
 @JsonSerializable()
 class _AnchorAlarmSettings {
-  String clientID;
-  String authToken;
   int recordSeconds;
   int recordPoints;
 
   _AnchorAlarmSettings({
-    String? clientID,
-    this.authToken = '',
     this.recordSeconds = 10,
     this.recordPoints = 1000
-  }) : clientID = clientID??'boatinstrument-anchor-alarm-${customAlphabet('0123456789', 4)}';
+  });
 }
 
 class _AnchorPainter extends CustomPainter {
@@ -310,8 +304,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
           uri,
           headers: {
             "Content-Type": "application/json",
-            "accept": "application/json",
-            "Authorization": "Bearer ${_settings.authToken}"
+            "accept": "application/json"
           },
           body: params
       );
@@ -451,42 +444,8 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
       ListTile(
         title: Text('Records for ${(s.recordSeconds*s.recordPoints/60/60).toStringAsFixed(2)} hours'),
       ),
-      ListTile(
-          leading: const Text("Client ID:"),
-          title: TextFormField(
-              initialValue: s.clientID,
-              onChanged: (value) => s.clientID = value)
-      ),
-      ListTile(
-          leading: const Text("Request Auth Token:"),
-          title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
-      ),
-      ListTile(
-          leading: const Text("Auth Token:"),
-          title: Text(s.authToken)
-      ),
     ];
 
     return ListView(children: list);
-  }
-
-  void _requestAuthToken() async {
-    SignalKAuthorization(widget._controller).request(widget._settings.clientID, "Boat Instrument - Anchor Alarm",
-            (authToken) {
-          setState(() {
-            widget._settings.authToken = authToken;
-          });
-        },
-            (msg) {
-          if (mounted) {
-            setState(() {
-              widget._settings.authToken = msg;
-            });
-          }
-        });
-
-    setState(() {
-      widget._settings.authToken = 'PENDING - keep this page open until request approved';
-    });
   }
 }

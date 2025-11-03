@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:boatinstrument/authorization.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
@@ -541,18 +540,14 @@ class _ElectricalSettingsState extends State<_ElectricalSettingsWidget> {
 @JsonSerializable()
 class _ElectricalSwitchesSettings {
   bool useSliderForDimming;
-  String clientID;
-  String authToken;
 
   _ElectricalSwitchesSettings({
-    this.useSliderForDimming = false,
-    clientID,
-    this.authToken = '',
-  }) : clientID = clientID??'boatinstrument-electrical-switches-${customAlphabet('0123456789', 4)}';
+    this.useSliderForDimming = false
+  });
 }
 
 mixin SwitchCommands {
-  void _sendCommand(BoxWidgetConfig config, BuildContext context, String authToken, String id, String type, String params) async {
+  void _sendCommand(BoxWidgetConfig config, BuildContext context, String id, String type, String params) async {
     if(config.editMode) {
       return;
     }
@@ -565,8 +560,7 @@ mixin SwitchCommands {
           uri,
           headers: {
             "Content-Type": "application/json",
-            "accept": "application/json",
-            "Authorization": "Bearer $authToken"
+            "accept": "application/json"
           },
           body: params
       );
@@ -736,7 +730,7 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with Swit
     setState(() {
       s.state = state;
     });
-    _sendCommand(widget.config, context, _settings.authToken, s.id, 'state', '{"value": $state}');
+    _sendCommand(widget.config, context, s.id, 'state', '{"value": $state}');
   }
 
   void _setDimmer(_ElectricalSwitch s, double dimmingLevel) {
@@ -745,7 +739,7 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with Swit
       dimmingLevel = dimmingLevel<0 ? 0 : dimmingLevel;
       s.dimmingLevel = dimmingLevel;
     });
-    _sendCommand(widget.config, context, _settings.authToken, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
+    _sendCommand(widget.config, context, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
   }
 
   void _onUpdate(List<Update> updates) {
@@ -812,44 +806,11 @@ class _ElectricalSwitchesSettingsState extends State<_ElectricalSwitchesSettings
               s.useSliderForDimming = value;
             });
           }),
-      ListTile(
-          leading: const Text("Client ID:"),
-          title: TextFormField(
-              initialValue: s.clientID,
-              onChanged: (value) => s.clientID = value)
-      ),
-      ListTile(
-          leading: const Text("Request Auth Token:"),
-          title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
-      ),
-      ListTile(
-          leading: const Text("Auth Token:"),
-          title: Text(s.authToken)
-      ),
     ];
 
     return ListView(children: list);
   }
 
-  void _requestAuthToken() async {
-    SignalKAuthorization(widget._controller).request(widget._settings.clientID, "Boat Instrument - Electrical Switches",
-            (authToken) {
-          setState(() {
-            widget._settings.authToken = authToken;
-          });
-        },
-            (msg) {
-          if (mounted) {
-            setState(() {
-              widget._settings.authToken = msg;
-            });
-          }
-        });
-
-    setState(() {
-      widget._settings.authToken = 'PENDING - keep this page open until request approved';
-    });
-  }
 }
 
 class ElectricalSwitchBox extends BoxWidget {
@@ -963,7 +924,7 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
     setState(() {
       _switch.state = state;
     });
-    _sendCommand(widget.config, context, _settings.authToken, _switch.id, 'state', '{"value": $state}');
+    _sendCommand(widget.config, context, _switch.id, 'state', '{"value": $state}');
   }
 
   void _setDimmer(_ElectricalSwitch s, double dimmingLevel) {
@@ -972,7 +933,7 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
       dimmingLevel = dimmingLevel<0 ? 0 : dimmingLevel;
       s.dimmingLevel = dimmingLevel;
     });
-    _sendCommand(widget.config, context, _settings.authToken, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
+    _sendCommand(widget.config, context, s.id, 'dimmingLevel', '{"value": $dimmingLevel}');
   }
 
   void _onUpdate(List<Update> updates) {

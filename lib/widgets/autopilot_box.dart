@@ -4,12 +4,9 @@ import 'dart:math' as m;
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:nanoid/nanoid.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
-
-import '../authorization.dart';
 
 part 'autopilot_box.g.dart';
 
@@ -22,17 +19,6 @@ enum AutopilotState {
   final String displayName;
 
   const AutopilotState(this.displayName);
-}
-
-@JsonSerializable()
-class _AutopilotControlSettings {
-  String clientID;
-  String authToken;
-
-  _AutopilotControlSettings({
-    String? clientID,
-    this.authToken = ''
-  }) : clientID = clientID??'boatinstrument-autopilot-${customAlphabet('0123456789', 4)}';
 }
 
 @JsonSerializable()
@@ -60,14 +46,6 @@ abstract class AutopilotControlBox extends BoxWidget {
   }
 
   @override
-  bool get hasSettings => true;
-
-  @override
-  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _AutopilotControlSettingsWidget(super.config.controller, _$AutopilotControlSettingsFromJson(json));
-  }
-
-  @override
   Widget? getSettingsHelp() => const HelpPage(text: '''Ensure the **signalk-autopilot** plugin is installed on signalk.
 To be able to control the autopilot, the device must be given "read/write" permission to signalk. Request an **Auth Token** and without closing the settings page authorise the device in the signalk web interface. When the **Auth Token** is shown, the settings page can be closed.
 The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-autopilot-helm". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
@@ -82,14 +60,12 @@ The Client ID can be set to reflect the instrument's location, e.g. "boatinstrum
 }
 
 abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends State<T> {
-  _AutopilotControlSettings _settings = _AutopilotControlSettings();
   bool _locked = true;
   Timer? _lockTimer;
 
   @override
   void initState() {
     super.initState();
-    _settings = _$AutopilotControlSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure();
   }
 
@@ -117,8 +93,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
           uri,
           headers: {
             "Content-Type": "application/json",
-            "accept": "application/json",
-            "Authorization": "Bearer ${_settings.authToken}"
+            "accept": "application/json"
           },
           body: params
       );
@@ -334,68 +309,6 @@ class _AutopilotHeadingControlVerticalBoxState extends _AutopilotHeadingControlB
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(alignment: Alignment.center, children:  buttons)]);
-  }
-}
-
-class _AutopilotControlSettingsWidget extends BoxSettingsWidget {
-  final BoatInstrumentController _controller;
-  final _AutopilotControlSettings _settings;
-
-  const _AutopilotControlSettingsWidget(this._controller, this._settings);
-
-  @override
-  createState() => _AutopilotControlSettingsState();
-
-  @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$AutopilotControlSettingsToJson(_settings);
-  }
-}
-
-class _AutopilotControlSettingsState extends State<_AutopilotControlSettingsWidget> {
-
-  @override
-  Widget build(BuildContext context) {
-    _AutopilotControlSettings s = widget._settings;
-
-    List<Widget> list = [
-      ListTile(
-          leading: const Text("Client ID:"),
-          title: TextFormField(
-              initialValue: s.clientID,
-              onChanged: (value) => s.clientID = value)
-      ),
-      ListTile(
-          leading: const Text("Request Auth Token:"),
-          title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login))
-      ),
-      ListTile(
-          leading: const Text("Auth Token:"),
-          title: Text(s.authToken)
-      ),
-    ];
-
-    return ListView(children: list);
-  }
-
-  void _requestAuthToken() async {
-    SignalKAuthorization(widget._controller).request(widget._settings.clientID, "Boat Instrument - Autopilot Control",
-            (authToken) {
-          setState(() {
-            widget._settings.authToken = authToken;
-          });
-        },
-            (msg) {
-          if (mounted) {
-            setState(() {
-              widget._settings.authToken = msg;
-            });
-          }
-        });
-
-    setState(() {
-      widget._settings.authToken = 'PENDING - keep this page open until request approved';
-    });
   }
 }
 

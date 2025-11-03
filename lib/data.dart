@@ -902,6 +902,29 @@ class _Settings {
         data['version'] = 2;
       }
 
+      if(data['version'] == 2) {
+        l.i('Backing up configuration file');
+        f.copy('${f.path}.v2');
+        l.i('Converting configuration from version 2 to 3');
+
+        // We have migrated to a single authentication on the main connection, rather
+        // than auth pee-box type.
+        if(data['boxSettings'] != null) {
+          String authToken = '';
+          data['boxSettings'].forEach((k, d) {
+            String a = '';
+            if(authToken.isEmpty && k == 'autopilot-control') a = d['authToken'];
+            if(authToken.isEmpty && k == 'electrical-switches') a = d['authToken'];
+            // The anchor-alarm should have admin access, so is preferred.
+            if(k == 'anchor-alarm') a = d['authToken'];
+            if(a.isNotEmpty) authToken = a;
+          });
+          data['authToken'] = authToken;
+        }
+
+        data['version'] = 3;
+      }
+
       settings =_Settings.fromJson(data);
     } catch (e) {
       var backupPath = '${f.path}.bad.${DateTime.now()}';
