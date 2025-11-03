@@ -133,7 +133,7 @@ class AnchorAlarmBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _AnchorAlarmSettingsWidget(super.config.controller, _$AnchorAlarmSettingsFromJson(json));
+    return _AnchorAlarmSettingsWidget(_$AnchorAlarmSettingsFromJson(json));
   }
 
   @override
@@ -391,10 +391,9 @@ class _AnchorState extends State<AnchorAlarmBox> {
 }
 
 class _AnchorAlarmSettingsWidget extends BoxSettingsWidget {
-  final BoatInstrumentController _controller;
   final _AnchorAlarmSettings _settings;
 
-  const _AnchorAlarmSettingsWidget(this._controller, this._settings);
+  const _AnchorAlarmSettingsWidget(this._settings);
 
   @override
   createState() => _AnchorAlarmSettingsState();

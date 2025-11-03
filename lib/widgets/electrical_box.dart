@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:format/format.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:nanoid/nanoid.dart';
 
 part 'electrical_box.g.dart';
 
@@ -588,7 +587,7 @@ class ElectricalSwitchesBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _ElectricalSwitchesSettingsWidget(super.config.controller, _$ElectricalSwitchesSettingsFromJson(json));
+    return _ElectricalSwitchesSettingsWidget(_$ElectricalSwitchesSettingsFromJson(json));
   }
 
   @override
@@ -778,10 +777,9 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with Swit
 }
 
 class _ElectricalSwitchesSettingsWidget extends BoxSettingsWidget {
-  final BoatInstrumentController _controller;
   final _ElectricalSwitchesSettings _settings;
 
-  const _ElectricalSwitchesSettingsWidget(this._controller, this._settings);
+  const _ElectricalSwitchesSettingsWidget(this._settings);
 
   @override
   createState() => _ElectricalSwitchesSettingsState();
@@ -829,7 +827,7 @@ class ElectricalSwitchBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _ElectricalSwitchesSettingsWidget(super.config.controller, _$ElectricalSwitchesSettingsFromJson(json));
+    return _ElectricalSwitchesSettingsWidget(_$ElectricalSwitchesSettingsFromJson(json));
   }
 
   @override
