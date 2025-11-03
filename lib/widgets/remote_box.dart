@@ -129,7 +129,8 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
 
     List<IconButton> brightnessButtons = [];
     if(s.controlBrightness) {
-      brightnessButtons.add(IconButton(onPressed: disabled ? null : () {_sendAction('nightMode', {});}, icon: Icon(Icons.mode_night)));
+      brightnessButtons.add(IconButton(onPressed: disabled ? null : () {_sendAction('nightMode', {'on': true});}, icon: const Icon(Icons.mode_night)));
+      brightnessButtons.add(IconButton(onPressed: disabled ? null : () {_sendAction('nightMode', {'on': false});}, icon: const Icon(Icons.light_mode)));
       for(int i in BoatInstrumentController.brightnessIcons.keys) {
         brightnessButtons.add(IconButton(
           onPressed: disabled ? null : () {_sendAction('setBrightness', {'level': i});},

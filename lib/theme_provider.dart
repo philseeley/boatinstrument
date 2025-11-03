@@ -21,8 +21,16 @@ class ThemeProvider extends ChangeNotifier {
   void toggleNightMode(bool darkMode) {
     if(themeData == _nightTheme) {
       setDarkMode(darkMode);
-    }else {
+    } else {
       _themeData = _nightTheme;
+    }
+  }
+
+  void setNightMode(bool darkMode, bool on) {
+    if(on) {
+      _themeData = _nightTheme;
+    } else {
+      setDarkMode(darkMode);
     }
   }
 }

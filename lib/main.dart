@@ -208,9 +208,13 @@ class MainPageState extends State<MainPage> {
     );
   }
 
-  void nightMode() {
+  void nightMode({bool? on}) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    themeProvider.toggleNightMode(_controller.darkMode);
+    if(on == null) {
+      themeProvider.toggleNightMode(_controller.darkMode);
+    } else {
+      themeProvider.setNightMode(_controller.darkMode, on);
+    }
   }
 
   void _unmute() {

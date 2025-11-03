@@ -681,7 +681,7 @@ class BoatInstrumentController {
             stepBrightness(level: u.value['level']);
             break;
           case 'nightMode':
-            _mainPageState.nightMode();
+            _mainPageState.nightMode(on: u.value['on']);
             break;
         }
       } catch (e) {
