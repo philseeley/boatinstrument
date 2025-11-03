@@ -948,16 +948,22 @@ class BoatInstrumentController {
     }
   }
 
+  void _send(Object data, {bool controlChannel = false}) {
+    try {
+      (controlChannel?_controlChannel:_dataChannel)?.sink.add(jsonEncode(data));
+    } catch (e) {
+      l.e("Error converting sending ${controlChannel?'control':'data'} data $data", error: e);
+    }
+  }
+
   void _unsubscribe() {
-    _dataChannel?.sink.add(
-      jsonEncode(
-          {
-            "context": "*",
-            "unsubscribe": [
-              {"path": "*"}
-            ]
-          }
-      ),
+    _send(
+      {
+        "context": "*",
+        "unsubscribe": [
+          {"path": "*"}
+        ]
+      }
     );
   }
 
@@ -992,13 +998,11 @@ class BoatInstrumentController {
         });
       }
 
-      _dataChannel?.sink.add(
-        jsonEncode(
-          {
-            "context": "vessels.self",
-            "subscribe": subscribe
-          },
-        ),
+      _send(
+        {
+          "context": "vessels.self",
+          "subscribe": subscribe
+        },
       );
     }
 
@@ -1013,13 +1017,11 @@ class BoatInstrumentController {
         });
       }
 
-      _controlChannel?.sink.add(
-        jsonEncode(
-          {
-            "context": "vessels.self",
-            "subscribe": subscribe
-          },
-        ),
+      _send(controlChannel: true,
+        {
+          "context": "vessels.self",
+          "subscribe": subscribe
+        },
       );
     }
   }
@@ -1033,33 +1035,33 @@ class BoatInstrumentController {
 
       if(_settings!.clientID.isNotEmpty) {
         // If we don't have permission, then updates are ignored.
-        _dataChannel?.sink.add(jsonEncode(
-            {
-              "updates": [{
-                "values": [
-                  {
-                    "path": "$bi.devices.${_settings!.clientID}.pages",
-                    "value": pageNames
-                  }
-                ]
-              }]
-            }
-        ));
+        _send(
+          {
+            "updates": [{
+              "values": [
+                {
+                  "path": "$bi.devices.${_settings!.clientID}.pages",
+                  "value": pageNames
+                }
+              ]
+            }]
+          }
+        );
       }
 
       if(_settings!.groupID.isNotEmpty) {
-        _dataChannel?.sink.add(jsonEncode(
-            {
-              "updates": [{
-                "values": [
-                  {
-                    "path": "$bi.groups.${_settings!.groupID}.pages",
-                    "value": pageNames
-                  }
-                ]
-              }]
-            }
-        ));
+        _send(
+          {
+            "updates": [{
+              "values": [
+                {
+                  "path": "$bi.groups.${_settings!.groupID}.pages",
+                  "value": pageNames
+                }
+              ]
+            }]
+          }
+        );
       }
 
       if(_settings!.supplementalGroupIDs.isNotEmpty) {
@@ -1072,30 +1074,30 @@ class BoatInstrumentController {
           });
         }
 
-        _dataChannel?.sink.add(jsonEncode(
-            {
-              "updates": [{
-                "values": values
-              }]
-            }
-        ));
+        _send(
+          {
+            "updates": [{
+              "values": values
+            }]
+          }
+        );
       }
     }
   }
 
   void sendUpdate(String path, Map<String, dynamic>? value) {
-    _dataChannel?.sink.add(jsonEncode(
-        {
-          "updates": [{
-            "values": [
-              {
-                "path": path,
-                "value": value
-              }
-            ]
-          }]
-        }
-    ));
+    _send(
+      {
+        "updates": [{
+          "values": [
+            {
+              "path": path,
+              "value": value
+            }
+          ]
+        }]
+      }
+    );
   }
 
   void _networkTimeout () {
