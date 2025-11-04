@@ -4,7 +4,9 @@ part of 'boatinstrument_controller.dart';
 // assets/doc and referenced with the "doc:" scheme, e.g.
 //   @override
 //   Widget? getHelp(BuildContext context) => const HelpPage(url: 'doc:my_help.md');
-
+//
+// Only use H1 to H3, i.e. #, ## and ### headers.
+//
 // If referencing icons, download them as PNG from https://fonts.google.com/icons
 // as 32pt and colour #000000 for the light theme and #FFFFFF for the dark theme.
 // The icons should be referenced as:
@@ -76,7 +78,10 @@ class HelpPageState extends State<HelpPage> {
             LinkConfig(
               style: TextStyle(decoration: TextDecoration.underline),
               onTap: (url) {loadData(url, true);}
-            )
+            ),
+            H1Config(style: H2Config().style),
+            H2Config(style: H3Config().style),
+            H3Config(style: H4Config().style)
           ]),
           data: _text!,
         )
