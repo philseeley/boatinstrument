@@ -1,5 +1,7 @@
 Ensure the **signalk-anchoralarm-plugin** is installed and configured on signalk.
 
+To be able to set the **Anchor Alarm**, the device must be given "admin" permission to SignalK.
+
 When you drop your anchor press the ![anchor](assets/icons/__THEME__/anchor.png) button. Then payout your chain/rode. Once dug-in, press the ![set radius](assets/icons/__THEME__/cancel.png) button to set the alarm radius. The **Alarm Radius Fudge Factor** setting in the **signalk-anchoralarm-plugin** gets added to your current distance from the anchor.
 
 Once set, the anchor position can be moved by unlocking and dragging the anchor.

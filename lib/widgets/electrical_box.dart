@@ -593,11 +593,9 @@ class ElectricalSwitchesBox extends BoxWidget {
   @override
   Widget? getHelp() => const HelpPage(text: '''**Note:** due to the scrollable list of Switches, swipe down from the title to configure.
 
-This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.''');
+This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.
 
-  @override
-  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an **Auth Token** and without closing the settings page authorise the device in the signalk web interface. When the **Auth Token** is shown, the settings page can be closed.
-The Client ID can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the ID can be set to the same value for all instruments to share the same authorisation.''');
+To be able to control switches, the device must be given "read/write" permission to SignalK.''');
 
   @override
   State<ElectricalSwitchesBox> createState() => _ElectricalSwitchesBoxState();
@@ -831,7 +829,7 @@ class ElectricalSwitchBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp() => const HelpPage(text: 'This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**.');
+  Widget? getHelp() => const HelpPage(text: 'This Box requires digital switching plugins that allow **PUT** requests, e.g. **signalk-empirbusnxt-plugin**. To be able to control switches, the device must be given "read/write" permission to SignalK.');
 
   @override
   bool get hasPerBoxSettings => true;
@@ -840,10 +838,6 @@ class ElectricalSwitchBox extends BoxWidget {
   BoxSettingsWidget getPerBoxSettingsWidget() {
     return _ElectricalSettingsWidget(config.controller, _perBoxSettings, 'Switch', 'electrical.switches');
   }
-
-  @override
-  Widget? getSettingsHelp() => const HelpPage(text: '''To be able to control switches, the device must be given "read/write" permission to signalk. Request an **Auth Token** and without closing the settings page authorise the device in the signalk web interface. When the **Auth Token** is shown, the settings page can be closed.
-The **Client ID** can be set to reflect the instrument's location, e.g. "boatinstrument-electrical-switches-tablet". Or the **ID** can be set to the same value for all instruments to share the same authorisation.''');
 
   @override
   Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "electrical.switch.1.state" the ID is "1"');
