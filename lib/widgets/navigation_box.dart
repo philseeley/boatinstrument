@@ -76,7 +76,7 @@ class CrossTrackErrorDeltaBox extends DoubleValueSemiGaugeBox {
 
   @override
   String units(double value) {
-    return '\u0394'; // Delta symbol
+    return deltaChar; // Delta symbol
   }
 
   @override

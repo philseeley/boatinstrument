@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -228,5 +231,394 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
               onChanged: (value) => s.timeFormat = value)
       ),
     ]);
+  }
+}
+
+@JsonSerializable()
+class _TimerDisplaySettings {
+  String id;
+   bool allowRestart;
+   bool allowStop;
+
+  _TimerDisplaySettings({
+    this.id = '',
+    this.allowRestart = true,
+    this.allowStop = false
+  });
+}
+
+class TimerDisplayBox extends BoxWidget {
+  late final _TimerDisplaySettings _perBoxSettings;
+
+  static String sid = 'timer-display';
+  @override
+  String get id => sid;
+
+  TimerDisplayBox(super.config, {super.key})  {
+    _perBoxSettings = _$TimerDisplaySettingsFromJson(config.settings);
+  }
+
+  @override
+  State<TimerDisplayBox> createState() => _TimerDisplayBoxState();
+
+  @override
+  Widget? getHelp() => const HelpPage(url: 'doc:timers.md');
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _TimerDisplaySettingsWidget(config.controller, _perBoxSettings);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'Timers must first be defined and activated using the **Timers Setup** Box. The Restart and Stop buttons will only be displayed for Delta Timers.');
+}
+
+class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
+  _Timer? _timer;
+  DateTime? _expires;
+  Timer? _updateTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.${widget._perBoxSettings.id}'}, dataType: SignalKDataType.static);
+  }
+
+  @override
+  void dispose() {
+    _updateTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(widget.config.editMode) {
+      _expires = widget.config.controller.now().add(Duration(minutes: 123));
+    }
+
+    Duration? d = _expires?.difference(widget.config.controller.now());
+
+    String expiresStr = _expires==null?'':TimeOfDayConverter.timeFormat.format(_expires!.toLocal());
+    String deltaStr = _timer!=null && _timer!.delta?' ${TimeOfDayConverter().toJson(_timer!.time)} $deltaChar':'';
+
+    header = 'Timer:${widget._perBoxSettings.id} $expiresStr$deltaStr';
+    text = d==null?'-':duration2String(d);
+    color = (d!=null && d.isNegative)?widget.config.controller.val2PSColor(context, -1):null;
+
+    return Stack(children: [
+      super.build(context),
+      if(_timer!=null && _timer!.delta) Positioned(top: 0, right: 0, child: Row(children: [
+        if(widget._perBoxSettings.allowStop) IconButton(onPressed: _stop, icon: Icon(Icons.stop)),
+        if(widget._perBoxSettings.allowRestart) IconButton(onPressed: _restart, icon: Icon(Icons.restore))
+      ]))
+    ]);
+  }
+
+  void _restart () {
+    _TimersSetupBoxState.start(widget.config.controller, _timer!);
+  }
+
+  void _stop () {
+    _TimersSetupBoxState.stop(widget.config.controller, _timer!);
+  }
+
+  void _processData(List<Update> updates) {
+    if(updates[0].value == null) {
+      _timer = _expires = null;
+      _updateTimer?.cancel();
+      _updateTimer = null;
+    } else {
+      try {
+        dynamic v = updates[0].value;
+
+        _timer = null;
+        _expires = DateTime.tryParse(v['expires']??'');
+        _updateTimer?.cancel();
+        _updateTimer = null;
+
+        if(_expires != null) {
+          _timer = _Timer(
+            id: widget._perBoxSettings.id,
+            time: TimeOfDayConverter().fromJson(v['time']),
+            delta: v['delta']
+          );
+          
+          _updateTimer = Timer.periodic(Duration(seconds: 1), (_) {if(mounted) setState(() {});});
+        }
+      } catch (e) {
+        widget.config.controller.l.e("Error parsing date/time $updates", error: e);
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
+  }
+}
+
+class _TimerDisplaySettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
+  final _TimerDisplaySettings _settings;
+
+  const _TimerDisplaySettingsWidget(this._controller, this._settings);
+
+  @override
+  createState() => _TimerDisplaySettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$TimerDisplaySettingsToJson(_settings);
+  }
+}
+
+class _TimerDisplaySettingsState extends State<_TimerDisplaySettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _TimerDisplaySettings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+        leading: Text("Timer ID:"),
+        title: SignalkPathDropdownMenu(
+          widget._controller,
+          s.id,
+          '$bi.timers',
+          (value) => s.id = value)
+      ),
+      SwitchListTile(title: const Text("Allow Restart:"),
+        value: s.allowRestart,
+        onChanged: (bool value) {
+          setState(() {
+            s.allowRestart = value;
+          });
+        }
+      ),
+      SwitchListTile(title: const Text("Allow Stop:"),
+        value: s.allowStop,
+        onChanged: (bool value) {
+          setState(() {
+            s.allowStop = value;
+          });
+        }
+      )
+    ]);
+  }
+}
+
+@JsonSerializable()
+@TimeOfDayConverter()
+class _Timer {
+  String id;
+  TimeOfDay time;
+  bool delta;
+
+  _Timer({
+    this.id = '',
+    this.time = const TimeOfDay(hour: 0, minute: 0),
+    this.delta = false});
+
+  factory _Timer.fromJson(Map<String, dynamic> json) =>
+      _$TimerFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TimerToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class _TimersSettings {
+  late List<_Timer> timers;
+
+  _TimersSettings({
+     this.timers = const []}) {
+       if(timers.isEmpty) timers = [];
+    }
+
+  factory _TimersSettings.fromJson(Map<String, dynamic> json) =>
+      _$TimersSettingsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TimersSettingsToJson(this);
+}
+
+class TimersSetupBox extends BoxWidget {
+
+  static String sid = 'timers-setup';
+  @override
+  String get id => sid;
+
+  const TimersSetupBox(super.config, {super.key});
+  
+  @override
+  State<TimersSetupBox> createState() => _TimersSetupBoxState();
+
+  @override
+  Widget? getHelp() => const HelpPage(url: 'doc:timers.md');
+
+  @override
+  bool get hasSettings => true;
+
+  @override
+  BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
+    return _TimersSetupSettings(config.controller, _TimersSettings.fromJson(json));
+  }
+}
+
+class _TimersSetupBoxState extends State<TimersSetupBox> {
+  _TimersSettings? _settings;
+
+  @override
+  void initState() {
+    super.initState();
+    _settings = _TimersSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    widget.config.controller.configure();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(padding: EdgeInsetsGeometry.all(5), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        const HeaderText('Timers'),
+        if(!widget.config.editMode) IconButton(onPressed: _edit, icon: Icon(Icons.settings))
+      ])),
+      Expanded(child: ListView.builder(itemCount: _settings!.timers.length, itemBuilder: (context, i) {
+        _Timer timer = _settings!.timers[i];
+        return ListTile(key: UniqueKey(),
+          leading: Row(mainAxisSize: MainAxisSize.min, children: [
+            IconButton(onPressed: () {start(widget.config.controller, timer);}, icon: Icon(Icons.play_arrow)),
+            IconButton(onPressed: () {stop(widget.config.controller, timer);}, icon: Icon(Icons.stop))
+          ]),
+          title: Row(children: [Text('${TimeOfDayConverter.format(timer.time)} '), Icon(timer.delta?Icons.change_history:Icons.timer), Text(' ${timer.id}')]),
+        );
+      }))
+    ]);
+  }
+
+  void _edit() async {
+    if(mounted) await widget.config.controller.showSettingsPage(context, widget);
+
+    _settings = _TimersSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    
+    widget.config.controller.save();
+
+    setState(() {});
+  }
+
+  static void start(BoatInstrumentController controller, _Timer timer) {
+    DateTime now = controller.now();
+    DateTime expires = timer.delta?
+      now.add(Duration(hours: timer.time.hour, minutes: timer.time.minute)):
+      DateTime(now.year, now.month, now.day, timer.time.hour, timer.time.minute);
+
+    if(expires.isBefore(now)) expires = expires.add(Duration(days: 1));
+
+    controller.sendUpdate('$bi.timers.${timer.id}', {
+      'time': TimeOfDayConverter.format(timer.time),
+      'delta': timer.delta,
+      'expires': expires.toUtc().toIso8601String()
+    });
+  }
+
+  static void stop(BoatInstrumentController controller, _Timer timer) {
+    controller.sendUpdate('$bi.timers.${timer.id}', {
+      'time': TimeOfDayConverter.format(timer.time),
+      'delta': timer.delta,
+      'expires': null
+    });
+  }
+}
+
+class _TimersSetupSettings extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
+  final _TimersSettings _settings;
+
+  const _TimersSetupSettings(this._controller, this._settings);
+  
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _settings.toJson();
+  }
+
+  @override
+  State<_TimersSetupSettings> createState() => _TimersSetupSettingsState();
+}
+
+class _TimersSetupSettingsState extends State<_TimersSetupSettings> {
+
+  @override
+  Widget build(BuildContext context) {
+    _TimersSettings s = widget._settings;
+    Color fg = Theme.of(context).colorScheme.onSurface;
+    Color bg = widget._controller.val2PSColor(context, 1, none: Colors.grey);
+
+    List<ListTile> items = [];
+    for(int i=0; i<s.timers.length; ++i) {
+      _Timer timer = s.timers[i];
+      items.add(ListTile(
+        key: UniqueKey(),
+        leading: Row(mainAxisSize: MainAxisSize.min, children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(foregroundColor: fg, backgroundColor: bg),
+            child: Text(TimeOfDayConverter.format(timer.time)),
+            onPressed: () { _selectTime(timer);}
+          ),
+          IconButton(onPressed: () {setState(() {timer.delta = !timer.delta;});}, icon: Icon(timer.delta?Icons.change_history:Icons.timer))
+        ]),
+        title: TextFormField(
+          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
+          decoration: const InputDecoration(hintText: 'id'),
+          initialValue: timer.id,
+          onChanged: (value) => timer.id = value),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          IconButton(onPressed: () {_deleteTimer(i);}, icon: Icon(Icons.delete)),
+          ReorderableDragStartListener(index: i, child: const Icon(Icons.drag_handle))
+        ])
+      ));
+    }
+
+    return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _checkIDs();}, child: Column(children: [
+      Row(children: [
+        IconButton(tooltip: 'Add Timer', icon: const Icon(Icons.add),onPressed: _addTimer),
+      ]),
+      Expanded(child: ReorderableListView(buildDefaultDragHandles: false, children: items, onReorder: (oldIndex, newIndex) {
+        setState(() {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          _Timer t = s.timers.removeAt(oldIndex);
+          s.timers.insert(newIndex, t);
+        });
+      }))
+    ]));
+  }
+
+  void _checkIDs () {
+    if(widget._settings.timers.every((timer) {return timer.id.isNotEmpty;})) {
+      Navigator.pop(context);
+    } else {
+      widget._controller.showMessage(context, 'Timer IDs cannot be blank');
+    }
+  }
+
+  void _addTimer() {
+    setState(() {
+      widget._settings.timers.add(_Timer());
+    });
+  }
+
+  Future<void> _deleteTimer(int i) async {
+    setState(() {
+      widget._settings.timers.removeAt(i);
+    });
+  }
+
+  Future<void> _selectTime (_Timer timer) async {
+    TimeOfDay? tod = await showTimePicker(context: context, initialTime: timer.time);
+    if(tod != null) {
+      setState(() {
+        timer.time = tod;
+      });
+    }
   }
 }

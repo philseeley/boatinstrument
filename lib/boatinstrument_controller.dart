@@ -30,6 +30,7 @@ import 'package:http/http.dart' as http;
 import 'package:format/format.dart' as fmt;
 import 'package:flutter/services.dart';
 import 'package:bonsoir/bonsoir.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:text_scroll/text_scroll.dart';
@@ -1085,7 +1086,7 @@ class BoatInstrumentController {
     }
   }
 
-  void sendUpdate(String path, Map<String, dynamic>? value) {
+  void sendUpdate(String path, dynamic value) {
     _send(
       {
         "updates": [{
@@ -1268,4 +1269,20 @@ class BoatInstrumentController {
 
     _timeSet = true;
   }
+
+  Future<void> showSettingsPage (BuildContext context, BoxWidget boxWidget) async {
+    BoxSettingsWidget boxSettingsWidget =  boxWidget.getSettingsWidget(getBoxSettingsJson(boxWidget.id))!;
+
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+          return _BoxSettingsPage(
+              boxSettingsWidget,
+              boxWidget.getSettingsHelp()
+          );
+        })
+    );
+
+    _settings?.boxSettings[boxWidget.id] = boxSettingsWidget.getSettingsJson();
+  }
+
 }

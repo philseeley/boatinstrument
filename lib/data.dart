@@ -2,6 +2,7 @@ part of 'boatinstrument_controller.dart';
 
 const String bi = 'boatinstrument';
 const String degreesUnits = '\u00B0T'; // degrees symbol.
+const String deltaChar = '\u0394';
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
 const String idChars = '[0-9a-zA-Z_-]';
@@ -29,9 +30,9 @@ String duration2String (Duration d) {
   List<String> parts = d.toString().split(RegExp('[.:]'));
   int hours = int.parse(parts[0]);
   int days = hours~/24;
-  if(days > 0) {
+  if(days.abs() > 0) {
     return '${days}d${hours%24}h';
-  } else if(hours > 0) {
+  } else if(hours.abs() > 0) {
     return '${hours}h${parts[1]}m';
   }
   return '${parts[1]}m${parts[2]}s';
@@ -442,6 +443,22 @@ BoxDetails getBoxDetails(String id) {
 
   CircularLogger().e('Unknown widget with ID $id', error: Exception('Unknown widget with ID $id'));
   return boxDetails[0];
+}
+
+class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {
+  static DateFormat timeFormat = DateFormat('HH:mm');
+  static String format(TimeOfDay object) => timeFormat.format(DateTime(1, 1, 1, object.hour, object.minute));
+
+  const TimeOfDayConverter();
+
+  @override
+  TimeOfDay fromJson(String json) {
+    DateTime dt = timeFormat.parse(json);
+    return TimeOfDay(hour: dt.hour, minute: dt.minute);
+  }
+
+  @override
+  String toJson(TimeOfDay object) => format(object);
 }
 
 class Update {

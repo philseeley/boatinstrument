@@ -115,6 +115,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(CompassGaugeBox.sid, gauge: true, (config) {return CompassGaugeBox(config, key: UniqueKey());}),
   BoxDetails(StarlinkBox.sid, (config) {return StarlinkBox(config, key: UniqueKey());}),
   BoxDetails(RemoteControlBox.sid, (config) {return RemoteControlBox(config, key: UniqueKey());}),
+  BoxDetails(TimerDisplayBox.sid, (config) {return TimerDisplayBox(config, key: UniqueKey());}),
+  BoxDetails(TimersSetupBox.sid, (config) {return TimersSetupBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -306,7 +308,11 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(RPiSDUtilisationBox.sid, 'Disk Utilisation'),
         _widgetMenuEntry(RaspberryPiBox.sid, 'Raspberry Pi'),
       ]),
-      _widgetMenuEntry(DateTimeBox.sid, 'Date/Time'),
+      _widgetSubMenuEntry(box, 'Time', [
+        _widgetMenuEntry(DateTimeBox.sid, 'Date/Time'),
+        _widgetMenuEntry(TimerDisplayBox.sid, 'Timer Display'),
+        _widgetMenuEntry(TimersSetupBox.sid, 'Timers Setup'),
+      ]),
       _widgetMenuEntry(CustomTextBox.sid, 'Text'),
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
@@ -582,18 +588,7 @@ class _EditPageState extends State<_EditPage> {
   }
 
   Future<void> _showSettingsPage (BoxWidget boxWidget) async {
-    BoxSettingsWidget boxSettingsWidget =  boxWidget.getSettingsWidget(widget._controller.getBoxSettingsJson(boxWidget.id))!;
-
-    await Navigator.push(
-        context, MaterialPageRoute(builder: (context) {
-          return _BoxSettingsPage(
-              boxSettingsWidget,
-              boxWidget.getSettingsHelp()
-          );
-        })
-    );
-
-    widget._controller._settings?.boxSettings[boxWidget.id] = boxSettingsWidget.getSettingsJson();
+    if(mounted) await widget._controller.showSettingsPage(context, boxWidget);
 
     setState(() {});
   }
