@@ -237,11 +237,13 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
 @JsonSerializable()
 class _TimerDisplaySettings {
   String id;
+  NotificationState notificationState;
    bool allowRestart;
    bool allowStop;
 
   _TimerDisplaySettings({
     this.id = '',
+    this.notificationState = NotificationState.warn,
     this.allowRestart = true,
     this.allowStop = false
   });
@@ -273,8 +275,14 @@ class TimerDisplayBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'Timers must first be defined and activated using the **Timers Setup** Box. The Restart and Stop buttons will only be displayed for Delta Timers.');
-}
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''Timers must first be defined and activated using the **Timers Setup** Box.
+
+The Restart and Stop buttons will only be displayed for Delta Timers.
+
+Setting the **Alert Level** to "Normal" or "Nominal" will disable the audio alarm.
+
+**Note:** audio will only sound when the **Timer Display** Box is visible on the current Page.''');
+  }
 
 class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
   _Timer? _timer;
@@ -306,7 +314,11 @@ class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
 
     header = 'Timer:${widget._perBoxSettings.id} $expiresStr$deltaStr';
     text = d==null?'-':duration2String(d);
-    color = (d!=null && d.isNegative)?widget.config.controller.val2PSColor(context, -1):null;
+    color = null;
+    if(d!=null && d.isNegative) {
+      color = widget.config.controller.val2PSColor(context, -1);
+      if(widget._perBoxSettings.notificationState.soundFile!=null) widget.config.controller.playSoundFile(widget._perBoxSettings.notificationState.soundFile!);
+    }
 
     return Stack(children: [
       super.build(context),
@@ -388,6 +400,17 @@ class _TimerDisplaySettingsState extends State<_TimerDisplaySettingsWidget> {
           s.id,
           '$bi.timers',
           (value) => s.id = value)
+      ),
+      ListTile(
+          leading: const Text("Alert Level:"),
+          title: EnumDropdownMenu(
+            NotificationState.values,
+            s.notificationState,
+            (v) {
+              setState(() {
+                s.notificationState = v!;
+              });
+            })
       ),
       SwitchListTile(title: const Text("Allow Restart:"),
         value: s.allowRestart,

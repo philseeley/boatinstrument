@@ -92,19 +92,23 @@ class CircularLogger extends Logger {
             }));
 }
 
-enum NotificationState {
-  normal(false, 1, null),
-  nominal(false, 1, null),
-  alert(false, 5, 'alert.mp3'),
-  warn(false, 10, 'warning.mp3'),
-  alarm(true, 20, 'alarm.mp3'),
-  emergency(true, 30, 'emergency.wav');
+enum NotificationState implements EnumMenuEntry {
+  normal('Normal', false, 1, null),
+  nominal('Nominal', false, 1, null),
+  alert('Alert', false, 5, 'alert.mp3'),
+  warn('Warning', false, 10, 'warning.mp3'),
+  alarm('Alarm', true, 20, 'alarm.mp3'),
+  emergency('Emergency', true, 30, 'emergency.wav');
+
+  @override
+  String get displayName => _displayName;
+  final String _displayName;
 
   final bool error;
   final int count;
   final String? soundFile;
 
-  const NotificationState(this.error, this.count, this.soundFile);
+  const NotificationState(this._displayName, this.error, this.count, this.soundFile);
 }
 
 class NotificationStatus {
@@ -364,6 +368,10 @@ class BoatInstrumentController {
       case FluidRateUnits.usGallonsPerHour:
         return value * 951019.388489;
     }
+  }
+
+  void playSoundFile(String soundFile) {
+    _audioPlayer?.play(AssetSource(soundFile));
   }
 
   Future<void> _loadDefaultConfig(bool portrait) async {
@@ -641,7 +649,7 @@ class BoatInstrumentController {
                 }));
 
             if (playSound && newState.soundFile != null) {
-              _audioPlayer?.play(AssetSource(newState.soundFile!));
+              playSoundFile(newState.soundFile!);
             }
           }
         } catch(e) {
