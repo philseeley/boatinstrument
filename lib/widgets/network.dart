@@ -47,15 +47,19 @@ class _StarlinkBoxState extends State<StarlinkBox> with DoubleValeBoxPainter {
 
     Widget main = Container();
     if(_hardware != null) {
-      String filename = 'assets/Starlink_Standard.png';
+      String filename = 'standard.png';
 
       if(_hardware!.startsWith('mini')) {
-        filename = 'assets/Starlink_Mini.png';
-      } else if(_hardware!.toLowerCase().contains('actuated')) {
-        filename = 'assets/Starlink_StandardActuated.png';
+        filename = 'mini.png';
+      } else if(_hardware!.startsWith('rev4_hp_')) {
+        filename = 'performance-gen3.png';
+      } else if(_hardware!.startsWith('rev_hp1')) {
+        filename = 'performance-gen2.png';
+      } else if(_hardware!.startsWith('rev3')) {
+        filename = 'standard-actuated.png';
       }
 
-      main = Image(width: double.infinity, image: AssetImage(filename));
+      main = Image(width: double.infinity, image: AssetImage('assets/starlink/$filename'));
     }
 
     return Container(
