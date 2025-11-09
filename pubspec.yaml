@@ -92,6 +92,7 @@ flutter:
     - assets/icons/
     - assets/icons/dark/
     - assets/icons/light/
+    - assets/starlink/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
