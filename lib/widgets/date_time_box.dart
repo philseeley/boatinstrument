@@ -645,3 +645,96 @@ class _TimersSetupSettingsState extends State<_TimersSetupSettings> {
     }
   }
 }
+
+class StopwatchBox extends BoxWidget {
+
+  static String sid = 'stopwatch';
+  @override
+  String get id => sid;
+
+  const StopwatchBox(super.config, {super.key});
+
+  @override
+  State<StopwatchBox> createState() => _StopwatchBoxState();
+}
+
+class _StopwatchBoxState extends HeadedBoxState<StopwatchBox> {
+  static Duration _duration = Duration();
+  static DateTime? _startTime;
+  static bool _paused = false;
+  Timer? _updateTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    header = 'Stopwatch';
+    widget.config.controller.configure();
+    if(!_paused) _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _stopTimer();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(_startTime!= null) _duration = widget.config.controller.now().difference(_startTime!);
+
+    text = _duration.toString();
+    text = text.substring(0, text.lastIndexOf('.'));
+
+    return Stack(children: [
+      super.build(context),
+      Positioned(top: 0, right: 0, child: Row(children: [
+        IconButton(onPressed: _start, icon: Icon(_startTime!=null||_paused?Icons.restore:Icons.play_arrow)),
+        IconButton(onPressed: _startTime!=null || _paused?_togglePause:null, icon: Icon(_paused?Icons.not_started:Icons.pause)),
+        IconButton(onPressed: _stop, icon: Icon(Icons.stop))
+      ]))
+    ]);
+  }
+
+  void _start ({bool restart = true}) {
+    setState(() {
+      if(!restart && _paused) {
+        _startTime = widget.config.controller.now().subtract(_duration);
+      } else {
+        _startTime = widget.config.controller.now();
+      }
+      _paused = false;
+    });
+    _startTimer();
+  }
+
+  void _togglePause () {
+    _stopTimer();
+
+    setState(() {
+      if(_paused) {
+        _start(restart: false);
+      } else {
+        _startTime = null;
+        _paused = true;
+      }
+    });
+  }
+
+  void _stop () {
+    setState(() {
+      _startTime = null;
+      _paused = false;
+    });
+    _stopTimer();
+  }
+
+  void _startTimer() {
+    _updateTimer?.cancel();
+    _updateTimer = Timer.periodic(Duration(seconds: 1), (_) {if(mounted) setState(() {});});
+  }
+
+  void _stopTimer () {
+    _updateTimer?.cancel();
+    _updateTimer = null;
+  }
+}

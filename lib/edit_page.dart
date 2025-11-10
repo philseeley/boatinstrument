@@ -117,6 +117,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(RemoteControlBox.sid, (config) {return RemoteControlBox(config, key: UniqueKey());}),
   BoxDetails(TimerDisplayBox.sid, (config) {return TimerDisplayBox(config, key: UniqueKey());}),
   BoxDetails(TimersSetupBox.sid, (config) {return TimersSetupBox(config, key: UniqueKey());}),
+  BoxDetails(StopwatchBox.sid, (config) {return StopwatchBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -312,6 +313,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(DateTimeBox.sid, 'Date/Time'),
         _widgetMenuEntry(TimerDisplayBox.sid, 'Timer Display'),
         _widgetMenuEntry(TimersSetupBox.sid, 'Timers Setup'),
+        _widgetMenuEntry(StopwatchBox.sid, 'Stopwatch'),
       ]),
       _widgetMenuEntry(CustomTextBox.sid, 'Text'),
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
