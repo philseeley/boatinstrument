@@ -133,6 +133,7 @@ class _SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLinux = Platform.isLinux;
     _Settings settings = widget._controller._settings!;
     final themeProvider = Provider.of<ThemeProvider>(context);
 
@@ -394,8 +395,9 @@ class _SettingsState extends State<SettingsPage> {
         title: const Text("Settings"),
         actions: [
           if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.power_settings_new), onPressed: _exit),
-          IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
+          if(!isLinux) IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
           IconButton(tooltip: 'Import', icon: const Icon(Icons.file_open), onPressed: _import),
+          if(!isLinux) IconButton(tooltip: 'Export Files', icon: const Icon(Icons.upload), onPressed: () {_upload(context);}),
           IconButton(tooltip: 'Subscriptions', icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
           IconButton(tooltip: 'Help', icon: const Icon(Icons.help), onPressed: _showHelpPage),
           IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: () {LogDisplay.show(context);})
@@ -439,6 +441,24 @@ class _SettingsState extends State<SettingsPage> {
         setState(() {});
       } catch (e) {
         widget._controller.l.e('Failed to import settings', error: e);
+      }
+    }
+  }
+
+  void _upload (BuildContext context) async {
+    Directory dir = await path_provider.getApplicationDocumentsDirectory();
+
+    if(context.mounted) {
+      String? path = await FilesystemPicker.open(
+        title: 'Export',     
+        context: context,
+        rootDirectory: dir,
+        showGoUp: false,
+        fsType: FilesystemType.file,
+        fileTileSelectMode: FileTileSelectMode.wholeTile);
+
+      if(path != null) {
+        await SharePlus.instance.share(ShareParams(files: [XFile(path)], subject: 'Boat Instrument Export'));
       }
     }
   }

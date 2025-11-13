@@ -46,6 +46,7 @@ dependencies:
   nanoid:
   share_plus:
   file_picker:
+  filesystem_picker:
   provider:
   flutter_inappwebview:
   screen_brightness:

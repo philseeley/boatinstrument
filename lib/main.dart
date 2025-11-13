@@ -26,9 +26,11 @@ void main(List<String> cmdlineArgs) {
 
 void logError(FlutterErrorDetails details) async {
   FlutterError.dumpErrorToConsole(details);
+  String errorStr = '${details.exceptionAsString()}\n${details.stack}';
+  CircularLogger().e(errorStr);
   Directory directory = await path_provider.getApplicationDocumentsDirectory();
   File('${directory.path}/boatinstrument-error.log').writeAsStringSync(
-    '${DateTime.now()}\n${details.exceptionAsString()}\n${details.stack}\n',
+    '${DateTime.now()}\n$errorStr\n',
     mode: FileMode.append,
     flush: true);
 }

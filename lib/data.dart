@@ -874,8 +874,7 @@ class _Settings {
       dynamic data = json.decode(s);
 
       if(data['version'] == 0) {
-        l.i('Backing up configuration file');
-        f.copy('${f.path}.v0');
+        _backup(f, 'v0');
         l.i('Converting configuration from version 0 to 1');
 
         // New format for specifying SignalK server.
@@ -904,8 +903,7 @@ class _Settings {
       }
       
       if(data['version'] == 1) {
-        l.i('Backing up configuration file');
-        f.copy('${f.path}.v1');
+        _backup(f, 'v1');
         l.i('Converting configuration from version 1 to 2');
 
         // PositionBox now combines the separate lat/long formats into one.
@@ -920,8 +918,7 @@ class _Settings {
       }
 
       if(data['version'] == 2) {
-        l.i('Backing up configuration file');
-        f.copy('${f.path}.v2');
+        _backup(f, 'v2');
         l.i('Converting configuration from version 2 to 3');
 
         // We have migrated to a single authentication on the main connection, rather
@@ -944,10 +941,8 @@ class _Settings {
 
       settings =_Settings.fromJson(data);
     } catch (e) {
-      var backupPath = '${f.path}.bad.${DateTime.now()}';
-      l.e('Failed to decode config. Backing up to $backupPath', error: e);
-      f.copy(backupPath);
-
+      l.e('Failed to decode config', error: e);
+       _backup(f, 'bad.${DateTime.now()}');
       rethrow;
     }
     return settings;
@@ -955,6 +950,12 @@ class _Settings {
 
   void _save (){
     _store?.writeAsStringSync(json.encode(toJson()));
+  }
+
+  static void _backup(File f, String ext) {
+    var backupPath = '${f.path}.$ext';
+    CircularLogger().i('Backing up ${f.path} to $backupPath');
+    f.copy(backupPath);
   }
 }
 
