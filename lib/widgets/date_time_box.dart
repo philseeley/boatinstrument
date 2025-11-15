@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:format/format.dart' as fmt;
 import 'package:json_annotation/json_annotation.dart';
 
 part 'date_time_box.g.dart';
@@ -313,7 +314,7 @@ class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
     String deltaStr = _timer!=null && _timer!.delta?' ${TimeOfDayConverter().toJson(_timer!.time)} $deltaChar':'';
 
     header = 'Timer:${widget._perBoxSettings.id} $expiresStr$deltaStr';
-    text = d==null?'-':duration2String(d);
+    text = d==null?'-':duration2HumanString(d);
     color = null;
     if(d!=null && d.isNegative) {
       color = widget.config.controller.val2PSColor(context, -1);
@@ -658,16 +659,17 @@ class StopwatchBox extends BoxWidget {
   State<StopwatchBox> createState() => _StopwatchBoxState();
 }
 
-class _StopwatchBoxState extends HeadedBoxState<StopwatchBox> {
+class _StopwatchBoxState extends State<StopwatchBox> {
   static Duration _duration = Duration();
   static DateTime? _startTime;
   static bool _paused = false;
+  static final List<Duration> _laps = [];
+  static bool _deltaLaps = true;
   Timer? _updateTimer;
 
   @override
   void initState() {
     super.initState();
-    header = 'Stopwatch';
     widget.config.controller.configure();
     if(!_paused) _startTimer();
   }
@@ -682,17 +684,28 @@ class _StopwatchBoxState extends HeadedBoxState<StopwatchBox> {
   Widget build(BuildContext context) {
     if(_startTime!= null) _duration = widget.config.controller.now().difference(_startTime!);
 
-    text = _duration.toString();
-    text = text.substring(0, text.lastIndexOf('.'));
+    StringBuffer lapsList = StringBuffer();
+    for(int i=0; i<_laps.length; ++i) {
+      Duration d = _laps[i];
+      if(_deltaLaps && i > 0) d -= _laps[i-1];
+      lapsList.writeln(fmt.format('{:2d}: {}', i, duration2String(d)));
+    }
 
-    return Stack(children: [
-      super.build(context),
-      Positioned(top: 0, right: 0, child: Row(children: [
+    return Padding(padding: EdgeInsets.all(5), child: Column(children: [
+      Expanded(child: Row(children: [
+        Expanded(child: MaxTextWidget(duration2String(_duration))),
+        if(lapsList.isNotEmpty) Column(children: [
+          IconButton(onPressed: _toggleDeltaLaps, icon: Icon(_deltaLaps?Icons.change_history:Icons.timer)),
+          Expanded(child: SingleChildScrollView(child: Text(lapsList.toString())))
+        ])
+      ])),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         IconButton(onPressed: _start, icon: Icon(_startTime!=null||_paused?Icons.restore:Icons.play_arrow)),
         IconButton(onPressed: _startTime!=null || _paused?_togglePause:null, icon: Icon(_paused?Icons.not_started:Icons.pause)),
-        IconButton(onPressed: _stop, icon: Icon(Icons.stop))
-      ]))
-    ]);
+        IconButton(onPressed: _startTime!=null?_lap:null, icon: Icon(Icons.list)),
+        IconButton(onPressed: _startTime!=null?_stop:null, icon: Icon(Icons.stop))
+      ])
+    ]));
   }
 
   void _start ({bool restart = true}) {
@@ -700,6 +713,7 @@ class _StopwatchBoxState extends HeadedBoxState<StopwatchBox> {
       if(!restart && _paused) {
         _startTime = widget.config.controller.now().subtract(_duration);
       } else {
+        _laps.clear();
         _startTime = widget.config.controller.now();
       }
       _paused = false;
@@ -720,12 +734,24 @@ class _StopwatchBoxState extends HeadedBoxState<StopwatchBox> {
     });
   }
 
+  void _lap () {
+    setState(() {
+      _laps.add(_duration);
+    });
+  }
+
   void _stop () {
     setState(() {
       _startTime = null;
       _paused = false;
     });
     _stopTimer();
+  }
+
+  void _toggleDeltaLaps () {
+    setState(() {
+      _deltaLaps = !_deltaLaps;
+    });
   }
 
   void _startTimer() {

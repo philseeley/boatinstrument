@@ -297,7 +297,7 @@ class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
 
     if(_timeToGo != null) {
       Duration ttg = Duration(seconds: _timeToGo!);
-      text = duration2String(ttg);
+      text = duration2HumanString(ttg);
 
       DateTime now = widget.config.controller.now().toLocal();
       DateTime eta = now.add(ttg);

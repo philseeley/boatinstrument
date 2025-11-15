@@ -26,8 +26,8 @@ String rad2Cardinal(double? direction) {
 
   return  (direction == null) ? '-' : cardinalDirections[((direction+(f/2))/f).toInt()];
 }
-String duration2String (Duration d) {
-  List<String> parts = d.toString().split(RegExp('[.:]'));
+String duration2HumanString (Duration d) {
+  List<String> parts = d.toString().split(':');
   int hours = int.parse(parts[0]);
   int days = hours~/24;
   if(days.abs() > 0) {
@@ -35,7 +35,13 @@ String duration2String (Duration d) {
   } else if(hours.abs() > 0) {
     return '${hours}h${parts[1]}m';
   }
-  return '${parts[1]}m${parts[2]}s';
+  int s = double.parse(parts[2]).round();
+  return '${parts[1]}m${s}s';
+}
+String duration2String(Duration d) {
+  List<String> parts = d.toString().split(':');
+  int s = double.parse(parts[2]).round();
+  return fmt.format('{}:{}:{:02d}', parts[0], parts[1], s);
 }
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {

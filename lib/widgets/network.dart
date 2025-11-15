@@ -68,7 +68,7 @@ class _StarlinkBoxState extends State<StarlinkBox> with DoubleValeBoxPainter {
         Text('Starlink: ${_status??'-'} ${_countryCode??''}'),
         Expanded(child: main),
         if(_fractionObstructed != null) Container(decoration: BoxDecoration(border: BoxBorder.all(width: 2.0, color: Colors.grey)), child: LinearProgressIndicator(value: 1.0-(_fractionObstructed??1.0), color: _unobstructedColor, backgroundColor: _obstructedColor, minHeight: 10)),
-        Text('Uptime: ${_uptime==null?'-':duration2String(_uptime!)}'),
+        Text('Uptime: ${_uptime==null?'-':duration2HumanString(_uptime!)}'),
       ])
     );
   }
