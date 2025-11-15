@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:share_plus/share_plus.dart';
 
 class LogDisplay extends StatefulWidget {
@@ -29,6 +33,7 @@ class _LogDisplayState extends State<LogDisplay> {
       appBar: AppBar(
         title: const Text("Log"),
         actions: [
+          if(!Platform.isLinux) IconButton(tooltip: 'Export Files', icon: const Icon(Icons.upload), onPressed: () {_upload(context);}),
           IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
               onPressed: () {
                 _share(entries);
@@ -58,6 +63,25 @@ class _LogDisplayState extends State<LogDisplay> {
   void _share (List<String> entries) async {
     await SharePlus.instance.share(ShareParams(text: entries.join('\n'), subject: 'Boat Instrument Log'));
   }
+
+  void _upload (BuildContext context) async {
+    Directory dir = await path_provider.getApplicationDocumentsDirectory();
+
+    if(context.mounted) {
+      String? path = await FilesystemPicker.open(
+        title: 'Export',     
+        context: context,
+        rootDirectory: dir,
+        showGoUp: false,
+        fsType: FilesystemType.file,
+        fileTileSelectMode: FileTileSelectMode.wholeTile);
+
+      if(path != null) {
+        await SharePlus.instance.share(ShareParams(files: [XFile(path)], subject: 'Boat Instrument Export'));
+      }
+    }
+  }
+
 }
 
 class ChangeLogPage extends StatefulWidget {

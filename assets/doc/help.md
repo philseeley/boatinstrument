@@ -59,6 +59,7 @@ The **Settings** page provides additional options:
 ![subscriptions](assets/icons/__THEME__/mediation.png) Show the current SignalK Subscriptions
 ![error log](assets/icons/__THEME__/notes.png) Shows the message/error log
 ![change log](assets/icons/__THEME__/change_history.png) From the Help page, shows the change log
+![export file](assets/icons/__THEME__/upload.png) From the Error Log page, Export a Config or Log file
 
 # Command Line Options
 
