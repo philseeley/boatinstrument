@@ -240,7 +240,7 @@ class SetAndDriftBox extends BoxWidget {
   String get id => sid;
 }
 
-class _SetAndDriftBoxState extends State<SetAndDriftBox> {
+class _SetAndDriftBoxState extends HeadedBoxState<SetAndDriftBox> {
   double? _set;
   double? _drift;
   double? _displayDrift;
@@ -253,27 +253,17 @@ class _SetAndDriftBoxState extends State<SetAndDriftBox> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
-
     if(widget.config.editMode) {
       _set = deg2Rad(123);
       _displayDrift = 12.3;
     }
 
-    String text = (_set == null || _displayDrift == null) ?
+    header = 'Set&Drift $degreesUnits-${widget.config.controller.speedUnits.unit}';
+    text = (_set == null || _displayDrift == null) ?
       '-\n-' :
       fmt.format('{:3}\n{:.1f}', rad2Deg(_set), _displayDrift);
 
-    double fontSize = maxFontSize(text, style,
-        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / 2,
-        widget.config.constraints.maxWidth - (2 * pad));
-
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Set&Drift $degreesUnits-${widget.config.controller.speedUnits.unit}', style: style)),
-      // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(pad), child: Text(text, textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)))))
-    ]);
+    return super.build(context);
   }
 
   void _processData(List<Update> updates) {
@@ -440,7 +430,7 @@ class _Time {
   const _Time(this.name, this.time);
 }
 
-class _SunlightBox extends State<SunlightBox> {
+class _SunlightBox extends HeadedBoxState<SunlightBox> {
   static const int _numTimes = 7;
   bool _utc = false;
   List<_Time?> _times = List.filled(_numTimes, null);
@@ -448,6 +438,7 @@ class _SunlightBox extends State<SunlightBox> {
   @override
   void initState() {
     super.initState();
+    header = 'Sunlight';
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataType: SignalKDataType.infrequent);
   }
 
@@ -457,35 +448,27 @@ class _SunlightBox extends State<SunlightBox> {
     final now = widget.config.controller.now();
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
 
     if(widget.config.editMode) {
       _times = List.filled(_numTimes, _Time('Time:    ', now));
     }
 
-    String textSample = 'Time:     ${fmt.format(now)}';
-    double fontSize = maxFontSize(textSample, style,
-        (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / _numTimes,
-        widget.config.constraints.maxWidth - (2 * pad));
-
-    List<Widget> timeWidgets = [];
+    StringBuffer textBuffer = StringBuffer();
     for(int i = 0; i<_times.length; ++i) {
       _Time? t = _times[i];
-      // We need to disable the device text scaling as this interferes with our text scaling.
       if(t == null) {
-        timeWidgets.add(Text('-', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
+        textBuffer.writeln('-');
       } else {
-        TextDecoration? d;
+        textBuffer.writeln('${t.name} ${fmt.format(_utc?t.time.toUtc():t.time.toLocal())}');
         if(i < _times.length-1 && now.compareTo(t.time) >= 0 && now.compareTo(_times[i+1]?.time??now) < 0) {
-          d = TextDecoration.underline;
+          textBuffer.writeln('\u23BC\u23BC\u23BC\u23BC\u23BC${fmt.format(_utc?now.toUtc():now.toLocal())}\u23BC\u23BC\u23BC\u23BC\u23BC');
         }
-        timeWidgets.add(Text('${t.name} ${fmt.format(_utc?t.time.toUtc():t.time.toLocal())}', textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize, decoration: d)));
       }
     }
+    text = textBuffer.toString();
+
     return Stack(children: [
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Sunlight', style: style)),
-        Padding(padding: const EdgeInsets.all(pad), child: Column(children: timeWidgets))]),
+      super.build(context),
       Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
     ]);
   }

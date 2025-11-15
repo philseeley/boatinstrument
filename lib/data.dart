@@ -56,8 +56,7 @@ double averageDouble(double current, double next, { int smooth = 1 }) {
 // Assumption is that the font characters are higher than they are wide.
 // NOTE: the style MUST have the height set to 1.0.
 double maxFontSize(String text, TextStyle style, double availableHeight, double availableWidth) {
-  //TODO Haven't worked out why the "- 1.0" is required.
-  double fontSize = availableHeight - 1.0;
+  double fontSize = availableHeight;
   // The size must be greater than 0 to avoid rendering errors.
   fontSize = (fontSize > 0.0) ? fontSize : 1.0;
 
@@ -248,19 +247,19 @@ class BoxWidgetConfig {
 
 class HeaderText extends StatelessWidget {
   final String _text;
-  final TextStyle? style;
   final TextAlign? textAlign;
   final bool scrolling;
 
-  const HeaderText(this._text, {this.style, this.textAlign, this.scrolling = false, super.key});//}, {super.style, super.textAlign, super.key}) {
-
+  const HeaderText(this._text, {this.textAlign, this.scrolling = false, super.key});
 
   @override
   Widget build(BuildContext context) {
+    TextStyle ts = Theme.of(context).textTheme.titleMedium!;
+
     if(scrolling) {
       return TextScroll(
         _text,
-        style: style,
+        style: ts,
         textAlign: textAlign,
         mode: TextScrollMode.bouncing,
         pauseOnBounce: const Duration(seconds: 2),
@@ -269,7 +268,7 @@ class HeaderText extends StatelessWidget {
       );
     }
 
-    return Text(_text, style: style, textAlign: textAlign, softWrap: false, overflow: TextOverflow.ellipsis);
+    return Text(_text, style: ts, textAlign: textAlign, softWrap: false, overflow: TextOverflow.ellipsis);
   }
 }
 
@@ -330,26 +329,49 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-
-    int lines = LineSplitter().convert(text).length;
-    double fontSize = maxFontSize(text, style,
-      (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / lines,
-      widget.config.constraints.maxWidth - (2 * pad));
-
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.only(top: pad, left: pad, right: pad), child:
-        HeaderText(header, style: style, scrolling: scrolling),
+        HeaderText(header, scrolling: scrolling),
       ),
+      Expanded(child: Align(alignment: alignment,
+        child: Padding(padding: const EdgeInsets.all(pad),
+          child: MaxTextWidget(text, alignment: alignment, color: color, textBgColor: textBgColor)
+        ))
+      )
+    ]);
+  }
+}
+
+class MaxTextWidget extends StatelessWidget {
+  final String text;
+  final Alignment alignment;
+  final Color? color;
+  final Color? textBgColor;
+  final TextDecoration? decoration;
+
+  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+
+      double fontSize = 1;
+      if(text.isNotEmpty) {
+        int lines = LineSplitter().convert(text).length;
+        fontSize = maxFontSize(text, style,
+          constraints.maxHeight / lines,
+          constraints.maxWidth);
+      }
+
       // We need to disable the device text scaling as this interferes with our text scaling.
-      Expanded(child: Align(alignment: alignment, child: Padding(padding: const EdgeInsets.all(pad),
-          child: Stack(children: [
-            if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling,
-              style: style.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
-            Text(text, textScaler: TextScaler.noScaling,
-              style: style.copyWith(fontSize: fontSize, color: color))
-          ]))))
+      return Stack(alignment: alignment, children: [
+        if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling,
+          style: style.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
+        Text(text, textScaler: TextScaler.noScaling,
+          style: style.copyWith(fontSize: fontSize, color: color, decoration: decoration))
       ]);
+    });
   }
 }
 

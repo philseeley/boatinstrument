@@ -448,6 +448,7 @@ class _PositionBoxState extends HeadedBoxState<PositionBox> {
   @override
   void initState() {
     super.initState();
+    header = 'Position';
     _settings = _$PositionSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _processData, paths: {'navigation.position'});
     _llf = LatLongFormatter(_settings.format);
@@ -462,7 +463,7 @@ class _PositionBoxState extends HeadedBoxState<PositionBox> {
     text = (_latitude == null || _longitude == null) ?
       '-' :
       _llf.format(LatLong(_latitude!, _longitude!));
-    header = 'Position';
+
     return super.build(context);
   }
 

@@ -461,7 +461,7 @@ class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends Doub
     final TextStyle style = Theme.of(context).textTheme.titleMedium!;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.all(pad), child: HeaderText('${widget.title}${widget.showPercent?' ${((value??0)*100).toInt()}%':''}', style: style)),
+      Padding(padding: const EdgeInsets.all(pad), child: HeaderText('${widget.title}${widget.showPercent?' ${((value??0)*100).toInt()}%':''}')),
       Expanded(child: Padding(padding: const EdgeInsets.only(left: pad, right: pad),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
@@ -777,7 +777,7 @@ class GraphBoxState extends State<GraphBox> {
       Padding(padding: const EdgeInsets.only(left: pad, right: pad), child: Row(children: [
         Text('${widget.title} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
         Expanded(child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          Expanded(child: HeaderText(currentValueString, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium)),
+          Expanded(child: HeaderText(currentValueString, textAlign: TextAlign.center)),
           IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
           IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
         ]))

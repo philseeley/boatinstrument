@@ -390,7 +390,7 @@ class _Battery {
   _Battery(this.id);
 }
 
-class _BatteriesBoxState extends State<BatteriesBox> {
+class _BatteriesBoxState extends HeadedBoxState<BatteriesBox> {
   List<_Battery> _batteries = [];
 
   _Battery _getBattery(String id) {
@@ -408,23 +408,30 @@ class _BatteriesBoxState extends State<BatteriesBox> {
   @override
   void initState() {
     super.initState();
+    header = 'Batteries';
+    alignment = Alignment.topLeft;
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'$batteriesBasePath.*'});
   }
 
   @override
   Widget build(BuildContext context) {
     BoatInstrumentController c = widget.config.controller;
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
 
     if(widget.config.editMode) {
-      _Battery b = _Battery('1')
-         ..name = 'bat1'
+      _batteries = [
+        _Battery('1')
+         ..name = 'starter'
          ..voltage = 12.3
          ..current = 12.3
          ..stateOfCharge = 0.5
-         ..temperature = kelvinOffset+12.3;
-      _batteries = [b];
+         ..temperature = kelvinOffset+12.3,
+        _Battery('2')
+         ..name = 'house'
+         ..voltage = 12.3
+         ..current = 12.3
+         ..stateOfCharge = 0.5
+         ..temperature = kelvinOffset+12.3,
+      ];
     }
 
     _batteries.sort((a, b) => (a.name??a.id).compareTo(b.name??b.id));
@@ -436,24 +443,17 @@ class _BatteriesBoxState extends State<BatteriesBox> {
       }
     }
 
-    List<Widget> l = [];
+    StringBuffer textBuffer = StringBuffer();
     if(_batteries.isNotEmpty) {
       String f = ' {:3.0f}% {:4.1f}V {:6.1f}A {:6.1f}${c.temperatureUnits.unit}';
-      String textSample = format('$maxName$f', 1.0, 1.0, 1.0, 1.0);
-      double fontSize = maxFontSize(textSample, style,
-          (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / _batteries.length,
-          widget.config.constraints.maxWidth - (2 * pad));
 
-      TextStyle contentStyle = style.copyWith(fontSize: fontSize);
       for(_Battery b  in _batteries) {
-        l.add(Row(children: [Text(format('{:${maxName.length}s}$f', b.name??b.id, (b.stateOfCharge??0.0)*100, b.voltage??0.0, b.current??0.0, c.temperatureToDisplay(b.temperature??0.0)),
-              textScaler: TextScaler.noScaling,  style: contentStyle)]));
+        textBuffer.writeln(format('{:${maxName.length}s}$f', b.name??b.id, (b.stateOfCharge??0.0)*100, b.voltage??0.0, b.current??0.0, c.temperatureToDisplay(b.temperature??0.0)));
       }
     }
+    text = textBuffer.toString();
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Batteries', style: style)),
-      Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
+    return super.build(context);
   }
 
   void _onUpdate(List<Update> updates) {
@@ -718,7 +718,7 @@ class _ElectricalSwitchesBoxState extends State<ElectricalSwitchesBox> with Swit
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(padding: const EdgeInsets.all(pad), child: HeaderText('Switches', style: style)),
+        Padding(padding: const EdgeInsets.all(pad), child: HeaderText('Switches')),
         Expanded(child: ListView(children: l))
       ]);
   }
@@ -862,7 +862,6 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
     const double pad = 5.0;
 
     List<Widget> dimmerList = [];
@@ -906,7 +905,7 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
       });
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(padding: const EdgeInsets.all(pad), child: HeaderText('Switch ${_switch.name??_switch.id}', style: style)),
+        Padding(padding: const EdgeInsets.all(pad), child: HeaderText('Switch ${_switch.name??_switch.id}')),
         Center(child: toggleSwitch),
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: dimmerList)
       ]);

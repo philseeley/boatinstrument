@@ -537,25 +537,13 @@ class _CustomTextBoxState extends State<CustomTextBox> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> lines = _formatter.format(_pathData).split('\n');
+    String text = _formatter.format(_pathData);
 
-    if(widget.config.editMode && lines.length == 1 && lines[0].isEmpty) {
-      lines = ['Your text here'];
+    if(widget.config.editMode && text.isEmpty) {
+      text = 'Your text here';
     }
 
-    String max = '-';
-    int numLines = 1;
-    if(lines.isNotEmpty) {
-      numLines = lines.length;
-      max = lines.reduce((a, b) {return a.length > b.length ? a : b;});
-    }
-
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    double fontSize = maxFontSize(max, style,
-        ((widget.config.constraints.maxHeight - style.fontSize!) / numLines),
-        widget.config.constraints.maxWidth);
-
-    return Center(child: Text(lines.join('\n'), textScaler: TextScaler.noScaling,  style: style.copyWith(fontSize: fontSize)));
+    return Center(child: Padding(padding: EdgeInsets.all(5), child:  MaxTextWidget(text)));
   }
 
   void _onUpdate(List<Update> updates) {

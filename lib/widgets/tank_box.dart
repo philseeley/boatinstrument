@@ -163,7 +163,7 @@ class _Tank {
   _Tank(this.pathType, this.id);
 }
 
-class _TanksBoxState extends State<TanksBox> {
+class _TanksBoxState extends HeadedBoxState<TanksBox> {
   List<_Tank> _tanks = [];
 
   _Tank _getTank(String pathType, String id) {
@@ -181,23 +181,30 @@ class _TanksBoxState extends State<TanksBox> {
   @override
   void initState() {
     super.initState();
+    header = 'Tanks ${widget.config.controller.capacityUnits.unit}';
+    alignment = Alignment.topLeft;
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'tanks.*'}, dataType: SignalKDataType.infrequent);
   }
 
   @override
   Widget build(BuildContext context) {
     BoatInstrumentController c = widget.config.controller;
-    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
-    const double pad = 5.0;
 
     if(widget.config.editMode) {
-      _Tank b = _Tank('fuel', '1')
-        ..name = 'diesel1'
+      _tanks = [
+        _Tank('fuel', '1')
+        ..name = 'main'
         ..type = 'diesel'
         ..capacity = c.capacityFromDisplay(123.0)
         ..currentLevel = 0.5
-        ..currentVolume = c.capacityFromDisplay(123.0)*0.5;
-      _tanks = [b];
+        ..currentVolume = c.capacityFromDisplay(123.0)*0.5,
+        _Tank('fuel', '2')
+        ..name = 'reserve'
+        ..type = 'diesel'
+        ..capacity = c.capacityFromDisplay(123.0)
+        ..currentLevel = 0.5
+        ..currentVolume = c.capacityFromDisplay(123.0)*0.5
+      ];
     }
 
     _tanks.sort((a, b) => (a.name??a.id).compareTo(b.name??b.id));
@@ -218,24 +225,16 @@ class _TanksBoxState extends State<TanksBox> {
       }
     }
 
-    List<Widget> l = [];
+    StringBuffer textBuffer = StringBuffer();
     if(_tanks.isNotEmpty) {
       String f = ' {:4.0f} {:3.0f}% {:4.0f}';
-      String textSample = format('$maxName $maxType$f', 1.0, 1.0, 1.0);
-      double fontSize = maxFontSize(textSample, style,
-          (widget.config.constraints.maxHeight - style.fontSize! - (3 * pad)) / _tanks.length,
-          widget.config.constraints.maxWidth - (2 * pad));
-
-      TextStyle contentStyle = style.copyWith(fontSize: fontSize);
       for(_Tank t  in _tanks) {
-        l.add(Row(children: [Text(format('{:${maxName.length}s} {:${maxType.length}s}$f', t.name??t.id, t.type??t.pathType, c.capacityToDisplay(t.capacity??0.0), (t.currentLevel??0)*100, c.capacityToDisplay(t.currentVolume??0.0)),
-              textScaler: TextScaler.noScaling,  style: contentStyle)]));
+        textBuffer.writeln(format('{:${maxName.length}s} {:${maxType.length}s}$f', t.name??t.id, t.type??t.pathType, c.capacityToDisplay(t.capacity??0.0), (t.currentLevel??0)*100, c.capacityToDisplay(t.currentVolume??0.0)));
       }
     }
+    text = textBuffer.toString();
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: const EdgeInsets.only(top: pad, left: pad), child: HeaderText('Tanks ${c.capacityUnits.unit}', style: style)),
-      Padding(padding: const EdgeInsets.all(pad), child: Column(children: l))]);
+    return super.build(context);
   }
 
   void _onUpdate(List<Update> updates) {
