@@ -297,8 +297,6 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
   void initState() {
     super.initState();
     widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.${widget._perBoxSettings.id}'}, dataType: SignalKDataType.static);
-    if(widget._perBoxSettings.allowStop) actions.add(IconButton(onPressed: _stop, icon: Icon(Icons.stop)));
-    if(widget._perBoxSettings.allowRestart) actions.add(IconButton(onPressed: _restart, icon: Icon(Icons.restore)));
   }
 
   @override
@@ -313,17 +311,28 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
       _expires = widget.config.controller.now().add(Duration(minutes: 123));
     }
 
-    Duration? d = _expires?.difference(widget.config.controller.now());
-
     String expiresStr = _expires==null?'':TimeOfDayConverter.timeFormat.format(_expires!.toLocal());
     String deltaStr = _timer!=null && _timer!.delta?' ${TimeOfDayConverter().toJson(_timer!.time)} $deltaChar':'';
 
     header = 'Timer:${widget._perBoxSettings.id} $expiresStr$deltaStr';
-    text = d==null?'-':duration2HumanString(d);
-    color = null;
-    if(d!=null && d.isNegative) {
-      color = widget.config.controller.val2PSColor(context, -1);
-      if(widget._perBoxSettings.notificationState.soundFile!=null) widget.config.controller.playSoundFile(widget._perBoxSettings.notificationState.soundFile!);
+
+    if(widget._perBoxSettings.id.isEmpty) {
+      text = 'Select a Timer\nin the settings';      
+    } else {
+      actions.clear();
+      if(!widget.config.editMode && _timer != null) {
+        if(widget._perBoxSettings.allowStop) actions.add(IconButton(onPressed: _stop, icon: Icon(Icons.stop)));
+        if(widget._perBoxSettings.allowRestart) actions.add(IconButton(onPressed: _restart, icon: Icon(Icons.restore)));
+      }
+
+      Duration? d = _expires?.difference(widget.config.controller.now());
+
+      text = d==null?'-':duration2HumanString(d);
+      color = null;
+      if(d!=null && d.isNegative) {
+        color = widget.config.controller.val2PSColor(context, -1);
+        if(widget._perBoxSettings.notificationState.soundFile!=null) widget.config.controller.playSoundFile(widget._perBoxSettings.notificationState.soundFile!);
+      }
     }
 
     return super.build(context);
