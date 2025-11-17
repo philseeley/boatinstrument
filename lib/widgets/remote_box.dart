@@ -56,7 +56,7 @@ class RemoteControlBox extends BoxWidget {
   State<RemoteControlBox> createState() => _RemoteControlBoxState();
 }
 
-class _RemoteControlBoxState extends State<RemoteControlBox> {
+class _RemoteControlBoxState extends HeadedBoxState<RemoteControlBox> {
   bool _locked = true;
   Timer? _lockTimer;
   List<String> _pages = [];
@@ -66,6 +66,8 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
     super.initState();
 
     String type = widget._settings.isGroup?'groups':'devices';
+    header = '${widget._settings.isGroup?'GRP':'DEV'}:${widget._settings.id}';
+
     Set<String> paths = {};
 
     if(widget._settings.id.isNotEmpty) paths.add('$bi.$type.${widget._settings.id}.pages');
@@ -137,37 +139,37 @@ class _RemoteControlBoxState extends State<RemoteControlBox> {
           icon: Icon(BoatInstrumentController.brightnessIcons[i])));
       }
     }
-    return Padding(padding: EdgeInsetsGeometry.all(5), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      HeaderText('${s.isGroup?'GRP':'DEV'}:${s.id}'),
-      Stack(alignment: Alignment.center, children: [
-        Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          if(s.controlPages && (_pages.isNotEmpty || s.manualPages.isNotEmpty)) SizedBox(height: 50, child: ListView.separated(
-            padding: EdgeInsets.all(5),
-            itemCount: s.manualPages.isNotEmpty?s.manualPages.length:_pages.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, i) {return ElevatedButton(
-              onPressed: disabled ? null : (){_sendAction('gotoPage', {'page': s.manualPages.isNotEmpty?s.manualPages[i]:_pages[i]});},
-              style: ElevatedButton.styleFrom(foregroundColor: fg, backgroundColor: bg),
-              child: Text(s.manualPages.isNotEmpty?s.manualPages[i]:_pages[i]));}, separatorBuilder: (context, i){return SizedBox(width: 10);})),
-          if(s.controlPages && _pages.isNotEmpty && s.manualPages.isEmpty) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('firstPage', {});}, icon: const Icon(Icons.first_page)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('decPage', {});}, icon: const Icon(Icons.keyboard_arrow_left)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('incPage', {});}, icon: const Icon(Icons.keyboard_arrow_right)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('lastPage', {});}, icon: const Icon(Icons.last_page)),
-          ]),
-          if(s.controlRotatePages) Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOn', {});}, icon: const Icon(Icons.sync_alt)),
-            IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOff', {});}, icon: const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)])),
-          ]),
-          if(s.controlBrightness) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: brightnessButtons),
+
+    body = Stack(alignment: Alignment.center, children: [
+      Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        if(s.controlPages && (_pages.isNotEmpty || s.manualPages.isNotEmpty)) SizedBox(height: 50, child: ListView.separated(
+          padding: EdgeInsets.all(5),
+          itemCount: s.manualPages.isNotEmpty?s.manualPages.length:_pages.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, i) {return ElevatedButton(
+            onPressed: disabled ? null : (){_sendAction('gotoPage', {'page': s.manualPages.isNotEmpty?s.manualPages[i]:_pages[i]});},
+            style: ElevatedButton.styleFrom(foregroundColor: fg, backgroundColor: bg),
+            child: Text(s.manualPages.isNotEmpty?s.manualPages[i]:_pages[i]));}, separatorBuilder: (context, i){return SizedBox(width: 10);})),
+        if(s.controlPages && _pages.isNotEmpty && s.manualPages.isEmpty) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('firstPage', {});}, icon: const Icon(Icons.first_page)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('decPage', {});}, icon: const Icon(Icons.keyboard_arrow_left)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('incPage', {});}, icon: const Icon(Icons.keyboard_arrow_right)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('lastPage', {});}, icon: const Icon(Icons.last_page)),
         ]),
-        if(disabled) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
-          text: "Unlock",
-          outerColor: Colors.grey,
-          onSubmit: () { return _unlock();},
-        )))
+        if(s.controlRotatePages) Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOn', {});}, icon: const Icon(Icons.sync_alt)),
+          IconButton(iconSize: 48, onPressed: disabled ? null : () {_sendAction('rotatePagesOff', {});}, icon: const Stack(children: [Icon(Icons.sync_alt), Icon(Icons.close)])),
+        ]),
+        if(s.controlBrightness) Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: brightnessButtons),
       ]),
-    ]));
+      if(disabled) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
+        text: "Unlock",
+        outerColor: Colors.grey,
+        onSubmit: () { return _unlock();},
+      )))
+    ]);
+
+    return super.build(context);
   }
 
   void _processUpdates(List<Update> updates) {

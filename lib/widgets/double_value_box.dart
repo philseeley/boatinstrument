@@ -61,7 +61,7 @@ abstract class DoubleValueBox extends BoxWidget {
   set extremeValue(double value) => extremeValues[id] = value;
 }
 
-class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
+class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedTextBoxState<T> {
   double? value;
   double? displayValue;
   int inRange = 0;
@@ -69,6 +69,12 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
   @override
   void initState() {
     super.initState();
+    if(widget.valueToDisplay != DoubleValueToDisplay.value) {
+      actions = [
+        IconButton(icon: Icon(Icons.restore), onPressed: _resetExtremeValue)
+     ];
+    }
+
     widget.config.controller.configure(onUpdate: processUpdates, paths: {widget.path}, dataType: widget.dataType);
   }
 
@@ -90,11 +96,7 @@ class DoubleValueBoxState<T extends DoubleValueBox> extends HeadedBoxState<T> {
       color = Colors.red;
     }
 
-    return Stack(children: [
-      super.build(context),
-      if(widget.valueToDisplay != DoubleValueToDisplay.value) Positioned(top: 0, right: 0, child:
-        IconButton(icon: Icon(Icons.restore), onPressed: _resetExtremeValue))
-    ]);
+    return super.build(context);
   }
 
   void processUpdates(List<Update> updates) {

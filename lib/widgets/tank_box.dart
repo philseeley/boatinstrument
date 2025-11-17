@@ -163,7 +163,7 @@ class _Tank {
   _Tank(this.pathType, this.id);
 }
 
-class _TanksBoxState extends HeadedBoxState<TanksBox> {
+class _TanksBoxState extends HeadedTextBoxState<TanksBox> {
   List<_Tank> _tanks = [];
 
   _Tank _getTank(String pathType, String id) {

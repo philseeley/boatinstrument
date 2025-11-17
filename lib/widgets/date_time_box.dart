@@ -74,7 +74,7 @@ class DateTimeBox extends BoxWidget {
   Widget? getPerBoxSettingsHelp() => const HelpPage(text: _help);
 }
 
-class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
+class _DateTimeBoxState extends HeadedTextBoxState<DateTimeBox> {
   _DateTimeSettings _settings = _DateTimeSettings();
   DateTime? _dateTime;
   bool _utc = false;
@@ -116,10 +116,13 @@ class _DateTimeBoxState extends HeadedBoxState<DateTimeBox> {
 
     header = '${perBoxSettings.showDate?'Date${perBoxSettings.showTime?'/':''}':''}${perBoxSettings.showTime?'Time':''}${(_utc && !widget._perBoxSettings.showUTCButton) ? ' UTC':''}';
 
-    return Stack(children: [
-      super.build(context),
-      if(widget._perBoxSettings.showUTCButton) Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
-    ]);
+    if(widget._perBoxSettings.showUTCButton) {
+      actions = [
+        TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough)))
+      ];
+    }
+
+    return super.build(context);
   }
 
   void _toggleUTC() {
@@ -285,7 +288,7 @@ Setting the **Alert Level** to "Normal" or "Nominal" will disable the audio alar
 **Note:** audio will only sound when the **Timer Display** Box is visible on the current Page.''');
   }
 
-class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
+class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
   _Timer? _timer;
   DateTime? _expires;
   Timer? _updateTimer;
@@ -294,6 +297,8 @@ class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
   void initState() {
     super.initState();
     widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.${widget._perBoxSettings.id}'}, dataType: SignalKDataType.static);
+    if(widget._perBoxSettings.allowStop) actions.add(IconButton(onPressed: _stop, icon: Icon(Icons.stop)));
+    if(widget._perBoxSettings.allowRestart) actions.add(IconButton(onPressed: _restart, icon: Icon(Icons.restore)));
   }
 
   @override
@@ -321,13 +326,7 @@ class _TimerDisplayBoxState extends HeadedBoxState<TimerDisplayBox> {
       if(widget._perBoxSettings.notificationState.soundFile!=null) widget.config.controller.playSoundFile(widget._perBoxSettings.notificationState.soundFile!);
     }
 
-    return Stack(children: [
-      super.build(context),
-      if(_timer!=null && _timer!.delta) Positioned(top: 0, right: 0, child: Row(children: [
-        if(widget._perBoxSettings.allowStop) IconButton(onPressed: _stop, icon: Icon(Icons.stop)),
-        if(widget._perBoxSettings.allowRestart) IconButton(onPressed: _restart, icon: Icon(Icons.restore))
-      ]))
-    ]);
+    return super.build(context);
   }
 
   void _restart () {
@@ -489,7 +488,7 @@ class TimersSetupBox extends BoxWidget {
   }
 }
 
-class _TimersSetupBoxState extends State<TimersSetupBox> {
+class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
   _TimersSettings? _settings;
 
   @override
@@ -497,26 +496,32 @@ class _TimersSetupBoxState extends State<TimersSetupBox> {
     super.initState();
     _settings = _TimersSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure();
+    header = 'Timers';
+    if(!widget.config.editMode) actions = [IconButton(onPressed: _edit, icon: Icon(Icons.settings))];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(padding: EdgeInsetsGeometry.all(5), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        const HeaderText('Timers'),
-        if(!widget.config.editMode) IconButton(onPressed: _edit, icon: Icon(Icons.settings))
-      ])),
-      Expanded(child: ListView.builder(itemCount: _settings!.timers.length, itemBuilder: (context, i) {
-        _Timer timer = _settings!.timers[i];
+    var editMode = widget.config.editMode;
+    var timers = _settings!.timers;
+    if(editMode && timers.isEmpty) {
+      timers = [
+        _Timer(id: 't1', time: TimeOfDay(hour: 1, minute: 12)),
+        _Timer(id: 't1', time: TimeOfDay(hour: 1, minute: 12), delta: true)
+      ];
+    }
+    body = ListView.builder(itemCount: timers.length, itemBuilder: (context, i) {
+        _Timer timer = timers[i];
         return ListTile(key: UniqueKey(),
           leading: Row(mainAxisSize: MainAxisSize.min, children: [
-            IconButton(onPressed: () {start(widget.config.controller, timer);}, icon: Icon(Icons.play_arrow)),
-            IconButton(onPressed: () {stop(widget.config.controller, timer);}, icon: Icon(Icons.stop))
+            IconButton(onPressed: editMode?null:() {start(widget.config.controller, timer);}, icon: Icon(Icons.play_arrow)),
+            IconButton(onPressed: editMode?null:() {stop(widget.config.controller, timer);}, icon: Icon(Icons.stop))
           ]),
           title: Row(children: [Text('${TimeOfDayConverter.format(timer.time)} '), Icon(timer.delta?Icons.change_history:Icons.timer), Text(' ${timer.id}')]),
         );
-      }))
-    ]);
+      });
+
+    return super.build(context);
   }
 
   void _edit() async {

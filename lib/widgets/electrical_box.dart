@@ -390,7 +390,7 @@ class _Battery {
   _Battery(this.id);
 }
 
-class _BatteriesBoxState extends HeadedBoxState<BatteriesBox> {
+class _BatteriesBoxState extends HeadedTextBoxState<BatteriesBox> {
   List<_Battery> _batteries = [];
 
   _Battery _getBattery(String id) {

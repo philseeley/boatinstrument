@@ -326,10 +326,9 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
 
   bool scrolling;
   String header = '';
-  String text = '';
+  List<Widget> actions = [];
+  Widget body = Container();
   Alignment alignment = Alignment.center;
-  Color? color;
-  Color? textBgColor;
 
   HeadedBoxState({this.scrolling = false});
 
@@ -337,14 +336,34 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.only(top: pad, left: pad, right: pad), child:
-        HeaderText(header, scrolling: scrolling),
+        Row(children: [
+          Expanded(child: HeaderText(header, scrolling: scrolling)),
+          Row(children: actions)
+        ])
       ),
       Expanded(child: Align(alignment: alignment,
         child: Padding(padding: const EdgeInsets.all(pad),
-          child: MaxTextWidget(text, alignment: alignment, color: color, textBgColor: textBgColor)
+          child: body
         ))
       )
     ]);
+  }
+}
+
+class HeadedTextBoxState<T extends BoxWidget> extends HeadedBoxState<T> {
+  static const double pad = 5.0;
+
+  String text = '';
+  Color? color;
+  Color? textBgColor;
+
+  HeadedTextBoxState({super.scrolling});
+
+  @override
+  Widget build(BuildContext context) {
+    body = MaxTextWidget(text, alignment: alignment, color: color, textBgColor: textBgColor);
+
+    return super.build(context);
   }
 }
 
@@ -1242,4 +1261,15 @@ class _EditListWidgetState extends State<EditListWidget> {
       widget._list.removeAt(i);
     });
   }
+}
+
+class BiTextFormField extends OnscreenKeyboardTextFormField {
+   BiTextFormField({
+    super.enabled,
+    super.inputFormatters,
+    super.decoration,
+    super.enableOnscreenKeyboard = true,
+    required super.onChanged,
+    required String initialValue,
+    super.key}) : super(controller: TextEditingController(text: initialValue));
 }

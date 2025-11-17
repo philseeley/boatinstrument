@@ -275,7 +275,7 @@ abstract class TimeToGoBox extends BoxWidget {
   State<TimeToGoBox> createState() => TimeToGoBoxState();
 }
 
-class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedBoxState<T> {
+class TimeToGoBoxState<T extends TimeToGoBox> extends HeadedTextBoxState<T> {
   int? _timeToGo;
 
   TimeToGoBoxState() : super(scrolling: true);
@@ -439,7 +439,7 @@ class PositionBox extends BoxWidget {
   Widget? getSettingsHelp() => const HelpPage(text: 'For a full list of formats see https://pub.dev/packages/latlong_formatter');
 }
 
-class _PositionBoxState extends HeadedBoxState<PositionBox> {
+class _PositionBoxState extends HeadedTextBoxState<PositionBox> {
   _PositionSettings _settings = _PositionSettings();
   LatLongFormatter _llf = LatLongFormatter('');
   double? _latitude;

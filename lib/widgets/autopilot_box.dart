@@ -377,7 +377,7 @@ class AutopilotStatusBox extends BoxWidget {
   String get id => sid;
 }
 
-class _AutopilotStatusState extends HeadedBoxState<AutopilotStatusBox> {
+class _AutopilotStatusState extends HeadedTextBoxState<AutopilotStatusBox> {
   AutopilotState? _autopilotState;
   double? _targetWindAngleApparent;
   double? _targetHeadingTrue;

@@ -240,7 +240,7 @@ class SetAndDriftBox extends BoxWidget {
   String get id => sid;
 }
 
-class _SetAndDriftBoxState extends HeadedBoxState<SetAndDriftBox> {
+class _SetAndDriftBoxState extends HeadedTextBoxState<SetAndDriftBox> {
   double? _set;
   double? _drift;
   double? _displayDrift;
@@ -430,7 +430,7 @@ class _Time {
   const _Time(this.name, this.time);
 }
 
-class _SunlightBox extends HeadedBoxState<SunlightBox> {
+class _SunlightBox extends HeadedTextBoxState<SunlightBox> {
   static const int _numTimes = 7;
   bool _utc = false;
   List<_Time?> _times = List.filled(_numTimes, null);
@@ -466,11 +466,9 @@ class _SunlightBox extends HeadedBoxState<SunlightBox> {
       }
     }
     text = textBuffer.toString();
+    actions = [TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough)))];
 
-    return Stack(children: [
-      super.build(context),
-      Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
-    ]);
+    return super.build(context);
   }
 
   void _toggleUTC() {
@@ -588,7 +586,7 @@ class MoonBox extends CelestialBox {
   State<MoonBox> createState() => _MoonBox();
 }
 
-class _MoonBox extends HeadedBoxState<MoonBox> {
+class _MoonBox extends HeadedTextBoxState<MoonBox> {
   bool _utc = false;
   DateTime? _rise, _set;
   double? _fraction;
@@ -623,12 +621,13 @@ Set:   ${(_set == null) ? '-' : fmt.format(_utc?_set!.toUtc():_set!.toLocal())}
 Phase: ${(_fraction == null) ? '-' : (_fraction!*100).toInt()}%
 ${(_phaseName == null) ? '-' : _phaseName}''';
 
+    actions = [TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough)))];
+
     return Stack(children: [
       if(widget._perBoxSettings.showMoon)
-        Padding(padding: const EdgeInsets.all(HeadedBoxState.pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
+        Padding(padding: const EdgeInsets.all(HeadedTextBoxState.pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
           painter: _MoonPainter(_fraction??0)))),
-      super.build(context),
-      Positioned(top: 0, right: 0, child: TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough))))
+      super.build(context)
     ]);
   }
 
