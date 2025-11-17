@@ -34,7 +34,7 @@ class _LogDisplayState extends State<LogDisplay> {
         title: const Text("Log"),
         actions: [
           if(!Platform.isLinux) IconButton(tooltip: 'Export Files', icon: const Icon(Icons.upload), onPressed: () {_upload(context);}),
-          IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
+          if(!Platform.isLinux) IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
               onPressed: () {
                 _share(entries);
               },
