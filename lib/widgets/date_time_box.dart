@@ -656,6 +656,9 @@ class StopwatchBox extends BoxWidget {
   const StopwatchBox(super.config, {super.key});
 
   @override
+  Widget? getHelp() => const HelpPage(text: 'The list of lap times can be switched between delta or absolute times by clicking on the ![request](assets/icons/__THEME__/timer.png) or ![request](assets/icons/__THEME__/change_history.png) list header.');
+
+  @override
   State<StopwatchBox> createState() => _StopwatchBoxState();
 }
 
