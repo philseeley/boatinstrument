@@ -73,6 +73,9 @@ class BoatInstrumentApp extends StatelessWidget {
       }
 
       return MaterialApp(
+        builder: (context, child) {
+          var m = MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true);
+          return MediaQuery(data: m, child: child!);},
         home: MainPage(
           r.flag(noAudio),
           r.flag(noBrightnessCtrl),
