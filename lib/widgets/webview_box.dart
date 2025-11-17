@@ -87,7 +87,7 @@ class _SettingsState extends State<_SettingsWidget> {
     return ListView(children: [
       ListTile(
           leading: const Text("Web Site:"),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.url,
               onChanged: (value) => s.url = value.trim())
       ),

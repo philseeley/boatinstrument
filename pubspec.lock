@@ -501,6 +501,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  flutter_onscreen_keyboard:
+    dependency: "direct main"
+    description:
+      name: flutter_onscreen_keyboard
+      sha256: b9a629ceb2496e2ffa0f2a6b8852deb361e5992a19e4bae4a98b619f2118ab71
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

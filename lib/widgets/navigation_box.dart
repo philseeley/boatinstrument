@@ -508,7 +508,7 @@ class _PositionSettingsState extends State<_PositionSettingsWidget> {
     List<Widget> list = [
       ListTile(
           leading: const Text("Format:"),
-          title: TextFormField(
+          title: BiTextFormField(
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
             maxLines: null,

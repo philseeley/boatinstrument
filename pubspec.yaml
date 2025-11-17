@@ -64,6 +64,7 @@ dependencies:
   color_hex:
   flutter_fullscreen:
   text_scroll:
+  flutter_onscreen_keyboard:
   actions_menu_appbar:
     path: ../actions_menu_appbar
 

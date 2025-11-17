@@ -403,7 +403,7 @@ class _CelestialSettingsState extends State<_CelestialSettingsWidget> {
     return ListView(children: [
       ListTile(
           leading: const Text('Time Format:'),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.timeFormat,
               onChanged: (value) => s.timeFormat = value)
       ),

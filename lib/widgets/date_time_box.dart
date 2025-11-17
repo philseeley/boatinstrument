@@ -171,7 +171,7 @@ class _SettingsState extends State<_SettingsWidget> {
     return ListView(children: [
       ListTile(
           leading: const Text('Date Format:'),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.dateFormat,
               onChanged: (value) => s.dateFormat = value)
       ),
@@ -230,7 +230,7 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
           }),
       ListTile(
           leading: const Text('Time Format:'),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.timeFormat,
               onChanged: (value) => s.timeFormat = value)
       ),
@@ -603,7 +603,7 @@ class _TimersSetupSettingsState extends State<_TimersSetupSettings> {
           ),
           IconButton(onPressed: () {setState(() {timer.delta = !timer.delta;});}, icon: Icon(timer.delta?Icons.change_history:Icons.timer))
         ]),
-        title: TextFormField(
+        title: BiTextFormField(
           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
           decoration: const InputDecoration(hintText: 'id'),
           initialValue: timer.id,

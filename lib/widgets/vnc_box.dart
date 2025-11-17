@@ -90,13 +90,13 @@ class _VNCSettingsState extends State<_VNCSettingsWidget> {
     return ListView(children: [
       ListTile(
           leading: const Text('Host:'),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.host,
               onChanged: (value) => s.host = value)
       ),
       ListTile(
           leading: const Text("Port:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: s.port.toString(),
@@ -104,7 +104,7 @@ class _VNCSettingsState extends State<_VNCSettingsWidget> {
       ),
       ListTile(
           leading: const Text('Password:'),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.password,
               onChanged: (value) => s.password = value)
       ),

@@ -9,10 +9,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
+import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'theme_provider.dart';
+
+class BiDesktopKeyboardLayout extends DesktopKeyboardLayout {
+  final MediaQuery _media;
+
+  BiDesktopKeyboardLayout(this._media);
+
+  @override
+  double get aspectRatio {return _media.data.size.aspectRatio*2;}
+}
 
 void main(List<String> cmdlineArgs) {
   FlutterError.onError = logError;
@@ -51,6 +61,7 @@ class BoatInstrumentApp extends StatelessWidget {
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
     const enableSetTime = 'enable-set-time';
+    const enableKeyboard = 'enable-keyboard';
     const configFile = 'config-file';
 
     final p = ArgParser()
@@ -61,6 +72,7 @@ class BoatInstrumentApp extends StatelessWidget {
                 ..addFlag(readOnly, negatable: false)
                 ..addFlag(enableExit, negatable: false)
                 ..addFlag(enableSetTime, negatable: false)
+                ..addFlag(enableKeyboard, negatable: false)
                 ..addOption(configFile,
                     defaultsTo: 'boatinstrument.json',
                     valueHelp: 'filename',
@@ -74,8 +86,11 @@ class BoatInstrumentApp extends StatelessWidget {
 
       return MaterialApp(
         builder: (context, child) {
-          var m = MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true);
-          return MediaQuery(data: m, child: child!);},
+          var mq = MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!);
+          return OnscreenKeyboard(
+            layout: BiDesktopKeyboardLayout(mq),
+            child: mq
+          );},
         home: MainPage(
           r.flag(noAudio),
           r.flag(noBrightnessCtrl),
@@ -84,6 +99,7 @@ class BoatInstrumentApp extends StatelessWidget {
           r.flag(readOnly),
           r.flag(enableExit),
           r.flag(enableSetTime),
+          r.flag(enableKeyboard),
           r.option(configFile)!),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
@@ -105,7 +121,7 @@ class MainPage extends StatefulWidget {
   final bool enableSetTime;
   final String configFile;
 
-  const MainPage(
+  MainPage(
     this.noAudio,
     this.noBrightnessControl,
     this.noKeepAwake,
@@ -113,8 +129,11 @@ class MainPage extends StatefulWidget {
     this.readOnly,
     this.enableExit,
     this.enableSetTime,
+    bool enableKeyboard,
     this.configFile,
-    {super.key});
+    {super.key}) {
+      enableEmbeddedKeyboard = enableKeyboard;
+    }
 
   @override
   State<MainPage> createState() => MainPageState();

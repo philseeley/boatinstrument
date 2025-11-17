@@ -327,7 +327,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
       if({EngineRPMBox}.contains(b.runtimeType))
         ListTile(
             leading: const Text("Max RPM:"),
-            title: TextFormField(
+            title: BiTextFormField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: s.maxRPM.toString(),
@@ -337,7 +337,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
       if({EngineRPMBox}.contains(b.runtimeType))
         ListTile(
             leading: const Text("Redline:"),
-            title: TextFormField(
+            title: BiTextFormField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: s.rpmRedLine.toString(),
@@ -347,7 +347,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
       if({EngineTempBox}.contains(b.runtimeType))
         ListTile(
             leading: const Text("Max Temp:"),
-            title: TextFormField(
+            title: BiTextFormField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: c.temperatureToDisplay(s.maxTemp).toInt().toString(),
@@ -357,7 +357,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
       if({EngineOilPressureBox}.contains(b.runtimeType))
         ListTile(
             leading: const Text("Max Oil Pressure:"),
-            title: TextFormField(
+            title: BiTextFormField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: c.oilPressureToDisplay(s.maxOilPressure).toInt().toString(),
@@ -367,7 +367,7 @@ class _EngineSettingsState extends State<_EngineSettingsWidget> {
       if({EngineExhaustTempBox}.contains(b.runtimeType))
         ListTile(
             leading: const Text("Max Exhaust Temp:"),
-            title: TextFormField(
+            title: BiTextFormField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: c.temperatureToDisplay(s.maxExhaustTemp).toInt().toString(),

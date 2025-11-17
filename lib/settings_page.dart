@@ -21,11 +21,11 @@ class _EditPagesState extends State<EditPagesPage> {
 
       pageList.add(ListTile(key: UniqueKey(),
           leading: IconButton(icon: const Icon(Icons.edit), onPressed: () {_editPage(page);}),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: page.name,
               onChanged: (value) => page.name = value),
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(width: 30, child: TextFormField(
+            SizedBox(width: 30, child: BiTextFormField(
                 decoration: const InputDecoration(label: Icon(Icons.timer_outlined)),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -269,7 +269,7 @@ class _SettingsState extends State<SettingsPage> {
           }),
       ListTile(
           leading: const Text("URL:"),
-          title: TextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
+          title: BiTextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
               decoration: const InputDecoration(hintText: 'http://mypi.local:3000'),
               initialValue: settings.signalkUrl,
               onChanged: (value) => settings.signalkUrl = value),
@@ -284,7 +284,7 @@ class _SettingsState extends State<SettingsPage> {
           }),
       ListTile(
           leading: const Text("Subscription Min Period:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.signalkMinPeriod.toString(),
@@ -293,7 +293,7 @@ class _SettingsState extends State<SettingsPage> {
       ),
       ListTile(
           leading: const Text("Connection Timeout:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.signalkConnectionTimeout.toString(),
@@ -302,7 +302,7 @@ class _SettingsState extends State<SettingsPage> {
       ),
       ListTile(
           leading: const Text("Real-time Data Timeout:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.realTimeDataTimeout.toString(),
@@ -311,7 +311,7 @@ class _SettingsState extends State<SettingsPage> {
       ),
       ListTile(
           leading: const Text("Infrequent Data Timeout:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: settings.infrequentDataTimeout.toString(),
@@ -321,14 +321,14 @@ class _SettingsState extends State<SettingsPage> {
       _Divider('Authentication'), //=====================================================
       ListTile(
           leading: const Text("App ID:"),
-          title: TextFormField(
+          title: BiTextFormField(
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
             initialValue: settings.clientID,
             onChanged: (value) => settings.clientID = value)
       ),
       ListTile(
           leading: const Text("Group ID:"),
-          title: TextFormField(
+          title: BiTextFormField(
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
             initialValue: settings.groupID,
             onChanged: (value) => settings.groupID = value),
@@ -554,11 +554,11 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
       var header = widget._httpHeaders[h];
       headerList.add(ListTile(key: UniqueKey(),
           title: Column(children: [
-            TextFormField(
+            BiTextFormField(
               decoration: const InputDecoration(hintText: 'name'),
               initialValue: header.name,
               onChanged: (value) => header.name = value),
-            TextFormField(
+            BiTextFormField(
               decoration: const InputDecoration(hintText: 'value'),
               initialValue: header.value,
               onChanged: (value) => header.value = value)

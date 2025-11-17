@@ -238,7 +238,7 @@ class _SettingsState extends State<_SettingsWidget> {
       ),
       ListTile(
         leading: const Text("Title:"),
-        title: TextFormField(
+        title: BiTextFormField(
             initialValue: s.title,
             onChanged: (value) => s.title = value)
       ),
@@ -254,20 +254,20 @@ class _SettingsState extends State<_SettingsWidget> {
       ),
       ListTile(
           leading: const Text("Units:"),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.units,
               onChanged: (value) => s.units = value)
       ),
       ListTile(
         leading: const Text("Multiplier:"),
-        title: TextFormField(
+        title: BiTextFormField(
             initialValue: s.multiplier.toString(),
             onChanged: (value) => s.multiplier = double.tryParse(value)??1),
       ),
       if({CustomDoubleValueBox}.contains(b.runtimeType))
         ListTile(
           leading: const Text("Precision:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: s.precision.toString(),
@@ -276,7 +276,7 @@ class _SettingsState extends State<_SettingsWidget> {
       if({CustomDoubleValueBox}.contains(b.runtimeType))
         ListTile(
           leading: const Text("Min Length:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: s.minLen.toString(),
@@ -284,20 +284,20 @@ class _SettingsState extends State<_SettingsWidget> {
         ),
       ListTile(
         leading: const Text("Min Value:"),
-        title: TextFormField(
+        title: BiTextFormField(
             initialValue: (s.minValue??'').toString(),
             onChanged: (value) => s.minValue = double.tryParse(value)),
       ),
       ListTile(
         leading: const Text("Max Value:"),
-        title: TextFormField(
+        title: BiTextFormField(
             initialValue: (s.maxValue??'').toString(),
             onChanged: (value) => s.maxValue = double.tryParse(value)),
       ),
       if({CustomDoubleValueSemiGaugeBox, CustomDoubleValueCircularGaugeBox, CustomDoubleValueBarGaugeBox}.contains(b.runtimeType))
         ListTile(
           leading: const Text("Step:"),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.step.toString(),
               onChanged: (value) => s.step = double.tryParse(value)??1),
         ),
@@ -479,7 +479,7 @@ class _DebugSettingsState extends State<_DebugSettingsWidget> {
       ),
       ListTile(
           leading: const Text("Signalk Path:"),
-          title: TextFormField(
+          title: BiTextFormField(
               initialValue: s.path,
               onChanged: (value) => s.path = value)
       ),
@@ -582,7 +582,7 @@ class _CustomTextBoxSettingsState extends State<_CustomTextBoxSettingsWidget> {
     return ListView(children: [
       ListTile(key: UniqueKey(),
           leading: const Text("Text\nTemplate:"),
-          title: TextFormField(
+          title: BiTextFormField(
             textInputAction: TextInputAction.newline,
             keyboardType: TextInputType.multiline,
             minLines: 2,

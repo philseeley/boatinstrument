@@ -304,7 +304,7 @@ class _TankSettingsState extends State<_TankSettingsWidget> {
           title: SignalkPathDropdownMenu(widget._controller, s.id, widget._basePath, (value) => s.id = value)),
       ListTile(
           leading: const Text("Capacity:"),
-          title: TextFormField(
+          title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: c.capacityToDisplay(s.capacity).toInt().toString(),
