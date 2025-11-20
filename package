@@ -61,10 +61,11 @@ name=${name}-fpi
 
 for pi_cpu in $*
 do
+  rm -rf build/flutter-pi
   flutterpi_tool build --release ${pi_opts} --cpu ${pi_cpu}
   prepackage
   mkdir -p debian/etc/systemd/system/getty@tty1.service.d debian/etc/${name}
-  mv build/flutter_assets debian/usr/share/${name}
+  mv build/flutter-pi/* debian/usr/share/${name}
   echo /etc/${name}/config >debian/DEBIAN/conffiles
   cp boatinstrument-fpi debian/usr/share/${name}
   cp boatinstrument-fpi-config debian/etc/${name}/config
