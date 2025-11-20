@@ -204,7 +204,7 @@ class MainPageState extends State<MainPage> {
           if(_controller.brightnessControl) IconButton(tooltip: 'Brightness', icon: Icon(_controller.brightnessIcon), onPressed: _controller.stepBrightness),
           if(_controller.notifications.isNotEmpty) IconButton(tooltip: 'Notifications', icon: Icon(Icons.format_list_bulleted), onPressed: _showNotifications),
           if(!widget.readOnly) IconButton(tooltip: 'Edit Pages', icon: const Icon(Icons.web), onPressed: _showEditPagesPage),
-          if(widget.readOnly) IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: () {LogDisplay.show(context);})
+          if(widget.readOnly) IconButton(tooltip: 'Log', icon: const Icon(Icons.notes),onPressed: () {LogDisplay.show(context, _controller);})
         ]
       );
     }

@@ -9,15 +9,16 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:share_plus/share_plus.dart';
 
 class LogDisplay extends StatefulWidget {
+  final BoatInstrumentController _controller;
 
-  static void show (BuildContext context) async {
+  static void show (BuildContext context, BoatInstrumentController controller) async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return const LogDisplay();
+      return LogDisplay(controller);
     }));
   }
 
-  const LogDisplay({super.key});
+  const LogDisplay(this._controller, {super.key});
 
   @override
   State<LogDisplay> createState() => _LogDisplayState();
@@ -34,7 +35,7 @@ class _LogDisplayState extends State<LogDisplay> {
         title: const Text("Log"),
         actions: [
           if(!Platform.isLinux) IconButton(tooltip: 'Export Files', icon: const Icon(Icons.upload), onPressed: () {_upload(context);}),
-          if(!Platform.isLinux) IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
+          IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
               onPressed: () {
                 _share(entries);
               },
@@ -61,7 +62,16 @@ class _LogDisplayState extends State<LogDisplay> {
   }
 
   void _share (List<String> entries) async {
-    await SharePlus.instance.share(ShareParams(text: entries.join('\n'), subject: 'Boat Instrument Log'));
+    String text = entries.join('\n');
+
+    if(Platform.isLinux) {
+      Directory dir = await path_provider.getApplicationDocumentsDirectory();
+      File f = File('${dir.path}/$bi.log');
+      f.writeAsStringSync(text, flush: true);
+      if(mounted) widget._controller.showMessage(context, 'Log written to "${f.path}"');
+    } else {
+      await SharePlus.instance.share(ShareParams(text: text, subject: 'Boat Instrument Log'));
+    }
   }
 
   void _upload (BuildContext context) async {
