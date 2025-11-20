@@ -61,7 +61,7 @@ class BoatInstrumentApp extends StatelessWidget {
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
     const enableSetTime = 'enable-set-time';
-    const enableKeyboard = 'keyboard';
+    const keyboard = 'keyboard';
     const configFile = 'config-file';
 
     final p = ArgParser()
@@ -72,7 +72,7 @@ class BoatInstrumentApp extends StatelessWidget {
                 ..addFlag(readOnly, negatable: false)
                 ..addFlag(enableExit, negatable: false)
                 ..addFlag(enableSetTime, negatable: false)
-                ..addFlag(enableKeyboard, negatable: false)
+                ..addFlag(keyboard, negatable: false)
                 ..addOption(configFile,
                     defaultsTo: 'boatinstrument.json',
                     valueHelp: 'filename',
@@ -99,7 +99,7 @@ class BoatInstrumentApp extends StatelessWidget {
           r.flag(readOnly),
           r.flag(enableExit),
           r.flag(enableSetTime),
-          r.flag(enableKeyboard),
+          r.flag(keyboard),
           r.option(configFile)!),
         theme:  Provider.of<ThemeProvider>(context).themeData
       );
@@ -129,10 +129,10 @@ class MainPage extends StatefulWidget {
     this.readOnly,
     this.enableExit,
     this.enableSetTime,
-    bool enableKeyboard,
+    bool keyboard,
     this.configFile,
     {super.key}) {
-      enableEmbeddedKeyboard = enableKeyboard;
+      embeddedKeyboard = keyboard;
     }
 
   @override

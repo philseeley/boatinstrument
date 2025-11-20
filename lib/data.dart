@@ -7,7 +7,7 @@ const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
 const String idChars = '[0-9a-zA-Z_-]';
 
-bool enableEmbeddedKeyboard = false;
+bool embeddedKeyboard = false;
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
@@ -1276,5 +1276,5 @@ class BiTextFormField extends OnscreenKeyboardTextFormField {
     super.decoration,
     required super.onChanged,
     required String initialValue,
-    super.key}) : super(enableOnscreenKeyboard: enableEmbeddedKeyboard, controller: TextEditingController(text: initialValue));
+    super.key}) : super(enableOnscreenKeyboard: embeddedKeyboard, controller: TextEditingController(text: initialValue));
 }
