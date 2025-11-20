@@ -61,7 +61,7 @@ class BoatInstrumentApp extends StatelessWidget {
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
     const enableSetTime = 'enable-set-time';
-    const enableKeyboard = 'enable-keyboard';
+    const enableKeyboard = 'keyboard';
     const configFile = 'config-file';
 
     final p = ArgParser()
