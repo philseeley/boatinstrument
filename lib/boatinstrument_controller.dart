@@ -955,6 +955,7 @@ class BoatInstrumentController {
       l.i("Connected to: $wsUri");
     } catch (e) {
       l.e('Error connecting WebSocket', error: e);
+      _dataChannel = _controlChannel = null;
     }
   }
 
@@ -962,7 +963,7 @@ class BoatInstrumentController {
     try {
       (controlChannel?_controlChannel:_dataChannel)?.sink.add(jsonEncode(data));
     } catch (e) {
-      l.e("Error converting sending ${controlChannel?'control':'data'} data $data", error: e);
+      l.e("Error sending ${controlChannel?'control':'data'} data $data", error: e);
     }
   }
 
