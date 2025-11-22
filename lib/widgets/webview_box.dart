@@ -49,8 +49,8 @@ class _WebViewBoxState extends State<WebViewBox> {
 
   @override
   Widget build(BuildContext context) {
-    if(Platform.isMacOS) {
-      return const Center(child: Text('Not implemented on MacOS'));
+    if(Platform.isMacOS || Platform.isLinux) {
+      return const Center(child: Text('Not implemented on this platform'));
     }
     if(widget._settings.url.isEmpty) {
       return Container(padding: const EdgeInsets.all(40.0), alignment: Alignment.topCenter, child: const Text('No Web Page set'));

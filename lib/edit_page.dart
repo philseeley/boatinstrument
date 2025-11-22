@@ -318,7 +318,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(CustomTextBox.sid, 'Text'),
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
-      if(!Platform.isMacOS) _widgetMenuEntry(WebViewBox.sid, 'Web View'),
+      if(!Platform.isMacOS && !Platform.isLinux) _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid, 'Value'),
