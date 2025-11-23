@@ -296,6 +296,13 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
   @override
   void initState() {
     super.initState();
+    scrolling = true;
+    if(!widget.config.editMode) {
+      actions = [
+        IconButton(onPressed: widget._perBoxSettings.allowStop?_stop:null, icon: Icon(Icons.stop)),
+        IconButton(onPressed: widget._perBoxSettings.allowRestart?_restart:null, icon: Icon(Icons.restore))
+      ];
+    }
     widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.${widget._perBoxSettings.id}'}, dataType: SignalKDataType.static);
   }
 
@@ -319,10 +326,9 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
     if(widget._perBoxSettings.id.isEmpty) {
       text = 'Select a Timer\nin the settings';      
     } else {
-      actions.clear();
-      if(!widget.config.editMode && _timer != null) {
-        if(widget._perBoxSettings.allowStop) actions.add(IconButton(onPressed: _stop, icon: Icon(Icons.stop)));
-        if(widget._perBoxSettings.allowRestart) actions.add(IconButton(onPressed: _restart, icon: Icon(Icons.restore)));
+      if(!widget.config.editMode) {
+        actions[0] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowStop)?_stop:null, icon: Icon(Icons.stop));
+        actions[1] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowRestart)?_restart:null, icon: Icon(Icons.restore));
       }
 
       Duration? d = _expires?.difference(widget.config.controller.now());
