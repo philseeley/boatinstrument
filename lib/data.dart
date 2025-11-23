@@ -38,7 +38,7 @@ String duration2HumanString (Duration d) {
     return '${hours}h${parts[1]}m';
   }
   int s = double.parse(parts[2]).round();
-  return '${parts[1]}m${s}s';
+  return fmt.format('${parts[1]}m{:02d}s', s);
 }
 String duration2String(Duration d) {
   List<String> parts = d.toString().split(':');
