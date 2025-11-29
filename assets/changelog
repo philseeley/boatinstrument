@@ -27,6 +27,7 @@
             NextPointTimeToGoBox: the heading will now scroll if it is long and
               the value is subject to smoothing.
             Sunlight/Moon Boxes now handle null values per-path.
+            Electrical Boxes now flag there data as Infrequent.
   * 0.7.0 Application time is now taken from the SignalK server. This ensures
             timestamps are handled correctly even on devices not correctly
             time synchronised.

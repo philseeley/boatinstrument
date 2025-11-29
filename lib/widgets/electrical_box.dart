@@ -55,7 +55,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   final _ElectricalBatterySettings _settings;
 
   const BatteryVoltMeterBox._init(this._settings, config, title, path, {super.key, super.minValue, super.maxValue, super.ranges, super.step}) :
-    super(config, title, GaugeOrientation.up, path);
+    super(config, title, GaugeOrientation.up, path, dataType: SignalKDataType.infrequent);
 
   factory BatteryVoltMeterBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalBatterySettings s = _$ElectricalBatterySettingsFromJson(config.settings);
@@ -158,7 +158,7 @@ class BatteryVoltageBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const BatteryVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path);
+  const BatteryVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, dataType: SignalKDataType.infrequent);
 
   factory BatteryVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -194,7 +194,7 @@ class BatteryCurrentBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const BatteryCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
+  const BatteryCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory BatteryCurrentBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -230,7 +230,7 @@ class BatteryTemperatureBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const BatteryTemperatureBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
+  const BatteryTemperatureBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory BatteryTemperatureBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -266,7 +266,7 @@ class InverterCurrentBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const InverterCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
+  const InverterCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory InverterCurrentBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -302,7 +302,7 @@ class SolarVoltageBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const SolarVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path);
+  const SolarVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, dataType: SignalKDataType.infrequent);
 
   factory SolarVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -338,7 +338,7 @@ class SolarCurrentBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const SolarCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false);
+  const SolarCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory SolarCurrentBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -410,7 +410,7 @@ class _BatteriesBoxState extends HeadedTextBoxState<BatteriesBox> {
     super.initState();
     header = 'Batteries';
     alignment = Alignment.topLeft;
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'$batteriesBasePath.*'});
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'$batteriesBasePath.*'}, dataType: SignalKDataType.infrequent);
   }
 
   @override
