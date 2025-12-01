@@ -48,7 +48,7 @@ If a Box receives no data within the **Real-time Data Timeout** the box is clear
 
 You can set additional HTTP Headers if the connection to the SignalK server requires them, e.g. for proxies.
 
-In **Demo Mode** the app connects to https://demo.signalk.org.
+In **Demo Mode** the app connects to https://demo.signalk.org. Note that no HTTP headers, including authentication, will be added.
 
 Certain Boxes, like the **Autopilot Controls**, and [App Remote Control](doc:remote-control.md) require [Authentication](doc:authentication.md) to be set-up.
 

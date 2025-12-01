@@ -7,6 +7,7 @@
           You can now export backup configs and log files.
           Added commandline arguments for:
             --keyboard - enables an embedded onscreen keyboard
+          In Demo mode we don't add any HTTP headers, as this can stop the connection.
 
           New Boxes:
             Remote Control
