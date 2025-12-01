@@ -410,7 +410,14 @@ class _BatteriesBoxState extends HeadedTextBoxState<BatteriesBox> {
     super.initState();
     header = 'Batteries';
     alignment = Alignment.topLeft;
-    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'$batteriesBasePath.*'}, dataType: SignalKDataType.infrequent);
+    widget.config.controller.configure(onUpdate: _onUpdate, dataType: SignalKDataType.infrequent, paths: {
+      '$batteriesBasePath.*.name',
+      '$batteriesBasePath.*.voltage',
+      '$batteriesBasePath.*.current',
+      '$batteriesBasePath.*.capacity',
+      '$batteriesBasePath.*.stateOfCharge',
+      '$batteriesBasePath.*.temperature',
+    });
   }
 
   @override
@@ -457,38 +464,34 @@ class _BatteriesBoxState extends HeadedTextBoxState<BatteriesBox> {
   }
 
   void _onUpdate(List<Update> updates) {
-    if(updates[0].value == null) {
-      _batteries = [];
-    } else {
-      for (Update u in updates) {
-        try {
-          List<String> p = u.path.split('.');
-          _Battery b = _getBattery(p[2]);
+    for (Update u in updates) {
+      try {
+        List<String> p = u.path.split('.');
+        _Battery b = _getBattery(p[2]);
 
-          switch (p[3]) {
-            case 'name':
-              b.name = u.value;
+        switch (p[3]) {
+          case 'name':
+            b.name = u.value;
+            break;
+          case 'voltage':
+            b.voltage = (u.value==null)?null:(u.value as num).toDouble();
+            break;
+          case 'current':
+            b.current = (u.value==null)?null:(u.value as num).toDouble();
+            break;
+          case 'capacity':
+            switch (p[4]) {
+              case 'stateOfCharge':
+              b.stateOfCharge = (u.value==null)?null:(u.value as num).toDouble();
               break;
-            case 'voltage':
-              b.voltage = (u.value as num).toDouble();
-              break;
-            case 'current':
-              b.current = (u.value as num).toDouble();
-              break;
-            case 'capacity':
-              switch (p[4]) {
-                case 'stateOfCharge':
-                b.stateOfCharge = (u.value as num).toDouble();
-                break;
-              }
-              break;
-            case 'temperature':
-              b.temperature = (u.value as num).toDouble();
-              break;
-          }
-        } catch (e) {
-          widget.config.controller.l.e("Error converting $u", error: e);
+            }
+            break;
+          case 'temperature':
+            b.temperature = (u.value==null)?null:(u.value as num).toDouble();
+            break;
         }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 
