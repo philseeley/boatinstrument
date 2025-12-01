@@ -375,8 +375,9 @@ class MaxTextWidget extends StatelessWidget {
   final Color? color;
   final Color? textBgColor;
   final TextDecoration? decoration;
+  final Color? backgroundColor;
 
-  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, super.key});
+  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, this.backgroundColor, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -396,7 +397,7 @@ class MaxTextWidget extends StatelessWidget {
         if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling,
           style: style.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
         Text(text, textScaler: TextScaler.noScaling,
-          style: style.copyWith(fontSize: fontSize, color: color, decoration: decoration))
+          style: style.copyWith(fontSize: fontSize, color: color, decoration: decoration, backgroundColor: backgroundColor))
       ]);
     });
   }
@@ -1266,7 +1267,7 @@ class _EditListWidgetState extends State<EditListWidget> {
 }
 
 class BiTextFormField extends OnscreenKeyboardTextFormField {
-   BiTextFormField({
+  BiTextFormField({
     super.enabled,
     super.inputFormatters,
     super.keyboardType,

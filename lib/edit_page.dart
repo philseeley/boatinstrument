@@ -118,6 +118,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(TimerDisplayBox.sid, (config) {return TimerDisplayBox(config, key: UniqueKey());}),
   BoxDetails(TimersSetupBox.sid, (config) {return TimersSetupBox(config, key: UniqueKey());}),
   BoxDetails(StopwatchBox.sid, (config) {return StopwatchBox(config, key: UniqueKey());}),
+  BoxDetails(SHRPiBox.sid, experimental: true, (config) {return SHRPiBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -301,13 +302,16 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Network', [
         _widgetMenuEntry(StarlinkBox.sid, 'Starlink'),
       ]),
-      _widgetSubMenuEntry(box, 'Raspberry Pi', [
-        _widgetMenuEntry(RPiCPUTemperatureBox.sid, 'CPU Temp'),
-        _widgetMenuEntry(RPiGPUTemperatureBox.sid, 'GPU Temp'),
-        _widgetMenuEntry(RPiCPUUtilisationBox.sid, 'CPU Utilisation'),
-        _widgetMenuEntry(RPiMemoryUtilisationBox.sid, 'Memory Utilisation'),
-        _widgetMenuEntry(RPiSDUtilisationBox.sid, 'Disk Utilisation'),
-        _widgetMenuEntry(RaspberryPiBox.sid, 'Raspberry Pi'),
+      _widgetSubMenuEntry(box, 'Hardware', [
+        _widgetSubMenuEntry(box, 'Raspberry Pi', [
+          _widgetMenuEntry(RPiCPUTemperatureBox.sid, 'CPU Temp'),
+          _widgetMenuEntry(RPiGPUTemperatureBox.sid, 'GPU Temp'),
+          _widgetMenuEntry(RPiCPUUtilisationBox.sid, 'CPU Utilisation'),
+          _widgetMenuEntry(RPiMemoryUtilisationBox.sid, 'Memory Utilisation'),
+          _widgetMenuEntry(RPiSDUtilisationBox.sid, 'Disk Utilisation'),
+          _widgetMenuEntry(RaspberryPiBox.sid, 'Raspberry Pi'),
+        ]),
+        _widgetMenuEntry(SHRPiBox.sid, 'Sailor Hat'),
       ]),
       _widgetSubMenuEntry(box, 'Time', [
         _widgetMenuEntry(DateTimeBox.sid, 'Date/Time'),

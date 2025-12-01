@@ -19,7 +19,7 @@ import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/network.dart';
 import 'package:boatinstrument/widgets/propulsion_box.dart';
 import 'package:boatinstrument/widgets/remote_box.dart';
-import 'package:boatinstrument/widgets/rpi_box.dart';
+import 'package:boatinstrument/widgets/hardware.dart';
 import 'package:boatinstrument/widgets/tank_box.dart';
 import 'package:boatinstrument/widgets/vnc_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
