@@ -54,6 +54,8 @@ Certain Boxes, like the **Autopilot Controls**, and [App Remote Control](doc:rem
 
 The **Settings** page provides additional options:
 
+![poweroff](assets/icons/__THEME__/power_settings_new.png) If enabled, powers off the host using sudo
+![exit](assets/icons/__THEME__/exit_to_app.png) If enabled, exits the app. If run from systemd, the app will be restarted
 ![export](assets/icons/__THEME__/share.png) Shares/Exports the Settings
 ![import](assets/icons/__THEME__/file_open.png) Imports Settings from a file
 ![subscriptions](assets/icons/__THEME__/mediation.png) Show the current SignalK Subscriptions

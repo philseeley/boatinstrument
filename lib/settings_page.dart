@@ -394,8 +394,8 @@ class _SettingsState extends State<SettingsPage> {
         title: const Text("Settings"),
         actions: [
 
-          if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.power_settings_new), onPressed: _exit),
-          if(!Platform.isLinux) IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
+          if(widget._controller._enablePoweroff) IconButton(tooltip: 'Poweroff', icon: const Icon(Icons.power_settings_new), onPressed: _poweroff),
+          if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.exit_to_app), onPressed: _exit),
           IconButton(tooltip: 'Import', icon: const Icon(Icons.file_open), onPressed: _import),
           IconButton(tooltip: 'Subscriptions', icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
           IconButton(tooltip: 'Help', icon: const Icon(Icons.help), onPressed: _showHelpPage),
@@ -404,6 +404,22 @@ class _SettingsState extends State<SettingsPage> {
       ),
       body: ListView(children: list)
     );
+  }
+
+  Future<void> _poweroff () async {
+    var c = widget._controller;
+
+    if(await c.askToConfirm(context, 'Poweroff?', alwaysAsk: true)) {
+      try {
+        var r = await Process.run('/usr/bin/sudo', ['/usr/sbin/poweroff']);
+
+        if(r.exitCode != 0) {
+          c.l.e('Failed to poweroff, exit code ${r.exitCode} output "${r.stdout}" error "${r.stderr}"');
+        }
+      } catch (e) {
+        c.l.e('Exception trying to poweroff', error: e);
+      }
+    }
   }
 
   Future<void> _exit () async {

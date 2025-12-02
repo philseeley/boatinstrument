@@ -125,6 +125,7 @@ class BoatInstrumentController {
   final bool _noAudio;
   final bool _noBrightnessControls;
   final bool _enableExit;
+  final bool _enablePoweroff;
   final bool _enableSetTime;
   final MainPageState _mainPageState;
   bool _timeSet = false;
@@ -161,7 +162,7 @@ class BoatInstrumentController {
   final Set<String> _staticPaths = {};
 
 
-  BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enableSetTime) {
+  BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enablePoweroff, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
   }
 

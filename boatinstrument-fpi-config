@@ -9,6 +9,7 @@ FLUTTER_PI_ARGS="--release"
 #   --no-full-screen     Disables Full Screen support
 #   --read-only          Disables the ability to change the configuration
 #   --enable-exit        Enables an Exit button on the setting page and systemd will restart the instrument
+#   --enable-poweroff    Enables a Poweroff button on the setting page. This will use sudo to power off the host
 #   --enable-set-time    Enables the option to set the system time from the 'navigation.datetime' path
 #   --keyboard           Enables the embedded onscreen keyboard
-BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake --no-full-screen --enable-exit"
+BOAT_INSTRUMENT_ARGS="--no-audio --no-brightness-ctrl --no-keep-awake --no-full-screen --enable-exit --enable-poweroff"

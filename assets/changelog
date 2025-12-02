@@ -6,6 +6,7 @@
           Authentication is now handled at the application level rather than per-box.
           You can now export backup configs and log files.
           Added commandline arguments for:
+            --enable-poweroff - Enables a Poweroff button on the setting page.
             --keyboard - enables an embedded onscreen keyboard
           In Demo mode we don't add any HTTP headers, as this can stop the connection.
 

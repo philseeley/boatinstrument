@@ -60,6 +60,7 @@ class BoatInstrumentApp extends StatelessWidget {
     const noFullScreen = 'no-full-screen';
     const readOnly = 'read-only';
     const enableExit = 'enable-exit';
+    const enablePoweroff = 'enable-poweroff';
     const enableSetTime = 'enable-set-time';
     const keyboard = 'keyboard';
     const configFile = 'config-file';
@@ -71,6 +72,7 @@ class BoatInstrumentApp extends StatelessWidget {
                 ..addFlag(noFullScreen, negatable: false)
                 ..addFlag(readOnly, negatable: false)
                 ..addFlag(enableExit, negatable: false)
+                ..addFlag(enablePoweroff, negatable: false)
                 ..addFlag(enableSetTime, negatable: false)
                 ..addFlag(keyboard, negatable: false)
                 ..addOption(configFile,
@@ -98,6 +100,7 @@ class BoatInstrumentApp extends StatelessWidget {
           r.flag(noFullScreen),
           r.flag(readOnly),
           r.flag(enableExit),
+          r.flag(enablePoweroff),
           r.flag(enableSetTime),
           r.flag(keyboard),
           r.option(configFile)!),
@@ -118,6 +121,7 @@ class MainPage extends StatefulWidget {
   final bool noFullScreen;
   final bool readOnly;
   final bool enableExit;
+  final bool enablePoweroff;
   final bool enableSetTime;
   final String configFile;
 
@@ -128,6 +132,7 @@ class MainPage extends StatefulWidget {
     this.noFullScreen,
     this.readOnly,
     this.enableExit,
+    this.enablePoweroff,
     this.enableSetTime,
     bool keyboard,
     this.configFile,
@@ -155,7 +160,7 @@ class MainPageState extends State<MainPage> {
     super.initState();
 
     _themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    _controller = BoatInstrumentController(this, widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enableSetTime);
+    _controller = BoatInstrumentController(this, widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enablePoweroff, widget.enableSetTime);
   }
 
   Future<void> _configure () async {
