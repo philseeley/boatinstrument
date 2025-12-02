@@ -397,7 +397,7 @@ class BoatInstrumentController {
 
     _configureBackgroundData();
 
-    if(_noBrightnessControls) {
+    if(_noBrightnessControls || Platform.isLinux) {
       _settings?.brightnessControl = false;
     }
   }

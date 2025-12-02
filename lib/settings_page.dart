@@ -133,6 +133,7 @@ class _SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLinux = Platform.isLinux;
     _Settings settings = widget._controller._settings!;
     final themeProvider = Provider.of<ThemeProvider>(context);
 
@@ -173,7 +174,7 @@ class _SettingsState extends State<SettingsPage> {
               settings.keepAwake = value;
             });
           }),
-      SwitchListTile(title: const Text("Show Brightness Controls:"),
+      if(!isLinux) SwitchListTile(title: const Text("Show Brightness Controls:"),
           value: settings.brightnessControl,
           onChanged: widget._controller._noBrightnessControls ? null : (bool value) {
             setState(() {
@@ -396,6 +397,7 @@ class _SettingsState extends State<SettingsPage> {
 
           if(widget._controller._enablePoweroff) IconButton(tooltip: 'Poweroff', icon: const Icon(Icons.power_settings_new), onPressed: _poweroff),
           if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.exit_to_app), onPressed: _exit),
+          if(!isLinux) IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
           IconButton(tooltip: 'Import', icon: const Icon(Icons.file_open), onPressed: _import),
           IconButton(tooltip: 'Subscriptions', icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
           IconButton(tooltip: 'Help', icon: const Icon(Icons.help), onPressed: _showHelpPage),

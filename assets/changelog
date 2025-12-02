@@ -9,6 +9,7 @@
             --enable-poweroff - Enables a Poweroff button on the setting page.
             --keyboard - enables an embedded onscreen keyboard
           In Demo mode we don't add any HTTP headers, as this can stop the connection.
+          Brightness controls are disabled on Linux as there's no implementation.
 
           New Boxes:
             Remote Control
