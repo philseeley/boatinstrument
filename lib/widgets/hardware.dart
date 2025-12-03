@@ -289,48 +289,39 @@ class _SHRPiBoxState extends HeadedBoxState<SHRPiBox> {
       _state = 'example';
     }
 
-    header = 'SHRPi: ${_state??''}';
+    header = 'SHRPi: ${_state??'-'}';
 
     body = LayoutBuilder(builder: (context, constraints) {
       var controller = widget.config.controller;
-      double textSize = Theme.of(context).textTheme.bodyMedium!.fontSize! * 2;
       double w = constraints.maxWidth;
       double h = constraints.maxHeight;
-      double t = 0;
-      double l = 0;
-      double b = 0;
-      double r = 1877/1634;
+      double r = 1877/1634; // Size of the image.
 
-      double wr = 1877/w;
-      double hr = 1634/h;
       double iw = h*r;
       double ih = w/r;
 
-      if(wr < hr) {
-        l = r = (w-iw)/2;
+      if(1877/w < 1634/h) {
         ih = h;
       } else {
         iw = w;
-        t = b =(h-ih)/2;
       }
 
-      return Container(padding: const EdgeInsets.all(HeadedBoxState.pad), child: Stack(children: [
+      return Container(padding: const EdgeInsets.all(HeadedBoxState.pad), child: Stack(alignment: AlignmentGeometry.center, children: [
         Center(child: Image(image: AssetImage('assets/shrpi.jpg'))),
+        SizedBox(width: iw, height: ih, child: MaxTextWidget(textBgColor: bg,
 
-        if(_watchdogEnabled!=null) Positioned(top: t+10, left: l, child: SizedBox(width: textSize*10, height: textSize, child: MaxTextWidget(backgroundColor: bg,
-          'Watchdog: ${_watchdogEnabled!?'On':'Off'}'))),
+'''  Watchdog: ${_watchdogEnabled??false?'On':'Off'}
+        
 
-        if(_capacitorVoltage!=null) Positioned(top: t+(ih/4), left: l+(iw/5), child: SizedBox(width: textSize*4, height: textSize, child: MaxTextWidget(backgroundColor: bg,
-          fmt.format('{:2.2f}v', _capacitorVoltage!)))),
+     ${fmt.format('{:2.2f}', _capacitorVoltage??0.0)}v
+        
+      ${fmt.format('{:5.2f}', controller.temperatureToDisplay(_mcuTemperature??kelvinOffset))}${controller.temperatureUnits.unit}
 
-        if(_mcuTemperature!=null) Positioned(bottom: b+(ih/2.5), right: r+(iw/12), child: SizedBox(width: textSize*8, height: textSize, child: MaxTextWidget(backgroundColor: bg,
-          fmt.format('{:5.2f}{:}', controller.temperatureToDisplay(_mcuTemperature!), controller.temperatureUnits.unit)))),
 
-        if(_inputVoltage!=null && _inputAmps!=null) Positioned(bottom: b+10, right: r+(iw/12), child: SizedBox(width: textSize*5, height: textSize*2, child: MaxTextWidget(backgroundColor: bg,
-          fmt.format('{:5.2f}v\n{:5.2f}a', _inputVoltage!, _inputAmps!)))),
+             ${fmt.format('{:5.2f}', _inputVoltage??0.0)}v
+   ${_v5Output??false?'On ':'Off'}       ${fmt.format('{:5.2f}', _inputAmps??0.0)}a'''
 
-        if(_v5Output!=null) Positioned(bottom: b+20, left: l+(iw/10), child: SizedBox(width: textSize*3, height: textSize, child: MaxTextWidget(backgroundColor: bg,
-          _v5Output!?'On':'Off'))),
+        ))
       ]));
     });
 
