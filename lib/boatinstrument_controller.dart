@@ -25,6 +25,7 @@ import 'package:boatinstrument/widgets/vnc_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
+import 'package:bonsoir/bonsoir.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +33,6 @@ import 'package:format/format.dart' as fmt;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:markdown_widget/markdown_widget.dart';
-import 'package:multicast_dns/multicast_dns.dart';
 import 'package:nanoid/nanoid.dart';
 import 'package:text_scroll/text_scroll.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -865,22 +865,27 @@ class BoatInstrumentController {
       else if(_settings!.discoverServer) {
         host = '';
         port = 0;
-        final MDnsClient client = MDnsClient();
-        await client.start();
+        BonsoirDiscovery discovery = BonsoirDiscovery(type:  '_signalk-http._tcp');
+        await discovery.initialize();
+        await discovery.start();
+        Timer t = Timer(const Duration(seconds: 10), () {discovery.stop();});
         try {
-          await for (var ptr in client.lookup<PtrResourceRecord>(
-            ResourceRecordQuery.serverPointer('_signalk-http._tcp'))) {
-              await for (SrvResourceRecord srv in client.lookup<SrvResourceRecord>(
-                  ResourceRecordQuery.service(ptr.domainName))) {
-                host = srv.target;
-                port = srv.port;
-                break;
-              }
+          await for(BonsoirDiscoveryEvent e in discovery.eventStream!) {
+            if (e is BonsoirDiscoveryServiceFoundEvent) {
+              e.service.resolve(discovery.serviceResolver);
+            } else if (e is BonsoirDiscoveryServiceResolvedEvent) {
+              host = e.service.host!;
+              port = e.service.port;
+              discovery.stop();
               break;
-          }
-        } finally {
-          client.stop();
-        }
+            } else if (e is BonsoirDiscoveryStoppedEvent) {
+              // This should only happen if the Timer expires.
+              throw Exception('Service discovery failed');
+            }
+           }
+         } finally {
+          t.cancel();
+         }
       }
 
       Uri uri = Uri(scheme: scheme, host: host, port: port, pathSegments: paths);

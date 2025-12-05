@@ -52,8 +52,10 @@ dependencies:
   screen_brightness:
   flutter_email_sender:
   intl:
-#  great_circle_distance_calculator:
-  multicast_dns:
+  # We can't use the pure dart implementation "multicast_dns" because Apple doesn't allow
+  # you to create multicast ports.
+  # See: https://github.com/flutter/flutter/issues/42102#issuecomment-2308904083
+  bonsoir:
   audioplayers:
   latlong2:
   args:
@@ -65,6 +67,7 @@ dependencies:
   flutter_fullscreen:
   text_scroll:
   flutter_onscreen_keyboard:
+#  great_circle_distance_calculator:
   actions_menu_appbar:
     path: ../actions_menu_appbar
 

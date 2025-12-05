@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
+  bonsoir_windows
   flutter_inappwebview_windows
   screen_brightness_windows
   screen_retriever_windows
