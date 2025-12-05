@@ -67,7 +67,7 @@ The **Settings** page provides additional options:
 
 If setting time is enabled via the "--enable-set-time" command line option and "Set Time" is enabled in the Advanced Settings, then **sudo** will be used to set the time from "navigation.datetime".
 
-Additional [documentation](https://philseeley.github.io/docs/boatinstrument/main.html) is available online.
+Additional [documentation](https://philseeley.github.io/docs/boatinstrument/main.html), including any known issues is available online.
 
 # Issues and Feedback
 
