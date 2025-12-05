@@ -315,7 +315,7 @@ class _SHRPiBoxState extends HeadedBoxState<SHRPiBox> {
 
      ${fmt.format('{:2.2f}', _capacitorVoltage??0.0)}v
         
-      ${fmt.format('{:5.2f}', controller.temperatureToDisplay(_mcuTemperature??kelvinOffset))}${controller.temperatureUnits.unit}
+      ${fmt.format('{:5.2f}', controller.temperatureToDisplay(_mcuTemperature??controller.temperatureFromDisplay(0.0)))}${controller.temperatureUnits.unit}
 
 
              ${fmt.format('{:5.2f}', _inputVoltage??0.0)}v

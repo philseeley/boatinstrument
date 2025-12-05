@@ -455,7 +455,7 @@ class _BatteriesBoxState extends HeadedTextBoxState<BatteriesBox> {
       String f = ' {:3.0f}% {:4.1f}V {:6.1f}A {:6.1f}${c.temperatureUnits.unit}';
 
       for(_Battery b  in _batteries) {
-        textBuffer.writeln(format('{:${maxName.length}s}$f', b.name??b.id, (b.stateOfCharge??0.0)*100, b.voltage??0.0, b.current??0.0, c.temperatureToDisplay(b.temperature??0.0)));
+        textBuffer.writeln(format('{:${maxName.length}s}$f', b.name??b.id, (b.stateOfCharge??0.0)*100, b.voltage??0.0, b.current??0.0, c.temperatureToDisplay(b.temperature??c.temperatureFromDisplay(0.0))));
       }
     }
     text = textBuffer.toString();
