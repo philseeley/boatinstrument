@@ -96,7 +96,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
           body: params
       );
 
-      if(response.statusCode != HttpStatus.ok) {
+      if(![HttpStatus.ok, HttpStatus.accepted].contains(response.statusCode)) {
         if(mounted) {
           widget.config.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
         }
