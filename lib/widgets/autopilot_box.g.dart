@@ -21,3 +21,17 @@ Map<String, dynamic> _$AutopilotControlPerBoxSettingsToJson(
       'lockSeconds': instance.lockSeconds,
       'showLabels': instance.showLabels,
     };
+
+_AutopilotReefingSettings _$AutopilotReefingSettingsFromJson(
+        Map<String, dynamic> json) =>
+    _AutopilotReefingSettings(
+      upwindAngle: (json['upwindAngle'] as num?)?.toInt() ?? 50,
+      downwindAngle: (json['downwindAngle'] as num?)?.toInt() ?? 120,
+    );
+
+Map<String, dynamic> _$AutopilotReefingSettingsToJson(
+        _AutopilotReefingSettings instance) =>
+    <String, dynamic>{
+      'upwindAngle': instance.upwindAngle,
+      'downwindAngle': instance.downwindAngle,
+    };

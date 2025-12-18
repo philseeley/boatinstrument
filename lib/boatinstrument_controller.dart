@@ -1271,6 +1271,33 @@ class BoatInstrumentController {
     }
   }
 
+  Uri _pathUri(String path) {
+    Uri uri = httpApiUri;
+
+    List<String> basePathSegments = [...uri.pathSegments]
+      ..removeLast()
+      ..addAll(['vessels', 'self']);
+
+    List<String> pathSegments = [...basePathSegments, ...path.split('.')];
+
+    return uri.replace(pathSegments: pathSegments);
+  }
+
+  Future<double> getPathDouble(String path) async {
+    Uri uri = _pathUri(path);
+
+    http.Response response = await httpGet(
+      uri,
+      headers: {
+        "accept": "application/json",
+      },
+    );
+
+    if(response.statusCode != HttpStatus.ok) throw Exception('Failed to retrieve double for $path');
+
+    return (json.decode(response.body) as num).toDouble();
+  }
+
   void _setTime(String timeStr) async {
     try {
       var r = await Process.run('/usr/bin/sudo', ['/usr/bin/date', '--utc', '--set', timeStr]);

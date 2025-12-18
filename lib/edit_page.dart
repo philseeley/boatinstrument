@@ -39,6 +39,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AutopilotStatusBox.sid, (config) {return AutopilotStatusBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStateControlHorizontalBox.sid, (config) {return AutopilotStateControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotStateControlVerticalBox.sid, (config) {return AutopilotStateControlVerticalBox(config, key: UniqueKey());}),
+  BoxDetails(AutopilotReefingControlHorizontalBox.sid, (config) {return AutopilotReefingControlHorizontalBox(config, key: UniqueKey());}),
+  BoxDetails(AutopilotReefingControlVerticalBox.sid, (config) {return AutopilotReefingControlVerticalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlHorizontalBox.sid, (config) {return AutopilotHeadingControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlVerticalBox.sid, (config) {return AutopilotHeadingControlVerticalBox(config, key: UniqueKey());}),
   BoxDetails(WebViewBox.sid, experimental: true, (config) {return WebViewBox(config, key: UniqueKey());}),
@@ -264,6 +266,10 @@ class _EditPageState extends State<_EditPage> {
         _widgetSubMenuEntry(box, 'Heading Control', [
           _widgetMenuEntry(AutopilotHeadingControlHorizontalBox.sid, 'Horizontal'),
           _widgetMenuEntry(AutopilotHeadingControlVerticalBox.sid, 'Vertical'),
+        ]),
+        _widgetSubMenuEntry(box, 'Reefing Control', [
+          _widgetMenuEntry(AutopilotReefingControlHorizontalBox.sid, 'Horizontal'),
+          _widgetMenuEntry(AutopilotReefingControlVerticalBox.sid, 'Vertical'),
         ]),
       ]),
       _widgetSubMenuEntry(box, 'Electrical', [
