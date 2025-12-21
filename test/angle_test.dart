@@ -15,19 +15,42 @@ void main() {
     expect(rad2Deg(averageAngle(deg2Rad(315), deg2Rad( 45))),   0);
     expect(rad2Deg(averageAngle(deg2Rad( 45), deg2Rad(315))),   0);
 
-    expect(rad2Deg(averageAngle(deg2Rad(- 10), deg2Rad(  10), relative: true)), - 0);
-    expect(rad2Deg(averageAngle(deg2Rad(- 10), deg2Rad(-350), relative: true)), - 0);
-    expect(rad2Deg(averageAngle(deg2Rad(-350), deg2Rad(- 10), relative: true)), - 0);
+    // The resulting elative angle should be between -180 <= a <= 180
+    expect(rad2Deg(averageAngle(deg2Rad(- 10), deg2Rad(  10), relative: true)),    0);
+    expect(rad2Deg(averageAngle(deg2Rad(- 10), deg2Rad(-350), relative: true)),    0);
+    expect(rad2Deg(averageAngle(deg2Rad(-350), deg2Rad(- 10), relative: true)),    0);
     expect(rad2Deg(averageAngle(deg2Rad(- 45), deg2Rad(-135), relative: true)), - 90);
     expect(rad2Deg(averageAngle(deg2Rad(-135), deg2Rad(- 45), relative: true)), - 90);
     expect(rad2Deg(averageAngle(deg2Rad(-135), deg2Rad(-225), relative: true)),  180);
     expect(rad2Deg(averageAngle(deg2Rad(-225), deg2Rad(-135), relative: true)),  180);
-    expect(rad2Deg(averageAngle(deg2Rad(-315), deg2Rad(- 45), relative: true)), -  0);
-    expect(rad2Deg(averageAngle(deg2Rad(- 45), deg2Rad(-315), relative: true)), -  0);
+    expect(rad2Deg(averageAngle(deg2Rad(-315), deg2Rad(- 45), relative: true)),    0);
+    expect(rad2Deg(averageAngle(deg2Rad(- 45), deg2Rad(-315), relative: true)),    0);
   });
 
   test('Angle smoothing', ()
   {
+    expect(rad2Deg(averageAngle(deg2Rad( 10), deg2Rad(350), smooth: 0)), 350);
+    expect(rad2Deg(averageAngle(deg2Rad(350), deg2Rad( 10), smooth: 0)),  10);
+    expect(rad2Deg(averageAngle(deg2Rad( 45), deg2Rad(135), smooth: 0)), 135);
+    expect(rad2Deg(averageAngle(deg2Rad(135), deg2Rad( 45), smooth: 0)),  45);
+    expect(rad2Deg(averageAngle(deg2Rad(135), deg2Rad(225), smooth: 0)), 225);
+    expect(rad2Deg(averageAngle(deg2Rad(225), deg2Rad(135), smooth: 0)), 135);
+    expect(rad2Deg(averageAngle(deg2Rad(225), deg2Rad(315), smooth: 0)), 315);
+    expect(rad2Deg(averageAngle(deg2Rad(315), deg2Rad(225), smooth: 0)), 225);
+    expect(rad2Deg(averageAngle(deg2Rad(315), deg2Rad( 45), smooth: 0)),  45);
+    expect(rad2Deg(averageAngle(deg2Rad( 45), deg2Rad(315), smooth: 0)), 315);
+
+    // The resulting elative angle should be between -180 <= a <= 180
+    expect(rad2Deg(averageAngle(deg2Rad(- 10), deg2Rad(  10), relative: true, smooth: 0)),   10);
+    expect(rad2Deg(averageAngle(deg2Rad(- 10), deg2Rad(-350), relative: true, smooth: 0)),   10);
+    expect(rad2Deg(averageAngle(deg2Rad(-350), deg2Rad(- 10), relative: true, smooth: 0)), - 10);
+    expect(rad2Deg(averageAngle(deg2Rad(- 45), deg2Rad(-135), relative: true, smooth: 0)), -135);
+    expect(rad2Deg(averageAngle(deg2Rad(-135), deg2Rad(- 45), relative: true, smooth: 0)), - 45);
+    expect(rad2Deg(averageAngle(deg2Rad(-135), deg2Rad(-225), relative: true, smooth: 0)),  135);
+    expect(rad2Deg(averageAngle(deg2Rad(-225), deg2Rad(-135), relative: true, smooth: 0)), -135);
+    expect(rad2Deg(averageAngle(deg2Rad(-315), deg2Rad(- 45), relative: true, smooth: 0)), - 45);
+    expect(rad2Deg(averageAngle(deg2Rad(- 45), deg2Rad(-315), relative: true, smooth: 0)),   45);
+
     expect(rad2Deg(averageAngle(deg2Rad( 10), deg2Rad(350), smooth: 10)),   8);
     expect(rad2Deg(averageAngle(deg2Rad(350), deg2Rad( 10), smooth: 10)), 352);
     expect(rad2Deg(averageAngle(deg2Rad( 45), deg2Rad(135), smooth: 10)),  51);
