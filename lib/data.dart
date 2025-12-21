@@ -548,7 +548,6 @@ class _BoxData {
   List<RegExp> regExpStaticPaths = [];
   List<Update> updates = [];
   final Map<String, DateTime> pathTimestamps = {};
-  List<Update> staticUpdates = [];
 
   _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType, this.onControlChannel);
 }

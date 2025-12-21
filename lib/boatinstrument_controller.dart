@@ -1221,10 +1221,6 @@ class BoatInstrumentController {
         },
     );
 
-    for(_BoxData bd in _boxData) {
-      bd.staticUpdates.clear();
-    }
-
     if(response.statusCode == HttpStatus.ok) {
       dynamic data = json.decode(response.body);
       try {
@@ -1233,20 +1229,12 @@ class BoatInstrumentController {
         for (_BoxData bd in _boxData) {
           for (RegExp r in bd.regExpStaticPaths) {
             if (r.hasMatch(path)) {
-              bd.staticUpdates.add(Update(path, value));
+              if(bd.onStaticUpdate!=null) bd.onStaticUpdate!([Update(path, value)]);
             }
           }
         }
       } catch (e) {
         l.e('Error converting "$data" for "$path"', error: e);
-      }
-    }
-
-    for(_BoxData bd in _boxData) {
-      if(bd.staticUpdates.isNotEmpty) {
-        if (bd.onStaticUpdate != null) {
-          bd.onStaticUpdate!(bd.staticUpdates);
-        }
       }
     }
   }
