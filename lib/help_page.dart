@@ -67,10 +67,14 @@ class HelpPageState extends State<HelpPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
         leading: BackButton(onPressed: () {
           _back(context);
-        },),),
+        }),
+        title: Text(widget.title),
+        actions: [
+          IconButton(icon: const Icon(Icons.change_history), onPressed: () {_showChangeLog(context);})
+        ],
+      ),
       body: Container(
         padding: const EdgeInsets.only(left: 10.0, right: 10.0),
         child: MarkdownWidget(key: UniqueKey(),
@@ -88,4 +92,11 @@ class HelpPageState extends State<HelpPage> {
       )
     );
   }  
+
+  void _showChangeLog (BuildContext context) async {
+    await Navigator.push(
+        context, MaterialPageRoute(builder: (context) {
+      return const ChangeLogPage();
+    }));
+  }
 }
