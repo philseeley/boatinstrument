@@ -439,6 +439,7 @@ class _SunlightBox extends HeadedTextBoxState<SunlightBox> {
   void initState() {
     super.initState();
     header = 'Sunlight';
+    alignment = Alignment.topCenter;
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataType: SignalKDataType.infrequent);
   }
 
