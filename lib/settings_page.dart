@@ -472,7 +472,7 @@ class _SettingsState extends State<SettingsPage> {
   void _editHttpHeaders () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _EditHttpHeaders(widget._controller._settings!.httpHeaders);
+      return _EditHttpHeaders(widget._controller, widget._controller._settings!.httpHeaders);
     }));
   }
 
@@ -554,9 +554,10 @@ class _PathSubscriptionsPage extends StatelessWidget {
 }
 
 class _EditHttpHeaders extends StatefulWidget {
+  final BoatInstrumentController _controller;
   final List<_HttpHeader> _httpHeaders;
 
-  const _EditHttpHeaders(this._httpHeaders);
+  const _EditHttpHeaders(this._controller, this._httpHeaders);
 
   @override
   createState() => _EditHttpHeadersState();
@@ -586,7 +587,7 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
       headerList.add(Divider(thickness: 3, color: Theme.of(context).colorScheme.secondary));
     }
 
-    return Scaffold(
+    return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _checkHeaders();}, child: Scaffold(
         appBar: AppBar(
           title: const Text("HTTP Headers"),
           actions: [
@@ -594,7 +595,15 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
           ],
         ),
         body: ListView(children: headerList)
-    );
+    ));
+  }
+
+  void _checkHeaders () {
+    if(widget._httpHeaders.every((h) {return h.name.isNotEmpty;})) {
+      Navigator.pop(context);
+    } else {
+      widget._controller.showMessage(context, 'Header Names cannot be blank');
+    }
   }
 
   void _addHeader() {
