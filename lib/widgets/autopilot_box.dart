@@ -257,29 +257,32 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
     int actual;
 
     // We need to check we have reached the desired angle as it's possible that N2K messages might
-    // have been missed.
-    while(true) {
+    // have been missed. We check a few times just to make sure.
+    int reachedAngleCount = 0;
+    do {
       actual = rad2Deg(await widget.config.controller.getPathDouble('steering.autopilot.target.windAngleApparent'));
 
-      if(actual == desired) break;
+      if(actual == desired) ++reachedAngleCount;
 
       int diff = desired - actual;
       int tens = diff ~/ 10;
       int units = diff - (tens*10);
 
       for(int i=0; i<tens.abs(); ++i) {
+        reachedAngleCount = 0;
         _adjustHeading(diff<0?10:-10);        
       }
       for(int i=0; i<units.abs(); ++i) {
+        reachedAngleCount = 0;
         _adjustHeading(diff<0?1:-1);        
       }
 
       await Future.delayed(Duration(milliseconds: 200));
-    }
+    } while(reachedAngleCount < 3);
   }
 
   Future<void> _setAngle(bool upwind) async {
-    int angle = (upwind?_settings.upwindAngle:_settings.downwindAngle)*((_windAngleApparent??0)<0?-1:1);
+    int angle = (upwind?_settings.upwindAngle:_settings.downwindAngle)*((_targetWindAngleApparent??_windAngleApparent??0)<0?-1:1);
 
     if(await widget.config.controller.askToConfirm(context, 'Set wind angle to ${angle.abs()}$degreesSymbol to ${val2PSString(angle)}')) {
       switch(_autopilotState) {
@@ -304,7 +307,6 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
           setState(() {
             _savedAngle = _targetWindAngleApparent;
             _savedState = AutopilotState.wind;
-            _autopilotState = AutopilotState.wind;
           });
           break;
       }
@@ -327,8 +329,9 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
       await _sendCommand('steering/autopilot/state', '{"value": "${_savedState!.name}"}');
       if(_savedState == AutopilotState.auto) {
         await _sendCommand('steering/autopilot/target/headingMagnetic', '{"value": ${rad2Deg(_savedAngle!)}}');
+        _targetWindAngleApparent = null;
       } else {
-        await _sendCommand('steering/autopilot/target/windAngleApparent', '{"value": ${rad2Deg(_savedAngle!)}}');
+        await _setWindAngle(rad2Deg(_savedAngle!));
       }
 
       setState(() {
@@ -343,8 +346,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
     Color bc = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
 
     bool locked = widget._perBoxSettings.enableLock && _locked;
-    bool enabledUpwind = (_autopilotState != AutopilotState.standby) && ((_windAngleApparent??0).abs() > deg2Rad(_settings.upwindAngle));
-    bool enabledDownwind = (_autopilotState != AutopilotState.standby) && ((_windAngleApparent??0).abs() < deg2Rad(_settings.downwindAngle));
+    bool enabledUpwind = (_autopilotState != AutopilotState.standby) && ((_targetWindAngleApparent??_windAngleApparent??0).abs() > deg2Rad(_settings.upwindAngle));
+    bool enabledDownwind = (_autopilotState != AutopilotState.standby) && ((_targetWindAngleApparent??_windAngleApparent??180).abs() < deg2Rad(_settings.downwindAngle));
 
     List<Widget> reefingButtons = [
       if(_savedAngle == null) ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
@@ -355,6 +358,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
         onPressed: locked||!enabledDownwind ? null : () {_setAngle(false);},
         child: Text(widget._perBoxSettings.showLabels ? 'Downwind' : 'D'),
       ),
+      if(_savedAngle != null) Expanded(child: MaxTextWidget(_savedState == AutopilotState.auto ? 'HDG:${rad2Deg(_savedAngle!+(_magneticVariation??0))}':
+                                                                                                 'AWA:${rad2Deg(_savedAngle!.abs())}${val2PS(_savedAngle!)}')),
       if(_savedAngle != null) ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
         onPressed: locked ? null : () {_restoreAngle();},
         child: Text(widget._perBoxSettings.showLabels ? 'Restore' : 'R'),
@@ -376,7 +381,7 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
       ))));
     }
 
-    return Stack(alignment: Alignment.center, children: buttons);
+    return Padding(padding: EdgeInsetsGeometry.all(5.0), child: Stack(alignment: Alignment.center, children: buttons));
   }
 
   void _processData(List<Update> updates) {
@@ -386,7 +391,7 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
           case 'steering.autopilot.state':
             var newAutopilotState = (u.value == null) ? AutopilotState.standby : AutopilotState.values.byName(u.value);
             // If the state changes, then we reset.
-            if(newAutopilotState != _autopilotState) _savedAngle = null;
+            if(newAutopilotState != _autopilotState) _savedAngle = _savedState = null;
             _autopilotState = newAutopilotState;
             break;
           case 'steering.autopilot.target.windAngleApparent':

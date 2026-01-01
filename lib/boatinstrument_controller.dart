@@ -1283,7 +1283,7 @@ class BoatInstrumentController {
 
     if(response.statusCode != HttpStatus.ok) throw Exception('Failed to retrieve double for $path');
 
-    return (json.decode(response.body) as num).toDouble();
+    return (json.decode(response.body)['value'] as num).toDouble();
   }
 
   void _setTime(String timeStr) async {
