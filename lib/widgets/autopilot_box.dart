@@ -207,18 +207,15 @@ class _AutopilotReefingSettings {
 
 class _ReefingPainter extends CustomPainter {
   final BuildContext _context;
-  final BoatInstrumentController _controller;
   final _AutopilotReefingSettings _settings;
   final bool _port;
   final double _windAngle;
 
-  const _ReefingPainter(this._context, this._controller, this._settings, this._port, this._windAngle);
+  const _ReefingPainter(this._context, this._settings, this._port, this._windAngle);
 
   @override
   void paint(Canvas canvas, Size size) {
     Color fg = Theme.of(_context).colorScheme.onSurface;
-    Color activeColor = _controller.val2PSColor(_context, -1, none: Colors.grey);
-    Color inactiveColor = _controller.val2PSColor(_context, 1, none: Colors.grey);
 
     final paint = Paint()
       ..color = fg
@@ -252,9 +249,9 @@ class _ReefingPainter extends CustomPainter {
 
     canvas.translate(w*0.5, h*mastPosition);
 
-    _paintNeedle(canvas, inactiveColor, w, (_port?-1:1)*deg2Rad(_settings.upwindAngle));
-    _paintNeedle(canvas, inactiveColor, w, (_port?-1:1)*deg2Rad(_settings.downwindAngle));
-    _paintNeedle(canvas, activeColor, w, _windAngle);
+    _paintNeedle(canvas, Colors.yellow, w, (_port?-1:1)*deg2Rad(_settings.upwindAngle));
+    _paintNeedle(canvas, Colors.yellow, w, (_port?-1:1)*deg2Rad(_settings.downwindAngle));
+    _paintNeedle(canvas, Colors.blue, w, _windAngle);
   }
 
   void _paintNeedle(Canvas canvas, Color color, double length, double angle) {
@@ -438,7 +435,7 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
     bool port = (_targetWindAngleApparent??_windAngleApparent??0.0) < 0;
 
     List<Widget> stack = [
-      CustomPaint(size: Size.infinite, painter: _ReefingPainter(context, widget.config.controller, _settings, port, _targetWindAngleApparent??_windAngleApparent??0.0)),
+      CustomPaint(size: Size.infinite, painter: _ReefingPainter(context, _settings, port, _targetWindAngleApparent??_windAngleApparent??0.0)),
       Positioned(top: 30, left: port?10:null, right: !port?10:null,
         child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
           onPressed: locked||!enabledUpwind ? null : () {_setAngle(true);},
