@@ -201,18 +201,93 @@ class _AutopilotReefingSettings {
 
   _AutopilotReefingSettings({
     this.upwindAngle = 50,
-    this.downwindAngle = 120
+    this.downwindAngle = 130
   });
 }
 
-abstract class AutopilotReefingControlBox extends AutopilotControlBox {
-  final bool vertical;
+class _ReefingPainter extends CustomPainter {
+  final BuildContext _context;
+  final BoatInstrumentController _controller;
+  final _AutopilotReefingSettings _settings;
+  final bool _port;
+  final double _windAngle;
 
+  const _ReefingPainter(this._context, this._controller, this._settings, this._port, this._windAngle);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Color fg = Theme.of(_context).colorScheme.onSurface;
+    Color activeColor = _controller.val2PSColor(_context, -1, none: Colors.grey);
+    Color inactiveColor = _controller.val2PSColor(_context, 1, none: Colors.grey);
+
+    final paint = Paint()
+      ..color = fg
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    double mastPosition = 0.45;
+    double lenMaxBeam = 0.5;
+    double curve = 0.9;
+    double sternWidth = 0.7;
+
+    final h = size.height;
+    final w = h/1.5;
+
+    if(_windAngle > 0) {
+      canvas.translate(-w*0.22, 0);
+    } else if(_windAngle < 0){
+      canvas.translate(size.width-w+w*0.22, 0);
+    } else {
+      canvas.translate((size.width-w)*0.5, 0);
+    }
+
+    final hull = Path()
+    ..moveTo(w * 0.5, 0)
+    ..quadraticBezierTo(w * curve, h * lenMaxBeam, w * sternWidth, h)
+    ..lineTo(w * (1-sternWidth), h)
+    ..quadraticBezierTo(w * (1-curve), h * lenMaxBeam, w * 0.5, 0)
+    ..close();
+
+    canvas.drawPath(hull, paint);
+
+    canvas.translate(w*0.5, h*mastPosition);
+
+    _paintNeedle(canvas, inactiveColor, w, (_port?-1:1)*deg2Rad(_settings.upwindAngle));
+    _paintNeedle(canvas, inactiveColor, w, (_port?-1:1)*deg2Rad(_settings.downwindAngle));
+    _paintNeedle(canvas, activeColor, w, _windAngle);
+  }
+
+  void _paintNeedle(Canvas canvas, Color color, double length, double angle) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 2;
+
+    canvas.save();
+    canvas.rotate(angle);
+
+    Path needle = Path()
+      ..moveTo(-10, 0.0)
+      ..lineTo(0.0, -length*0.5)
+      ..lineTo(10, 0.0)
+      ..moveTo(0.0, 0.0)
+      ..addArc(Offset(-10, -10) & Size(10*2, 10*2), 0.0, m.pi)
+      ..close();
+
+    canvas.drawPath(needle, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class AutopilotReefingControlBox extends AutopilotControlBox {
   static const String sid = 'autopilot-control-reefing';
   @override
   String get id => sid;
 
-  AutopilotReefingControlBox(super.config, this.vertical, {super.key});
+  AutopilotReefingControlBox(super.config, {super.key});
 
   @override
   bool get hasSettings => true;
@@ -226,7 +301,6 @@ abstract class AutopilotReefingControlBox extends AutopilotControlBox {
 
 class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<AutopilotReefingControlBox> {
   _AutopilotReefingSettings _settings = _AutopilotReefingSettings();
-  AutopilotState _autopilotState = AutopilotState.standby;
   double? _targetWindAngleApparent;
   double? _targetHeadingTrue;
   double? _targetHeadingMagnetic;
@@ -234,6 +308,7 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
   double? _navigationHeadingTrue;
   double? _windAngleApparent;
 
+  static AutopilotState _autopilotState = AutopilotState.standby;
   static double? _savedAngle;
   static AutopilotState? _savedState;
 
@@ -346,42 +421,40 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
     Color bc = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
 
     bool locked = widget._perBoxSettings.enableLock && _locked;
-    bool enabledUpwind = (_autopilotState != AutopilotState.standby) && ((_targetWindAngleApparent??_windAngleApparent??0).abs() > deg2Rad(_settings.upwindAngle));
-    bool enabledDownwind = (_autopilotState != AutopilotState.standby) && ((_targetWindAngleApparent??_windAngleApparent??180).abs() < deg2Rad(_settings.downwindAngle));
+    bool enabledRestore = (_autopilotState != AutopilotState.standby) && (_savedAngle != null);
+    bool enabledUpwind = (_autopilotState != AutopilotState.standby) && !enabledRestore;
+    bool enabledDownwind = enabledUpwind;
 
-    List<Widget> reefingButtons = [
-      if(_savedAngle == null) ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-        onPressed: locked||!enabledUpwind ? null : () {_setAngle(true);},
-        child: Text(widget._perBoxSettings.showLabels ? 'Upwind' : 'U'),
-      ),
-      if(_savedAngle == null) ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-        onPressed: locked||!enabledDownwind ? null : () {_setAngle(false);},
-        child: Text(widget._perBoxSettings.showLabels ? 'Downwind' : 'D'),
-      ),
-      if(_savedAngle != null) Expanded(child: MaxTextWidget(_savedState == AutopilotState.auto ? 'HDG:${rad2Deg(_savedAngle!+(_magneticVariation??0))}':
-                                                                                                 'AWA:${rad2Deg(_savedAngle!.abs())}${val2PS(_savedAngle!)}')),
-      if(_savedAngle != null) ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-        onPressed: locked ? null : () {_restoreAngle();},
-        child: Text(widget._perBoxSettings.showLabels ? 'Restore' : 'R'),
-      ),
-    ];
+    enabledUpwind = enabledUpwind && ((_targetWindAngleApparent??_windAngleApparent??0).abs() > deg2Rad(_settings.upwindAngle));
+    enabledDownwind = enabledDownwind && ((_targetWindAngleApparent??_windAngleApparent??180).abs() < deg2Rad(_settings.downwindAngle));
 
-    List<Widget> buttons = [];
-    if(widget.vertical) {
-      buttons.add(Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: reefingButtons));
-    } else {
-      buttons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: reefingButtons));
-    }
+    bool port = (_targetWindAngleApparent??_windAngleApparent??0.0) < 0;
 
-    if(locked) {
-      buttons.add(Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
+    List<Widget> stack = [
+      CustomPaint(size: Size.infinite, painter: _ReefingPainter(context, widget.config.controller, _settings, port, _targetWindAngleApparent??_windAngleApparent??0.0)),
+      Positioned(top: 30, left: port?10:null, right: !port?10:null,
+        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+          onPressed: locked||!enabledUpwind ? null : () {_setAngle(true);},
+          child: Text(widget._perBoxSettings.showLabels ? 'Upwind' : 'U'))
+      ),
+      Positioned(bottom: 30, left: port?10:null, right: !port?10:null,
+        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+          onPressed: locked||!enabledDownwind ? null : () {_setAngle(false);},
+          child: Text(widget._perBoxSettings.showLabels ? 'Downwind' : 'D'))
+      ),
+      Positioned(left: port?10:null, right: !port?10:null,
+        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+          onPressed: locked||!enabledRestore ? null : _restoreAngle,
+          child: Text(widget._perBoxSettings.showLabels ? 'Restore' : 'R'))
+      ),
+    if(locked) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
         text: 'Unlock',
         outerColor: Colors.grey,
         onSubmit: () { return _unlock();},
-      ))));
-    }
+      )))
+    ];
 
-    return Padding(padding: EdgeInsetsGeometry.all(5.0), child: Stack(alignment: Alignment.center, children: buttons));
+    return Padding(padding: EdgeInsetsGeometry.all(5.0), child: RepaintBoundary(child: Stack(alignment: Alignment.center, children: stack)));
   }
 
   void _processData(List<Update> updates) {
@@ -439,20 +512,6 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
   }
 }
 
-class AutopilotReefingControlHorizontalBox extends AutopilotReefingControlBox {
-
-  static const String sid = 'autopilot-control-reefing-horizontal';
-
-  AutopilotReefingControlHorizontalBox(BoxWidgetConfig config, {super.key}) : super(config, false);
-}
-
-class AutopilotReefingControlVerticalBox extends AutopilotReefingControlBox {
-
-  static const String sid = 'autopilot-control-reefing-vertical';
-
-  AutopilotReefingControlVerticalBox(BoxWidgetConfig config, {super.key}) : super(config, true);
-}
-
 class _AutopilotReefingBoxSettingsWidget extends BoxSettingsWidget {
   final _AutopilotReefingSettings _settings;
 
@@ -479,7 +538,7 @@ class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettin
         title: Slider(
             min: 10,
             max: 90,
-            divisions: 8,
+            divisions: 16,
             value: s.upwindAngle.toDouble(),
             label: s.upwindAngle.toString(),
             onChanged: (double value) {
@@ -492,8 +551,8 @@ class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettin
         leading: const Text('Downwind Angle:'),
         title: Slider(
             min: 90,
-            max: 150,
-            divisions: 6,
+            max: 160,
+            divisions: 14,
             value: s.downwindAngle.toDouble(),
             label: s.downwindAngle.toString(),
             onChanged: (double value) {
