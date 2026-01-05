@@ -541,8 +541,8 @@ class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettin
         leading: const Text('Upwind Angle:  '),
         title: Slider(
             min: 10,
-            max: 90,
-            divisions: 16,
+            max: 85,
+            divisions: 15,
             value: s.upwindAngle.toDouble(),
             label: s.upwindAngle.toString(),
             onChanged: (double value) {
@@ -554,9 +554,9 @@ class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettin
       ListTile(
         leading: const Text('Downwind Angle:'),
         title: Slider(
-            min: 90,
+            min: 95,
             max: 160,
-            divisions: 14,
+            divisions: 13,
             value: s.downwindAngle.toDouble(),
             label: s.downwindAngle.toString(),
             onChanged: (double value) {
