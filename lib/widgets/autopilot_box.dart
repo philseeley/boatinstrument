@@ -290,6 +290,13 @@ class AutopilotReefingControlBox extends AutopilotControlBox {
   AutopilotReefingControlBox(super.config, {super.key});
 
   @override
+  Widget? getHelp() => HelpPage(text: '''The **Reefing Controls** allow you to instruct the Autopilot to go to a pre-set **Upwind** or **Downwind** apparent wind angle in **Vane** mode. Once instructed the previous Autopilot setting can then be restored.
+
+**Note:** if the Autopilot was in **Track/Route** mode, then **Restoring** will return to the previous **Heading** in **Auto** mode and not re-engage **Track** mode.
+
+${(super.getHelp() as HelpPage).text}''');
+
+  @override
   bool get hasSettings => true;
 
   @override
