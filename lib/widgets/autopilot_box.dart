@@ -62,12 +62,6 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
   Timer? _lockTimer;
 
   @override
-  void initState() {
-    super.initState();
-    widget.config.controller.configure();
-  }
-
-  @override
   void dispose() {
     _lockTimer?.cancel();
     super.dispose();
@@ -106,6 +100,10 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     }
   }
 
+  Future<void> _adjustHeading(int direction) async {
+    await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
+  }
+
   Future<void> _unlock() async {
     if(_locked) {
       setState(() {
@@ -135,6 +133,12 @@ abstract class AutopilotStateControlBox extends AutopilotControlBox {
 }
 
 class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotStateControlBox> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+  }
 
   Future<void> _setState(AutopilotState state) async {
     if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
@@ -190,6 +194,390 @@ class AutopilotStateControlVerticalBox extends AutopilotStateControlBox {
   AutopilotStateControlVerticalBox(BoxWidgetConfig config, {super.key}) : super(config, true);
 }
 
+@JsonSerializable()
+class _AutopilotReefingSettings {
+  int upwindAngle;
+  int downwindAngle;
+
+  _AutopilotReefingSettings({
+    this.upwindAngle = 50,
+    this.downwindAngle = 130
+  });
+}
+
+class _ReefingPainter extends CustomPainter {
+  final BuildContext _context;
+  final BoatInstrumentController _controller;
+  final _AutopilotReefingSettings _settings;
+  final bool _port;
+  final double _windAngle;
+
+  const _ReefingPainter(this._context, this._controller, this._settings, this._port, this._windAngle);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Color fg = Theme.of(_context).colorScheme.onSurface;
+    Color activeColor = _controller.val2PSColor(_context, -1, none: Colors.grey);
+    Color inactiveColor = _controller.val2PSColor(_context, 1, none: Colors.grey);
+
+    final paint = Paint()
+      ..color = fg
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    double mastPosition = 0.45;
+    double lenMaxBeam = 0.5;
+    double curve = 0.9;
+    double sternWidth = 0.7;
+
+    final h = size.height;
+    final w = h/1.5;
+
+    if(_windAngle > 0) {
+      canvas.translate(-w*0.22, 0);
+    } else if(_windAngle < 0){
+      canvas.translate(size.width-w+w*0.22, 0);
+    } else {
+      canvas.translate((size.width-w)*0.5, 0);
+    }
+
+    final hull = Path()
+    ..moveTo(w * 0.5, 0)
+    ..quadraticBezierTo(w * curve, h * lenMaxBeam, w * sternWidth, h)
+    ..lineTo(w * (1-sternWidth), h)
+    ..quadraticBezierTo(w * (1-curve), h * lenMaxBeam, w * 0.5, 0)
+    ..close();
+
+    canvas.drawPath(hull, paint);
+
+    canvas.translate(w*0.5, h*mastPosition);
+
+    _paintNeedle(canvas, inactiveColor, w, (_port?-1:1)*deg2Rad(_settings.upwindAngle));
+    _paintNeedle(canvas, inactiveColor, w, (_port?-1:1)*deg2Rad(_settings.downwindAngle));
+    _paintNeedle(canvas, activeColor, w, _windAngle);
+  }
+
+  void _paintNeedle(Canvas canvas, Color color, double length, double angle) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 2;
+
+    canvas.save();
+    canvas.rotate(angle);
+
+    Path needle = Path()
+      ..moveTo(-10, 0.0)
+      ..lineTo(0.0, -length*0.5)
+      ..lineTo(10, 0.0)
+      ..moveTo(0.0, 0.0)
+      ..addArc(Offset(-10, -10) & Size(10*2, 10*2), 0.0, m.pi)
+      ..close();
+
+    canvas.drawPath(needle, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class AutopilotReefingControlBox extends AutopilotControlBox {
+  static const String sid = 'autopilot-control-reefing';
+  @override
+  String get id => sid;
+
+  AutopilotReefingControlBox(super.config, {super.key});
+
+  @override
+  bool get hasSettings => true;
+
+  @override
+  BoxSettingsWidget? getSettingsWidget(Map<String, dynamic> json) => _AutopilotReefingBoxSettingsWidget(_$AutopilotReefingSettingsFromJson(json));
+
+  @override
+  AutopilotControlBoxState<AutopilotReefingControlBox> createState() => _AutopilotReefingControlBoxState();
+}
+
+class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<AutopilotReefingControlBox> {
+  _AutopilotReefingSettings _settings = _AutopilotReefingSettings();
+  double? _targetWindAngleApparent;
+  double? _targetHeadingTrue;
+  double? _targetHeadingMagnetic;
+  double? _magneticVariation;
+  double? _navigationHeadingTrue;
+  double? _windAngleApparent;
+
+  static AutopilotState _autopilotState = AutopilotState.standby;
+  static double? _savedAngle;
+  static AutopilotState? _savedState;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _settings = _$AutopilotReefingSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    widget.config.controller.configure(onUpdate: _processData, paths: {
+      'steering.autopilot.state',
+      'steering.autopilot.target.windAngleApparent',
+      'steering.autopilot.target.headingTrue',
+      'steering.autopilot.target.headingMagnetic',
+      'navigation.magneticVariation',
+      'navigation.headingTrue',
+      'environment.wind.angleApparent',
+    });
+  }
+
+  Future<void> _setWindAngle(int desired) async {
+    int actual;
+
+    // We need to check we have reached the desired angle as it's possible that N2K messages might
+    // have been missed. We check a few times just to make sure.
+    int reachedAngleCount = 0;
+    do {
+      actual = rad2Deg(await widget.config.controller.getPathDouble('steering.autopilot.target.windAngleApparent'));
+
+      if(actual == desired) ++reachedAngleCount;
+
+      int diff = desired - actual;
+      int tens = diff ~/ 10;
+      int units = diff - (tens*10);
+
+      for(int i=0; i<tens.abs(); ++i) {
+        reachedAngleCount = 0;
+        _adjustHeading(diff<0?10:-10);        
+      }
+      for(int i=0; i<units.abs(); ++i) {
+        reachedAngleCount = 0;
+        _adjustHeading(diff<0?1:-1);        
+      }
+
+      await Future.delayed(Duration(milliseconds: 200));
+    } while(reachedAngleCount < 3);
+  }
+
+  Future<void> _setAngle(bool upwind) async {
+    int angle = (upwind?_settings.upwindAngle:_settings.downwindAngle)*((_targetWindAngleApparent??_windAngleApparent??0)<0?-1:1);
+
+    if(await widget.config.controller.askToConfirm(context, 'Set wind angle to ${angle.abs()}$degreesSymbol to ${val2PSString(angle)}')) {
+      switch(_autopilotState) {
+        case AutopilotState.standby:
+          throw Exception('Bad autopilot state');// We shouldn't ever get here.
+        case AutopilotState.auto:
+        case AutopilotState.route:
+          if(_targetHeadingTrue==null && (_targetHeadingMagnetic==null || _magneticVariation==null)) throw Exception('Inconsistent heading data');
+
+          // We can only change to wind angle from auto.
+          if(_autopilotState == AutopilotState.route) await _sendCommand('steering/autopilot/state', '{"value": "${AutopilotState.auto.name}"}');
+          await _sendCommand('steering/autopilot/state', '{"value": "${AutopilotState.wind.name}"}');
+          setState(() {
+            _savedAngle = (_targetHeadingTrue!=null)?_targetHeadingTrue!-_magneticVariation!:_targetHeadingMagnetic!;
+            _savedState = AutopilotState.auto;
+            _autopilotState = AutopilotState.wind;
+          });
+          break;
+        case AutopilotState.wind:
+          if(_targetWindAngleApparent==null) throw Exception('Inconsistent wind angle data');
+
+          setState(() {
+            _savedAngle = _targetWindAngleApparent;
+            _savedState = AutopilotState.wind;
+          });
+          break;
+      }
+
+      await _setWindAngle(angle);
+    }
+  }
+
+  Future<void> _restoreAngle() async {
+    if(_savedAngle == null || _savedState == null) throw Exception('Inconsistent saved state');
+
+    String msg = '';
+    if(_savedState == AutopilotState.auto) {
+      msg = 'Set heading to ${rad2Deg(_savedAngle!+_magneticVariation!)}$degreesUnits?';
+    } else {
+      msg = 'Set wind angle to ${rad2Deg(_savedAngle!.abs())}$degreesSymbol to ${val2PSString(_savedAngle!)}';
+    }
+
+    if(await widget.config.controller.askToConfirm(context, msg)) {
+      await _sendCommand('steering/autopilot/state', '{"value": "${_savedState!.name}"}');
+      if(_savedState == AutopilotState.auto) {
+        await _sendCommand('steering/autopilot/target/headingMagnetic', '{"value": ${rad2Deg(_savedAngle!)}}');
+        _targetWindAngleApparent = null;
+      } else {
+        await _setWindAngle(rad2Deg(_savedAngle!));
+      }
+
+      setState(() {
+        _savedAngle = _savedState = null;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color fc = Theme.of(context).colorScheme.onSurface;
+    Color bc = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
+
+    bool locked = widget._perBoxSettings.enableLock && _locked;
+    bool enabledRestore = (_autopilotState != AutopilotState.standby) && (_savedAngle != null);
+    bool enabledUpwind = (_autopilotState != AutopilotState.standby) && !enabledRestore;
+    bool enabledDownwind = enabledUpwind;
+
+    enabledUpwind = enabledUpwind && ((_targetWindAngleApparent??_windAngleApparent??0).abs() > deg2Rad(_settings.upwindAngle));
+    enabledDownwind = enabledDownwind && ((_targetWindAngleApparent??_windAngleApparent??180).abs() < deg2Rad(_settings.downwindAngle));
+
+    bool port = (_targetWindAngleApparent??_windAngleApparent??0.0) < 0;
+
+    List<Widget> stack = [
+      CustomPaint(size: Size.infinite, painter: _ReefingPainter(context, widget.config.controller, _settings, port, _targetWindAngleApparent??_windAngleApparent??0.0)),
+      Positioned(top: 30, left: port?10:null, right: !port?10:null,
+        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+          onPressed: locked||!enabledUpwind ? null : () {_setAngle(true);},
+          child: Text(widget._perBoxSettings.showLabels ? 'Upwind' : 'U'))
+      ),
+      Positioned(bottom: 30, left: port?10:null, right: !port?10:null,
+        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+          onPressed: locked||!enabledDownwind ? null : () {_setAngle(false);},
+          child: Text(widget._perBoxSettings.showLabels ? 'Downwind' : 'D'))
+      ),
+      Positioned(left: port?10:null, right: !port?10:null,
+        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+          onPressed: locked||!enabledRestore ? null : _restoreAngle,
+          child: Text(widget._perBoxSettings.showLabels ? 'Restore' : 'R'))
+      ),
+    if(locked) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
+        text: 'Unlock',
+        outerColor: Colors.grey,
+        onSubmit: () { return _unlock();},
+      )))
+    ];
+
+    return Padding(padding: EdgeInsetsGeometry.all(5.0), child: RepaintBoundary(child: Stack(alignment: Alignment.center, children: stack)));
+  }
+
+  void _processData(List<Update> updates) {
+    for (Update u in updates) {
+      try {
+        switch (u.path) {
+          case 'steering.autopilot.state':
+            var newAutopilotState = (u.value == null) ? AutopilotState.standby : AutopilotState.values.byName(u.value);
+            // If the state changes, then we reset.
+            if(newAutopilotState != _autopilotState) _savedAngle = _savedState = null;
+            _autopilotState = newAutopilotState;
+            break;
+          case 'steering.autopilot.target.windAngleApparent':
+            _targetWindAngleApparent = (u.value == null) ? null : (u.value as num).toDouble();
+            break;
+          case 'steering.autopilot.target.headingTrue':
+            _targetHeadingTrue = (u.value == null) ? null : (u.value as num).toDouble();
+            break;
+          case 'steering.autopilot.target.headingMagnetic':
+            _targetHeadingMagnetic = (u.value == null) ? null : (u.value as num).toDouble();
+            break;
+          case 'navigation.magneticVariation':
+            _magneticVariation = (u.value == null) ? null : (u.value as num).toDouble();
+            break;
+          case 'navigation.headingTrue':
+            if (u.value == null) {
+              _navigationHeadingTrue = null;
+            } else {
+              var next = (u.value as num).toDouble();
+              _navigationHeadingTrue = averageDouble(
+                _navigationHeadingTrue ?? next, next,
+                smooth: widget.config.controller.valueSmoothing);
+            }
+            break;
+          case 'environment.wind.angleApparent':
+            if (u.value == null) {
+              _windAngleApparent = null;
+            } else {
+              var next = (u.value as num).toDouble();
+              _windAngleApparent = averageAngle(
+                _windAngleApparent ?? next, next,
+                smooth: widget.config.controller.valueSmoothing,
+                relative: true);
+            }
+            break;
+        }
+      } catch (e) {
+        widget.config.controller.l.e('Error converting $u', error: e);
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
+  }
+}
+
+class _AutopilotReefingBoxSettingsWidget extends BoxSettingsWidget {
+  final _AutopilotReefingSettings _settings;
+
+  const _AutopilotReefingBoxSettingsWidget(this._settings);
+
+  @override
+  createState() => _AutopilotReefingBoxSettingsState();
+
+  @override
+  Map<String, dynamic> getSettingsJson() {
+    return _$AutopilotReefingSettingsToJson(_settings);
+  }
+}
+
+class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    _AutopilotReefingSettings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+        leading: const Text('Upwind Angle:  '),
+        title: Slider(
+            min: 10,
+            max: 90,
+            divisions: 16,
+            value: s.upwindAngle.toDouble(),
+            label: s.upwindAngle.toString(),
+            onChanged: (double value) {
+              setState(() {
+                s.upwindAngle = value.toInt();
+              });
+            }),
+      ),
+      ListTile(
+        leading: const Text('Downwind Angle:'),
+        title: Slider(
+            min: 90,
+            max: 160,
+            divisions: 14,
+            value: s.downwindAngle.toDouble(),
+            label: s.downwindAngle.toString(),
+            onChanged: (double value) {
+              setState(() {
+                s.downwindAngle = value.toInt();
+              });
+            }),
+      ),
+    ]);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
 
   AutopilotHeadingControlBox(super.config, {super.key});
@@ -197,8 +585,10 @@ abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
 
 abstract class _AutopilotHeadingControlBoxState<T extends AutopilotHeadingControlBox> extends AutopilotControlBoxState<T> {
 
-  Future<void> _adjustHeading(int direction) async {
-    await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
   }
 
   Future<void> _autoTack(String direction) async {

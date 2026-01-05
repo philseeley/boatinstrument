@@ -1,7 +1,8 @@
 part of 'boatinstrument_controller.dart';
 
 const String bi = 'boatinstrument';
-const String degreesUnits = '\u00B0T'; // degrees symbol.
+const String degreesSymbol = '\u00B0'; // degrees symbol.
+const String degreesUnits = '${degreesSymbol}T'; // degrees symbol.
 const String deltaChar = '\u0394';
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
@@ -12,6 +13,7 @@ bool embeddedKeyboard = false;
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
 double deg2Rad(int? deg) => (deg??0) * vm.degrees2Radians;
 String val2PS(num val) => val < 0 ? 'P' : (val > 0) ? 'S' : '';
+String val2PSString(num val) => val < 0 ? 'Port' : (val > 0) ? 'Starboard' : '';
 double revolutions2RPM(double rev) => rev * 60;
 double rpm2Revolutions(double rpm) => rpm / 60;
 double kts2ms(double kts) => kts / 1.943844;
