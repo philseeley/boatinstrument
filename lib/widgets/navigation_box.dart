@@ -556,3 +556,39 @@ class RateOfTurnBox extends DoubleValueBox {
     return '$degreesUnits/s';
   }
 }
+
+class NavigationLogBox extends DoubleValueBox {
+  static const String sid = 'navigation-log';
+  @override
+  String get id => sid;
+
+  const NavigationLogBox(BoxWidgetConfig config, {super.key}) : super(config, 'Log', 'navigation.log', precision: 0, dataType: SignalKDataType.infrequent, smoothing: false);
+
+  @override
+  double convert(double value) {
+    return config.controller.distanceToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.distanceUnitsToDisplay(value);
+  }
+}
+
+class NavigationTripLogBox extends DoubleValueBox {
+  static const String sid = 'navigation-log-trip';
+  @override
+  String get id => sid;
+
+  const NavigationTripLogBox(BoxWidgetConfig config, {super.key}) : super(config, 'Trip Log', 'navigation.trip.log', precision: 0, dataType: SignalKDataType.infrequent, smoothing: false);
+
+  @override
+  double convert(double value) {
+    return config.controller.distanceToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return config.controller.distanceUnitsToDisplay(value);
+  }
+}

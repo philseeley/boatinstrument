@@ -120,6 +120,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(TimersSetupBox.sid, (config) {return TimersSetupBox(config, key: UniqueKey());}),
   BoxDetails(StopwatchBox.sid, (config) {return StopwatchBox(config, key: UniqueKey());}),
   BoxDetails(SHRPiBox.sid, experimental: true, (config) {return SHRPiBox(config, key: UniqueKey());}),
+  BoxDetails(NavigationLogBox.sid, (config) {return NavigationLogBox(config, key: UniqueKey());}),
+  BoxDetails(NavigationTripLogBox.sid, (config) {return NavigationTripLogBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -230,6 +232,10 @@ class _EditPageState extends State<_EditPage> {
         ]),
         _widgetMenuEntry(RateOfTurnBox.sid, 'Rate of Turn'),
         _widgetMenuEntry(MagneticVariationBox.sid, 'Magnetic Variation'),
+        _widgetSubMenuEntry(box, 'Log', [
+          _widgetMenuEntry(NavigationLogBox.sid, 'Total'),
+          _widgetMenuEntry(NavigationTripLogBox.sid, 'Trip'),
+        ]),
       ]),
       _widgetSubMenuEntry(box, 'Boat', [
         _widgetSubMenuEntry(box, 'Speed', [
