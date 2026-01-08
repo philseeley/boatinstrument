@@ -1,3 +1,14 @@
+  * 0.9.0 When adding HTTP headers, we now make sure the names are not blank
+            as that causes connection errors.
+          The Autopilot Boxes now recognise an HTTP 202 (Accepted) as a good status.
+            The latest signalk-autopilot plugin now returns 202s.
+          Added back the change log.
+
+          New Boxes:
+            Autopilot Reefing Control
+
+          Box updates:
+            SunlightBox: now aligned at top.
   * 0.8.0 We now handle data timeouts on a per-path basis. This allows one
             value in a multi-value Box to timeout, e.g. WPT Bearing in the CompassRoseBox.
           Help can now be written in Markdown. This allow easier formatting and linking.
