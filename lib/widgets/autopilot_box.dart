@@ -436,29 +436,28 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
 
     List<Widget> stack = [
       CustomPaint(size: Size.infinite, painter: _ReefingPainter(context, _settings, port, _targetWindAngleApparent??_windAngleApparent??0.0)),
-      Positioned(top: 30, left: port?10:null, right: !port?10:null,
-        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-          onPressed: locked||!enabledUpwind ? null : () {_setAngle(true);},
-          child: Text(widget._perBoxSettings.showLabels ? 'Upwind' : 'U'))
-      ),
-      Positioned(bottom: 30, left: port?10:null, right: !port?10:null,
-        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-          onPressed: locked||!enabledDownwind ? null : () {_setAngle(false);},
-          child: Text(widget._perBoxSettings.showLabels ? 'Downwind' : 'D'))
-      ),
-      Positioned(left: port?10:null, right: !port?10:null,
-        child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-          onPressed: locked||!enabledRestore ? null : _restoreAngle,
-          child: Text(widget._perBoxSettings.showLabels ? 'Restore' : 'R'))
-      ),
-    if(locked) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
+      Positioned(left: port?10:null, right: !port?10:null, top: 0, bottom: 0, child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, crossAxisAlignment: port?CrossAxisAlignment.start:CrossAxisAlignment.end, children: [
+        ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+            onPressed: locked||!enabledUpwind ? null : () {_setAngle(true);},
+            child: Text(widget._perBoxSettings.showLabels ? 'Upwind' : 'U')
+        ),
+        ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+            onPressed: locked||!enabledRestore ? null : _restoreAngle,
+            child: Text(widget._perBoxSettings.showLabels ? 'Restore' : 'R')
+        ),
+        ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
+            onPressed: locked||!enabledDownwind ? null : () {_setAngle(false);},
+            child: Text(widget._perBoxSettings.showLabels ? 'Downwind' : 'D')
+        ),
+      ])),
+      if(locked) Center(child: Padding(padding: const EdgeInsets.only(left: 20, right: 20),child: SlideAction(
         text: 'Unlock',
         outerColor: Colors.grey,
         onSubmit: () { return _unlock();},
       )))
     ];
 
-    return Padding(padding: EdgeInsetsGeometry.all(5.0), child: RepaintBoundary(child: Stack(alignment: Alignment.center, children: stack)));
+    return ClipRect(child: Padding(padding: EdgeInsetsGeometry.all(5.0), child: RepaintBoundary(child: Stack(alignment: Alignment.center, children: stack))));
   }
 
   void _processData(List<Update> updates) {
