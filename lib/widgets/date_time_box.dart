@@ -299,8 +299,8 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
     scrolling = true;
     if(!widget.config.editMode) {
       actions = [
-        IconButton(onPressed: widget._perBoxSettings.allowStop?_stop:null, icon: Icon(Icons.stop)),
-        IconButton(onPressed: widget._perBoxSettings.allowRestart?_restart:null, icon: Icon(Icons.restore))
+        IconButton(onPressed: _timer != null && widget._perBoxSettings.allowStop?_stop:null, icon: Icon(Icons.stop)),
+        IconButton(onPressed: _timer != null && widget._perBoxSettings.allowRestart?_restart:null, icon: Icon(Icons.restore))
       ];
     }
     widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.${widget._perBoxSettings.id}'}, dataType: SignalKDataType.static);
