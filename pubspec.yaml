@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.8.0+8
 
 environment:
-  sdk: '>=3.3.3 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -67,6 +67,7 @@ dependencies:
   flutter_fullscreen:
   text_scroll:
   flutter_onscreen_keyboard:
+  collection:
 #  great_circle_distance_calculator:
   actions_menu_appbar:
     path: ../actions_menu_appbar

@@ -325,16 +325,23 @@ abstract class BoxWidget extends StatefulWidget {
   Widget? getPerBoxSettingsHelp() => null;
 }
 
-class HeadedBoxState<T extends BoxWidget> extends State<T> {
+class HeadedBoxWidget extends StatelessWidget {
   static const double pad = 5.0;
 
-  bool scrolling;
-  String header = '';
-  List<Widget> actions = [];
-  Widget body = Container();
-  Alignment alignment = Alignment.center;
+  final String header;
+  final bool scrolling;
+  final List<Widget> actions;
+  final Widget body;
+  final Alignment alignment;
 
-  HeadedBoxState({this.scrolling = false});
+  const HeadedBoxWidget({
+    super.key, 
+    required this.header,
+    this.scrolling = false,
+    this.actions = const [],
+    required this.body,
+    this.alignment = Alignment.center
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -351,6 +358,40 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
         ))
       )
     ]);
+  }
+}
+
+class HeadedBoxState<T extends BoxWidget> extends State<T> {
+  String header = '';
+  bool scrolling;
+  List<Widget> actions = [];
+  Widget body = Container();
+  Alignment alignment = Alignment.center;
+
+  HeadedBoxState({this.scrolling = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return HeadedBoxWidget(
+      header: header,
+      scrolling: scrolling,
+      actions: actions,
+      body: body,
+      alignment: alignment,
+    );
+    // return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    //   Padding(padding: const EdgeInsets.only(top: pad, left: pad, right: pad), child:
+    //     Row(children: [
+    //       Expanded(child: HeaderText(header, scrolling: scrolling)),
+    //       Row(children: actions)
+    //     ])
+    //   ),
+    //   Expanded(child: Align(alignment: alignment,
+    //     child: Padding(padding: const EdgeInsets.all(pad),
+    //       child: body
+    //     ))
+    //   )
+    // ]);
   }
 }
 

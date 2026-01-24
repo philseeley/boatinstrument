@@ -122,6 +122,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(SHRPiBox.sid, experimental: true, (config) {return SHRPiBox(config, key: UniqueKey());}),
   BoxDetails(NavigationLogBox.sid, (config) {return NavigationLogBox(config, key: UniqueKey());}),
   BoxDetails(NavigationTripLogBox.sid, (config) {return NavigationTripLogBox(config, key: UniqueKey());}),
+  BoxDetails(LaunchBox.sid, (config) {return LaunchBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -337,6 +338,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid, 'Semi Gauge'),
         _widgetMenuEntry(CustomDoubleValueCircularGaugeBox.sid, 'Circular Gauge'),
         _widgetMenuEntry(CustomDoubleValueBarGaugeBox.sid, 'Bar Gauge'),
+        _widgetMenuEntry(LaunchBox.sid, 'App Launcher'),
         _widgetMenuEntry(DebugBox.sid, 'Debug'),
       ]),
     ];

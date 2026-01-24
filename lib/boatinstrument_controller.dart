@@ -15,6 +15,7 @@ import 'package:boatinstrument/widgets/custom_box.dart';
 import 'package:boatinstrument/widgets/date_time_box.dart';
 import 'package:boatinstrument/widgets/electrical_box.dart';
 import 'package:boatinstrument/widgets/environment_box.dart';
+import 'package:boatinstrument/widgets/launch_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/network.dart';
 import 'package:boatinstrument/widgets/propulsion_box.dart';
