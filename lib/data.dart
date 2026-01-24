@@ -7,6 +7,7 @@ const String deltaChar = '\u0394';
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
 const String idChars = '[0-9a-zA-Z_-]';
+const double pad = 5.0;
 
 bool embeddedKeyboard = false;
 
@@ -109,6 +110,39 @@ void _dynamic2String(dynamic d, StringBuffer s) {
         s.write('$k: ${d[k]} ');
       }
     }
+  }
+}
+
+class AwesomeFontDropdownMenu extends StatefulWidget {
+  final String _initialValue;
+  final ValueChanged<String> _onSelected;
+
+  const AwesomeFontDropdownMenu(this._initialValue, this._onSelected, {super.key});
+
+  @override
+  State<AwesomeFontDropdownMenu> createState() => _AwesomeFontDropdownMenuState();
+}
+
+class _AwesomeFontDropdownMenuState extends State<AwesomeFontDropdownMenu> {
+  @override
+  Widget build(BuildContext context) {
+    const ts = TextStyle(fontFamily: 'Awesome', fontSize: 30);
+    //TODO need to ba ablew to search.
+    return DropdownMenu<String>(
+      textStyle: ts,
+      expandedInsets: EdgeInsets.zero,
+      enableSearch: false,
+      enableFilter: true,
+      requestFocusOnTap: true,
+      initialSelection: widget._initialValue,
+      dropdownMenuEntries: awesomeFontData.keys.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey), textStyle: WidgetStatePropertyAll<TextStyle>(ts)),
+          value: v,
+          label: String.fromCharCode(awesomeFontData[v]??0));}).toList(),
+      onSelected: (value) {
+        widget._onSelected(value??'');
+      },
+    );
   }
 }
 
@@ -326,8 +360,6 @@ abstract class BoxWidget extends StatefulWidget {
 }
 
 class HeadedBoxWidget extends StatelessWidget {
-  static const double pad = 5.0;
-
   final String header;
   final bool scrolling;
   final List<Widget> actions;
@@ -379,19 +411,6 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
       body: body,
       alignment: alignment,
     );
-    // return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    //   Padding(padding: const EdgeInsets.only(top: pad, left: pad, right: pad), child:
-    //     Row(children: [
-    //       Expanded(child: HeaderText(header, scrolling: scrolling)),
-    //       Row(children: actions)
-    //     ])
-    //   ),
-    //   Expanded(child: Align(alignment: alignment,
-    //     child: Padding(padding: const EdgeInsets.all(pad),
-    //       child: body
-    //     ))
-    //   )
-    // ]);
   }
 }
 
@@ -419,18 +438,19 @@ class MaxTextWidget extends StatelessWidget {
   final Color? textBgColor;
   final TextDecoration? decoration;
   final Color? backgroundColor;
+  final TextStyle? style;
 
-  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, this.backgroundColor, super.key});
+  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, this.backgroundColor, this.style, super.key});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+      TextStyle s = (style??Theme.of(context).textTheme.titleMedium!).copyWith(height: 1.0);
 
       double fontSize = 1;
       if(text.isNotEmpty) {
         int lines = LineSplitter().convert(text).length;
-        fontSize = maxFontSize(text, style,
+        fontSize = maxFontSize(text, s,
           constraints.maxHeight / lines,
           constraints.maxWidth);
       }
@@ -438,9 +458,9 @@ class MaxTextWidget extends StatelessWidget {
       // We need to disable the device text scaling as this interferes with our text scaling.
       return Stack(alignment: alignment, children: [
         if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling,
-          style: style.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
+          style: s.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
         Text(text, textScaler: TextScaler.noScaling,
-          style: style.copyWith(fontSize: fontSize, color: color, decoration: decoration, backgroundColor: backgroundColor))
+          style: s.copyWith(fontSize: fontSize, color: color, decoration: decoration, backgroundColor: backgroundColor))
       ]);
     });
   }

@@ -306,7 +306,7 @@ class _SHRPiBoxState extends HeadedBoxState<SHRPiBox> {
         iw = w;
       }
 
-      return Container(padding: const EdgeInsets.all(HeadedBoxWidget.pad), child: Stack(alignment: AlignmentGeometry.center, children: [
+      return Container(padding: const EdgeInsets.all(pad), child: Stack(alignment: AlignmentGeometry.center, children: [
         Center(child: Image(image: AssetImage('assets/shrpi.jpg'))),
         SizedBox(width: iw, height: ih, child: MaxTextWidget(textBgColor: bg,
 

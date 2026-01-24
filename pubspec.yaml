@@ -139,6 +139,9 @@ flutter:
     - family: Red Hat Mono
       fonts:
         - asset: fonts/RedHatMono-Regular.ttf
+    - family: Awesome
+      fonts:
+        - asset: fonts/Font-Awesome-7-Free-Solid-900.otf
 
 msix_config:
   display_name: Boat Instrument

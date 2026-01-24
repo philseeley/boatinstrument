@@ -12,6 +12,7 @@ part 'launch_box.g.dart';
 class _LaunchConfig {
   String id;
   String title;
+  String icon;
   String image;
   String executable;
   String params;
@@ -19,6 +20,7 @@ class _LaunchConfig {
   _LaunchConfig({
     this.id = '',
     this.title = '',
+    this.icon = '',
     this.image = '',
     this.executable = '',
     this.params = '',
@@ -121,14 +123,16 @@ class _LaunchBoxState extends HeadedTextBoxState<LaunchBox> {
       Widget label;
       if (lc.image.isNotEmpty) {
         label = Image.file(File(lc.image));
+      } else if(lc.icon.isNotEmpty) {
+        label = MaxTextWidget(String.fromCharCode(awesomeFontData[lc.icon]??0), style: TextStyle(fontFamily: 'Awesome'));
       } else {
-        label = MaxTextWidget(widget._launchConfig!.title);
+        label = MaxTextWidget(lc.title);
       }
       var button = TextButton(onPressed: _launch, child: label);
-      if(lc.title.isNotEmpty && lc.image.isNotEmpty) {
+      if(lc.title.isNotEmpty && (lc.image.isNotEmpty || lc.icon.isNotEmpty)) {
         return HeadedBoxWidget(header: lc.title, body: button);
       } else {
-        return button;
+        return Padding(padding: EdgeInsetsGeometry.all(pad), child: button);
       }
     }
   }
@@ -188,11 +192,12 @@ class _SettingsState extends State<_SettingsWidget> {
               initialValue: config.id,
               onChanged: (value) => config.id = value),
             BiTextFormField(
-              decoration: const InputDecoration(hintText: 'title - required if no image'),
+              decoration: const InputDecoration(hintText: 'title - required if no icon or image'),
               initialValue: config.title,
               onChanged: (value) => config.title = value),
+            ListTile(leading: Text('Icon:'), title: AwesomeFontDropdownMenu(config.icon, (icon) {config.icon = icon;})),
             BiTextFormField(
-              decoration: const InputDecoration(hintText: '/path/to/image.[png|jpg] - required if no title'),
+              decoration: const InputDecoration(hintText: '/path/to/image.[png|jpg] - required if no title or icon'),
               initialValue: config.image,
               onChanged: (value) => config.image = value),
             BiTextFormField(
@@ -216,7 +221,8 @@ class _SettingsState extends State<_SettingsWidget> {
   }
 
   void _checkConfigs () {
-    if(widget._settings.configs.every((h) {return h.id.isNotEmpty && h.executable.isNotEmpty && (h.title.isNotEmpty || h.image.isNotEmpty);})) {
+    if(widget._settings.configs.every((h) {return h.id.isNotEmpty && h.executable.isNotEmpty &&
+       (h.title.isNotEmpty || h.icon.isNotEmpty || h.image.isNotEmpty);})) {
       Navigator.pop(context);
     } else {
       widget._controller.showMessage(context, 'IDs, Executables and Title or Image cannot be blank');

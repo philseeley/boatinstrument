@@ -58,6 +58,7 @@ part 'data.dart';
 part 'settings_page.dart';
 part 'edit_page.dart';
 part 'help_page.dart';
+part 'awesome_font.dart';
 
 class CircularLogOutput extends LogOutput {
   static final CircularBuffer<String> _buffer = CircularBuffer(100);

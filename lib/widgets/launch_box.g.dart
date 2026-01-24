@@ -10,7 +10,8 @@ _LaunchConfig _$LaunchConfigFromJson(Map<String, dynamic> json) =>
     _LaunchConfig(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
-      image: json['icon'] as String? ?? '',
+      icon: json['icon'] as String? ?? '',
+      image: json['image'] as String? ?? '',
       executable: json['executable'] as String? ?? '',
       params: json['params'] as String? ?? '',
     );
@@ -19,7 +20,8 @@ Map<String, dynamic> _$LaunchConfigToJson(_LaunchConfig instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'icon': instance.image,
+      'icon': instance.icon,
+      'image': instance.image,
       'executable': instance.executable,
       'params': instance.params,
     };

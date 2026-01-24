@@ -1,0 +1,30 @@
+#!/bin/env python
+
+import subprocess
+import xml.etree.ElementTree as ET
+import pprint
+
+char_map = {}
+char_map[''] = 0x20
+
+xml = subprocess.check_output(['ttx', '-t', 'cmap', 'fonts/Font-Awesome-7-Free-Solid-900.otf', '-q', '-o', '-'])
+
+ttFont = ET.fromstring(xml)
+
+def output_cmap(element_name):
+  cmap_format = cmap.findall(element_name)[0]
+
+  for map in cmap_format:
+    if map.attrib['name'] != 'zero-width-space' and map.attrib['name'] != 'space' and len(map.attrib['name']) > 1:
+      char_map[map.attrib['name']] = int(map.attrib['code'], 16)
+
+for cmap in ttFont:
+  output_cmap('cmap_format_4')
+  output_cmap('cmap_format_12')
+
+with open('lib/awesome_font.dart', 'w') as f:
+  print('''// GENERATED - do not edit
+part of "boatinstrument_controller.dart";
+const Map<String, int> awesomeFontData = ''', file=f)
+  pprint.pprint(char_map, stream=f)
+  print(';', file=f)
