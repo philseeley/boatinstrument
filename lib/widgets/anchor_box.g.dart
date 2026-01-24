@@ -13,8 +13,8 @@ _AnchorAlarmSettings _$AnchorAlarmSettingsFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$AnchorAlarmSettingsToJson(
-        _AnchorAlarmSettings instance) =>
-    <String, dynamic>{
-      'recordSeconds': instance.recordSeconds,
-      'recordPoints': instance.recordPoints,
-    };
+  _AnchorAlarmSettings instance,
+) => <String, dynamic>{
+  'recordSeconds': instance.recordSeconds,
+  'recordPoints': instance.recordPoints,
+};

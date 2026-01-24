@@ -7,13 +7,11 @@ part of 'wind_box.dart';
 // **************************************************************************
 
 _WindDirectionSettings _$WindDirectionSettingsFromJson(
-        Map<String, dynamic> json) =>
-    _WindDirectionSettings(
-      cardinalPrimary: json['cardinalPrimary'] as bool? ?? true,
-    );
+  Map<String, dynamic> json,
+) => _WindDirectionSettings(
+  cardinalPrimary: json['cardinalPrimary'] as bool? ?? true,
+);
 
 Map<String, dynamic> _$WindDirectionSettingsToJson(
-        _WindDirectionSettings instance) =>
-    <String, dynamic>{
-      'cardinalPrimary': instance.cardinalPrimary,
-    };
+  _WindDirectionSettings instance,
+) => <String, dynamic>{'cardinalPrimary': instance.cardinalPrimary};

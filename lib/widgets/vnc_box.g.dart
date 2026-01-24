@@ -7,10 +7,10 @@ part of 'vnc_box.dart';
 // **************************************************************************
 
 _VNCSettings _$VNCSettingsFromJson(Map<String, dynamic> json) => _VNCSettings(
-      host: json['host'] as String? ?? '',
-      port: (json['port'] as num?)?.toInt() ?? 5900,
-      password: json['password'] as String? ?? '',
-    );
+  host: json['host'] as String? ?? '',
+  port: (json['port'] as num?)?.toInt() ?? 5900,
+  password: json['password'] as String? ?? '',
+);
 
 Map<String, dynamic> _$VNCSettingsToJson(_VNCSettings instance) =>
     <String, dynamic>{

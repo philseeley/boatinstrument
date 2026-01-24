@@ -8,8 +8,11 @@ part of 'gauge_box.dart';
 
 _GraphSettings _$GraphSettingsFromJson(Map<String, dynamic> json) =>
     _GraphSettings(
-      displayDuration: $enumDecodeNullable(
-              _$GraphDurationEnumMap, json['displayDuration']) ??
+      displayDuration:
+          $enumDecodeNullable(
+            _$GraphDurationEnumMap,
+            json['displayDuration'],
+          ) ??
           GraphDuration.fifteenMinutes,
     );
 

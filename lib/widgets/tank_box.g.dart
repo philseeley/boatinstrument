@@ -13,7 +13,4 @@ _TankSettings _$TankSettingsFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$TankSettingsToJson(_TankSettings instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'capacity': instance.capacity,
-    };
+    <String, dynamic>{'id': instance.id, 'capacity': instance.capacity};

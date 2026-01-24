@@ -22,9 +22,12 @@ _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
       portStarboard: json['portStarboard'] as bool? ?? false,
       dataType:
           $enumDecodeNullable(_$SignalKDataTypeEnumMap, json['dataType']) ??
-              SignalKDataType.realTime,
-      valueToDisplay: $enumDecodeNullable(
-              _$DoubleValueToDisplayEnumMap, json['valueToDisplay']) ??
+          SignalKDataType.realTime,
+      valueToDisplay:
+          $enumDecodeNullable(
+            _$DoubleValueToDisplayEnumMap,
+            json['valueToDisplay'],
+          ) ??
           DoubleValueToDisplay.value,
       color: json['color'] == null
           ? Colors.blue
@@ -63,23 +66,15 @@ const _$DoubleValueToDisplayEnumMap = {
 };
 
 _DebugSettings _$DebugSettingsFromJson(Map<String, dynamic> json) =>
-    _DebugSettings(
-      path: json['path'] as String? ?? 'path',
-    );
+    _DebugSettings(path: json['path'] as String? ?? 'path');
 
 Map<String, dynamic> _$DebugSettingsToJson(_DebugSettings instance) =>
-    <String, dynamic>{
-      'path': instance.path,
-    };
+    <String, dynamic>{'path': instance.path};
 
 _CustomTextBoxSettings _$CustomTextBoxSettingsFromJson(
-        Map<String, dynamic> json) =>
-    _CustomTextBoxSettings(
-      template: json['template'] as String? ?? '',
-    );
+  Map<String, dynamic> json,
+) => _CustomTextBoxSettings(template: json['template'] as String? ?? '');
 
 Map<String, dynamic> _$CustomTextBoxSettingsToJson(
-        _CustomTextBoxSettings instance) =>
-    <String, dynamic>{
-      'template': instance.template,
-    };
+  _CustomTextBoxSettings instance,
+) => <String, dynamic>{'template': instance.template};

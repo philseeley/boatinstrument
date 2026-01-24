@@ -12,50 +12,50 @@ _DateTimeSettings _$DateTimeSettingsFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$DateTimeSettingsToJson(_DateTimeSettings instance) =>
-    <String, dynamic>{
-      'dateFormat': instance.dateFormat,
-    };
+    <String, dynamic>{'dateFormat': instance.dateFormat};
 
 _DateTimePerBoxSettings _$DateTimePerBoxSettingsFromJson(
-        Map<String, dynamic> json) =>
-    _DateTimePerBoxSettings(
-      showDate: json['showDate'] as bool? ?? true,
-      showTime: json['showTime'] as bool? ?? true,
-      utc: json['utc'] as bool? ?? false,
-      timeFormat: json['timeFormat'] as String? ?? 'HH:mm:ss',
-      showUTCButton: json['showUTCButton'] as bool? ?? false,
-    );
+  Map<String, dynamic> json,
+) => _DateTimePerBoxSettings(
+  showDate: json['showDate'] as bool? ?? true,
+  showTime: json['showTime'] as bool? ?? true,
+  utc: json['utc'] as bool? ?? false,
+  timeFormat: json['timeFormat'] as String? ?? 'HH:mm:ss',
+  showUTCButton: json['showUTCButton'] as bool? ?? false,
+);
 
 Map<String, dynamic> _$DateTimePerBoxSettingsToJson(
-        _DateTimePerBoxSettings instance) =>
-    <String, dynamic>{
-      'showDate': instance.showDate,
-      'showTime': instance.showTime,
-      'utc': instance.utc,
-      'timeFormat': instance.timeFormat,
-      'showUTCButton': instance.showUTCButton,
-    };
+  _DateTimePerBoxSettings instance,
+) => <String, dynamic>{
+  'showDate': instance.showDate,
+  'showTime': instance.showTime,
+  'utc': instance.utc,
+  'timeFormat': instance.timeFormat,
+  'showUTCButton': instance.showUTCButton,
+};
 
 _TimerDisplaySettings _$TimerDisplaySettingsFromJson(
-        Map<String, dynamic> json) =>
-    _TimerDisplaySettings(
-      id: json['id'] as String? ?? '',
-      notificationState: $enumDecodeNullable(
-              _$NotificationStateEnumMap, json['notificationState']) ??
-          NotificationState.warn,
-      allowRestart: json['allowRestart'] as bool? ?? true,
-      allowStop: json['allowStop'] as bool? ?? false,
-    );
+  Map<String, dynamic> json,
+) => _TimerDisplaySettings(
+  id: json['id'] as String? ?? '',
+  notificationState:
+      $enumDecodeNullable(
+        _$NotificationStateEnumMap,
+        json['notificationState'],
+      ) ??
+      NotificationState.warn,
+  allowRestart: json['allowRestart'] as bool? ?? true,
+  allowStop: json['allowStop'] as bool? ?? false,
+);
 
 Map<String, dynamic> _$TimerDisplaySettingsToJson(
-        _TimerDisplaySettings instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'notificationState':
-          _$NotificationStateEnumMap[instance.notificationState]!,
-      'allowRestart': instance.allowRestart,
-      'allowStop': instance.allowStop,
-    };
+  _TimerDisplaySettings instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'notificationState': _$NotificationStateEnumMap[instance.notificationState]!,
+  'allowRestart': instance.allowRestart,
+  'allowStop': instance.allowStop,
+};
 
 const _$NotificationStateEnumMap = {
   NotificationState.normal: 'normal',
@@ -67,22 +67,23 @@ const _$NotificationStateEnumMap = {
 };
 
 _Timer _$TimerFromJson(Map<String, dynamic> json) => _Timer(
-      id: json['id'] as String? ?? '',
-      time: json['time'] == null
-          ? const TimeOfDay(hour: 0, minute: 0)
-          : const TimeOfDayConverter().fromJson(json['time'] as String),
-      delta: json['delta'] as bool? ?? false,
-    );
+  id: json['id'] as String? ?? '',
+  time: json['time'] == null
+      ? const TimeOfDay(hour: 0, minute: 0)
+      : const TimeOfDayConverter().fromJson(json['time'] as String),
+  delta: json['delta'] as bool? ?? false,
+);
 
 Map<String, dynamic> _$TimerToJson(_Timer instance) => <String, dynamic>{
-      'id': instance.id,
-      'time': const TimeOfDayConverter().toJson(instance.time),
-      'delta': instance.delta,
-    };
+  'id': instance.id,
+  'time': const TimeOfDayConverter().toJson(instance.time),
+  'delta': instance.delta,
+};
 
 _TimersSettings _$TimersSettingsFromJson(Map<String, dynamic> json) =>
     _TimersSettings(
-      timers: (json['timers'] as List<dynamic>?)
+      timers:
+          (json['timers'] as List<dynamic>?)
               ?.map((e) => _Timer.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],

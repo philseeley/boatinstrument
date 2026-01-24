@@ -13,6 +13,4 @@ _PositionSettings _$PositionSettingsFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$PositionSettingsToJson(_PositionSettings instance) =>
-    <String, dynamic>{
-      'format': instance.format,
-    };
+    <String, dynamic>{'format': instance.format};
