@@ -571,6 +571,7 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
     List<Widget> headerList = [];
     for(int h=0; h<widget._httpHeaders.length; ++h) {
       var header = widget._httpHeaders[h];
+      headerList.add(Divider(thickness: 3, color: Theme.of(context).colorScheme.secondary));
       headerList.add(ListTile(key: UniqueKey(),
           title: Column(children: [
             BiTextFormField(
@@ -584,7 +585,6 @@ class _EditHttpHeadersState extends State<_EditHttpHeaders> {
           ]),
           trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteHeader(h);})
       ));
-      headerList.add(Divider(thickness: 3, color: Theme.of(context).colorScheme.secondary));
     }
 
     return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _checkHeaders();}, child: Scaffold(

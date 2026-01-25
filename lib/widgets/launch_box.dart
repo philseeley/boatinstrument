@@ -87,7 +87,7 @@ class LaunchBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpPage(text: '''At least one of **Title** or **Image** must be defined. If both are defined, then the Title will be used to head the Launch Box.
+  Widget? getSettingsHelp() => const HelpPage(text: '''At least one of **Title**, **Icon** or **Image** must be defined. The **Image** overrides the **Icon** and if the **Title** is also defined it will be used to head the Launch Box.
 
 The **Parameters** will be split into an argument list at each space. If this does not produce the expected result, e.g. due to quoted parameters, then you should create a script to launch your application as desired and specify this as the executable.
 
@@ -184,6 +184,7 @@ class _SettingsState extends State<_SettingsWidget> {
     List<Widget> configList = [];
     for(int c=0; c<s.configs.length; ++c) {
       var config = s.configs[c];
+      configList.add(Divider(thickness: 3, color: Theme.of(context).colorScheme.secondary));
       configList.add(ListTile(key: UniqueKey(),
           title: Column(children: [
             BiTextFormField(
@@ -211,7 +212,6 @@ class _SettingsState extends State<_SettingsWidget> {
           ]),
           trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteConfig(c);})
       ));
-      configList.add(Divider(thickness: 3, color: Theme.of(context).colorScheme.secondary));
     }
 
     return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _checkConfigs();}, child: Column(children: [
