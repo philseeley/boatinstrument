@@ -124,21 +124,28 @@ class AwesomeFontDropdownMenu extends StatefulWidget {
 }
 
 class _AwesomeFontDropdownMenuState extends State<AwesomeFontDropdownMenu> {
+  static List<DropdownMenuEntry<String>>? _menuEntries;
+
   @override
   Widget build(BuildContext context) {
     const ts = TextStyle(fontFamily: 'Awesome', fontSize: 30);
-    //TODO need to ba ablew to search.
+
+    _menuEntries ??= awesomeFontData.keys.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
+      style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey), textStyle: WidgetStatePropertyAll<TextStyle>(ts)),
+      value: v,
+      label: String.fromCharCode(awesomeFontData[v]??0));}).toList();
+
     return DropdownMenu<String>(
       textStyle: ts,
       expandedInsets: EdgeInsets.zero,
       enableSearch: false,
       enableFilter: true,
+      filterCallback: (List<DropdownMenuEntry<String>>entries, String search) {
+        return entries.where((entry) => entry.value.contains(search)).toList();
+      },
       requestFocusOnTap: true,
       initialSelection: widget._initialValue,
-      dropdownMenuEntries: awesomeFontData.keys.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey), textStyle: WidgetStatePropertyAll<TextStyle>(ts)),
-          value: v,
-          label: String.fromCharCode(awesomeFontData[v]??0));}).toList(),
+      dropdownMenuEntries: _menuEntries!,
       onSelected: (value) {
         widget._onSelected(value??'');
       },
