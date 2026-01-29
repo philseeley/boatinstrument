@@ -479,6 +479,7 @@ class BoatInstrumentController {
         SnackBar(
             backgroundColor: (error) ? Colors.orange : null,
             duration: Duration(milliseconds: millisecondsDuration),
+            persist: false,
             action: action,
             content: Text(msg)));
   }
