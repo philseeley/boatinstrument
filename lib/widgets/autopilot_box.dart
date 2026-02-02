@@ -568,19 +568,6 @@ class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettin
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 abstract class AutopilotHeadingControlBox extends AutopilotControlBox {
 
   AutopilotHeadingControlBox(super.config, {super.key});

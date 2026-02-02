@@ -18,6 +18,7 @@ import 'package:boatinstrument/widgets/environment_box.dart';
 import 'package:boatinstrument/widgets/launch_box.dart';
 import 'package:boatinstrument/widgets/navigation_box.dart';
 import 'package:boatinstrument/widgets/network.dart';
+import 'package:boatinstrument/widgets/onvif_box.dart';
 import 'package:boatinstrument/widgets/propulsion_box.dart';
 import 'package:boatinstrument/widgets/remote_box.dart';
 import 'package:boatinstrument/widgets/hardware.dart';

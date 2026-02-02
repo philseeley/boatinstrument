@@ -6,6 +6,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   bonsoir_windows
   flutter_inappwebview_windows
+  media_kit_libs_windows_video
+  media_kit_video
   screen_brightness_windows
   screen_retriever_windows
   share_plus

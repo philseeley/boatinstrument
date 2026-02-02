@@ -123,6 +123,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(NavigationLogBox.sid, (config) {return NavigationLogBox(config, key: UniqueKey());}),
   BoxDetails(NavigationTripLogBox.sid, (config) {return NavigationTripLogBox(config, key: UniqueKey());}),
   BoxDetails(LaunchBox.sid, (config) {return LaunchBox(config, key: UniqueKey());}),
+  BoxDetails(ONVIFBox.sid, experimental: true, (config) {return ONVIFBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -333,6 +334,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
       if(!Platform.isMacOS && !Platform.isLinux) _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
+      _widgetMenuEntry(ONVIFBox.sid, 'Camera'),
       _widgetSubMenuEntry(box, 'Custom', [
         _widgetMenuEntry(CustomDoubleValueBox.sid, 'Value'),
         _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid, 'Semi Gauge'),
