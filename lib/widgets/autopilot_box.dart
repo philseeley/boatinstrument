@@ -622,12 +622,12 @@ class _AutopilotHeadingControlHorizontalBoxState extends _AutopilotHeadingContro
     controlButtons.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right)),
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right)),
-          IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward)),
+          IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
+          IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
+          IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
+          IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right)),
+          IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right)),
+          IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward)),
         ]
     ));
 
@@ -662,19 +662,19 @@ class _AutopilotHeadingControlVerticalBoxState extends _AutopilotHeadingControlB
     List<Row> controlButtons = [];
 
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
+      IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(-1);}, icon: const Icon(Icons.keyboard_arrow_left)),
       Text(widget._perBoxSettings.showLabels ? '1' : ''),
-      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right))
+      IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(1);}, icon: const Icon(Icons.keyboard_arrow_right))
     ]));
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
+      IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(-10);}, icon: const Icon(Icons.keyboard_double_arrow_left)),
       Text(widget._perBoxSettings.showLabels ? '10' : ''),
-      IconButton(iconSize: 48, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right))
+      IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_adjustHeading(10);}, icon: const Icon(Icons.keyboard_double_arrow_right))
     ]));
     controlButtons.add(Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
+      IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_autoTack('port');}, icon: const Icon(Icons.fast_rewind)),
       Text(widget._perBoxSettings.showLabels ? 'Tack' : ''),
-      IconButton(iconSize: 48, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward))
+      IconButton(iconSize: buttonIconSize, onPressed: disabled ? null : () {_autoTack('starboard');}, icon: const Icon(Icons.fast_forward))
     ]));
 
     List<Widget> buttons = [Column(children: controlButtons)];

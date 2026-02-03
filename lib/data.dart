@@ -8,6 +8,7 @@ const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
 const String idChars = '[0-9a-zA-Z_-]';
 const double pad = 5.0;
+const double buttonIconSize = 48;
 
 bool embeddedKeyboard = false;
 
