@@ -78,7 +78,9 @@ abstract class ONVIFBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp() => const HelpPage(text: 'TODO Applications must first be defined in the **Shared Settings** before being selected in the **Per-Box Settings**.');
+  Widget? getHelp() => const HelpPage(text: '''Cameras must first be defined in the **Shared Settings** before being selected in the **Per-Box Settings**.
+
+**Note:** only **ONVIF** cameras are supported.''');
 
   @override
   bool get hasSettings => true;
@@ -89,11 +91,7 @@ abstract class ONVIFBox extends BoxWidget {
   }
 
   @override
-  Widget? getSettingsHelp() => const HelpPage(text: '''TODO At least one of **Title**, **Icon** or **Image** must be defined. The **Image** overrides the **Icon** and if the **Title** is also defined it will be used to head the Launch Box.
-
-The **Parameters** will be split into an argument list at each space. If this does not produce the expected result, e.g. due to quoted parameters, then you should create a script to launch your application as desired and specify this as the executable.
-
-**Note:** once defined, if an **ID** is changed then any **Launch Box** referencing it will need reconfiguring.''');
+  Widget? getSettingsHelp() => const HelpPage(text: '**Note:** once defined, if an **ID** is changed then any referencing Box will need reconfiguring.');
 
   @override
   bool get hasPerBoxSettings => true;
@@ -104,7 +102,7 @@ The **Parameters** will be split into an argument list at each space. If this do
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'TODO The application launch configuration must first be defined in the **Shared Settings**.');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'The Camera must first be defined in the **Shared Settings**.');
 }
 
 abstract class _ONVIFBoxState<T extends ONVIFBox> extends State<T> {
