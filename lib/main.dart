@@ -201,7 +201,7 @@ class MainPageState extends State<MainPage> {
         actionsPercent: 0.5,
         context: context,
         leading: BackButton(onPressed: () {setState(() {_showAppBar = false;});}),
-        title: Text(_controller.pageName()),
+        title: Text(_controller.currentPageTitle()),
         actions: [
           if(!widget.noFullScreen) IconButton(tooltip: '${fullScreen ? 'Exit ':''}Full Screen', icon: Icon(fullScreen ? Icons.fullscreen_exit : Icons.fullscreen), onPressed: _toggleFullScreen),
           if(_controller.muted) IconButton(tooltip: 'Unmute', icon: const Icon(Icons.volume_off), onPressed: _unmute),
@@ -215,9 +215,24 @@ class MainPageState extends State<MainPage> {
       );
     }
 
+    var theme = Theme.of(context);
+    var ts = theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface);
+
     return Scaffold(
-      appBar: appBar,
-      body: SafeArea(child: GestureDetector(
+      appBar: appBar, 
+      drawer: !_controller.quickPageSwitch?null:Drawer(
+        child: ListView.builder(padding: EdgeInsets.all(pad), itemCount: _controller.pageCount, itemBuilder: (context, pageNum) {
+          return Padding(padding: EdgeInsets.all(pad), child: TextButton(
+            child: Text(_controller.pageName(pageNum), style: ts),
+            onPressed: () {
+              _controller.gotoPageNumber(pageNum);
+              Navigator.of(context).pop();
+          }));
+        })
+      ),
+      // We need to use a Builder() so that we can get the Context of Scaffold to open the Drawer.
+      body: Builder(builder: (context) => SafeArea(child: GestureDetector(
+        onDoubleTap: _controller.quickPageSwitch?() => Scaffold.of(context).openDrawer():null,
         onPanStart: (details) {
           _panStart = details.localPosition;
         },
@@ -235,7 +250,7 @@ class MainPageState extends State<MainPage> {
         },
         child: _controller.buildPage(),
       )),
-    );
+    ));
   }
 
   void nightMode({bool? on}) {

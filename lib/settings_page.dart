@@ -160,6 +160,13 @@ class _SettingsState extends State<SettingsPage> {
               themeProvider.setDarkMode(value);
             });
           }),
+      SwitchListTile(title: const Text("Quick Page Switch:"),
+          value: settings.quickPageSwitch,
+          onChanged: (bool value) {
+            setState(() {
+              settings.quickPageSwitch = value;
+            });
+          }),
       SwitchListTile(title: const Text("Wraparound page change:"),
           value: settings.wrapPages,
           onChanged: (bool value) {

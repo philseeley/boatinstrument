@@ -1,6 +1,8 @@
 # Application Pages
 
-The Boat Instrument shows a number of Pages and swiping left/right moves between them. Swiping down reveals additional options:
+The Boat Instrument shows a number of Pages and swiping left/right moves between them. If **Quick Page Switch** is enabled, then Double Tapping presents the list of Pages for direct selection.
+
+Swiping down reveals additional options:
 
 ![night mode](assets/icons/__THEME__/mode_night.png) Enables/Disables Night Mode
 ![full screen](assets/icons/__THEME__/fullscreen.png) Enables/Disables Full Screen

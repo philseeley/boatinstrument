@@ -894,6 +894,7 @@ class _Settings {
   String authToken;
   int notificationMuteTimeout; //Minutes
   bool demoMode;
+  bool quickPageSwitch;
   bool darkMode;
   bool wrapPages;
   bool brightnessControl;
@@ -938,6 +939,7 @@ class _Settings {
     this.notificationMuteTimeout = 15,
     this.demoMode = false,
     this.darkMode = true,
+    this.quickPageSwitch = false,
     this.wrapPages = true,
     this.brightnessControl = false,
     this.keepAwake = false,

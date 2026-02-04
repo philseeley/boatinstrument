@@ -171,12 +171,14 @@ class BoatInstrumentController {
 
   bool get ready => _settings != null;
 
+  int get pageCount => _settings!.pages.length;
   Uri get httpApiUri => _httpApiUri;
   Uri get wsUri => _wsUri;
   int get valueSmoothing => _settings!.valueSmoothing;
   int get realTimeDataTimeout => _settings!.realTimeDataTimeout;
   int get infrequentDataTimeout => _settings!.infrequentDataTimeout;
   bool get darkMode => _settings!.darkMode;
+  bool get quickPageSwitch => _settings!.quickPageSwitch;
   bool get brightnessControl => _settings!.brightnessControl;
   bool get keepAwake => _settings!.keepAwake;
   bool get pageTimerOnStart => _settings!.pageTimerOnStart;
@@ -672,7 +674,7 @@ class BoatInstrumentController {
 
         switch(u.value['id']) {
           case 'gotoPage':
-            gotoPage(u.value['page']);
+            gotoNamedPage(u.value['page']);
             break;
           case 'firstPage':
             firstPage();
@@ -744,8 +746,11 @@ class BoatInstrumentController {
     if (lastPage != _pageNum) _mainPageState.rebuild();
   }
 
-  void gotoPage(String pageName) {
-    int pageNum = _settings!.pages.indexWhere((page) {return page.name == pageName;});
+  void gotoNamedPage(String pageName) {
+    gotoPageNumber(_settings!.pages.indexWhere((page) {return page.name == pageName;}));
+  }
+
+  void gotoPageNumber(int pageNum) {
     if(pageNum != -1 && pageNum != _pageNum) {
       _pageNum = pageNum;
       _mainPageState.rebuild();
@@ -819,8 +824,10 @@ class BoatInstrumentController {
     }
   }
 
-  String pageName() {
-    return '${_pageNum+1}/${_settings!.pages.length} ${_settings!.pages[_pageNum].name}';
+  String pageName(int p) => _settings!.pages[p].name;
+
+  String currentPageTitle() {
+    return '${_pageNum+1}/${_settings!.pages.length} ${pageName(_pageNum)}';
   }
 
   Map<String, String> _httpHeaders(Map<String, String>? headers) {
