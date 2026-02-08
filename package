@@ -53,7 +53,7 @@ then
   mkdir -p debian/usr/share/applications
   mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
   cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
-  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0, sudo
+  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0, sudo, libmpv2
 fi
 
 # ================================ fpi ======================================
@@ -70,5 +70,5 @@ do
   cp boatinstrument-fpi debian/usr/share/${name}
   cp boatinstrument-fpi-config debian/etc/${name}/config
   cp boatinstrument-fpi.getty debian/etc/systemd/system/getty@tty1.service.d/override.conf
-  package -${pi_cpu} libgl1-mesa-dri, flutter-pi, sudo
+  package -${pi_cpu} libgl1-mesa-dri, flutter-pi, sudo, libmpv2
 done
