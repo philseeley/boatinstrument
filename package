@@ -18,6 +18,9 @@ fi
 date=$(date +"%a, %d %b %Y %T %z")
 . /etc/os-release
 
+os_deps=libmpv2
+[ $VERSION_ID == 11 ] && os_deps=libmpv1
+
 prepackage () (
   rm -rf debian
   mkdir -p debian/DEBIAN debian/usr/share/doc/${name}
@@ -53,7 +56,7 @@ then
   mkdir -p debian/usr/share/applications
   mv build/linux/${cpu:0:1}*/release/bundle debian/usr/share/${name}
   cp name.phil.seeley.boatinstrument.desktop debian/usr/share/applications
-  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0, sudo, libmpv2
+  package "" libgtk-3-0, libgstreamer-plugins-base1.0-0, sudo, $os_deps
 fi
 
 # ================================ fpi ======================================
