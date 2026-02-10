@@ -216,6 +216,7 @@ class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
 
   @override
   void dispose() {
+    _player.stop();
     _player.dispose();
     super.dispose();
   }
