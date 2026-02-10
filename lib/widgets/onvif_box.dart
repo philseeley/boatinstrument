@@ -110,6 +110,8 @@ abstract class _ONVIFBoxState<T extends ONVIFBox> extends State<T> {
   String? _profileToken;
 
   String get _header => 'Camera:${widget._onvifConfig?.id??'Select Camera in Settings'}';
+  Widget get _configWidget => Text('$_header\nCamera:URL: ${widget._onvifConfig?.url??''}');
+  Widget get _connectingWidget => Center(child: Text('Connecting...'));
 
   @override
   void initState() {
@@ -143,9 +145,6 @@ abstract class _ONVIFBoxState<T extends ONVIFBox> extends State<T> {
   }
 
   Widget _ptzControls() {
-    if(_profileToken == null) {
-      return Text('Connecting...');
-    } else {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
       Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         _controlButton(Icons.keyboard_arrow_left, -1, 0, 0),
@@ -161,7 +160,6 @@ abstract class _ONVIFBoxState<T extends ONVIFBox> extends State<T> {
         _controlButton(Icons.remove, 0, 0, -1),
       ]),
     ]);
-    }
   }
 
   Widget _controlButton(IconData icon, int pan, int tilt, int zoom, {bool home = false}) {
@@ -229,19 +227,20 @@ class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
 
   @override
   Widget build(BuildContext context) {
-    ONVIFConfig? c = widget._onvifConfig;
-
     bool connected = _profileToken != null;
     if(connected) _connectVideoStream();
 
-    Widget body = Text('$_header\nCamera:URL: ${c?.url??''}');
+    Widget body = _connectingWidget;
 
-    if(!widget.config.editMode && c != null) {
+    if(widget.config.editMode) {
+      body = _configWidget;
+    } else if(widget._onvifConfig != null && _profileToken != null) {
       body = Stack(alignment: AlignmentGeometry.center, children: [
         video.Video(controller: _controller, controls: null),
         if(widget._perBoxSettings.showControls) Opacity(opacity: connected?0.5:1.0, child: _ptzControls())
     ]);
     }
+
     return widget._perBoxSettings.showTitle?
       HeadedBoxWidget(header: _header, body: body):
       body;
@@ -260,12 +259,17 @@ class ONVIFControlBox extends ONVIFBox {
 class _ONVIFControlBoxState extends _ONVIFBoxState<ONVIFControlBox> {
   @override
   Widget build(BuildContext context) {
-    return widget._perBoxSettings.showTitle || widget.config.editMode?
-      HeadedBoxWidget(
-        header: _header,
-        body: _ptzControls()
-      ):
-      Center(child: _ptzControls());
+    Widget body = _connectingWidget;
+
+    if(widget.config.editMode) {
+      body = _configWidget;
+    } else if(_profileToken != null) {
+      body = _ptzControls();
+    }
+
+    return widget._perBoxSettings.showTitle?
+      HeadedBoxWidget(header: _header, body: body):
+      body;
   }
 }
 
