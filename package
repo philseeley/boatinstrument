@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 name=boatinstrument
 
 version=$(awk -F '[ :+]*' '/^version:/ {print $2}' pubspec.yaml)
