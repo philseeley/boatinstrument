@@ -95,8 +95,8 @@ class _Map extends StatelessWidget {
         MarkerLayer(markers: [
           Marker(point: _anchorPosition, child: Icon(Icons.anchor, color: _currentColor)),
           if(_position != null) Marker(point: _position!, child: Transform.rotate(angle: (_headingTrue??0)+m.pi/2, child: Icon(_headingTrue == null?Icons.disabled_by_default_outlined:Icons.backspace_outlined, color: _currentColor))),
-          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor),)),
-          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor),))
+          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
+          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
         ])
       ],
     );
@@ -178,15 +178,25 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _resetZoom() {
+    if(_currentRadius == null) return;
+
+    double max = m.max(_maxRadius??_currentRadius!, _currentRadius!);
+    double h = m.sqrt(max*max*2);
+    var cameraFit = CameraFit.coordinates(padding: EdgeInsets.all(50), coordinates: [
+      ll.Distance().offset(_anchorPosition!, h, 135),
+      ll.Distance().offset(_anchorPosition!, h, 315),
+    ]);
+
+    var camera = cameraFit.fit(_map!._controller.camera);
+
     setState(() {
-      _zoom = _initialZoom;
+      _zoom = camera.zoom;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var fg = Theme.of(context).colorScheme.onSurface;
-    var bg = Theme.of(context).colorScheme.surface;
+    var bg = Theme.of(context).colorScheme.onSurface;
     var dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
     var raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
 
@@ -196,41 +206,46 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
 
     return Padding(padding: const EdgeInsets.all(5), child: Column(children: [
-      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        IconButton(onPressed: _toggleLocked, icon: Icon(_unlocked ? Icons.lock_open : Icons.lock, color: dropColor)),
-        IconButton(onPressed: _maxRadius == null ? _drop : null, icon: Icon(Icons.anchor, color: dropColor)),
-        IconButton(onPressed: (_currentRadius != null && _maxRadius == null) ? _setMaxRadius : null, icon: Icon(Icons.highlight_off, color: dropColor)),
-        IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(-5);}, icon: Icon(Icons.remove, color: dropColor)),
-        IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(5);}, icon: Icon(Icons.add, color: dropColor)),
-        IconButton(onPressed: _unlocked ? _raise : null, icon: Stack(children: [Icon(Icons.anchor, color: raiseColor), Icon(Icons.close, color: raiseColor)])),
-      ]),
       Expanded(child: Stack(children: [
-        if(_anchorPosition != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
-        Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
-            IconButton.filled(onPressed: _zoomIn, icon: Icon(Icons.add), style: IconButton.styleFrom(backgroundColor: fg, foregroundColor: bg)),
-            IconButton.filled(onPressed: _zoomOut, icon: Icon(Icons.remove), style: IconButton.styleFrom(backgroundColor: fg, foregroundColor: bg))
+        if(_map != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
+        Positioned(top: pad, left: pad, right: pad, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          _button(_map==null?null:_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
+          _button(_maxRadius==null?_drop:null, dropColor, iconData: Icons.anchor),
+          _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
+          _button(_maxRadius==null?null:() {_changeMaxRadius(-5);}, dropColor, iconData: Icons.remove),
+          _button(_maxRadius==null?null:() {_changeMaxRadius(5);}, dropColor, iconData: Icons.add),
+          _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
         ])),
-        Positioned(bottom: pad, left: pad, child: IconButton.filled(onPressed: _resetZoom, icon: Icon(Icons.all_out), style: IconButton.styleFrom(backgroundColor: fg, foregroundColor: bg)),),
+        if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
+            _button(_resetZoom, bg, iconData: Icons.all_out),
+            _button(_zoomIn, bg, iconData: Icons.add),
+            _button(_zoomOut, bg, iconData: Icons.remove)
+        ])),
       ]))
     ]));
   }
 
-  void _panStart(DragStartDetails d) {
-    var size = _map!._controller.camera.size;
-    var box = Rect.fromCircle(center: Offset(size.width/2, size.height/2), radius: 30);
+  IconButton _button(Function()? onPressed, Color color, {IconData? iconData, Stack? iconStack}) {
+    return IconButton.filled(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+  }
 
-    if(box.contains(d.localPosition)) {
-      setState(() {
-        _newAnchorPosition = _map!.toLatLong(d.localPosition);
-      });
-    } else if(_maxRadius != null) {
+  void _panStart(DragStartDetails d) {
+    if(_maxRadius != null) {
       var maxRadiusPos = _map!.toOffset(ll.Distance().offset(_anchorPosition!, _maxRadius!, 90));
-      box = Rect.fromCircle(center: maxRadiusPos, radius: 30);
+      var box = Rect.fromCircle(center: maxRadiusPos, radius: 30);
       if(box.contains(d.localPosition)) {
         setState(() {
           _newMaxRadius = ll.Distance().distance(_anchorPosition!, _map!.toLatLong(d.localPosition));
         });
+        return;
       }
+    }
+    var size = _map!._controller.camera.size;
+    var box = Rect.fromCircle(center: Offset(size.width/2, size.height/2), radius: 30);
+    if(box.contains(d.localPosition)) {
+      setState(() {
+        _newAnchorPosition = _map!.toLatLong(d.localPosition);
+      });
     }
   }
 
@@ -288,12 +303,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _resizeMaxRadius(double newMaxRadius) {
-    if(newMaxRadius > _currentRadius!) {
-      _sendCommand('setRadius', '{"radius": ${newMaxRadius.round()}}');
-    }
+    if(newMaxRadius < _currentRadius!) newMaxRadius = _currentRadius!+5;
+
+    _sendCommand('setRadius', '{"radius": ${newMaxRadius.round()}}');
   }
 
-  void _changeRadius(int amount) {
+  void _changeMaxRadius(int amount) {
     _resizeMaxRadius(_maxRadius!+amount);
   }
 
@@ -301,7 +316,8 @@ class _AnchorState extends State<AnchorAlarmBox> {
     if(await widget.config.controller.askToConfirm(context, 'Raise Anchor?', alwaysAsk: true)) {
       await _sendCommand('raiseAnchor', '');
       setState(() {
-        _maxRadius = _currentRadius = null;
+        _unlocked = false;
+        _anchorPosition = _maxRadius = _currentRadius = null;
       });
     }
   }
