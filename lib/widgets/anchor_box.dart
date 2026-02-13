@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as m;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart' as ll;
@@ -22,103 +23,84 @@ class _AnchorAlarmSettings {
   });
 }
 
-class _AnchorPainter extends CustomPainter {
-  final BuildContext _context;
-  final BoatInstrumentController _controller;
-  final int? _maxRadius;
-  final int _currentRadius;
-  final double? _bearingTrue;
-  final double _apparentBearing;
-  final ll.LatLng? _anchorPosition;
-  final List<ll.LatLng> _positions;
+class _Map extends StatelessWidget {
+  final double _zoom;
+  final ll.LatLng? _position;
+  final ll.LatLng _anchorPosition;
+  final ll.LatLng? _newAnchorPosition;
+  final double? _currentRadius;
+  final double? _maxRadius;
+  final double? _newMaxRadius;
+  final Color _currentColor;
+  final Color _maxColor;
+  final double? _headingTrue;
   final double? _windAngleApparent;
+  final List<ll.LatLng> _positions;
 
-  const _AnchorPainter(this._controller, this._context, this._maxRadius, this._currentRadius, this._bearingTrue, this._apparentBearing, this._anchorPosition, this._windAngleApparent, this._positions);
+  final MapController _controller = MapController();
+
+  ll.LatLng toLatLong(Offset offset) => _controller.camera.screenOffsetToLatLng(offset);
+  Offset toOffset(ll.LatLng latLong) => _controller.camera.latLngToScreenOffset(latLong);
+
+  _Map(this._zoom, this._position, this._anchorPosition, this._newAnchorPosition, this._currentRadius, this._currentColor, this._maxRadius, this._newMaxRadius, this._maxColor, this._headingTrue, this._windAngleApparent, this._positions);
 
   @override
-  void paint(Canvas canvas, Size canvasSize) {
-    Color maxColor = _controller.val2PSColor(_context, -1, none: Colors.grey);
-    Color currentColor = _controller.val2PSColor(_context, 1, none: Colors.grey);
-    TextStyle th = Theme.of(_context).textTheme.bodyLarge!;
-    TextPainter tp = TextPainter(textDirection: TextDirection.ltr);
+  Widget build(BuildContext context) {
+    double maxTextWidth = 0;
+    double currentTextWidth = 0;
+    Color bgColor = Theme.of(context).colorScheme.surface;
+    TextStyle th = Theme.of(context).textTheme.bodyMedium!;
+    var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
     try {
-      double size = m.min(canvasSize.width, canvasSize.height) /2;
-
-      Paint paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..color = maxColor
-        ..strokeWidth = 2.0;
-
-      double ratio = _currentRadius/(_maxRadius??_currentRadius)*size;
-
-      if(_maxRadius != null) canvas.drawCircle(Offset(size, size), size, paint);
-
-      paint.color = currentColor;
-      canvas.drawCircle(Offset(size, size), ratio, paint);
-
-      IconData icon = Icons.anchor;
-      tp.text = TextSpan(text: String.fromCharCode(icon.codePoint),
-          style: TextStyle(fontSize: 30,
-              fontFamily: icon.fontFamily,
-              color: currentColor));
+      tp.text = TextSpan(text: (_maxRadius??0).round().toString(), style: th);
       tp.layout();
-      tp.paint(canvas, Offset(size-tp.size.width / 2, size-tp.size.height / 2));
+      maxTextWidth = tp.width;
 
-      if(_bearingTrue != null) {
-        canvas.save();
-        canvas.translate(size, size);
-        canvas.rotate(_bearingTrue! - m.pi);
-        canvas.translate(0, ratio);
-        canvas.save();
-        canvas.rotate((m.pi/2) - _apparentBearing);
-        icon = Icons.backspace_outlined;
-        tp.text = TextSpan(text: String.fromCharCode(icon.codePoint),
-            style: TextStyle(fontSize: 30,
-                fontFamily: icon.fontFamily,
-                color: currentColor));
-        tp.layout();
-        tp.paint(canvas, Offset(-tp.size.width / 2, -tp.size.height / 2));
-        canvas.drawLine(Offset.zero, Offset(-size, 0), paint);
-        canvas.restore();
-        if(_windAngleApparent != null) {
-          paint.color = Colors.blue;
-          canvas.rotate((m.pi/2) + _windAngleApparent! - _apparentBearing);
-          canvas.drawLine(Offset.zero, Offset(-size/2, 0), paint);
-        }
-        canvas.restore();
-      }
-
-      if(_anchorPosition != null && _maxRadius != null) {
-        paint.color = Colors.blue;
-        for(ll.LatLng p in _positions) {
-          double d = const ll.Distance().distance(_anchorPosition!, p);
-          double b = deg2Rad(const ll.Distance().bearing(_anchorPosition!, p).toInt());
-          canvas.save();
-          canvas.translate(size, size);
-          canvas.rotate(b - m.pi);
-          canvas.translate(0, d / (_maxRadius!) * size);
-          canvas.drawCircle(Offset.zero, 1, paint);
-          canvas.restore();
-        }
-      }
-
-      // We render the circle sizes last so that they're always readable.
-      if(_maxRadius != null) {
-        tp.text = TextSpan(text: _maxRadius.toString(), style: th.copyWith(backgroundColor: maxColor));
-        tp.layout();
-        tp.paint(canvas, Offset((size*2)-tp.size.width, size-tp.size.height/2));
-      }
-
-      tp.text = TextSpan(text: _currentRadius.toString(), style: th.copyWith(backgroundColor: currentColor));
+      tp.text = TextSpan(text: (_currentRadius??0).round().toString(), style: th);
       tp.layout();
-      tp.paint(canvas, Offset(size-ratio, size-tp.size.height/2));
+      currentTextWidth = tp.width;
+
     } finally {
       tp.dispose();
     }
-  }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+    var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition, _newMaxRadius??_maxRadius!, 90);
+    var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition, _currentRadius!, 270);
+
+    return FlutterMap(
+      mapController: _controller,
+      options: MapOptions(
+        keepAlive: true,
+        backgroundColor: bgColor,
+        initialCenter: _anchorPosition,
+        initialZoom: _zoom,
+        interactionOptions: InteractionOptions(
+          flags: InteractiveFlag.none
+        )
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+          userAgentPackageName: 'name.seeley.phil.boatinstrument',// TODO need this provided by user
+        ),
+        CircleLayer(circles: [
+          if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_currentRadius != null) CircleMarker(point: _anchorPosition, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+        ]),
+        PolylineLayer(polylines: [
+          if(_positions.isNotEmpty) Polyline(points: _positions, color: _currentColor),
+          if(_position != null && _currentRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!, rad2Deg(_headingTrue))]),
+          if(_position != null && _currentRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
+        ]),
+        MarkerLayer(markers: [
+          Marker(point: _anchorPosition, child: Icon(Icons.anchor, color: _currentColor)),
+          if(_position != null) Marker(point: _position!, child: Transform.rotate(angle: (_headingTrue??0)+m.pi/2, child: Icon(_headingTrue == null?Icons.disabled_by_default_outlined:Icons.backspace_outlined, color: _currentColor))),
+          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor),)),
+          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor),))
+        ])
+      ],
+    );
+  }
 }
 
 class AnchorAlarmBox extends BoxWidget {
@@ -144,18 +126,22 @@ class AnchorAlarmBox extends BoxWidget {
 }
 
 class _AnchorState extends State<AnchorAlarmBox> {
+  static const double _initialZoom = 18;
   late final _AnchorAlarmSettings _settings;
+  ll.LatLng? _position;
   ll.LatLng? _anchorPosition;
+  ll.LatLng? _newAnchorPosition;
+  double? _headingTrue;
   double? _windAngleApparent;
-  int? _maxRadius;
-  int? _currentRadius;
-  double? _bearingTrue;
-  double? _apparentBearing;
+  double? _maxRadius;
+  double? _newMaxRadius;
+  double? _currentRadius;
   bool _unlocked = false;
-  Offset _startDragOffset = Offset.zero;
   Timer? _lockTimer;
   static final List<ll.LatLng> _positions = [];
   late DateTime _lastPositionTime;
+  static double _zoom = _initialZoom;
+  _Map? _map;
 
   @override
   void initState() {
@@ -165,8 +151,11 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {
       'navigation.position',
+      'navigation.headingTrue',
       'environment.wind.angleApparent',
-      'navigation.anchor.*'
+      'navigation.anchor.position',
+      'navigation.anchor.maxRadius',
+      'navigation.anchor.currentRadius'
     });
   }
 
@@ -175,19 +164,36 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _lockTimer?.cancel();
     super.dispose();
   }
-  
+
+  void _zoomIn() {
+    setState(() {
+      _zoom += 0.5;
+    });
+  }
+
+  void _zoomOut() {
+    setState(() {
+      _zoom -= 0.5;
+    });
+  }
+
+  void _resetZoom() {
+    setState(() {
+      _zoom = _initialZoom;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if(widget.config.editMode) {
-      _maxRadius = 100;
-      _currentRadius = 80;
-      _bearingTrue = deg2Rad(45);
-      _apparentBearing = deg2Rad(45);
-      _windAngleApparent = deg2Rad(45);
-    }
+    var fg = Theme.of(context).colorScheme.onSurface;
+    var bg = Theme.of(context).colorScheme.surface;
+    var dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
+    var raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
 
-    Color dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
-    Color raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
+    _map = null;
+    if(_anchorPosition != null) {
+      _map = _Map(_zoom, _position, _anchorPosition!, _newAnchorPosition, _currentRadius, dropColor, _maxRadius, _newMaxRadius, raiseColor, _headingTrue, _windAngleApparent, _positions);
+    }
 
     return Padding(padding: const EdgeInsets.all(5), child: Column(children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -198,46 +204,59 @@ class _AnchorState extends State<AnchorAlarmBox> {
         IconButton(onPressed: _maxRadius == null ? null : () {_changeRadius(5);}, icon: Icon(Icons.add, color: dropColor)),
         IconButton(onPressed: _unlocked ? _raise : null, icon: Stack(children: [Icon(Icons.anchor, color: raiseColor), Icon(Icons.close, color: raiseColor)])),
       ]),
-      if(_currentRadius != null)
-        Expanded(child: GestureDetector(onPanDown: _unlocked ? _startDrag : null, onPanEnd: _unlocked ? _stopDrag : null,
-          child: ClipRect(
-            child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
-              painter: _AnchorPainter(
-                widget.config.controller,
-                context,
-                _maxRadius,
-                _currentRadius!,
-                _bearingTrue,
-                _apparentBearing??0,
-                _anchorPosition,
-                _windAngleApparent,
-                _positions
-              )
-            ))
-          )
-        ))
+      Expanded(child: Stack(children: [
+        if(_anchorPosition != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
+        Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
+            IconButton.filled(onPressed: _zoomIn, icon: Icon(Icons.add), style: IconButton.styleFrom(backgroundColor: fg, foregroundColor: bg)),
+            IconButton.filled(onPressed: _zoomOut, icon: Icon(Icons.remove), style: IconButton.styleFrom(backgroundColor: fg, foregroundColor: bg))
+        ])),
+        Positioned(bottom: pad, left: pad, child: IconButton.filled(onPressed: _resetZoom, icon: Icon(Icons.all_out), style: IconButton.styleFrom(backgroundColor: fg, foregroundColor: bg)),),
+      ]))
     ]));
   }
 
-  void _startDrag(DragDownDetails details) {
-    _setLockTimer();
-    _startDragOffset = details.localPosition;
+  void _panStart(DragStartDetails d) {
+    var size = _map!._controller.camera.size;
+    var box = Rect.fromCircle(center: Offset(size.width/2, size.height/2), radius: 30);
+
+    if(box.contains(d.localPosition)) {
+      setState(() {
+        _newAnchorPosition = _map!.toLatLong(d.localPosition);
+      });
+    } else if(_maxRadius != null) {
+      var maxRadiusPos = _map!.toOffset(ll.Distance().offset(_anchorPosition!, _maxRadius!, 90));
+      box = Rect.fromCircle(center: maxRadiusPos, radius: 30);
+      if(box.contains(d.localPosition)) {
+        setState(() {
+          _newMaxRadius = ll.Distance().distance(_anchorPosition!, _map!.toLatLong(d.localPosition));
+        });
+      }
+    }
   }
 
-  void _stopDrag(DragEndDetails details) {
-    _setLockTimer();
-    Offset diff = details.localPosition - _startDragOffset;
-    double size = m.min(widget.config.constraints.maxWidth,
-        widget.config.constraints.maxHeight) / 2;
+  void _panUpdate(DragUpdateDetails d) {
+    if(_newAnchorPosition != null) {
+      setState(() {
+        _newAnchorPosition = _map!.toLatLong(d.localPosition);
+      });
+    }
+    if(_newMaxRadius != null) {
+        setState(() {
+          _newMaxRadius = ll.Distance().distance(_anchorPosition!, _map!.toLatLong(d.localPosition));
+        });
+    }
+  }
 
-    double ratio = (_maxRadius??_currentRadius!) / size;
-
-    ll.LatLng newPosition = const ll.Distance().offset(
-        _anchorPosition!, diff.distance * ratio,
-        rad2Deg(diff.direction + (m.pi / 2)));
-
-    _sendCommand('setAnchorPosition',
-        '{"position": {"latitude": ${newPosition.latitude}, "longitude": ${newPosition.longitude}}}');
+  void _panEnd(DragEndDetails d) {
+    if(_newAnchorPosition != null) {
+      _sendCommand('setAnchorPosition',
+          '{"position": {"latitude": ${_newAnchorPosition!.latitude}, "longitude": ${_newAnchorPosition!.longitude}}}');
+      _newAnchorPosition = null;
+    }
+    if(_newMaxRadius != null) {
+      _resizeMaxRadius(_newMaxRadius!);
+      _newMaxRadius = null;
+    }
   }
 
   void _toggleLocked () {
@@ -268,12 +287,14 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _sendCommand('setRadius', '');
   }
 
-  void _changeRadius(int amount) {
-    int newMaxRadius = _maxRadius!+amount;
-
-    if(newMaxRadius > _currentRadius! || amount > 0) {
-      _sendCommand('setRadius', '{"radius": $newMaxRadius}');
+  void _resizeMaxRadius(double newMaxRadius) {
+    if(newMaxRadius > _currentRadius!) {
+      _sendCommand('setRadius', '{"radius": ${newMaxRadius.round()}}');
     }
+  }
+
+  void _changeRadius(int amount) {
+    _resizeMaxRadius(_maxRadius!+amount);
   }
 
   void _raise() async {
@@ -318,20 +339,26 @@ class _AnchorState extends State<AnchorAlarmBox> {
       try {
         switch (u.path) {
           case 'navigation.position':
-            if(u.value != null) {
+            if(u.value == null) {
+              _position = null;
+            } else {
+              _position = ll.LatLng(
+                    (u.value['latitude'] as num).toDouble(),
+                    (u.value['longitude'] as num).toDouble());
+
               DateTime now = widget.config.controller.now();
               if(now.difference(_lastPositionTime) >= Duration(seconds: _settings.recordSeconds)) {
                 _lastPositionTime = now;
-
-                _positions.add(ll.LatLng(
-                    (u.value['latitude'] as num).toDouble(),
-                    (u.value['longitude'] as num).toDouble()));
+                _positions.add(_position!);
 
                 if (_positions.length > _settings.recordPoints) {
                   _positions.removeRange(0, _settings.recordPoints ~/ 10);
                 }
               }
             }
+            break;
+          case 'navigation.headingTrue':
+            _headingTrue = (u.value == null) ? null : (u.value as num).toDouble();
             break;
           case 'environment.wind.angleApparent':
             if(u.value == null) {
@@ -350,10 +377,10 @@ class _AnchorState extends State<AnchorAlarmBox> {
                 _maxRadius = null;
               } else {
                 try {
-                  _maxRadius = (u.value as num).round();
+                  _maxRadius = (u.value as num).toDouble();
                 } catch (_){
                   // This only happens if the Anchor Alarm webapp is used.
-                  _maxRadius = int.parse(u.value as String);
+                  _maxRadius = double.parse(u.value as String);
                 }
               }
             break;
@@ -361,16 +388,10 @@ class _AnchorState extends State<AnchorAlarmBox> {
             if(u.value == null) {
               _currentRadius = null;
             } else {
-              _currentRadius = (u.value as num).round();
+              _currentRadius = (u.value as num).toDouble();
               // Make sure we have a radius to avoid div-by-zero error.
               _currentRadius = _currentRadius == 0 ? 1 : _currentRadius;
             }
-            break;
-          case 'navigation.anchor.bearingTrue':
-            _bearingTrue = (u.value == null) ? null : (u.value as num).toDouble()-m.pi;
-            break;
-          case 'navigation.anchor.apparentBearing':
-            _apparentBearing = (u.value == null) ? null : (u.value as num).toDouble();
             break;
         }
       } catch (e) {
