@@ -1,6 +1,6 @@
 # Application Pages
 
-The Boat Instrument shows a number of Pages and swiping left/right moves between them. If **Quick Page Switch** is enabled, then Double Tapping presents the list of Pages for direct selection.
+The Boat Instrument shows a number of Pages and swiping left/right moves between them. If **Quick Page Switch** is enabled, then **Double Tapping** presents the list of Pages for direct selection.
 
 Swiping down reveals additional options:
 
