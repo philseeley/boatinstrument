@@ -12,18 +12,28 @@ import '../boatinstrument_controller.dart';
 
 part 'anchor_box.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class _AnchorAlarmSettings {
   int recordSeconds;
   int recordPoints;
+  double zoomIncrement;
+  SignalkChart signalkChart;
 
   _AnchorAlarmSettings({
     this.recordSeconds = 10,
-    this.recordPoints = 1000
+    this.recordPoints = 1000,
+    this.zoomIncrement = 0.5,
+    this.signalkChart = const SignalkChart()
   });
+
+  factory _AnchorAlarmSettings.fromJson(Map<String, dynamic> json) => _$AnchorAlarmSettingsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AnchorAlarmSettingsToJson(this);
 }
 
 class _Map extends StatelessWidget {
+  final BoatInstrumentController _controller;
+  final SignalkChart _signalkChart;
   final double _zoom;
   final ll.LatLng? _position;
   final ll.LatLng _anchorPosition;
@@ -37,12 +47,27 @@ class _Map extends StatelessWidget {
   final double? _windAngleApparent;
   final List<ll.LatLng> _positions;
 
-  final MapController _controller = MapController();
+  final MapController _mapController = MapController();
 
-  ll.LatLng toLatLong(Offset offset) => _controller.camera.screenOffsetToLatLng(offset);
-  Offset toOffset(ll.LatLng latLong) => _controller.camera.latLngToScreenOffset(latLong);
+  ll.LatLng toLatLong(Offset offset) => _mapController.camera.screenOffsetToLatLng(offset);
+  Offset toOffset(ll.LatLng latLong) => _mapController.camera.latLngToScreenOffset(latLong);
 
-  _Map(this._zoom, this._position, this._anchorPosition, this._newAnchorPosition, this._currentRadius, this._currentColor, this._maxRadius, this._newMaxRadius, this._maxColor, this._headingTrue, this._windAngleApparent, this._positions);
+  _Map(
+    this._controller,
+    this._signalkChart,
+    this._zoom,
+    this._position,
+    this._anchorPosition,
+    this._newAnchorPosition,
+    this._currentRadius,
+    this._currentColor,
+    this._maxRadius,
+    this._newMaxRadius,
+    this._maxColor,
+    this._headingTrue,
+    this._windAngleApparent,
+    this._positions
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +92,19 @@ class _Map extends StatelessWidget {
     var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition, _newMaxRadius??_maxRadius!, 90);
     var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition, _currentRadius!, 270);
 
+    String url = '';
+    if(_signalkChart.url.isNotEmpty) {
+      if(_signalkChart.proxy) {
+        // We don't use the Uri.replace() method as this performs URL encoding,
+        // e.g. replaces'{' with '%7B', which the server doesn't like.
+        url = '${_controller.httpApiUri.origin}${_signalkChart.url}';
+      } else {
+        url = _signalkChart.url;
+      }
+    }
+
     return FlutterMap(
-      mapController: _controller,
+      mapController: _mapController,
       options: MapOptions(
         keepAlive: true,
         backgroundColor: bgColor,
@@ -79,10 +115,7 @@ class _Map extends StatelessWidget {
         )
       ),
       children: [
-        TileLayer(
-          urlTemplate: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-          userAgentPackageName: 'name.seeley.phil.boatinstrument',// TODO need this provided by user
-        ),
+        if(url.isNotEmpty) TileLayer(urlTemplate: url),
         CircleLayer(circles: [
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_currentRadius != null) CircleMarker(point: _anchorPosition, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
@@ -115,7 +148,7 @@ class AnchorAlarmBox extends BoxWidget {
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
-    return _AnchorAlarmSettingsWidget(_$AnchorAlarmSettingsFromJson(json));
+    return _AnchorAlarmSettingsWidget(config.controller, _$AnchorAlarmSettingsFromJson(json));
   }
 
   @override
@@ -126,7 +159,6 @@ class AnchorAlarmBox extends BoxWidget {
 }
 
 class _AnchorState extends State<AnchorAlarmBox> {
-  static const double _initialZoom = 18;
   late final _AnchorAlarmSettings _settings;
   ll.LatLng? _position;
   ll.LatLng? _anchorPosition;
@@ -140,7 +172,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   Timer? _lockTimer;
   static final List<ll.LatLng> _positions = [];
   late DateTime _lastPositionTime;
-  static double _zoom = _initialZoom;
+  static double _zoom = 19;
   _Map? _map;
 
   @override
@@ -148,7 +180,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     super.initState();
     _lastPositionTime = widget.config.controller.now();
 
-    _settings = _$AnchorAlarmSettingsFromJson(widget.config.controller.getBoxSettingsJson(widget.id));
+    _settings = _AnchorAlarmSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {
       'navigation.position',
       'navigation.headingTrue',
@@ -166,19 +198,21 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _zoomIn() {
+    if(widget.config.editMode) return;
     setState(() {
-      _zoom += 0.5;
+      _zoom += _settings.zoomIncrement;;
     });
   }
 
   void _zoomOut() {
+    if(widget.config.editMode) return;
     setState(() {
-      _zoom -= 0.5;
+      _zoom -= _settings.zoomIncrement;
     });
   }
 
   void _resetZoom() {
-    if(_currentRadius == null) return;
+    if(widget.config.editMode || _currentRadius == null) return;
 
     double max = m.max(_maxRadius??_currentRadius!, _currentRadius!);
     double h = m.sqrt(max*max*2);
@@ -187,7 +221,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       ll.Distance().offset(_anchorPosition!, h, 315),
     ]);
 
-    var camera = cameraFit.fit(_map!._controller.camera);
+    var camera = cameraFit.fit(_map!._mapController.camera);
 
     setState(() {
       _zoom = camera.zoom;
@@ -200,9 +234,35 @@ class _AnchorState extends State<AnchorAlarmBox> {
     var dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
     var raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
 
+    var zoom = _zoom;
+    if(widget.config.editMode) {
+      _position = ll.LatLng(50.61795, -2.246792);
+      _anchorPosition = ll.LatLng(50.618210, -2.246792);
+      _maxRadius = 45;
+      _currentRadius = 30;
+      _headingTrue = deg2Rad(45);
+      _windAngleApparent = deg2Rad(-30);
+      zoom = 17.5;
+    }
+
     _map = null;
     if(_anchorPosition != null) {
-      _map = _Map(_zoom, _position, _anchorPosition!, _newAnchorPosition, _currentRadius, dropColor, _maxRadius, _newMaxRadius, raiseColor, _headingTrue, _windAngleApparent, _positions);
+      _map = _Map(
+        widget.config.controller,
+        _settings.signalkChart,
+        zoom,
+        _position,
+        _anchorPosition!,
+        _newAnchorPosition,
+        _currentRadius,
+        dropColor,
+        _maxRadius,
+        _newMaxRadius,
+        raiseColor,
+        _headingTrue,
+        _windAngleApparent,
+        _positions
+      );
     }
 
     return Padding(padding: const EdgeInsets.all(5), child: Column(children: [
@@ -217,8 +277,8 @@ class _AnchorState extends State<AnchorAlarmBox> {
           _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
         ])),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
-            _button(_resetZoom, bg, iconData: Icons.all_out),
             _button(_zoomIn, bg, iconData: Icons.add),
+            _button(_resetZoom, bg, iconData: Icons.all_out),
             _button(_zoomOut, bg, iconData: Icons.remove)
         ])),
       ]))
@@ -240,7 +300,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         return;
       }
     }
-    var size = _map!._controller.camera.size;
+    var size = _map!._mapController.camera.size;
     var box = Rect.fromCircle(center: Offset(size.width/2, size.height/2), radius: 30);
     if(box.contains(d.localPosition)) {
       setState(() {
@@ -275,6 +335,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _toggleLocked () {
+    if(widget.config.editMode) return;
     setState(() {
       _unlocked = !_unlocked;
     });
@@ -323,9 +384,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   Future<void> _sendCommand(String path, String params) async {
-    if(widget.config.editMode) {
-      return;
-    }
+    if(widget.config.editMode) return;
 
     try {
       Uri uri = widget.config.controller.httpApiUri.replace(
@@ -422,16 +481,17 @@ class _AnchorState extends State<AnchorAlarmBox> {
 }
 
 class _AnchorAlarmSettingsWidget extends BoxSettingsWidget {
+  final BoatInstrumentController _controller;
   final _AnchorAlarmSettings _settings;
 
-  const _AnchorAlarmSettingsWidget(this._settings);
+  const _AnchorAlarmSettingsWidget(this._controller, this._settings);
 
   @override
   createState() => _AnchorAlarmSettingsState();
 
   @override
   Map<String, dynamic> getSettingsJson() {
-    return _$AnchorAlarmSettingsToJson(_settings);
+    return _settings.toJson();
   }
 }
 
@@ -474,6 +534,28 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
       ListTile(
         title: Text('Records for ${(s.recordSeconds*s.recordPoints/60/60).toStringAsFixed(2)} hours'),
       ),
+      ListTile(
+        leading: const Text("Zoom Increment:"),
+        title: Slider(
+            min: 0.25,
+            max: 2,
+            divisions: 7,
+            value: s.zoomIncrement.toDouble(),
+            label: "${s.zoomIncrement}",
+            onChanged: (double value) {
+              setState(() {
+                s.zoomIncrement = value;
+              });
+            }),
+      ),
+      ListTile(
+        leading: const Text("SignalK Chart:"),
+        title: SignalkChartsDropdownMenu(
+          widget._controller,
+          s.signalkChart,
+          (value) {s.signalkChart = value;}
+        )
+      )
     ];
 
     return ListView(children: list);
