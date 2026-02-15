@@ -268,6 +268,123 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
   }
 }
 
+@JsonSerializable()
+class SignalkChart {
+  final String identifier;
+  final String name;
+  final String description;
+  final bool proxy;
+  final String url;
+  
+  const SignalkChart({
+    this.identifier = '',
+    this.name = '',
+    this.description = '',
+    // Local SignalK charts do not return the proxy flag, so if it's not set
+    // we assume it's served by the SignalK server the same as proxied charts.
+    this.proxy = true,
+    this.url = ''
+  });
+
+  factory SignalkChart.fromJson(Map<String, dynamic> json) => _$SignalkChartFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SignalkChartToJson(this);
+
+  @override
+  bool operator==(other) => identifier == (other as SignalkChart).identifier;
+  
+  @override
+  int get hashCode => identifier.hashCode;
+  
+}
+
+class SignalkChartsDropdownMenu extends StatefulWidget {
+  final BoatInstrumentController _controller;
+  final SignalkChart _initialValue;
+  final ValueChanged<SignalkChart> _onSelected;
+
+  const SignalkChartsDropdownMenu(this._controller, this._initialValue, this._onSelected, {super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SignalkChartsDropdownMenuState();
+}
+
+class _SignalkChartsDropdownMenuState extends State<SignalkChartsDropdownMenu> {
+  List<SignalkChart> _values = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getCharts();
+  }
+
+  void getCharts() async {
+    Uri uri = widget._controller.httpApiUri;
+
+    try {
+      // Charts use the v2 API, but the server hello only publishes the v1 endpoints.
+      List<String> ps = [...uri.pathSegments]
+        ..removeLast()
+        ..removeLast()
+        ..removeLast()
+        ..addAll(['v2', 'api', 'resources', 'charts']);
+
+      uri = uri.replace(pathSegments: ps);
+
+      http.Response response = await widget._controller.httpGet(
+          uri,
+          headers: {
+            "accept": "application/json",
+          },
+      );
+
+      if(response.statusCode == HttpStatus.ok) {
+        Map<String, dynamic> data = json.decode(response.body);
+
+        setState(() {
+          _values.add(SignalkChart(description: 'None'));
+          for(dynamic d in data.values) {
+            _values.add(_$SignalkChartFromJson(d));
+          }
+        });
+      } else {
+        widget._controller.l.e('Got bad status "${response.statusCode}-${response.reasonPhrase}" retrieving charts');
+        setState(() {
+          _values.add(SignalkChart(description: 'Failed to retrieve Charts'));
+        });
+      }
+    } catch (e) {
+      widget._controller.l.e('Failed to retrieve charts', error: e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(_values.isEmpty) {
+      return const Text('Waiting for SignalK...');
+    }
+
+    SignalkChart iv = widget._initialValue;
+    if(widget._initialValue.identifier.isEmpty) {
+       iv = _values.firstOrNull??SignalkChart();
+       widget._onSelected(iv);
+    }
+
+    return DropdownMenu<SignalkChart>(
+      expandedInsets: EdgeInsets.zero,
+      enableSearch: false,
+      initialSelection: iv,
+      dropdownMenuEntries: _values.map<DropdownMenuEntry<SignalkChart>>((SignalkChart v) {return DropdownMenuEntry<SignalkChart>(
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+          value: v,
+          label: v.description);}).toList(),
+      onSelected: (value) {
+        widget._onSelected(value??SignalkChart());
+      },
+    );
+  }
+}
+
 abstract class EnumMenuEntry {
   String get displayName;
 }

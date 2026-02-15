@@ -72,6 +72,7 @@ dependencies:
   media_kit:
   media_kit_video:
   media_kit_libs_video:
+  flutter_map:
 #  great_circle_distance_calculator:
   actions_menu_appbar:
     path: ../actions_menu_appbar

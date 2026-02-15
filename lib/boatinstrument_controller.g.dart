@@ -6,6 +6,23 @@ part of 'boatinstrument_controller.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+SignalkChart _$SignalkChartFromJson(Map<String, dynamic> json) => SignalkChart(
+  identifier: json['identifier'] as String? ?? '',
+  name: json['name'] as String? ?? '',
+  description: json['description'] as String? ?? '',
+  proxy: json['proxy'] as bool? ?? true,
+  url: json['url'] as String? ?? '',
+);
+
+Map<String, dynamic> _$SignalkChartToJson(SignalkChart instance) =>
+    <String, dynamic>{
+      'identifier': instance.identifier,
+      'name': instance.name,
+      'description': instance.description,
+      'proxy': instance.proxy,
+      'url': instance.url,
+    };
+
 _Box _$BoxFromJson(Map<String, dynamic> json) => _Box(
   json['id'] as String,
   json['settings'] as Map<String, dynamic>,

@@ -242,8 +242,8 @@ class _PerBoxSettingsState extends State<_PerBoxSettingsWidget> {
 class _TimerDisplaySettings {
   String id;
   NotificationState notificationState;
-   bool allowRestart;
-   bool allowStop;
+  bool allowRestart;
+  bool allowStop;
 
   _TimerDisplaySettings({
     this.id = '',

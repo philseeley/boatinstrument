@@ -1327,5 +1327,4 @@ class BoatInstrumentController {
 
     _settings?.boxSettings[boxWidget.id] = boxSettingsWidget.getSettingsJson();
   }
-
 }
