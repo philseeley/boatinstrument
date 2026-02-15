@@ -126,7 +126,7 @@ class _Map extends StatelessWidget {
           if(_position != null && _currentRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
-          Marker(point: _anchorPosition, child: Icon(Icons.anchor, color: _currentColor)),
+          Marker(point: _newAnchorPosition??_anchorPosition, child: Icon(Icons.anchor, color: _currentColor)),
           if(_position != null) Marker(point: _position!, child: Transform.rotate(angle: (_headingTrue??0)+m.pi/2, child: Icon(_headingTrue == null?Icons.disabled_by_default_outlined:Icons.backspace_outlined, color: _currentColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
           if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
