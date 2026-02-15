@@ -1,3 +1,10 @@
+  * 0.10.0 Double Tapping, if "Quick Page Switch" enabled, show a menu of pages.
+
+           New Boxes:
+             Webcam(ONVIF)
+
+           Box updates:
+             AnchorAlarmBox: reworked to show Charts/Maps.
   * 0.9.0 When adding HTTP headers, we now make sure the names are not blank
             as that causes connection errors.
           The Autopilot Boxes now recognise an HTTP 202 (Accepted) as a good status.
