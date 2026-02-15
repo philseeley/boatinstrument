@@ -93,13 +93,13 @@ class _Map extends StatelessWidget {
     var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition, _currentRadius!, 270);
 
     String url = '';
-    if(_signalkChart.url.isNotEmpty) {
+    if(_signalkChart.tilemapUrl.isNotEmpty) {
       if(_signalkChart.proxy) {
         // We don't use the Uri.replace() method as this performs URL encoding,
         // e.g. replaces'{' with '%7B', which the server doesn't like.
-        url = '${_controller.httpApiUri.origin}${_signalkChart.url}';
+        url = '${_controller.httpApiUri.origin}${_signalkChart.tilemapUrl}';
       } else {
-        url = _signalkChart.url;
+        url = _signalkChart.tilemapUrl;
       }
     }
 
@@ -159,6 +159,8 @@ class AnchorAlarmBox extends BoxWidget {
 }
 
 class _AnchorState extends State<AnchorAlarmBox> {
+  static const int _radiusIncrement = 5;
+
   late final _AnchorAlarmSettings _settings;
   ll.LatLng? _position;
   ll.LatLng? _anchorPosition;
@@ -265,15 +267,15 @@ class _AnchorState extends State<AnchorAlarmBox> {
       );
     }
 
-    return Padding(padding: const EdgeInsets.all(5), child: Column(children: [
+    return Padding(padding: const EdgeInsets.all(pad), child: Column(children: [
       Expanded(child: Stack(children: [
         if(_map != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
         Positioned(top: pad, left: pad, right: pad, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           _button(_map==null?null:_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
           _button(_maxRadius==null?_drop:null, dropColor, iconData: Icons.anchor),
           _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
-          _button(_maxRadius==null?null:() {_changeMaxRadius(-5);}, dropColor, iconData: Icons.remove),
-          _button(_maxRadius==null?null:() {_changeMaxRadius(5);}, dropColor, iconData: Icons.add),
+          _button(_maxRadius==null?null:() {_changeMaxRadius(-_radiusIncrement);}, dropColor, iconData: Icons.remove),
+          _button(_maxRadius==null?null:() {_changeMaxRadius(_radiusIncrement);}, dropColor, iconData: Icons.add),
           _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
         ])),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
@@ -364,7 +366,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _resizeMaxRadius(double newMaxRadius) {
-    if(newMaxRadius < _currentRadius!) newMaxRadius = _currentRadius!+5;
+    if(newMaxRadius < _currentRadius!) newMaxRadius = _currentRadius!+_radiusIncrement;
 
     _sendCommand('setRadius', '{"radius": ${newMaxRadius.round()}}');
   }

@@ -11,7 +11,7 @@ SignalkChart _$SignalkChartFromJson(Map<String, dynamic> json) => SignalkChart(
   name: json['name'] as String? ?? '',
   description: json['description'] as String? ?? '',
   proxy: json['proxy'] as bool? ?? true,
-  url: json['url'] as String? ?? '',
+  tilemapUrl: json['tilemapUrl'] as String? ?? '',
 );
 
 Map<String, dynamic> _$SignalkChartToJson(SignalkChart instance) =>
@@ -20,7 +20,7 @@ Map<String, dynamic> _$SignalkChartToJson(SignalkChart instance) =>
       'name': instance.name,
       'description': instance.description,
       'proxy': instance.proxy,
-      'url': instance.url,
+      'tilemapUrl': instance.tilemapUrl,
     };
 
 _Box _$BoxFromJson(Map<String, dynamic> json) => _Box(

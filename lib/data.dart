@@ -274,7 +274,7 @@ class SignalkChart {
   final String name;
   final String description;
   final bool proxy;
-  final String url;
+  final String tilemapUrl;
   
   const SignalkChart({
     this.identifier = '',
@@ -283,7 +283,7 @@ class SignalkChart {
     // Local SignalK charts do not return the proxy flag, so if it's not set
     // we assume it's served by the SignalK server the same as proxied charts.
     this.proxy = true,
-    this.url = ''
+    this.tilemapUrl = ''
   });
 
   factory SignalkChart.fromJson(Map<String, dynamic> json) => _$SignalkChartFromJson(json);
@@ -322,14 +322,11 @@ class _SignalkChartsDropdownMenuState extends State<SignalkChartsDropdownMenu> {
     Uri uri = widget._controller.httpApiUri;
 
     try {
-      // Charts use the v2 API, but the server hello only publishes the v1 endpoints.
       List<String> ps = [...uri.pathSegments]
         ..removeLast()
-        ..removeLast()
-        ..removeLast()
-        ..addAll(['v2', 'api', 'resources', 'charts']);
+        ..addAll(['resources', 'charts']);
 
-      uri = uri.replace(pathSegments: ps);
+      uri = uri.replace(pathSegments: ps);print(uri);
 
       http.Response response = await widget._controller.httpGet(
           uri,
