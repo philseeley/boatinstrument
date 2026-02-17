@@ -663,10 +663,11 @@ class BoxDetails {
   final bool gauge;
   final bool graph;
   final bool experimental;
+  bool deprecated;
   final BoxWidget Function(BoxWidgetConfig config) build;
   final void Function(BoatInstrumentController controller)? background;
 
-  BoxDetails(this.id, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.background});
+  BoxDetails(this.id, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.deprecated = false, this.background});
 }
 
 BoxDetails getBoxDetails(String id) {

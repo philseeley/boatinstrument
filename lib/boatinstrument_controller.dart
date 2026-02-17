@@ -531,7 +531,17 @@ class BoatInstrumentController {
                   // return Stack(children: stack);
                   // ============= PATH MAPPING =============
 
-                  return getBoxDetails(box.id).build(BoxWidgetConfig(this, box.settings, constraints, false));
+                  var bd = getBoxDetails(box.id);
+
+                  if(bd.deprecated) {
+                    bd.deprecated = false;
+                    return Stack(children: [
+                      bd.build(BoxWidgetConfig(this, box.settings, constraints, false)),
+                      Center(child: MaxTextWidget('Deprecated', color: Colors.red, textBgColor: Theme.of(context).colorScheme.onSurface))
+                    ]);
+                  } else {
+                    return bd.build(BoxWidgetConfig(this, box.settings, constraints, false));
+                  }
                 }))));
       }
       return Row(children: widgets);

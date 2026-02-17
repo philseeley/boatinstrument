@@ -42,7 +42,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AutopilotReefingControlBox.sid, experimental: true, (config) {return AutopilotReefingControlBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlHorizontalBox.sid, (config) {return AutopilotHeadingControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlVerticalBox.sid, (config) {return AutopilotHeadingControlVerticalBox(config, key: UniqueKey());}),
-  BoxDetails(WebViewBox.sid, experimental: true, (config) {return WebViewBox(config, key: UniqueKey());}),
+  BoxDetails(WebViewBox.sid, experimental: true, deprecated: true, (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, gauge: true, (config) {return RudderAngleBox(config, key: UniqueKey());}),
   BoxDetails(CustomTextBox.sid, (config) {return CustomTextBox(config, key: UniqueKey());}),
   BoxDetails(CustomDoubleValueBox.sid, (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
@@ -141,6 +141,9 @@ class _EditPageState extends State<_EditPage> {
     }
     if(bd.experimental) {
       c.add(const Icon(Icons.science_outlined));
+    }
+    if(bd.deprecated) {
+      c.add(const Icon(Icons.block));
     }
 
     return PopupMenuItem<BoxDetails>(enabled: !bd.experimental || widget._controller.enableExperimentalBoxes, height: 0, value: bd, child: Row(children: c));
