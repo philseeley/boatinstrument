@@ -212,7 +212,7 @@ class ONVIFDisplayBox extends ONVIFBox {
 
 class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
   late final _player = media.Player();
-  late final _controller = video.VideoController(_player);
+  late final _videoController = video.VideoController(_player);
 
   @override
   void dispose() {
@@ -228,6 +228,7 @@ class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
 
   @override
   Widget build(BuildContext context) {
+    var bg = Theme.of(context).colorScheme.surface;
     bool connected = _profileToken != null;
     if(connected) _connectVideoStream();
 
@@ -237,7 +238,7 @@ class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
       body = _configWidget;
     } else if(widget._onvifConfig != null && _profileToken != null) {
       body = Stack(alignment: AlignmentGeometry.center, children: [
-        video.Video(controller: _controller, controls: null),
+        video.Video(controller: _videoController, controls: null, fill: bg),
         if(widget._perBoxSettings.showControls) Opacity(opacity: connected?0.5:1.0, child: _ptzControls())
     ]);
     }
