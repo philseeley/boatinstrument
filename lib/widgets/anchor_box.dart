@@ -121,7 +121,7 @@ class _Map extends StatelessWidget {
           if(_currentRadius != null) CircleMarker(point: _anchorPosition, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
-          if(_positions.isNotEmpty) Polyline(points: _positions, color: _currentColor),
+          if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
           if(_position != null && _currentRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!, rad2Deg(_headingTrue))]),
           if(_position != null && _currentRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
