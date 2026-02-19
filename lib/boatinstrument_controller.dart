@@ -167,6 +167,12 @@ class BoatInstrumentController {
 
   BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enablePoweroff, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
+
+    for(BoxDetails bd in boxDetails) {
+      if(bd.deprecated) {
+        if(_deprecatedRemovalDate(bd.deprecatedDate!).isBefore(DateTime.now())) throw Exception('Box ${bd.id} has passed its deprecation date');
+      }
+    }
   }
 
   bool get ready => _settings != null;
@@ -206,6 +212,8 @@ class BoatInstrumentController {
     if(_time != null) return _time!.add(now.difference(_timeReceived));
     return now;
   }
+
+  DateTime _deprecatedRemovalDate(DateTime deprecatedOn) => deprecatedOn.add(Duration(days: 30*7));
 
   Color val2PSColor(BuildContext context, num val, {Color? none}) {
     if(_settings!.portStarboardColors == PortStarboardColors.none) {
@@ -532,15 +540,20 @@ class BoatInstrumentController {
                   // ============= PATH MAPPING =============
 
                   var bd = getBoxDetails(box.id);
+                  var boxWidget = bd.build(BoxWidgetConfig(this, box.settings, constraints, false));
 
-                  if(bd.deprecated) {
-                    bd.deprecated = false;
+                  if(bd.deprecatedDate != null) {
+                    var removalDate = _deprecatedRemovalDate(bd.deprecatedDate!);
+                    bd.deprecatedDate = null; // We only display the statement once per-box after startup.
                     return Stack(children: [
-                      bd.build(BoxWidgetConfig(this, box.settings, constraints, false)),
-                      Center(child: MaxTextWidget('Deprecated', color: Colors.red, textBgColor: Theme.of(context).colorScheme.onSurface))
+                      boxWidget,
+                      Column(children: [
+                        Expanded(child: MaxTextWidget('Deprecated', color: Colors.red, textBgColor: Theme.of(context).colorScheme.onSurface)),
+                        Text('To be removed after ${DateFormat('MMMM yyyy').format(removalDate)}', style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Colors.red))
+                      ])
                     ]);
                   } else {
-                    return bd.build(BoxWidgetConfig(this, box.settings, constraints, false));
+                    return boxWidget;
                   }
                 }))));
       }

@@ -42,7 +42,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AutopilotReefingControlBox.sid, experimental: true, (config) {return AutopilotReefingControlBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlHorizontalBox.sid, (config) {return AutopilotHeadingControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlVerticalBox.sid, (config) {return AutopilotHeadingControlVerticalBox(config, key: UniqueKey());}),
-  BoxDetails(WebViewBox.sid, experimental: true, deprecated: true, (config) {return WebViewBox(config, key: UniqueKey());}),
+  BoxDetails(WebViewBox.sid, experimental: true, deprecatedDate: DateTime(2026, 02, 18), (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, gauge: true, (config) {return RudderAngleBox(config, key: UniqueKey());}),
   BoxDetails(CustomTextBox.sid, (config) {return CustomTextBox(config, key: UniqueKey());}),
   BoxDetails(CustomDoubleValueBox.sid, (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),

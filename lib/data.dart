@@ -310,7 +310,7 @@ class SignalkChartsDropdownMenu extends StatefulWidget {
 }
 
 class _SignalkChartsDropdownMenuState extends State<SignalkChartsDropdownMenu> {
-  List<SignalkChart> _values = [];
+  final List<SignalkChart> _values = [];
 
   @override
   void initState() {
@@ -326,7 +326,7 @@ class _SignalkChartsDropdownMenuState extends State<SignalkChartsDropdownMenu> {
         ..removeLast()
         ..addAll(['resources', 'charts']);
 
-      uri = uri.replace(pathSegments: ps);print(uri);
+      uri = uri.replace(pathSegments: ps);
 
       http.Response response = await widget._controller.httpGet(
           uri,
@@ -663,11 +663,12 @@ class BoxDetails {
   final bool gauge;
   final bool graph;
   final bool experimental;
-  bool deprecated;
+  DateTime? deprecatedDate;
+  final bool deprecated;
   final BoxWidget Function(BoxWidgetConfig config) build;
   final void Function(BoatInstrumentController controller)? background;
 
-  BoxDetails(this.id, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.deprecated = false, this.background});
+  BoxDetails(this.id, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.deprecatedDate, this.background}) : deprecated = deprecatedDate != null;
 }
 
 BoxDetails getBoxDetails(String id) {
