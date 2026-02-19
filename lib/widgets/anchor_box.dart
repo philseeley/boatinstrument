@@ -199,17 +199,10 @@ class _AnchorState extends State<AnchorAlarmBox> {
     super.dispose();
   }
 
-  void _zoomIn() {
+  void _changeZoom(int direction) {
     if(widget.config.editMode) return;
     setState(() {
-      _zoom += _settings.zoomIncrement;;
-    });
-  }
-
-  void _zoomOut() {
-    if(widget.config.editMode) return;
-    setState(() {
-      _zoom -= _settings.zoomIncrement;
+      _zoom += direction * _settings.zoomIncrement;
     });
   }
 
@@ -279,9 +272,9 @@ class _AnchorState extends State<AnchorAlarmBox> {
           _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
         ])),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
-            _button(_zoomIn, bg, iconData: Icons.add),
+            _button(() {_changeZoom(1);}, bg, iconData: Icons.add),
             _button(_resetZoom, bg, iconData: Icons.all_out),
-            _button(_zoomOut, bg, iconData: Icons.remove)
+            _button(() {_changeZoom(-1);}, bg, iconData: Icons.remove)
         ])),
       ]))
     ]));
