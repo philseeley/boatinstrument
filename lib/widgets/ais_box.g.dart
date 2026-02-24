@@ -8,9 +8,8 @@ part of 'ais_box.dart';
 
 _AISDisplaySettings _$AISDisplaySettingsFromJson(Map<String, dynamic> json) =>
     _AISDisplaySettings(
-      recordSeconds: (json['recordSeconds'] as num?)?.toInt() ?? 10,
-      recordPoints: (json['recordPoints'] as num?)?.toInt() ?? 1000,
-      zoomIncrement: (json['zoomIncrement'] as num?)?.toDouble() ?? 0.5,
+      showNames: json['showNames'] as bool? ?? true,
+      minutes: (json['minutes'] as num?)?.toDouble() ?? 5,
       signalkChart: json['signalkChart'] == null
           ? const SignalkChart()
           : SignalkChart.fromJson(json['signalkChart'] as Map<String, dynamic>),
@@ -18,8 +17,7 @@ _AISDisplaySettings _$AISDisplaySettingsFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$AISDisplaySettingsToJson(_AISDisplaySettings instance) =>
     <String, dynamic>{
-      'recordSeconds': instance.recordSeconds,
-      'recordPoints': instance.recordPoints,
-      'zoomIncrement': instance.zoomIncrement,
+      'showNames': instance.showNames,
+      'minutes': instance.minutes,
       'signalkChart': instance.signalkChart.toJson(),
     };

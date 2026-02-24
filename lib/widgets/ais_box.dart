@@ -13,15 +13,13 @@ part 'ais_box.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class _AISDisplaySettings {
-  int recordSeconds;
-  int recordPoints;
-  double zoomIncrement;
+  bool showNames;
+  double minutes;
   SignalkChart signalkChart;
 
   _AISDisplaySettings({
-    this.recordSeconds = 10,
-    this.recordPoints = 1000,
-    this.zoomIncrement = 0.5,
+    this.showNames = true,
+    this.minutes = 5,
     this.signalkChart = const SignalkChart()
   });
 
@@ -33,8 +31,8 @@ class _AISDisplaySettings {
 class _Vessel {
   String context;
   bool self;
-  String? name;
   ll.LatLng position;
+  String? name;
   double? headingTrue;
   double? cogTrue;
   double? sog;
@@ -42,12 +40,12 @@ class _Vessel {
   String? typeName;
   String? state;
 
-  _Vessel(this.context, this.self, this.position);
+  _Vessel(this.context, this.self, this.position, {this.name, this.cogTrue, this.sog});
 }
 
 class _Map extends StatelessWidget {
   final BoatInstrumentController _controller;
-  final SignalkChart _signalkChart;
+  final _AISDisplaySettings _settings;
   final double _zoom;
   final ll.LatLng _position;
   final Map<String, _Vessel> _vessels;
@@ -56,7 +54,7 @@ class _Map extends StatelessWidget {
 
   _Map(
     this._controller,
-    this._signalkChart,
+    this._settings,
     this._zoom,
     this._position,
     this._vessels
@@ -73,14 +71,15 @@ class _Map extends StatelessWidget {
       point: v.position,
       child: Stack(alignment: AlignmentGeometry.center, children: [
         Transform.rotate(angle: v.headingTrue??v.cogTrue??0, child: Icon(Icons.north, color: v.self?Colors.red:Colors.blue)),
+        // Transform.rotate(angle: v.headingTrue??v.cogTrue??0, child: Image.asset('assets/icons/light/mode_night.png', color: v.self?Colors.red:Colors.blue)),
         if(v.state == 'moored') Icon(Icons.circle, color: Colors.black, size: 10),
-        if(!v.self) Text(label, style: ts, textScaler: TextScaler.noScaling)  
+        if(_settings.showNames && !v.self) Text(label, style: ts, textScaler: TextScaler.noScaling)  
       ])
     );
   }
 
   Polyline _polyLine(_Vessel v) {
-    var end = FlutterMapMath.destinationPoint(v.position.latitude, v.position.longitude, (v.sog??0) * (5*60), rad2Deg(v.cogTrue??v.headingTrue).toDouble());
+    var end = FlutterMapMath.destinationPoint(v.position.latitude, v.position.longitude, (v.sog??0) * (_settings.minutes*60), rad2Deg(v.cogTrue??v.headingTrue).toDouble());
 
     return Polyline(
       points: [v.position, end],
@@ -99,13 +98,13 @@ class _Map extends StatelessWidget {
     var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
     try {
       String url = '';
-      if(_signalkChart.tilemapUrl.isNotEmpty) {
-        if(_signalkChart.proxy) {
+      if(_settings.signalkChart.tilemapUrl.isNotEmpty) {
+        if(_settings.signalkChart.proxy) {
           // We don't use the Uri.replace() method as this performs URL encoding,
           // e.g. replaces'{' with '%7B', which the server doesn't like.
-          url = '${_controller.httpApiUri.origin}${_signalkChart.tilemapUrl}';
+          url = '${_controller.httpApiUri.origin}${_settings.signalkChart.tilemapUrl}';
         } else {
-          url = _signalkChart.tilemapUrl;
+          url = _settings.signalkChart.tilemapUrl;
         }
       }
 
@@ -157,12 +156,9 @@ class AISDisplayBox extends BoxWidget {
 class _AISDisplayState extends State<AISDisplayBox> {
   static final Map<String, _Vessel> _vessels = {};
 
-  static const int _radiusIncrement = 5;
-
   late final _AISDisplaySettings _settings;
-  _Vessel? _self;
   Timer? _lockTimer;
-  static double _zoom = 10;//19
+  static double _zoom = 14;
   _Map? _map;
 
   @override
@@ -189,28 +185,33 @@ class _AISDisplayState extends State<AISDisplayBox> {
   void _changeZoom(int direction) {
     if(widget.config.editMode) return;
     setState(() {
-      _zoom += direction * _settings.zoomIncrement;
+      _zoom += direction;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     var bg = Theme.of(context).colorScheme.onSurface;
+    var self = _vessels[widget.config.controller.selfURN];
+    var vessels = _vessels;
     var zoom = _zoom;
-    // if(widget.config.editMode) {
-    //   // TODO
-    //   zoom = 17.5;
-    // }
+    if(widget.config.editMode) {
+      self = _Vessel('self', true, ll.LatLng(50.618210, -2.246792), cogTrue: deg2Rad(45), sog: 0.25);
+      vessels = {
+        'self': self,
+        'one': _Vessel('one', false, ll.LatLng(50.61795, -2.246792), name: 'One', cogTrue: deg2Rad(90), sog: 0.5)
+      };
+      zoom = 17.5;
+    }
 
-    _self = _vessels[widget.config.controller.selfURN];
     _map = null;
-    if(_self != null) {
+    if(self != null) {
       _map = _Map(
         widget.config.controller,
-        _settings.signalkChart,
+        _settings,
         zoom,
-        _self!.position,
-        _vessels
+        self.position,
+        vessels
       );
     }
 
@@ -308,51 +309,29 @@ class _AISDisplaySettingsState extends State<_AISDisplaySettingsWidget> {
     _AISDisplaySettings s = widget._settings;
 
     List<Widget> list = [
-      ListTile(
-        leading: const Text("Record Position Period:"),
-        title: Slider(
-            min: 1,
-            max: 60,
-            divisions: 6,
-            value: s.recordSeconds.toDouble(),
-            label: "${s.recordSeconds}",
-            onChanged: (double value) {
-              setState(() {
-                s.recordSeconds = value.toInt();
-              });
-            }),
-        trailing: const Text('sec'),
+      SwitchListTile(
+        title: const Text("Show Names:"),
+        value: s.showNames,
+        onChanged: (bool value) {
+          setState(() {
+            s.showNames = value;
+          });
+        }
       ),
       ListTile(
-        leading: const Text("Record Points:"),
+        leading: const Text("COG-Speed Prediction:"),
         title: Slider(
-            min: 100,
-            max: 10000,
-            divisions: 99,
-            value: s.recordPoints.toDouble(),
-            label: "${s.recordPoints}",
-            onChanged: (double value) {
-              setState(() {
-                s.recordPoints = value.toInt();
-              });
-            }),
-      ),
-      ListTile(
-        title: Text('Records for ${(s.recordSeconds*s.recordPoints/60/60).toStringAsFixed(2)} hours'),
-      ),
-      ListTile(
-        leading: const Text("Zoom Increment:"),
-        title: Slider(
-            min: 0.25,
-            max: 2,
-            divisions: 7,
-            value: s.zoomIncrement.toDouble(),
-            label: "${s.zoomIncrement}",
-            onChanged: (double value) {
-              setState(() {
-                s.zoomIncrement = value;
-              });
-            }),
+          min: 0,
+          max: 20,
+          divisions: 4,
+          value: s.minutes.toDouble(),
+          label: "${s.minutes.toInt()}",
+          onChanged: (double value) {
+            setState(() {
+              s.minutes = value;
+            });
+          }),
+        trailing: Text('mins'),
       ),
       ListTile(
         leading: const Text("SignalK Chart:"),
