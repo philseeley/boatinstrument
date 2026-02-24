@@ -699,14 +699,15 @@ class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {
 }
 
 class Update {
+  final String context;
   final String path;
   final dynamic value;
 
-  Update(this.path, this.value);
+  Update(this.context, this.path, this.value);
 
   @override
   String toString() {
-    return 'path: $path, value: $value';
+    return 'context: $context, path: $path, value: $value';
   }
 }
 
@@ -726,6 +727,7 @@ typedef OnUpdate = Function(List<Update> updates);
 
 class _BoxData {
   final OnUpdate? onUpdate;
+  final bool onlySelf;
   final Set<String> paths;
   final OnUpdate? onStaticUpdate;
   final Set<String> staticPaths;
@@ -736,7 +738,7 @@ class _BoxData {
   List<Update> updates = [];
   final Map<String, DateTime> pathTimestamps = {};
 
-  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType, this.onControlChannel);
+  _BoxData(this.onUpdate, this.onlySelf, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType, this.onControlChannel);
 }
 
 class _Resizable {

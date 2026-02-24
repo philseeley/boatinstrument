@@ -549,6 +549,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.2.2"
+  flutter_map_math:
+    dependency: "direct main"
+    description:
+      name: flutter_map_math
+      sha256: "86c442a946d4695fa3e5d9c53c802344160d8db1745b067b528df3813820eb85"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.4"
   flutter_material_color_picker:
     dependency: "direct main"
     description:
