@@ -36,8 +36,8 @@ class _Vessel {
   double? headingTrue;
   double? cogTrue;
   double? sog;
-  int? type;
-  String? typeName;
+  int? aisShipType;
+  String? airShipTypeName;
   String? state;
 
   _Vessel(this.context, this.self, this.position, {this.name, this.cogTrue, this.sog});
@@ -60,6 +60,12 @@ class _Map extends StatelessWidget {
     this._vessels
   );
 
+  static final _aisShipTypes = {
+    0: Colors.green, // Default
+    30: Colors.orange, // Fishing
+    36: Colors.purple, // Sailing
+    37: Colors.blue, // Pleasure
+  };
 
   Marker _marker(_Vessel v, TextPainter tp, TextStyle ts) {
     var label = '\n\n${v.name??''}';
@@ -67,11 +73,12 @@ class _Map extends StatelessWidget {
     tp.layout();
     var s = m.max(tp.width, tp.height*3);
 
+    var color = _aisShipTypes[v.aisShipType??0]??_aisShipTypes[0];
+
     return Marker(width:s , height: s,
       point: v.position,
       child: Stack(alignment: AlignmentGeometry.center, children: [
-        Transform.rotate(angle: v.headingTrue??v.cogTrue??0, child: Icon(Icons.north, color: v.self?Colors.red:Colors.blue)),
-        // Transform.rotate(angle: v.headingTrue??v.cogTrue??0, child: Image.asset('assets/icons/light/mode_night.png', color: v.self?Colors.red:Colors.blue)),
+        Transform.rotate(angle: v.headingTrue??v.cogTrue??0, child: Icon(Icons.navigation, color: v.self?Colors.red:color)),
         if(v.state == 'moored') Icon(Icons.circle, color: Colors.black, size: 10),
         if(_settings.showNames && !v.self) Text(label, style: ts, textScaler: TextScaler.noScaling)  
       ])
@@ -199,7 +206,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
       self = _Vessel('self', true, ll.LatLng(50.618210, -2.246792), cogTrue: deg2Rad(45), sog: 0.25);
       vessels = {
         'self': self,
-        'one': _Vessel('one', false, ll.LatLng(50.61795, -2.246792), name: 'One', cogTrue: deg2Rad(90), sog: 0.5)
+        'billy-do': _Vessel('billy-do', false, ll.LatLng(50.61795, -2.246792), name: 'Billy Do', cogTrue: deg2Rad(90), sog: 0.5)
       };
       zoom = 17.5;
     }
@@ -268,8 +275,8 @@ class _AISDisplayState extends State<AISDisplayBox> {
             break;
           case 'design.aisShipType':
             if(v == null) return;
-            v.typeName = u.value['name'];
-            v.type = (u.value['id'] as num).toInt();
+            v.airShipTypeName = u.value['name'];
+            v.aisShipType = (u.value['id'] as num).toInt();
             break;
           case 'navigation.state':
             if(v == null) return;
