@@ -84,7 +84,6 @@ class _Map extends StatelessWidget {
       tp.text = TextSpan(text: (_currentRadius??0).round().toString(), style: th);
       tp.layout();
       currentTextWidth = tp.width;
-
     } finally {
       tp.dispose();
     }
@@ -155,7 +154,7 @@ class AnchorAlarmBox extends BoxWidget {
   Widget? getHelp() => HelpPage(url: 'doc:anchor-alarm.md');
 
   @override
-  State<StatefulWidget> createState() => _AnchorState();
+  State<AnchorAlarmBox> createState() => _AnchorState();
 }
 
 class _AnchorState extends State<AnchorAlarmBox> {

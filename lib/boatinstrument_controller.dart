@@ -856,7 +856,7 @@ class BoatInstrumentController {
   Map<String, String> _httpHeaders(Map<String, String>? headers) {
     // We don't add headers in demo mode as any auth tokens will stop the
     // connection to the demo server.
-    if(_settings!.demoMode) return {};
+    if(_settings!.demoMode) return headers??{};
 
     Map<String, String> h = headers??{};
 
