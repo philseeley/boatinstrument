@@ -1057,7 +1057,7 @@ class BoatInstrumentController {
 
       _send(
         {
-          "context": onlySelf?'vessels.self':'*',
+          "context": "vessels.${onlySelf?'self':'*'}",
           "subscribe": subscribe
         },
       );
