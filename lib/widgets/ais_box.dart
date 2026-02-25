@@ -43,12 +43,18 @@ class _Vessel {
   _Vessel(this.context, this.self, this.position, {this.name, this.cogTrue, this.sog});
 }
 
-final Map<DistanceUnits, double> _dist2m = {
-  DistanceUnits.meters: 1000,
-  DistanceUnits.km: 1000,
-  DistanceUnits.miles: miles2m(1),
-  DistanceUnits.nm: nm2m(1),
-  DistanceUnits.nmM: nm2m(1)
+class _ScaleConvert {
+  DistanceUnits units;
+  double meters;
+
+  _ScaleConvert(this.units, this.meters);
+}
+final Map<DistanceUnits, _ScaleConvert> _dist2m = {
+  DistanceUnits.meters:  _ScaleConvert(DistanceUnits.km, 1000),
+  DistanceUnits.km: _ScaleConvert(DistanceUnits.km, 1000),
+  DistanceUnits.miles: _ScaleConvert(DistanceUnits.miles, miles2m(1)),
+  DistanceUnits.nm: _ScaleConvert(DistanceUnits.nm, nm2m(1)),
+  DistanceUnits.nmM: _ScaleConvert(DistanceUnits.nm, nm2m(1))
 };
 
 class _Map extends StatelessWidget {
@@ -118,7 +124,7 @@ class _Map extends StatelessWidget {
     try {
       for(int i = 1; i<=_numOfRings; ++i) {
         var ring = _range/_numOfRings*i;
-        var distance = ring*_dist2m[_controller.distanceUnits]!;
+        var distance = ring*_dist2m[_controller.distanceUnits]!.meters;
 
         rings.add(CircleMarker(
           point: _position,
@@ -145,11 +151,11 @@ class _Map extends StatelessWidget {
           )
         ));
       }
-      var label = _controller.distanceUnits.unit;
+      var label = _dist2m[_controller.distanceUnits]!.units.unit;
       tp.text = TextSpan(text: label, style: th);
       tp.layout();
       
-      var distance = _range*_dist2m[_controller.distanceUnits]!;
+      var distance = _range*_dist2m[_controller.distanceUnits]!.meters;
       double h = m.sqrt(distance*distance*2);
 
       var labelPos = ll.Distance().offset(_position, h, 135);
@@ -292,7 +298,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
       var size = camera.size;
 
       double range = widget.config.editMode?1:_range;
-      double distance = range*_dist2m[widget.config.controller.distanceUnits]!;
+      double distance = range*_dist2m[widget.config.controller.distanceUnits]!.meters;
       double h = m.sqrt(distance*distance*2);
 
       var cameraFit = CameraFit.coordinates(padding: EdgeInsets.all(20), coordinates: [
