@@ -253,10 +253,6 @@ class AISDisplayBox extends BoxWidget {
 
 The **Vessel Timeout** is the number of minutes that a vessel will be displayed after its last position report.''');
 
-
-  @override
-  Widget? getHelp() => HelpPage(url: 'doc:anchor-alarm.md');//TODO
-
   @override
   State<StatefulWidget> createState() => _AISDisplayState();
 }
