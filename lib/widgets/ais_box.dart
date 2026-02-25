@@ -14,12 +14,14 @@ part 'ais_box.g.dart';
 @JsonSerializable(explicitToJson: true)
 class _AISDisplaySettings {
   bool showNames;
-  double minutes;
+  double predictionMinutes;
+  int vesselTimeout;
   SignalkChart signalkChart;
 
   _AISDisplaySettings({
     this.showNames = true,
-    this.minutes = 5,
+    this.predictionMinutes = 5,
+    this.vesselTimeout = 10,
     this.signalkChart = const SignalkChart()
   });
 
@@ -31,6 +33,7 @@ class _AISDisplaySettings {
 class _Vessel {
   String context;
   bool self;
+  DateTime? lastSeen;
   ll.LatLng position;
   String? name;
   double? headingTrue;
@@ -105,7 +108,7 @@ class _Map extends StatelessWidget {
   }
 
   Polyline _polyLine(_Vessel v) {
-    var end = FlutterMapMath.destinationPoint(v.position.latitude, v.position.longitude, (v.sog??0) * (_settings.minutes*60), rad2Deg(v.cogTrue??v.headingTrue).toDouble());
+    var end = FlutterMapMath.destinationPoint(v.position.latitude, v.position.longitude, (v.sog??0) * (_settings.predictionMinutes*60), rad2Deg(v.cogTrue??v.headingTrue).toDouble());
 
     return Polyline(
       points: [v.position, end],
@@ -246,7 +249,13 @@ class AISDisplayBox extends BoxWidget {
   }
 
   @override
-  Widget? getHelp() => HelpPage(url: 'doc:anchor-alarm.md');
+  Widget? getSettingsHelp() => HelpPage(text: '''The **COG-SOG Prediction** is the number of minutes to predict the vessel's future position, i.e. the length of the line.
+
+The **Vessel Timeout** is the number of minutes that a vessel will be displayed after its last position report.''');
+
+
+  @override
+  Widget? getHelp() => HelpPage(url: 'doc:anchor-alarm.md');//TODO
 
   @override
   State<StatefulWidget> createState() => _AISDisplayState();
@@ -379,6 +388,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
 
   Future<void> _onUpdate(List<Update> updates) async {
     var c = widget.config.controller;
+    var now = c.now();
 
     for (Update u in updates) {
       try {
@@ -394,6 +404,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
               v = _Vessel(u.context, u.context == c.selfURN, position);
               _vessels[u.context] = v;
             }
+            v.lastSeen = now;
             v.position = position;
             if(v.name == null) _getVesselName(u.context);
             break;
@@ -423,6 +434,10 @@ class _AISDisplayState extends State<AISDisplayBox> {
         widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
+
+    _vessels.removeWhere((context, v) {
+      return v.lastSeen==null?true:now.difference(v.lastSeen!) > Duration(minutes: _settings.vesselTimeout);
+    });
 
     if(mounted) {
       setState(() {});
@@ -462,16 +477,31 @@ class _AISDisplaySettingsState extends State<_AISDisplaySettingsWidget> {
         }
       ),
       ListTile(
-        leading: const Text("COG-Speed Prediction:"),
+        leading: const Text("COG-SOG Prediction:"),
         title: Slider(
           min: 0,
           max: 20,
           divisions: 4,
-          value: s.minutes.toDouble(),
-          label: "${s.minutes.toInt()}",
+          value: s.predictionMinutes,
+          label: "${s.predictionMinutes.toInt()}",
           onChanged: (double value) {
             setState(() {
-              s.minutes = value;
+              s.predictionMinutes = value;
+            });
+          }),
+        trailing: Text('mins'),
+      ),
+      ListTile(
+        leading: const Text("Vessel Timeout:"),
+        title: Slider(
+          min: 5,
+          max: 30,
+          divisions: 5,
+          value: s.vesselTimeout.toDouble(),
+          label: s.vesselTimeout.toString(),
+          onChanged: (double value) {
+            setState(() {
+              s.vesselTimeout = value.toInt();
             });
           }),
         trailing: Text('mins'),
