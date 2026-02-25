@@ -43,24 +43,37 @@ class _Vessel {
   _Vessel(this.context, this.self, this.position, {this.name, this.cogTrue, this.sog});
 }
 
+final Map<DistanceUnits, double> _dist2m = {
+  DistanceUnits.meters: 1000,
+  DistanceUnits.km: 1000,
+  DistanceUnits.miles: miles2m(1),
+  DistanceUnits.nm: nm2m(1),
+  DistanceUnits.nmM: nm2m(1)
+};
+
 class _Map extends StatelessWidget {
   final BoatInstrumentController _controller;
   final _AISDisplaySettings _settings;
-  final double _zoom;
+  final Function() _onReady;
   final ll.LatLng _position;
+  final double _zoom;
+  final double _range;
+  final int _numOfRings;
   final Map<String, _Vessel> _vessels;
-
-  final _mapController = MapController();
+  final MapController _mapController = MapController();
 
   _Map(
     this._controller,
     this._settings,
-    this._zoom,
+    this._onReady,
     this._position,
-    this._vessels
+    this._zoom,
+    this._range,
+    this._numOfRings,
+    this._vessels,
   );
 
-  static final _aisShipTypes = {
+  static final Map<int, Color> _aisShipTypes = {
     0: Colors.green, // Default
     30: Colors.orange, // Fishing
     36: Colors.purple, // Sailing
@@ -98,6 +111,68 @@ class _Map extends StatelessWidget {
     return _polyLine(e.value);
   }
 
+  void _rangeRings(BuildContext context,  List<CircleMarker> rings, List<Marker> ringLabels) {
+    TextStyle th = Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.yellow);
+
+    var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
+    try {
+      for(int i = 1; i<=_numOfRings; ++i) {
+        var ring = _range/_numOfRings*i;
+        var distance = ring*_dist2m[_controller.distanceUnits]!;
+
+        rings.add(CircleMarker(
+          point: _position,
+          radius: distance,
+          useRadiusInMeter: true,
+          color: Colors.transparent,
+          borderColor: Colors.yellow,
+          borderStrokeWidth: 2));
+
+        var label = '$ring ';
+        tp.text = TextSpan(text: label, style: th);
+        tp.layout();
+
+        var labelPos = ll.Distance().offset(_position, distance, 90);
+
+        ringLabels.add(Marker(
+          width: tp.width,
+          alignment: Alignment.centerLeft,
+          point: labelPos,
+          child: Text(
+            label,
+            style: th,
+            textScaler: TextScaler.noScaling
+          )
+        ));
+      }
+      var label = _controller.distanceUnits.unit;
+      tp.text = TextSpan(text: label, style: th);
+      tp.layout();
+      
+      var distance = _range*_dist2m[_controller.distanceUnits]!;
+      double h = m.sqrt(distance*distance*2);
+
+      var labelPos = ll.Distance().offset(_position, h, 135);
+
+      ringLabels.add(Marker(
+        width: tp.width,
+        alignment: Alignment.centerLeft,
+        point: labelPos,
+        child: Text(
+          label,
+          style: th,
+          textScaler: TextScaler.noScaling
+        )
+      ));
+    } finally {
+      tp.dispose();
+    }
+  }
+  
+  void _mapReady() {
+    _onReady();
+  }
+
   @override
   Widget build(BuildContext context) {
     Color bgColor = Theme.of(context).colorScheme.surface;
@@ -115,9 +190,18 @@ class _Map extends StatelessWidget {
         }
       }
 
+      List<CircleMarker> rings = [];
+      List<Marker> ringLabels = [];
+
+      _rangeRings(context, rings, ringLabels);
+
+      // Note: the initialCameraFit doesn't work if a mapController is specified and changing the Camera after using
+      // the mapController doesn't work and changing the zoom only works if there is a controller. Hence the onMapReady
+      // callback process.
       return FlutterMap(
         mapController: _mapController,
         options: MapOptions(
+          onMapReady: _mapReady,
           keepAlive: true,
           backgroundColor: bgColor,
           initialCenter: _position,
@@ -128,6 +212,8 @@ class _Map extends StatelessWidget {
         ),
         children: [
           if(url.isNotEmpty) TileLayer(urlTemplate: url),
+          CircleLayer(circles: rings),
+          MarkerLayer(markers: ringLabels),
           MarkerLayer(markers: _vessels.entries.map((e) {return _marker(e.value, tp, ts);}).toList()),
           PolylineLayer(polylines: _vessels.entries.map(_headingLine).toList()),
         ]
@@ -165,7 +251,9 @@ class _AISDisplayState extends State<AISDisplayBox> {
 
   late final _AISDisplaySettings _settings;
   Timer? _lockTimer;
-  static double _zoom = 14;
+  double _zoom = 14;
+  static double _range = 2;
+  int _numOfRings = 1;
   _Map? _map;
 
   @override
@@ -189,11 +277,50 @@ class _AISDisplayState extends State<AISDisplayBox> {
     super.dispose();
   }
 
-  void _changeZoom(int direction) {
+  void _changeRange(bool increase) {
     if(widget.config.editMode) return;
-    setState(() {
-      _zoom += direction;
-    });
+    _range = increase?_range*2:_range/2;
+    _range = _range<0.5?0.5:_range;
+    _onReady();
+  }
+
+  // We can't use the MapController until we're told the map's ready.
+  void _onReady() {
+    var self = _vessels[widget.config.controller.selfURN];
+    if(self != null) {
+      var camera = _map!._mapController.camera;
+      var size = camera.size;
+
+      double range = widget.config.editMode?1:_range;
+      double distance = range*_dist2m[widget.config.controller.distanceUnits]!;
+      double h = m.sqrt(distance*distance*2);
+
+      var cameraFit = CameraFit.coordinates(padding: EdgeInsets.all(20), coordinates: [
+        ll.Distance().offset(self.position, h, 135),
+        ll.Distance().offset(self.position, h, 315),
+      ]);
+
+      var newCamera = cameraFit.fit(camera);
+
+      setState(() {
+        _zoom = newCamera.zoom;
+        // Assuming minimum distance between rings is 100 pixels.
+        _numOfRings = (m.min(size.width, size.height)/2/100).floor();
+        // Adjust to get on a 1/4 boundary.
+        var adjust = range/_numOfRings/0.25;
+        adjust = adjust.floorToDouble() * 0.25;
+        // But for 0.75 scale up.
+        adjust = adjust>0.5?adjust.ceilToDouble():adjust;
+        // Avoid dev-by-zero.
+        adjust = adjust>0?adjust:0.25;
+        // Apply adjustment.
+        _numOfRings = (range / adjust).toInt();
+        // We want an even number of rings.
+        _numOfRings = _numOfRings.isEven?_numOfRings:_numOfRings-1;
+        // But we want at least 1 ring.
+        _numOfRings = _numOfRings<1?1:_numOfRings;
+      });
+    }
   }
 
   @override
@@ -201,14 +328,14 @@ class _AISDisplayState extends State<AISDisplayBox> {
     var bg = Theme.of(context).colorScheme.onSurface;
     var self = _vessels[widget.config.controller.selfURN];
     var vessels = _vessels;
-    var zoom = _zoom;
+    var range = _range;
     if(widget.config.editMode) {
-      self = _Vessel('self', true, ll.LatLng(50.618210, -2.246792), cogTrue: deg2Rad(45), sog: 0.25);
+      self = _Vessel('self', true, ll.LatLng(50.618210, -2.246792), cogTrue: deg2Rad(45), sog: 0.5);
       vessels = {
         'self': self,
-        'billy-do': _Vessel('billy-do', false, ll.LatLng(50.61795, -2.246792), name: 'Billy Do', cogTrue: deg2Rad(90), sog: 0.5)
+        'billy-do': _Vessel('billy-do', false, ll.LatLng(50.60795, -2.246792), name: 'Billy Do', cogTrue: deg2Rad(90), sog: 1)
       };
-      zoom = 17.5;
+      range = 1;
     }
 
     _map = null;
@@ -216,8 +343,11 @@ class _AISDisplayState extends State<AISDisplayBox> {
       _map = _Map(
         widget.config.controller,
         _settings,
-        zoom,
+        _onReady,
         self.position,
+        _zoom,
+        range,
+        _numOfRings,
         vessels
       );
     }
@@ -226,8 +356,8 @@ class _AISDisplayState extends State<AISDisplayBox> {
       Expanded(child: Stack(children: [
         if(_map != null) AbsorbPointer(child: _map!),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
-            _button(() {_changeZoom(1);}, bg, iconData: Icons.add),
-            _button(() {_changeZoom(-1);}, bg, iconData: Icons.remove)
+            _button(() {_changeRange(false);}, bg, iconData: Icons.add),
+            _button(() {_changeRange(true);}, bg, iconData: Icons.remove)
         ])),
       ]))
     ]));

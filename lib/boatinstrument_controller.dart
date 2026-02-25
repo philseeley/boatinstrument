@@ -243,7 +243,7 @@ class BoatInstrumentController {
       case DistanceUnits.km:
         return distance * 0.001;
       case DistanceUnits.miles:
-        return distance * 0.000621371;
+        return m2miles(distance);
       case DistanceUnits.nm:
         return m2nm(distance);
       case DistanceUnits.nmM:
