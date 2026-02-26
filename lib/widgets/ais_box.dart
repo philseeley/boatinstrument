@@ -241,6 +241,16 @@ class AISDisplayBox extends BoxWidget {
   const AISDisplayBox(super.config, {super.key});
 
   @override
+  Widget? getHelp() => HelpPage(text: '''The length of the line shows the predicted location of the vessel in a configurable number of minutes time, given its Course and Speed over Ground.
+
+The targets are coloured as:
+- Fishing - Orange
+- Sailing - Purple
+- Pleasure - Blue
+- All others - Green
+''');
+
+  @override
   bool get hasSettings => true;
 
   @override
