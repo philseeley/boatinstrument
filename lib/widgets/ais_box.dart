@@ -329,14 +329,19 @@ class _AISDisplayState extends State<AISDisplayBox> {
         // Adjust to get on a 1/4 boundary.
         var adjust = range/_numOfRings/0.25;
         adjust = adjust.floorToDouble() * 0.25;
-        // But for 0.75 scale up.
-        adjust = adjust>0.5?adjust.ceilToDouble():adjust;
         // Avoid dev-by-zero.
         adjust = adjust>0?adjust:0.25;
+        // Make sure the adjustment fits the range.
+        while(range % adjust != 0) {
+          adjust -= 0.25;
+          // Sanity check that should never occur.
+          if(adjust <= 0) {
+            adjust = 0.25;
+            break;
+          }
+        }
         // Apply adjustment.
-        _numOfRings = (range / adjust).toInt();
-        // We want an even number of rings.
-        _numOfRings = _numOfRings.isEven?_numOfRings:_numOfRings-1;
+        _numOfRings = range ~/ adjust;
         // But we want at least 1 ring.
         _numOfRings = _numOfRings<1?1:_numOfRings;
       });
