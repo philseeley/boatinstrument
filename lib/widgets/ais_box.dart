@@ -161,7 +161,7 @@ class _Map extends StatelessWidget {
       var distance = _range*_dist2m[_controller.distanceUnits]!.meters;
       double h = m.sqrt(distance*distance*2);
 
-      var labelPos = ll.Distance().offset(_position, h, 135);
+      var labelPos = ll.Distance().offset(_position, h, 45);
 
       ringLabels.add(Marker(
         width: tp.width,
