@@ -105,7 +105,6 @@ class _Map extends StatelessWidget {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
-        keepAlive: true,
         backgroundColor: bgColor,
         initialCenter: _anchorPosition,
         initialZoom: _zoom,
@@ -240,7 +239,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
 
     _map = null;
-    if(_anchorPosition != null) {
+    if(TickerMode.valuesOf(context).enabled && _anchorPosition != null) {
       _map = _Map(
         widget.config.controller,
         _settings.signalkChart,

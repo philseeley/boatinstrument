@@ -211,7 +211,6 @@ class _Map extends StatelessWidget {
         mapController: _mapController,
         options: MapOptions(
           onMapReady: _mapReady,
-          keepAlive: true,
           backgroundColor: bgColor,
           initialCenter: _position,
           initialZoom: _zoom,
@@ -360,7 +359,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
     }
 
     _map = null;
-    if(self != null) {
+    if(TickerMode.valuesOf(context).enabled && self != null) {
       _map = _Map(
         widget.config.controller,
         _settings,
