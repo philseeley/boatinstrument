@@ -1173,7 +1173,7 @@ class BoatInstrumentController {
 
     // The initial connection returns our own vessel's URN. 
     if(d['updates'] == null) {
-      _selfURN = d['self'];print('URN = "$_selfURN"');
+      _selfURN = d['self'];
     } else {
       if(_selfURN == null) throw Exception('Own vessel not identified');
 
