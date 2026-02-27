@@ -210,6 +210,8 @@ class ONVIFDisplayBox extends ONVIFBox {
   State<ONVIFDisplayBox> createState() => _ONVIFDisplayBoxState();
 }
 
+const _rtsp = 'rtsp://';
+
 class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
   late final _player = media.Player();
   late final _videoController = video.VideoController(_player);
@@ -222,8 +224,10 @@ class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
   }
 
   Future<void> _connectVideoStream() async {
+    var c = widget._onvifConfig!;
     var uri = await _onvif!.media.getStreamUri(_profileToken!);
-    _player.open(media.Media(uri));
+    if(c.username.isNotEmpty) uri = uri.replaceFirst(RegExp('^$_rtsp'), '$_rtsp${c.username}:${c.password}@');
+    _player.open(media.Media(uri), play: true);
   }
 
   @override
