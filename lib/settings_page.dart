@@ -533,7 +533,9 @@ class _PathSubscriptionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<ListTile> list = [];
 
-    list.add(const ListTile(title: Text('Data Subscriptions', textAlign: TextAlign.center)));
+    var onlySelf = _controller._boxData.every((bd) => bd.onlySelf);
+
+    list.add(ListTile(title: Text('Data Subscriptions (vessels.${onlySelf?'self':'*'})', textAlign: TextAlign.center)));
 
     for(var path in _controller.paths) {
       list.add(ListTile(dense: true, leading: Text(path)));
