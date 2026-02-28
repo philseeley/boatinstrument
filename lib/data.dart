@@ -23,6 +23,9 @@ double ms2kts(double kts) => kts * 1.943844;
 double millibar2pascal (double millibar) => millibar / 0.01;
 double nm2m (double nm) => nm / 0.000539957;
 double m2nm (double m) => m * 0.000539957;
+double m2miles (double m) => m * 0.000621371;
+double miles2m (double miles) => miles / 0.000621371;
+
 String rad2Cardinal(double? direction) {
   const List<String> cardinalDirections = [
     'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S',
@@ -699,14 +702,15 @@ class TimeOfDayConverter implements JsonConverter<TimeOfDay, String> {
 }
 
 class Update {
+  final String context;
   final String path;
   final dynamic value;
 
-  Update(this.path, this.value);
+  Update(this.context, this.path, this.value);
 
   @override
   String toString() {
-    return 'path: $path, value: $value';
+    return 'context: $context, path: $path, value: $value';
   }
 }
 
@@ -726,6 +730,7 @@ typedef OnUpdate = Function(List<Update> updates);
 
 class _BoxData {
   final OnUpdate? onUpdate;
+  final bool onlySelf;
   final Set<String> paths;
   final OnUpdate? onStaticUpdate;
   final Set<String> staticPaths;
@@ -736,7 +741,7 @@ class _BoxData {
   List<Update> updates = [];
   final Map<String, DateTime> pathTimestamps = {};
 
-  _BoxData(this.onUpdate, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType, this.onControlChannel);
+  _BoxData(this.onUpdate, this.onlySelf, this.paths, this.onStaticUpdate, this.staticPaths, this.dataType, this.onControlChannel);
 }
 
 class _Resizable {

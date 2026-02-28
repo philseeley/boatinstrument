@@ -8,6 +8,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:boatinstrument/authorization.dart';
 import 'package:boatinstrument/main.dart';
 import 'package:boatinstrument/theme_provider.dart';
+import 'package:boatinstrument/widgets/ais_box.dart';
 import 'package:boatinstrument/widgets/anchor_box.dart';
 import 'package:boatinstrument/widgets/boat_box.dart';
 import 'package:boatinstrument/widgets/compass_rose_box.dart';
@@ -133,6 +134,7 @@ class BoatInstrumentController {
   final MainPageState _mainPageState;
   bool _timeSet = false;
   _Settings? _settings;
+  String? _selfURN;
   int _pageNum = 0;
   bool _rotatePages = false;
   Timer? _pageTimer;
@@ -177,6 +179,7 @@ class BoatInstrumentController {
 
   bool get ready => _settings != null;
 
+  String get selfURN => _selfURN??'';
   int get pageCount => _settings!.pages.length;
   Uri get httpApiUri => _httpApiUri;
   Uri get wsUri => _wsUri;
@@ -240,7 +243,7 @@ class BoatInstrumentController {
       case DistanceUnits.km:
         return distance * 0.001;
       case DistanceUnits.miles:
-        return distance * 0.000621371;
+        return m2miles(distance);
       case DistanceUnits.nm:
         return m2nm(distance);
       case DistanceUnits.nmM:
@@ -427,7 +430,7 @@ class BoatInstrumentController {
   }
 
   // Call this in the Widget's State initState() to subscribe to Signalk data.
-  void configure({OnUpdate? onUpdate, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, SignalKDataType dataType = SignalKDataType.realTime, bool isBox = true, bool onControlChannel = false}) {
+  void configure({OnUpdate? onUpdate, bool onlySelf = true, Set<String>? paths, OnUpdate? onStaticUpdate, Set<String>? staticPaths, SignalKDataType dataType = SignalKDataType.realTime, bool isBox = true, bool onControlChannel = false}) {
   
     // ============= PATH MAPPING =============
     // String pathsString = '';
@@ -439,7 +442,7 @@ class BoatInstrumentController {
       ++_boxesOnPage;
     }
 
-    _BoxData bd = _BoxData(onUpdate, paths??{}, onStaticUpdate, staticPaths??{}, dataType, onControlChannel);
+    _BoxData bd = _BoxData(onUpdate, onlySelf, paths??{}, onStaticUpdate, staticPaths??{}, dataType, onControlChannel);
     _boxData.add(bd);
 
     for(String path in bd.paths) {
@@ -943,7 +946,7 @@ class BoatInstrumentController {
         if(bd.onUpdate != null) {
           bd.updates.clear();
           for(String path in bd.pathTimestamps.keys) {
-            bd.updates.add(Update(path, null));
+            bd.updates.add(Update('', path, null));
           }
           bd.pathTimestamps.clear();
           if(bd.updates.isNotEmpty) bd.onUpdate!(bd.updates);
@@ -1021,6 +1024,7 @@ class BoatInstrumentController {
 
   void _subscribe(bool connecting) {
     // Find all the unique paths.
+    bool onlySelf = true;
     _paths.clear();
     _controlPaths.clear();
     _staticPaths.clear();
@@ -1031,6 +1035,7 @@ class BoatInstrumentController {
         _paths.addAll(bd.paths);
       }
       _staticPaths.addAll(bd.staticPaths);
+      if(!bd.onlySelf) onlySelf = false;
     }
 
     if(_boxData.length == _boxesOnPage) {
@@ -1052,7 +1057,7 @@ class BoatInstrumentController {
 
       _send(
         {
-          "context": "vessels.self",
+          "context": "vessels.${onlySelf?'self':'*'}",
           "subscribe": subscribe
         },
       );
@@ -1166,8 +1171,14 @@ class BoatInstrumentController {
 
     dynamic d = json.decode(data);
 
-    // We can get a status message on initial connection, which we ignore.
-    if(d['updates'] != null) {
+    // The initial connection returns our own vessel's URN. 
+    if(d['updates'] == null) {
+      _selfURN = d['self'];
+    } else {
+      if(_selfURN == null) throw Exception('Own vessel not identified');
+
+      String context = d['context'];
+
       for(_BoxData bd in _boxData) {
         bd.updates.clear();
       }
@@ -1183,6 +1194,8 @@ class BoatInstrumentController {
           for (dynamic v in u['values']) {
             String path = v['path'];
             for (_BoxData bd in _boxData) {
+              if(bd.onlySelf && context != selfURN) continue;
+
               for (RegExp r in bd.regExpPaths) {
                 if (r.hasMatch(path)) {
                   Duration d = now.difference(timeStamp);
@@ -1204,7 +1217,7 @@ class BoatInstrumentController {
 
                     if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
 
-                    bd.updates.add(Update(path,value));
+                    bd.updates.add(Update(context, path,value));
                     bd.pathTimestamps[path] = now;
                   } else {
                    l.i('Discarding old data for "$u"');
@@ -1227,7 +1240,7 @@ class BoatInstrumentController {
             ((bd.dataType == SignalKDataType.realTime) && d > realTimeDuration) ||
             ((bd.dataType == SignalKDataType.infrequent) && d > infrequentDuration)
             ) {
-              bd.updates.add(Update(path, null));
+              bd.updates.add(Update(context, path, null));
               bd.pathTimestamps.remove(path);
             }
           }
@@ -1263,7 +1276,7 @@ class BoatInstrumentController {
         for (_BoxData bd in _boxData) {
           for (RegExp r in bd.regExpStaticPaths) {
             if (r.hasMatch(path)) {
-              if(bd.onStaticUpdate!=null) bd.onStaticUpdate!([Update(path, value)]);
+              if(bd.onStaticUpdate!=null) bd.onStaticUpdate!([Update('', path, value)]);// TODO
             }
           }
         }
@@ -1293,20 +1306,20 @@ class BoatInstrumentController {
     }
   }
 
-  Uri _pathUri(String path) {
+  Uri _pathUri(String path, String context) {
     Uri uri = httpApiUri;
 
     List<String> basePathSegments = [...uri.pathSegments]
       ..removeLast()
-      ..addAll(['vessels', 'self']);
+      ..addAll(context.split('.'));
 
     List<String> pathSegments = [...basePathSegments, ...path.split('.')];
 
     return uri.replace(pathSegments: pathSegments);
   }
 
-  Future<double> getPathDouble(String path) async {
-    Uri uri = _pathUri(path);
+  Future<double> getPathDouble(String path, {String context = 'vessels.self'}) async {
+    Uri uri = _pathUri(path, context);
 
     http.Response response = await httpGet(
       uri,
@@ -1318,6 +1331,21 @@ class BoatInstrumentController {
     if(response.statusCode != HttpStatus.ok) throw Exception('Failed to retrieve double for $path');
 
     return (json.decode(response.body)['value'] as num).toDouble();
+  }
+
+  Future<String?> getPathString(String path, {String context = 'self'}) async {
+    Uri uri = _pathUri(path, context);
+
+    http.Response response = await httpGet(
+      uri,
+      headers: {
+        "accept": "application/json",
+      },
+    );
+
+    if(response.statusCode != HttpStatus.ok) return null;
+
+    return (response.body);
   }
 
   void _setTime(String timeStr) async {
