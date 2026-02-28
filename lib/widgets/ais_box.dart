@@ -379,6 +379,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
 
     return Padding(padding: const EdgeInsets.all(pad), child: Column(children: [
       Expanded(child: Stack(children: [
+        if(_map == null) MaxTextWidget('-'),
         if(_map != null) AbsorbPointer(child: _map!),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
             _button(() {_changeRange(false);}, bg, iconData: Icons.add),
@@ -402,7 +403,13 @@ class _AISDisplayState extends State<AISDisplayBox> {
 
     for (Update u in updates) {
       try {
-        if(u.value == null) continue;
+        if(u.value == null) {
+          // If we're being called because the connection has dropped, then there is
+          // no context. We remove our own vessel so the display is blanked.
+          if(u.context.isEmpty) _vessels.removeWhere((c, v) => v.self);
+          continue;
+        }
+
         var v = _vessels[u.context];
         switch (u.path) {
           case 'navigation.position':
