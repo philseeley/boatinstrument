@@ -17,12 +17,14 @@ class ONVIFConfig {
   String url;
   String username;
   String password;
+  String profileName;
 
   ONVIFConfig({
     this.id = '',
     this.url = '',
     this.username = '',
-    this.password = ''
+    this.password = '',
+    this.profileName = ''
   });
 
   factory ONVIFConfig.fromJson(Map<String, dynamic> json) =>
@@ -60,6 +62,14 @@ class ONVIFPerBoxSettings {
     this.showControls = true,
     this.showHomeButton = true
   });
+}
+
+Future<Onvif> _connectONVIF(ONVIFConfig config) async {
+  return await Onvif.connect(
+    host: config.url,
+    username: config.username,
+    password: config.password,
+  );
 }
 
 abstract class ONVIFBox extends BoxWidget {
@@ -109,15 +119,15 @@ abstract class _ONVIFBoxState<T extends ONVIFBox> extends State<T> {
   Onvif? _onvif;
   String? _profileToken;
 
-  String get _header => 'Camera:${widget._onvifConfig?.id??'Select Camera in Settings'}';
-  Widget get _configWidget => Text('$_header\nCamera:URL: ${widget._onvifConfig?.url??''}');
+  String get _header => 'Camera: ${widget._onvifConfig?.id??'Select Camera in Settings'}';
+  Widget get _configWidget => Text('$_header\nURL: ${widget._onvifConfig?.url??''}\nProfile: ${widget._onvifConfig?.profileName??''}');
   Widget get _connectingWidget => Center(child: Text('Connecting...'));
 
   @override
   void initState() {
     super.initState();
     widget.config.controller.configure();
-    _connect();
+    if(!widget.config.editMode) _connect();
   }
 
   Future<void> _connect() async {
@@ -125,17 +135,13 @@ abstract class _ONVIFBoxState<T extends ONVIFBox> extends State<T> {
 
     if(c != null) {
       try {
-        _onvif = await Onvif.connect(
-          host: c.url,
-          username: c.username,
-          password: c.password,
-        );
+        _onvif = await _connectONVIF(c);
 
         var profiles = await _onvif?.media.getProfiles();
 
         if ((profiles??[]).isNotEmpty) {
           setState(() {
-            _profileToken = profiles!.first.token;
+            _profileToken = profiles!.firstWhere((p) => p.name == c.profileName).token;
           });
         }
       } catch (err) {
@@ -240,7 +246,7 @@ class _ONVIFDisplayBoxState extends _ONVIFBoxState<ONVIFDisplayBox> {
 
     if(widget.config.editMode) {
       body = _configWidget;
-    } else if(widget._onvifConfig != null && _profileToken != null) {
+    } else if(connected) {
       body = Stack(alignment: AlignmentGeometry.center, children: [
         video.Video(controller: _videoController, controls: null, fill: bg),
         if(widget._perBoxSettings.showControls) Opacity(opacity: connected?0.5:1.0, child: _ptzControls())
@@ -323,6 +329,10 @@ class _SettingsState extends State<_SettingsWidget> {
               decoration: const InputDecoration(hintText: 'password'),
               initialValue: config.password,
               onChanged: (value) => config.password = value),
+            ListTile(
+              leading: const Text("Profile:"),
+              title: _ONVIFProfilesDropdownMenu(config)
+            )
           ]),
           trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {_deleteConfig(c);})
       ));
@@ -335,10 +345,10 @@ class _SettingsState extends State<_SettingsWidget> {
   }
 
   void _checkConfigs () {
-    if(widget._settings.configs.every((h) {return h.id.isNotEmpty && h.url.isNotEmpty;})) {
+    if(widget._settings.configs.every((c) {return c.id.isNotEmpty && c.url.isNotEmpty && c.profileName.isNotEmpty;})) {
       Navigator.pop(context);
     } else {
-      widget._controller.showMessage(context, 'IDs and URLs cannot be blank');
+      widget._controller.showMessage(context, 'IDs, URLs and Profiles cannot be blank');
     }
   }
 
@@ -352,6 +362,78 @@ class _SettingsState extends State<_SettingsWidget> {
     setState(() {
       widget._settings.configs.removeAt(configNum);
     });
+  }
+}
+
+class _ONVIFProfilesDropdownMenu extends StatefulWidget {
+  final ONVIFConfig _config;
+
+  const _ONVIFProfilesDropdownMenu(this._config);
+
+  @override
+  State<_ONVIFProfilesDropdownMenu> createState() => __ONVIFProfilesDropdownMenuState();
+}
+
+class __ONVIFProfilesDropdownMenuState extends State<_ONVIFProfilesDropdownMenu> {
+  List<MixedProfile>? _profiles;
+
+  @override
+  void initState() {
+    super.initState();
+    _getProfiles();
+  }
+  
+  void _getProfiles() async {
+    if(widget._config.url.isNotEmpty) {
+        setState(() {
+          _profiles = [];
+        });
+      try {
+        var onvif = await _connectONVIF(widget._config);
+
+        var profiles = await onvif.media.getProfiles();
+
+        setState(() {
+          _profiles = profiles;
+        });
+      } catch (e) {
+        if(mounted) {
+          setState(() {
+            _profiles = null;
+         });
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var c = widget._config;
+
+    if(_profiles == null) {
+      return OutlinedButton(onPressed: _getProfiles, child: Text('Press to retrieve profiles'));
+    }
+
+    if(_profiles!.isEmpty) {
+      return Text('Retrieving profiles...');
+    }
+
+    if(c.profileName.isEmpty) {
+      c.profileName = _profiles!.first.name;
+    }
+
+    return DropdownMenu<String>(
+      expandedInsets: EdgeInsets.zero,
+      enableSearch: false,
+      initialSelection: c.profileName,
+      dropdownMenuEntries: (_profiles??[]).map<DropdownMenuEntry<String>>((MixedProfile p) {return DropdownMenuEntry<String>(
+        style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+        value: p.name,
+        label: p.name);}).toList(),
+      onSelected: (value) {
+        c.profileName = value??'';
+      },
+    );
   }
 }
 

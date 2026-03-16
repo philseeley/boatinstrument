@@ -11,6 +11,7 @@ ONVIFConfig _$ONVIFConfigFromJson(Map<String, dynamic> json) => ONVIFConfig(
   url: json['url'] as String? ?? '',
   username: json['username'] as String? ?? '',
   password: json['password'] as String? ?? '',
+  profileName: json['profileName'] as String? ?? '',
 );
 
 Map<String, dynamic> _$ONVIFConfigToJson(ONVIFConfig instance) =>
@@ -19,6 +20,7 @@ Map<String, dynamic> _$ONVIFConfigToJson(ONVIFConfig instance) =>
       'url': instance.url,
       'username': instance.username,
       'password': instance.password,
+      'profileName': instance.profileName,
     };
 
 ONVIFSettings _$ONVIFSettingsFromJson(Map<String, dynamic> json) =>
