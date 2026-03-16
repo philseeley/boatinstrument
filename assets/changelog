@@ -1,4 +1,4 @@
-  * 0.10.0 Double Tapping, if "Quick Page Switch" enabled, show a menu of pages.
+  * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
            Boxes can now be marked as Deprecated.
 
            New Boxes:
