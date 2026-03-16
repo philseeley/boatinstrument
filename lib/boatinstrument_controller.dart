@@ -953,6 +953,10 @@ class BoatInstrumentController {
         }
       }
 
+      // On reconnect ensure we re-sync time as server may have been restarted
+      // and updated its time.
+      _time = null;
+
       await _dataStreamSubscription?.cancel();
       await _controlStreamSubscription?.cancel();
       await _dataChannel?.sink.close();
