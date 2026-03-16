@@ -192,7 +192,7 @@ class _Map extends StatelessWidget {
       if(_settings.signalkChart.tilemapUrl.isNotEmpty) {
         if(_settings.signalkChart.proxy && _controller.httpApiUri.host.isNotEmpty) {
           // We don't use the Uri.replace() method as this performs URL encoding,
-          // e.g. replaces'{' with '%7B', which the server doesn't like.
+          // e.g. replaces'{' with '%7B', which isn't the template format.
           url = '${_controller.httpApiUri.origin}${_settings.signalkChart.tilemapUrl}';
         } else {
           url = _settings.signalkChart.tilemapUrl;

@@ -95,7 +95,7 @@ class _Map extends StatelessWidget {
     if(_signalkChart.tilemapUrl.isNotEmpty) {
       if(_signalkChart.proxy && _controller.httpApiUri.host.isNotEmpty) {
         // We don't use the Uri.replace() method as this performs URL encoding,
-        // e.g. replaces'{' with '%7B', which the server doesn't like.
+        // e.g. replaces'{' with '%7B', which isn't the template format.
         url = '${_controller.httpApiUri.origin}${_signalkChart.tilemapUrl}';
       } else {
         url = _signalkChart.tilemapUrl;
@@ -120,12 +120,12 @@ class _Map extends StatelessWidget {
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
-          if(_position != null && _currentRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!, rad2Deg(_headingTrue))]),
-          if(_position != null && _currentRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _currentRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
+          if(_position != null && _maxRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _maxRadius!, rad2Deg(_headingTrue))]),
+          if(_position != null && _maxRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _maxRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
           Marker(point: _newAnchorPosition??_anchorPosition, child: Icon(Icons.anchor, color: _currentColor)),
-          if(_position != null) Marker(point: _position!, child: Transform.rotate(angle: (_headingTrue??0)+m.pi/2, child: Icon(_headingTrue == null?Icons.disabled_by_default_outlined:Icons.backspace_outlined, color: _currentColor))),
+          if(_position != null) Marker(point: _position!, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _currentColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
           if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
         ])
