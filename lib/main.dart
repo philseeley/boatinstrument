@@ -230,9 +230,8 @@ class MainPageState extends State<MainPage> {
           }));
         })
       ),
-      // We need to use a Builder() so that we can get the Context of Scaffold to open the Drawer.
+      // We need to use a Builder() so that we can get the Context of Scaffold to open the Drawer in _displayAdditionalControls.
       body: Builder(builder: (context) => SafeArea(child: GestureDetector(
-        onDoubleTap: _controller.quickPageSwitch?() => Scaffold.of(context).openDrawer():null,
         onPanStart: (details) {
           _panStart = details.localPosition;
         },
@@ -245,7 +244,7 @@ class MainPageState extends State<MainPage> {
           if(diff.dx.abs() > diff.dy.abs()) {
             _movePage(diff.dx);
           } else {
-            _displayAppBar(diff.dy);
+            _displayAdditionalControls(context, diff.dy);
           }
         },
         child: _controller.buildPage(),
@@ -315,18 +314,17 @@ class MainPageState extends State<MainPage> {
     }
   }
 
-  void _displayAppBar (double direction) async {
+  void _displayAdditionalControls (BuildContext context, double direction) async {
     _controller.startPageTimer();
 
-    bool showAppBar = false;
-    if(direction > 0.0) {
-      showAppBar = true;
-    }
+    bool showAppBar = direction > 0.0?true:false;
 
     if(_showAppBar != showAppBar) {
       setState(() {
         _showAppBar = showAppBar;
       });
+    } else if(_controller.quickPageSwitch && !_showAppBar && !showAppBar) {
+      Scaffold.of(context).openDrawer();
     }
   }
 }
