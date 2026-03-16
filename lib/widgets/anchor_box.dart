@@ -93,7 +93,7 @@ class _Map extends StatelessWidget {
 
     String url = '';
     if(_signalkChart.tilemapUrl.isNotEmpty) {
-      if(_signalkChart.proxy) {
+      if(_signalkChart.proxy && _controller.httpApiUri.host.isNotEmpty) {
         // We don't use the Uri.replace() method as this performs URL encoding,
         // e.g. replaces'{' with '%7B', which the server doesn't like.
         url = '${_controller.httpApiUri.origin}${_signalkChart.tilemapUrl}';
