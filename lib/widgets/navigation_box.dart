@@ -472,8 +472,8 @@ class _PositionBoxState extends HeadedTextBoxState<PositionBox> {
       _latitude = _longitude = null;
     } else {
       try {
-        _latitude = updates[0].value['latitude'];
-        _longitude = updates[0].value['longitude'];
+        _latitude = (updates[0].value['latitude'] as num).toDouble();
+        _longitude = (updates[0].value['longitude'] as num).toDouble();
       } catch (e) {
         widget.config.controller.l.e("Error converting $updates", error: e);
       }
