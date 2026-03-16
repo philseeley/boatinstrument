@@ -1260,7 +1260,7 @@ class BoatInstrumentController {
     }
   }
 
-  Future<void> _processStaticData(String path, Uri uri) async {
+  Future<void> _processStaticData(String context, String path, Uri uri) async {
     http.Response response = await httpGet(
         uri,
         headers: {
@@ -1276,7 +1276,7 @@ class BoatInstrumentController {
         for (_BoxData bd in _boxData) {
           for (RegExp r in bd.regExpStaticPaths) {
             if (r.hasMatch(path)) {
-              if(bd.onStaticUpdate!=null) bd.onStaticUpdate!([Update('', path, value)]);// TODO
+              if(bd.onStaticUpdate!=null) bd.onStaticUpdate!([Update(context, path, value)]);
             }
           }
         }
@@ -1287,19 +1287,21 @@ class BoatInstrumentController {
   }
 
   void _getStaticData(Set<String> staticPaths) {
+    const String context = 'vessels.self';
+
     Uri uri = httpApiUri;
     if(uri.host.isEmpty) return; // We're not connected.
     try {
       List<String> basePathSegments = [...uri.pathSegments]
         ..removeLast()
-        ..addAll(['vessels', 'self']);
+        ..addAll(context.split('.'));
 
       for(String path in staticPaths) {
         List<String> pathSegments = [...basePathSegments, ...path.split('.')];
 
         uri = uri.replace(pathSegments: pathSegments);
 
-        _processStaticData(path, uri);
+        _processStaticData(context, path, uri);
       }
     } catch (e) {
       l.e('Failed to retrieve static path', error: e);
