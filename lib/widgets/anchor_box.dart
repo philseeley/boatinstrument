@@ -239,7 +239,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
 
     _map = null;
-    if(TickerMode.of(context) && _anchorPosition != null) {
+    if(TickerMode.valuesOf(context).enabled && _anchorPosition != null) {
       _map = _Map(
         widget.config.controller,
         _settings.signalkChart,

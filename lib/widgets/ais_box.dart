@@ -364,7 +364,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
     }
 
     _map = null;
-    if(TickerMode.of(context) && self != null) {
+    if(TickerMode.valuesOf(context).enabled && self != null) {
       _map = _Map(
         widget.config.controller,
         _settings,
