@@ -281,7 +281,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
     super.initState();
 
     _settings = _AISDisplaySettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
-    widget.config.controller.configure(onUpdate: _onUpdate, onlySelf: false, paths: {
+    widget.config.controller.configure(onUpdate: _onUpdate, onlySelf: false, dataType: SignalKDataType.infrequent, paths: {
       'navigation.position',
       'navigation.headingTrue',
       'navigation.courseOverGroundTrue',
