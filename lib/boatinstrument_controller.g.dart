@@ -141,7 +141,7 @@ Map<String, dynamic> _$SignalKServerSettingsToJson(
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
   version: (json['version'] as num?)?.toInt() ?? 4,
-  valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
+  valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 10,
   signalkServerNum: (json['signalkServerNum'] as num?)?.toInt() ?? 0,
   signalkServerSettings:
       (json['signalkServerSettings'] as List<dynamic>?)
@@ -164,7 +164,7 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
   setTime: json['setTime'] as bool? ?? false,
   distanceUnits:
       $enumDecodeNullable(_$DistanceUnitsEnumMap, json['distanceUnits']) ??
-      DistanceUnits.nm,
+      DistanceUnits.nmM,
   m2nmThreshold: (json['m2nmThreshold'] as num?)?.toInt() ?? 500,
   speedUnits:
       $enumDecodeNullable(_$SpeedUnitsEnumMap, json['speedUnits']) ??

@@ -1078,7 +1078,7 @@ class _Settings {
 
   _Settings({
     this.version = 4,
-    this.valueSmoothing = 1,
+    this.valueSmoothing = 10,
     this.signalkServerNum = 0,
     this.signalkServerSettings = const [],
     this.notificationMuteTimeout = 15,
@@ -1092,7 +1092,7 @@ class _Settings {
     this.pageTimerOnStart = false,
     this.enableExperimentalBoxes = false,
     this.setTime = false,
-    this.distanceUnits = DistanceUnits.nm,
+    this.distanceUnits = DistanceUnits.nmM,
     this.m2nmThreshold = 500,
     this.speedUnits = SpeedUnits.kts,
     this.windSpeedUnits = SpeedUnits.kts,
