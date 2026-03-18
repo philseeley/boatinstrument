@@ -177,6 +177,8 @@ class BoatInstrumentController {
     }
   }
 
+  _SignalKServerSettings get _signalk => _settings!.signalkServerSettings[_settings!.signalkServerNum];
+
   bool get ready => _settings != null;
 
   String get selfURN => _selfURN??'';
@@ -184,8 +186,8 @@ class BoatInstrumentController {
   Uri get httpApiUri => _httpApiUri;
   Uri get wsUri => _wsUri;
   int get valueSmoothing => _settings!.valueSmoothing;
-  int get realTimeDataTimeout => _settings!.realTimeDataTimeout;
-  int get infrequentDataTimeout => _settings!.infrequentDataTimeout;
+  int get realTimeDataTimeout => _signalk.realTimeDataTimeout;
+  int get infrequentDataTimeout => _signalk.infrequentDataTimeout;
   bool get darkMode => _settings!.darkMode;
   bool get quickPageSwitch => _settings!.quickPageSwitch;
   bool get brightnessControl => _settings!.brightnessControl;
@@ -635,11 +637,11 @@ class BoatInstrumentController {
   }
 
   void _addRemoteControlSubscriptions() {
-    if(_settings!.allowRemoteControl) {
+    if(_signalk.allowRemoteControl) {
       Set<String> actionPaths = {};
-      if(_settings!.clientID.isNotEmpty) actionPaths.add('$bi.devices.${_settings!.clientID}.action');
-      if(_settings!.groupID.isNotEmpty) actionPaths.add('$bi.groups.${_settings!.groupID}.action');
-      for(var gID in _settings!.supplementalGroupIDs) {
+      if(_signalk.clientID.isNotEmpty) actionPaths.add('$bi.devices.${_signalk.clientID}.action');
+      if(_signalk.groupID.isNotEmpty) actionPaths.add('$bi.groups.${_signalk.groupID}.action');
+      for(var gID in _signalk.supplementalGroupIDs) {
         actionPaths.add('$bi.groups.$gID.action');
       }
 
@@ -863,11 +865,11 @@ class BoatInstrumentController {
 
     Map<String, String> h = headers??{};
 
-    if(_settings!.authToken.isNotEmpty) {
-      h['Authorization'] = 'Bearer ${_settings!.authToken}';
+    if(_signalk.authToken.isNotEmpty) {
+      h['Authorization'] = 'Bearer ${_signalk.authToken}';
     }
     
-    for (var header in _settings!.httpHeaders) {
+    for (var header in _signalk.httpHeaders) {
       h[header.name] = header.value;
     }
 
@@ -888,7 +890,7 @@ class BoatInstrumentController {
 
   Future<void> _discoverServices() async {
     try {
-      Uri url = Uri.parse(_settings!.signalkUrl);
+      Uri url = Uri.parse(_signalk.signalkUrl);
       String host = url.host;
       int port = url.port;
       String scheme = url.scheme.isEmpty ? 'http' : url.scheme;
@@ -899,7 +901,7 @@ class BoatInstrumentController {
         port = 443;
         scheme = 'https';
       }
-      else if(_settings!.discoverServer) {
+      else if(_signalk.discoverServer) {
         host = '';
         port = 0;
         BonsoirDiscovery discovery = BonsoirDiscovery(type:  '_signalk-http._tcp');
@@ -1055,7 +1057,7 @@ class BoatInstrumentController {
         subscribe.add({
           "path": path,
           "policy": 'instant',
-          "minPeriod": _settings!.signalkMinPeriod.toString()
+          "minPeriod": _signalk.signalkMinPeriod.toString()
         });
       }
 
@@ -1074,7 +1076,7 @@ class BoatInstrumentController {
         subscribe.add({
           "path": path,
           "policy": 'instant',
-          "minPeriod": _settings!.signalkMinPeriod.toString()
+          "minPeriod": _signalk.signalkMinPeriod.toString()
         });
       }
 
@@ -1088,20 +1090,20 @@ class BoatInstrumentController {
   }
 
   void _publishDeviceDetails() {
-    if(_settings!.allowRemoteControl) {
+    if(_signalk.allowRemoteControl) {
       List<String> pageNames = [];
       for(_Page page in _settings!.pages) {
         pageNames.add(page.name);
       }
 
-      if(_settings!.clientID.isNotEmpty) {
+      if(_signalk.clientID.isNotEmpty) {
         // If we don't have permission, then updates are ignored.
         _send(
           {
             "updates": [{
               "values": [
                 {
-                  "path": "$bi.devices.${_settings!.clientID}.pages",
+                  "path": "$bi.devices.${_signalk.clientID}.pages",
                   "value": pageNames
                 }
               ]
@@ -1110,13 +1112,13 @@ class BoatInstrumentController {
         );
       }
 
-      if(_settings!.groupID.isNotEmpty) {
+      if(_signalk.groupID.isNotEmpty) {
         _send(
           {
             "updates": [{
               "values": [
                 {
-                  "path": "$bi.groups.${_settings!.groupID}.pages",
+                  "path": "$bi.groups.${_signalk.groupID}.pages",
                   "value": pageNames
                 }
               ]
@@ -1125,9 +1127,9 @@ class BoatInstrumentController {
         );
       }
 
-      if(_settings!.supplementalGroupIDs.isNotEmpty) {
+      if(_signalk.supplementalGroupIDs.isNotEmpty) {
         List<dynamic> values = [];
-        for(var groupID in _settings!.supplementalGroupIDs) {
+        for(var groupID in _signalk.supplementalGroupIDs) {
           values.add({
             "path": "$bi.groups.$groupID",
             "value": null
@@ -1163,7 +1165,7 @@ class BoatInstrumentController {
 
   void _networkTimeout () {
     _networkTimer?.cancel();
-    _networkTimer = Timer(Duration(milliseconds: _settings!.signalkConnectionTimeout), connect);
+    _networkTimer = Timer(Duration(milliseconds: _signalk.signalkConnectionTimeout), connect);
   }
 
   void _processData(dynamic data) {

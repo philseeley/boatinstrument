@@ -93,9 +93,10 @@ _HttpHeader _$HttpHeaderFromJson(Map<String, dynamic> json) => _HttpHeader(
 Map<String, dynamic> _$HttpHeaderToJson(_HttpHeader instance) =>
     <String, dynamic>{'name': instance.name, 'value': instance.value};
 
-_Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
-  version: (json['version'] as num?)?.toInt() ?? 2,
-  valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
+_SignalKServerSettings _$SignalKServerSettingsFromJson(
+  Map<String, dynamic> json,
+) => _SignalKServerSettings(
+  id: json['id'] as String?,
   discoverServer: json['discoverServer'] as bool? ?? true,
   signalkUrl: json['signalkUrl'] as String? ?? '',
   httpHeaders:
@@ -118,6 +119,37 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
           .toSet() ??
       const {},
   authToken: json['authToken'] as String? ?? '',
+);
+
+Map<String, dynamic> _$SignalKServerSettingsToJson(
+  _SignalKServerSettings instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'discoverServer': instance.discoverServer,
+  'signalkUrl': instance.signalkUrl,
+  'httpHeaders': instance.httpHeaders,
+  'signalkMinPeriod': instance.signalkMinPeriod,
+  'signalkConnectionTimeout': instance.signalkConnectionTimeout,
+  'realTimeDataTimeout': instance.realTimeDataTimeout,
+  'infrequentDataTimeout': instance.infrequentDataTimeout,
+  'clientID': instance.clientID,
+  'groupID': instance.groupID,
+  'allowRemoteControl': instance.allowRemoteControl,
+  'supplementalGroupIDs': instance.supplementalGroupIDs.toList(),
+  'authToken': instance.authToken,
+};
+
+_Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
+  version: (json['version'] as num?)?.toInt() ?? 4,
+  valueSmoothing: (json['valueSmoothing'] as num?)?.toInt() ?? 1,
+  signalkServerNum: (json['signalkServerNum'] as num?)?.toInt() ?? 0,
+  signalkServerSettings:
+      (json['signalkServerSettings'] as List<dynamic>?)
+          ?.map(
+            (e) => _SignalKServerSettings.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
   notificationMuteTimeout:
       (json['notificationMuteTimeout'] as num?)?.toInt() ?? 15,
   demoMode: json['demoMode'] as bool? ?? false,
@@ -184,18 +216,8 @@ _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
 Map<String, dynamic> _$SettingsToJson(_Settings instance) => <String, dynamic>{
   'version': instance.version,
   'valueSmoothing': instance.valueSmoothing,
-  'discoverServer': instance.discoverServer,
-  'signalkUrl': instance.signalkUrl,
-  'httpHeaders': instance.httpHeaders,
-  'signalkMinPeriod': instance.signalkMinPeriod,
-  'signalkConnectionTimeout': instance.signalkConnectionTimeout,
-  'realTimeDataTimeout': instance.realTimeDataTimeout,
-  'infrequentDataTimeout': instance.infrequentDataTimeout,
-  'clientID': instance.clientID,
-  'groupID': instance.groupID,
-  'allowRemoteControl': instance.allowRemoteControl,
-  'supplementalGroupIDs': instance.supplementalGroupIDs.toList(),
-  'authToken': instance.authToken,
+  'signalkServerNum': instance.signalkServerNum,
+  'signalkServerSettings': instance.signalkServerSettings,
   'notificationMuteTimeout': instance.notificationMuteTimeout,
   'demoMode': instance.demoMode,
   'quickPageSwitch': instance.quickPageSwitch,

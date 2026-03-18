@@ -998,9 +998,8 @@ class _HttpHeader {
 }
 
 @JsonSerializable()
-class _Settings {
-  int version;
-  int valueSmoothing;
+class _SignalKServerSettings {
+  String id;
   bool discoverServer;
   String signalkUrl;
   late List<_HttpHeader> httpHeaders;
@@ -1013,6 +1012,41 @@ class _Settings {
   bool allowRemoteControl;
   Set<String> supplementalGroupIDs;
   String authToken;
+
+  _SignalKServerSettings({
+    String? id,
+    this.discoverServer = true,
+    this.signalkUrl = '',
+    this.httpHeaders = const [],
+    this.signalkMinPeriod = 500,
+    this.signalkConnectionTimeout = 20000,
+    this.realTimeDataTimeout = 10000,
+    this.infrequentDataTimeout = 90000,
+    String? clientID,
+    this.groupID = '',
+    this.allowRemoteControl = false,
+    this.supplementalGroupIDs = const {},
+    this.authToken = '',
+  }) :
+    id = id??'server-${customAlphabet('0123456789', 4)}',
+    clientID = clientID??'boatinstrument-${customAlphabet('0123456789', 4)}'
+  {
+    if(httpHeaders.isEmpty) httpHeaders = [];
+  }
+
+  factory _SignalKServerSettings.fromJson(Map<String, dynamic> json) =>
+      _$SignalKServerSettingsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SignalKServerSettingsToJson(this);
+
+}
+
+@JsonSerializable()
+class _Settings {
+  int version;
+  int valueSmoothing;
+  int signalkServerNum;
+  List<_SignalKServerSettings> signalkServerSettings;
   int notificationMuteTimeout; //Minutes
   bool demoMode;
   bool quickPageSwitch;
@@ -1043,20 +1077,10 @@ class _Settings {
   String get fileName => _store!.absolute.path;
 
   _Settings({
-    this.version = 2,
+    this.version = 4,
     this.valueSmoothing = 1,
-    this.discoverServer = true,
-    this.signalkUrl = '',
-    this.httpHeaders = const [],
-    this.signalkMinPeriod = 500,
-    this.signalkConnectionTimeout = 20000,
-    this.realTimeDataTimeout = 10000,
-    this.infrequentDataTimeout = 90000,
-    String? clientID,
-    this.groupID = '',
-    this.allowRemoteControl = false,
-    this.supplementalGroupIDs = const {},
-    this.authToken = '',
+    this.signalkServerNum = 0,
+    this.signalkServerSettings = const [],
     this.notificationMuteTimeout = 15,
     this.demoMode = false,
     this.darkMode = true,
@@ -1082,13 +1106,12 @@ class _Settings {
     this.pages = const [],
     Map<String, dynamic>? boxSettings
   }) :
-    boxSettings = boxSettings??{},
-    clientID = clientID??'boatinstrument-${customAlphabet('0123456789', 4)}'
+    boxSettings = boxSettings??{}
   {
     if(pages.isEmpty) {
       pages = [_Page._newPage()];
     }
-    if(httpHeaders.isEmpty) httpHeaders = [];
+    if(signalkServerSettings.isEmpty) signalkServerSettings = [_SignalKServerSettings()];
   }
 
   factory _Settings.fromJson(Map<String, dynamic> json) =>
@@ -1180,6 +1203,33 @@ class _Settings {
         }
 
         data['version'] = 3;
+      }
+
+      if(data['version'] == 3) {
+        _backup(f, 'v3');
+        l.i('Converting configuration from version 3 to 4');
+
+        // We now allow multiple SignalK servers.
+        data["signalkServerNum"] = 0;
+        data["signalkServerSettings"] = [
+          {
+            "id": "migrated",
+            "discoverServer": data['discoverServer'],
+            "signalkUrl": data["signalkUrl"],
+            "httpHeaders": data["httpHeaders"],
+            "signalkMinPeriod": data["signalkMinPeriod"],
+            "signalkConnectionTimeout": data["signalkConnectionTimeout"],
+            "realTimeDataTimeout": data["realTimeDataTimeout"],
+            "infrequentDataTimeout": data["infrequentDataTimeout"],
+            "clientID": data["clientID"],
+            "groupID": data["groupID"],
+            "allowRemoteControl": data["allowRemoteControl"],
+            "supplementalGroupIDs": data["supplementalGroupIDs"],
+            "authToken": data["authToken"]
+          }
+        ];
+
+        data['version'] = 4;
       }
 
       settings =_Settings.fromJson(data);

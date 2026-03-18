@@ -44,6 +44,8 @@ Occasionally Experimental Boxes cause issues that cannot be fixed and will be ma
 
 # SignalK Server Settings
 
+Whilst the app connects to a single SignalK Server multiple servers can be defined, each with its own connection details like ClientID and Authentication Token. Each server should be given a unique **Server ID**.
+
 If **mDNS** is enabled in your server's settings, your server should be automatically discovered. If discovery does not work, disable **Auto Discovery** and enter your server's URL.
 
 The **Subscription Min Period** is the minimum time between data updates. Increasing this value will reduce the load on your SignalK server.

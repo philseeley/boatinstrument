@@ -134,7 +134,8 @@ class _SettingsState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     bool isLinux = Platform.isLinux;
-    _Settings settings = widget._controller._settings!;
+    var c = widget._controller;
+    var settings = c._settings!;
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     List<Widget> list = [
@@ -267,22 +268,6 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Port/Starboard Colours:"),
           title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),
-      _Divider('SignalK'), //=====================================================
-      SwitchListTile(title: const Text("Auto Discover:"),
-          value: settings.discoverServer,
-          onChanged: settings.demoMode ? null : (bool value) {
-            setState(() {
-              settings.discoverServer = value;
-            });
-          }),
-      ListTile(
-          leading: const Text("URL:"),
-          title: BiTextFormField(enabled: (!settings.discoverServer && !settings.demoMode),
-              decoration: const InputDecoration(hintText: 'http://mypi.local:3000'),
-              initialValue: settings.signalkUrl,
-              onChanged: (value) => settings.signalkUrl = value),
-          trailing: OutlinedButton(onPressed: _editHttpHeaders, child: Text('Headers')),
-      ),
       SwitchListTile(title: const Text("Demo Mode:"),
           value: settings.demoMode,
           onChanged: (bool value) {
@@ -290,79 +275,125 @@ class _SettingsState extends State<SettingsPage> {
               settings.demoMode = value;
             });
           }),
-      ListTile(
+      if(!settings.demoMode) ...[
+        _Divider('SignalK'), //=====================================================
+        ListTile(
+          leading: Text('Server:'),
+          title: DropdownMenu<int>(
+            key: UniqueKey(),
+            expandedInsets: EdgeInsets.zero,
+            requestFocusOnTap: false,
+            initialSelection: settings.signalkServerNum,
+            dropdownMenuEntries: settings.signalkServerSettings.asMap().entries.map<DropdownMenuEntry<int>>((e) {return DropdownMenuEntry<int>(
+                style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+                value: e.key,
+                label: e.value.id);}).toList(),
+            onSelected: (value) {
+              setState(() {
+                settings.signalkServerNum = value??0;
+              });
+            },
+          ),
+          trailing: IconButton(onPressed: _addServer, icon: Icon(Icons.add)),
+        ),
+        ListTile(
+          leading: const Text("Server ID:"),
+          title: BiTextFormField(
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
+            initialValue: c._signalk.id,
+            onChanged: (value) => c._signalk.id = value),
+          trailing: IconButton(onPressed: settings.signalkServerSettings.length>1?_deleteServer:null, icon: Icon(Icons.delete)),
+        ),
+        SwitchListTile(title: const Text("Auto Discover:"),
+          value: c._signalk.discoverServer,
+          onChanged: (bool value) {
+            setState(() {
+              c._signalk.discoverServer = value;
+            });
+          }),
+        ListTile(
+          leading: const Text("URL:"),
+          title: BiTextFormField(enabled: (!c._signalk.discoverServer),
+            decoration: const InputDecoration(hintText: 'http://mypi.local:3000'),
+            initialValue: c._signalk.signalkUrl,
+            onChanged: (value) => c._signalk.signalkUrl = value),
+          trailing: OutlinedButton(onPressed: _editHttpHeaders, child: Text('Headers')),
+        ),
+        ListTile(
           leading: const Text("Subscription Min Period:"),
           title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.signalkMinPeriod.toString(),
-              onChanged: (value) => settings.signalkMinPeriod = int.parse(value)),
+              initialValue: c._signalk.signalkMinPeriod.toString(),
+              onChanged: (value) => c._signalk.signalkMinPeriod = int.parse(value)),
           trailing: const Text('ms')
-      ),
-      ListTile(
+        ),
+        ListTile(
           leading: const Text("Connection Timeout:"),
           title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.signalkConnectionTimeout.toString(),
-              onChanged: (value) => settings.signalkConnectionTimeout = int.parse(value)),
+              initialValue: c._signalk.signalkConnectionTimeout.toString(),
+              onChanged: (value) => c._signalk.signalkConnectionTimeout = int.parse(value)),
           trailing: const Text('ms')
-      ),
-      ListTile(
+        ),
+        ListTile(
           leading: const Text("Real-time Data Timeout:"),
           title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.realTimeDataTimeout.toString(),
-              onChanged: (value) => settings.realTimeDataTimeout = int.parse(value)),
+              initialValue: c._signalk.realTimeDataTimeout.toString(),
+              onChanged: (value) => c._signalk.realTimeDataTimeout = int.parse(value)),
           trailing: const Text('ms')
-      ),
-      ListTile(
+        ),
+        ListTile(
           leading: const Text("Infrequent Data Timeout:"),
           title: BiTextFormField(
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              initialValue: settings.infrequentDataTimeout.toString(),
-              onChanged: (value) => settings.infrequentDataTimeout = int.parse(value)),
+              initialValue: c._signalk.infrequentDataTimeout.toString(),
+              onChanged: (value) => c._signalk.infrequentDataTimeout = int.parse(value)),
           trailing: const Text('ms')
-      ),
-      _Divider('Authentication'), //=====================================================
-      ListTile(
+        ),
+        _Divider('Authentication'), //=====================================================
+        ListTile(
           leading: const Text("App ID:"),
           title: BiTextFormField(
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
-            initialValue: settings.clientID,
-            onChanged: (value) => settings.clientID = value)
-      ),
-      ListTile(
+            initialValue: c._signalk.clientID,
+            onChanged: (value) => c._signalk.clientID = value)
+        ),
+        ListTile(
           leading: const Text("Group ID:"),
           title: BiTextFormField(
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
-            initialValue: settings.groupID,
-            onChanged: (value) => settings.groupID = value),
-      ),
-      ListTile(
-            leading: const Text("Supplemental Group IDs:"),
-            title: Text(settings.supplementalGroupIDs.isEmpty?'':settings.supplementalGroupIDs.reduce((one, two) {return '$one, $two';})),
-            trailing: IconButton(onPressed: _editGroups, icon: Icon(Icons.edit)),
-      ),
-      SwitchListTile(title: const Text("Allow Remote Control:"),
-          value: settings.allowRemoteControl,
+            initialValue: c._signalk.groupID,
+            onChanged: (value) => c._signalk.groupID = value),
+        ),
+        ListTile(
+          leading: const Text("Supplemental Group IDs:"),
+          title: Text(c._signalk.supplementalGroupIDs.isEmpty?'':c._signalk.supplementalGroupIDs.reduce((one, two) {return '$one, $two';})),
+          trailing: IconButton(onPressed: _editGroups, icon: Icon(Icons.edit)),
+        ),
+        SwitchListTile(title: const Text("Allow Remote Control:"),
+          value: c._signalk.allowRemoteControl,
           onChanged: (bool value) {
             setState(() {
-              settings.allowRemoteControl = value;
+              c._signalk.allowRemoteControl = value;
             });
-          }),
-      ListTile(
+          }
+        ),
+        ListTile(
           leading: const Text("Request Auth Token:"),
           title: IconButton(onPressed: _requestAuthToken, icon: const Icon(Icons.login)),
           trailing: IconButton(onPressed: _showAuthHelpPage, icon: const Icon(Icons.help)),
-      ),
-      ListTile(
+        ),
+        ListTile(
           leading: const Text("Auth Token:"),
-          title: Text(settings.authToken),
+          title: Text(c._signalk.authToken),
           trailing: IconButton(onPressed: _deleteAuthToken, icon: const Icon(Icons.delete))
-      ),
+        ),
+      ],
       _Divider('Advanced'), //=====================================================
       ListTile(
         leading: const Text("Notification Mute Timeout:"),
@@ -401,7 +432,6 @@ class _SettingsState extends State<SettingsPage> {
         context: context,
         title: const Text("Settings"),
         actions: [
-
           if(widget._controller._enablePoweroff) IconButton(tooltip: 'Poweroff', icon: const Icon(Icons.power_settings_new), onPressed: _poweroff),
           if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.exit_to_app), onPressed: _exit),
           if(!isLinux) IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
@@ -476,15 +506,33 @@ class _SettingsState extends State<SettingsPage> {
     }));
   }
 
+  void _addServer() {
+    var settings = widget._controller._settings!;
+
+    setState(() {
+      widget._controller._settings!.signalkServerSettings.add(_SignalKServerSettings());
+      settings.signalkServerNum = settings.signalkServerSettings.length-1;
+    });
+  }
+
+  void _deleteServer() {
+    var settings = widget._controller._settings!;
+
+    setState(() {
+      settings.signalkServerSettings.removeAt(settings.signalkServerNum);
+      if(settings.signalkServerNum >= settings.signalkServerSettings.length) settings.signalkServerNum = settings.signalkServerSettings.length-1;
+    });
+  }
+
   void _editHttpHeaders () async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
-      return _EditHttpHeaders(widget._controller, widget._controller._settings!.httpHeaders);
+      return _EditHttpHeaders(widget._controller, widget._controller._signalk.httpHeaders);
     }));
   }
 
   void _editGroups () async {
-    List<String> groupsList = widget._controller._settings!.supplementalGroupIDs.toList();
+    List<String> groupsList = widget._controller._signalk.supplementalGroupIDs.toList();
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
       return _EditSupplementaryGroups(groupsList);
@@ -493,33 +541,35 @@ class _SettingsState extends State<SettingsPage> {
     setState(() {
       // We remove any empty and duplicate groups.
       groupsList.removeWhere((g) => g.isEmpty);
-      widget._controller._settings!.supplementalGroupIDs = groupsList.toSet();
+      widget._controller._signalk.supplementalGroupIDs = groupsList.toSet();
     });
   }
 
   void _requestAuthToken() async {
-    SignalKAuthorization(widget._controller).request(widget._controller._settings!.clientID, "Boat Instrument",
-            (authToken) {
+    // We force a re-connect so that if the server's been changed we connect to the right one.
+    await widget._controller.connect();
+    SignalKAuthorization(widget._controller).request(widget._controller._signalk.clientID, "Boat Instrument",
+        (authToken) {
           setState(() {
-            widget._controller._settings!.authToken = authToken;
+            widget._controller._signalk.authToken = authToken;
           });
         },
-            (msg) {
+        (msg) {
           if (mounted) {
             setState(() {
-              widget._controller._settings!.authToken = msg;
+              widget._controller._signalk.authToken = msg;
             });
           }
         });
 
     setState(() {
-      widget._controller._settings!.authToken = 'PENDING - keep this page open until request approved';
+      widget._controller._signalk.authToken = 'PENDING - keep this page open until request approved';
     });
   }
 
   void _deleteAuthToken()  {
     setState(() {
-      widget._controller._settings!.authToken = '';
+      widget._controller._signalk.authToken = '';
     });
   }
 }

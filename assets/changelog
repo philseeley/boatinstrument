@@ -1,8 +1,11 @@
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
+           Multiple SignalK Servers can be defined.
            Boxes can now be marked as Deprecated.
+           When reconnecting we reinitialise the time sync.
 
            New Boxes:
              Webcam(ONVIF)
+             AIS
 
            Box updates:
              Anchor Alarm reworked to show Charts/Maps.
