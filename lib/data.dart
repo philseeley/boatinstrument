@@ -982,6 +982,8 @@ enum DoubleValueToDisplay implements EnumMenuEntry {
   const DoubleValueToDisplay(this._displayName, this.title);
 }
 
+class _ConfigNotFound implements Exception {}
+
 @JsonSerializable()
 class _HttpHeader {
   String name;
@@ -1135,6 +1137,9 @@ class _Settings {
 
     _Settings settings;
 
+    // On first run no config file exists.
+    if(!f.existsSync()) throw _ConfigNotFound();
+
     try {
       String s = f.readAsStringSync();
       dynamic data = json.decode(s);
@@ -1235,7 +1240,7 @@ class _Settings {
       settings =_Settings.fromJson(data);
     } catch (e) {
       l.e('Failed to decode config', error: e);
-       _backup(f, 'bad.${DateTime.now()}');
+       _backup(f, 'bad.${DateTime.now().toIso8601String()}');
       rethrow;
     }
     return settings;

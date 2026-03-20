@@ -405,6 +405,8 @@ class BoatInstrumentController {
   Future<void> loadSettings(String configFile, bool portrait) async {
     try {
       _settings = await _Settings.load(configFile);
+    } on _ConfigNotFound {
+      await _loadDefaultConfig(portrait);
     } on Exception catch (e) {
       l.e('Exception loading Settings', error: e);
       await _loadDefaultConfig(portrait);
