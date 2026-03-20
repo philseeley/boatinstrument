@@ -19,12 +19,4 @@ Once set, you can unlock and drag the anchor to move it and resize the alarm rad
 
 **Note:** once **Unlocked**, swiping within the Box will not change the Page. Either re-lock or swipe on a different Box. The Box will automatically re-lock in 2 minutes.
 
-## Charts
-
-Charts/maps can be displayed from the [@signalk/charts-plugin](https://github.com/SignalK/charts-plugin#readme), which can serve local or cached online charts.
-
-Information on available tile servers can be found [here](https://docs.fleaflet.dev/tile-servers).
-
-![increase](assets/icons/__THEME__/add.png) Zooms in
-![decrees](assets/icons/__THEME__/all_out.png) Resets the view around the anchor
-![decrees](assets/icons/__THEME__/remove.png) Zooms out
+[Charts/Maps](doc:charts.md) can be display if configured in your SignalK server.

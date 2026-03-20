@@ -1213,7 +1213,7 @@ class _Settings {
         data["signalkServerNum"] = 0;
         data["signalkServerSettings"] = [
           {
-            "id": "migrated",
+            "id": "my-signalk",
             "discoverServer": data['discoverServer'],
             "signalkUrl": data["signalkUrl"],
             "httpHeaders": data["httpHeaders"],

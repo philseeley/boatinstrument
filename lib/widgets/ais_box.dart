@@ -242,6 +242,8 @@ class AISDisplayBox extends BoxWidget {
   @override
   Widget? getHelp() => HelpPage(text: '''The length of the line shows the predicted location of the vessel in a configurable number of minutes time, given its Course and Speed over Ground.
 
+[Charts/Maps](doc:charts.md) can be display if configured in your SignalK server.
+
 The targets are coloured as:
 - Fishing - Orange
 - Sailing - Purple
@@ -260,7 +262,9 @@ The targets are coloured as:
   @override
   Widget? getSettingsHelp() => HelpPage(text: '''The **COG-SOG Prediction** is the number of minutes to predict the vessel's future position, i.e. the length of the line.
 
-The **Vessel Timeout** is the number of minutes that a vessel will be displayed after its last position report.''');
+The **Vessel Timeout** is the number of minutes that a vessel will be displayed after its last position report.
+
+[Charts/Maps](doc:charts.md) can be display if configured in your SignalK server.''');
 
   @override
   State<StatefulWidget> createState() => _AISDisplayState();
