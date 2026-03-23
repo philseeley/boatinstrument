@@ -268,6 +268,7 @@ class _SettingsState extends State<SettingsPage> {
           leading: const Text("Port/Starboard Colours:"),
           title: EnumDropdownMenu(PortStarboardColors.values, widget._controller._settings?.portStarboardColors, (v) {widget._controller._settings?.portStarboardColors = v!;})
       ),
+      _Divider('SignalK'), //=====================================================
       SwitchListTile(title: const Text("Demo Mode:"),
           value: settings.demoMode,
           onChanged: (bool value) {
@@ -276,7 +277,6 @@ class _SettingsState extends State<SettingsPage> {
             });
           }),
       if(!settings.demoMode) ...[
-        _Divider('SignalK'), //=====================================================
         ListTile(
           leading: Text('Server:'),
           title: DropdownMenu<int>(
