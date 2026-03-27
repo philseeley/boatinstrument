@@ -69,7 +69,7 @@ class SignalKAuthorization {
                 'Failed: permission ${data['accessRequest']['permission']}');
           }
         } else {
-          _onError('Failed: code ${data['statusCode']}');
+          _onError('Failed: ${data['statusCode']} ${data['message']}');
         }
       } else {
         _checkAuhRequest();

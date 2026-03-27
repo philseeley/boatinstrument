@@ -2,6 +2,8 @@
            Multiple SignalK Servers can be defined.
            Boxes can now be marked as Deprecated.
            When reconnecting we reinitialise the time sync.
+           When connecting, we do an explicit IP lookup to stop additional
+             lookups for any subsequent connections.
 
            New Boxes:
              Webcam(ONVIF)

@@ -890,6 +890,13 @@ class BoatInstrumentController {
     return await http.post(uri, headers: _httpHeaders(headers), body: body);
   }
 
+  // We do an explicit lookup to get the IP so any future
+  // connections do not incur the lookup, which can be costly.
+  Future<Uri> _convert2IP(Uri uri) async {
+    var ip = await InternetAddress.lookup(uri.host);
+    return uri.replace(host: ip.first.address);
+  }
+
   Future<void> _discoverServices() async {
     try {
       Uri url = Uri.parse(_signalk.signalkUrl);
@@ -902,8 +909,7 @@ class BoatInstrumentController {
         host = 'demo.signalk.org';
         port = 443;
         scheme = 'https';
-      }
-      else if(_signalk.discoverServer) {
+      } else if(_signalk.discoverServer) {
         host = '';
         port = 0;
         BonsoirDiscovery discovery = BonsoirDiscovery(type:  '_signalk-http._tcp');
@@ -936,8 +942,8 @@ class BoatInstrumentController {
       dynamic data = json.decode(response.body);
       dynamic endPoints = data['endpoints']['v1'];
 
-      _httpApiUri = Uri.parse(endPoints['signalk-http']);
-      _wsUri = Uri.parse(endPoints['signalk-ws']);
+      _httpApiUri = await _convert2IP(Uri.parse(endPoints['signalk-http']));
+      _wsUri = await _convert2IP(Uri.parse(endPoints['signalk-ws']));
     } catch(e) {
       l.e('Error discovering services', error: e);
       rethrow;

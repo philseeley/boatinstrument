@@ -130,6 +130,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsState extends State<SettingsPage> {
+  String? _authMsg;
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +391,7 @@ class _SettingsState extends State<SettingsPage> {
         ),
         ListTile(
           leading: const Text("Auth Token:"),
-          title: Text(c._signalk.authToken),
+          title: Text(_authMsg!=null?_authMsg!:c._signalk.authToken),
           trailing: IconButton(onPressed: _deleteAuthToken, icon: const Icon(Icons.delete))
         ),
       ],
@@ -546,25 +547,26 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   void _requestAuthToken() async {
+    setState(() {
+      _authMsg = 'PENDING - keep this page open until request approved';
+    });
+    
     // We force a re-connect so that if the server's been changed we connect to the right one.
     await widget._controller.connect();
     SignalKAuthorization(widget._controller).request(widget._controller._signalk.clientID, "Boat Instrument",
         (authToken) {
           setState(() {
+            _authMsg = null;
             widget._controller._signalk.authToken = authToken;
           });
         },
         (msg) {
           if (mounted) {
             setState(() {
-              widget._controller._signalk.authToken = msg;
+              _authMsg = msg;
             });
           }
         });
-
-    setState(() {
-      widget._controller._signalk.authToken = 'PENDING - keep this page open until request approved';
-    });
   }
 
   void _deleteAuthToken()  {
