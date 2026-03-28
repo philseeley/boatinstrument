@@ -164,6 +164,12 @@ class MainPageState extends State<MainPage> {
     _controller = BoatInstrumentController(this, widget.noAudio, widget.noBrightnessControl, widget.enableExit, widget.enablePoweroff, widget.enableSetTime);
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future<void> _configure () async {
     if(!widget.noFullScreen) await FullScreen.ensureInitialized();
     if(mounted) await _controller.loadSettings(widget.configFile, MediaQuery.of(context).orientation == Orientation.portrait);

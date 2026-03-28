@@ -126,6 +126,7 @@ class NotificationStatus {
 
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
+  final _httpClient = http.Client();
   final bool _noAudio;
   final bool _noBrightnessControls;
   final bool _enableExit;
@@ -211,6 +212,10 @@ class BoatInstrumentController {
   Set<String> get paths => _paths;
   Set<String> get controlPaths => _controlPaths;
   Set<String> get staticPaths => _staticPaths;
+
+  void dispose() {
+    _httpClient.close();
+  }
 
   DateTime now() {
     DateTime now = DateTime.now();
@@ -879,15 +884,15 @@ class BoatInstrumentController {
   }
 
   Future<http.Response> httpGet(Uri uri, {Map<String, String>? headers}) async {
-    return await http.get(uri, headers: _httpHeaders(headers));
+    return await _httpClient.get(uri, headers: _httpHeaders(headers));
   }
 
   Future<http.Response> httpPut(Uri uri, {Map<String, String>? headers, Object? body}) async {
-    return await http.put(uri, headers: _httpHeaders(headers), body: body);
+    return await _httpClient.put(uri, headers: _httpHeaders(headers), body: body);
   }
 
   Future<http.Response> httpPost(Uri uri, {Map<String, String>? headers, Object? body}) async {
-    return await http.post(uri, headers: _httpHeaders(headers), body: body);
+    return await _httpClient.post(uri, headers: _httpHeaders(headers), body: body);
   }
 
   // We do an explicit lookup to get the IP so any future
