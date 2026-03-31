@@ -626,7 +626,7 @@ ${(_phaseName == null) ? '-' : _phaseName}''';
 
     return Stack(children: [
       if(widget._perBoxSettings.showMoon)
-        Padding(padding: const EdgeInsets.all(HeadedTextBoxState.pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
+        Padding(padding: const EdgeInsets.all(pad), child: RepaintBoundary(child: CustomPaint(size: Size.infinite,
           painter: _MoonPainter(_fraction??0)))),
       super.build(context)
     ]);

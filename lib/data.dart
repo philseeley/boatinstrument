@@ -540,8 +540,6 @@ class HeadedBoxState<T extends BoxWidget> extends State<T> {
 }
 
 class HeadedTextBoxState<T extends BoxWidget> extends HeadedBoxState<T> {
-  static const double pad = 5.0;
-
   String text = '';
   Color? color;
   Color? textBgColor;

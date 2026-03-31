@@ -394,8 +394,8 @@ class _WindRoseBoxState extends State<WindRoseBox> {
     }
 
     if(widget._settings.showButton) {
-      stack.add(Positioned(right: 0, bottom: 0, child:
-      IconButton(icon: Icon((widget._settings.type == WindRoseType.auto) ? Icons.lock_open : Icons.lock),
+      stack.add(Positioned(right: 0, top: 0, child:
+        IconButton(icon: Icon((widget._settings.type == WindRoseType.auto) ? Icons.lock_open : Icons.lock),
           onPressed: _cycleType))
       );
     }

@@ -10,7 +10,9 @@
              AIS
 
            Box updates:
-             Anchor Alarm reworked to show Charts/Maps.
+             Anchor Alarm reworked to show Charts/Maps
+             Wind Rose, moved the type toggle button to top right to be
+               consistent with other Boxes
              Web view marked as Deprecated
   * 0.9.0 When adding HTTP headers, we now make sure the names are not blank
             as that causes connection errors.
