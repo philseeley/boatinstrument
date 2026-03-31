@@ -65,7 +65,7 @@ class HelpPageState extends State<HelpPage> {
 
     _text = _text!.replaceAll('__THEME__', Theme.of(context).brightness.name);
 
-    return Scaffold(
+    return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _back(context);}, child: Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: () {
           _back(context);
@@ -90,7 +90,7 @@ class HelpPageState extends State<HelpPage> {
           data: _text!,
         )
       )
-    );
+    ));
   }  
 
   void _showChangeLog (BuildContext context) async {
