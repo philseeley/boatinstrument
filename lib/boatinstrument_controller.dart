@@ -1383,6 +1383,8 @@ class BoatInstrumentController {
     }
 
     _timeSet = true;
+    // We need to resync as OS time might have changed.
+    _time = null;
   }
 
   Future<void> showSettingsPage (BuildContext context, BoxWidget boxWidget) async {
