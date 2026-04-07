@@ -55,7 +55,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   final _ElectricalBatterySettings _settings;
 
   const BatteryVoltMeterBox._init(this._settings, config, title, path, {super.key, super.minValue, super.maxValue, super.ranges, super.step}) :
-    super(config, title, GaugeOrientation.up, path, dataType: SignalKDataType.infrequent);
+    super(config, title, GaugeOrientation.up, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory BatteryVoltMeterBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalBatterySettings s = _$ElectricalBatterySettingsFromJson(config.settings);
@@ -158,7 +158,7 @@ class BatteryVoltageBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const BatteryVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, dataType: SignalKDataType.infrequent);
+  const BatteryVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory BatteryVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
@@ -302,7 +302,7 @@ class SolarVoltageBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const SolarVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, dataType: SignalKDataType.infrequent);
+  const SolarVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory SolarVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
