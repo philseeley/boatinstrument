@@ -443,6 +443,10 @@ class _SunlightBox extends HeadedTextBoxState<SunlightBox> {
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.sunlight.times.*'}, dataType: SignalKDataType.infrequent);
   }
 
+  String _sep(DateFormat fmt, DateTime now) {
+    return '\u2015\u2015\u2015\u2015\u2015${fmt.format(_utc?now.toUtc():now.toLocal())}\u2015\u2015\u2015\u2015\u2015';
+  }
+
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
@@ -460,9 +464,16 @@ class _SunlightBox extends HeadedTextBoxState<SunlightBox> {
       if(t == null) {
         textBuffer.writeln('-');
       } else {
+        var last = i == _times.length-1;
+        var thisTime = now.compareTo(t.time);
+        var nextTime = last ? 0 : now.compareTo(_times[i+1]?.time??now);
+
+        if(i == 0 && thisTime < 0) {
+          textBuffer.writeln(_sep(fmt, now));
+        }
         textBuffer.writeln('${t.name} ${fmt.format(_utc?t.time.toUtc():t.time.toLocal())}');
-        if(i < _times.length-1 && now.compareTo(t.time) >= 0 && now.compareTo(_times[i+1]?.time??now) < 0) {
-          textBuffer.writeln('\u23BC\u23BC\u23BC\u23BC\u23BC${fmt.format(_utc?now.toUtc():now.toLocal())}\u23BC\u23BC\u23BC\u23BC\u23BC');
+        if((last && thisTime > 0) || (thisTime >= 0 && nextTime < 0)) {
+          textBuffer.writeln(_sep(fmt, now));
         }
       }
     }
