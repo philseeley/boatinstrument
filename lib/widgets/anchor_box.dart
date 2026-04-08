@@ -35,8 +35,8 @@ class _Map extends StatelessWidget {
   final BoatInstrumentController _controller;
   final SignalkChart _signalkChart;
   final double _zoom;
-  final ll.LatLng? _position;
-  final ll.LatLng _anchorPosition;
+  final ll.LatLng _position;
+  final ll.LatLng? _anchorPosition;
   final ll.LatLng? _newAnchorPosition;
   final double? _currentRadius;
   final double? _maxRadius;
@@ -88,8 +88,8 @@ class _Map extends StatelessWidget {
       tp.dispose();
     }
 
-    var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition, _newMaxRadius??_maxRadius!, 90);
-    var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition, _currentRadius!, 270);
+    var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition??_position, _newMaxRadius??_maxRadius!, 90);
+    var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition??_position, _currentRadius!, 270);
 
     String url = '';
     if(_signalkChart.tilemapUrl.isNotEmpty) {
@@ -106,7 +106,7 @@ class _Map extends StatelessWidget {
       mapController: _mapController,
       options: MapOptions(
         backgroundColor: bgColor,
-        initialCenter: _anchorPosition,
+        initialCenter: _anchorPosition??_position,
         initialZoom: _zoom,
         interactionOptions: InteractionOptions(
           flags: InteractiveFlag.none
@@ -115,17 +115,17 @@ class _Map extends StatelessWidget {
       children: [
         if(url.isNotEmpty) TileLayer(urlTemplate: url),
         CircleLayer(circles: [
-          if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
-          if(_currentRadius != null) CircleMarker(point: _anchorPosition, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_currentRadius != null) CircleMarker(point: _anchorPosition??_position, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
-          if(_position != null && _maxRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _maxRadius!, rad2Deg(_headingTrue))]),
-          if(_position != null && _maxRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position!, ll.Distance().offset(_position!, _maxRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
+          if(_maxRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius!, rad2Deg(_headingTrue))]),
+          if(_maxRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
-          Marker(point: _newAnchorPosition??_anchorPosition, child: Icon(Icons.anchor, color: _currentColor)),
-          if(_position != null) Marker(point: _position!, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _currentColor))),
+          if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
+          Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _currentColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
           if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
         ])
@@ -239,13 +239,13 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
 
     _map = null;
-    if(TickerMode.valuesOf(context).enabled && _anchorPosition != null) {
+    if(TickerMode.valuesOf(context).enabled && _position != null) {
       _map = _Map(
         widget.config.controller,
         _settings.signalkChart,
         zoom,
-        _position,
-        _anchorPosition!,
+        _position!,
+        _anchorPosition,
         _newAnchorPosition,
         _currentRadius,
         dropColor,
