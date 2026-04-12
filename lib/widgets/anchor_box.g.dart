@@ -14,6 +14,7 @@ _AnchorAlarmSettings _$AnchorAlarmSettingsFromJson(Map<String, dynamic> json) =>
       signalkChart: json['signalkChart'] == null
           ? const SignalkChart()
           : SignalkChart.fromJson(json['signalkChart'] as Map<String, dynamic>),
+      startWithChart: json['startWithChart'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$AnchorAlarmSettingsToJson(
@@ -23,4 +24,5 @@ Map<String, dynamic> _$AnchorAlarmSettingsToJson(
   'recordPoints': instance.recordPoints,
   'zoomIncrement': instance.zoomIncrement,
   'signalkChart': instance.signalkChart.toJson(),
+  'startWithChart': instance.startWithChart,
 };

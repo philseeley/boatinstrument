@@ -18,12 +18,14 @@ class _AnchorAlarmSettings {
   int recordPoints;
   double zoomIncrement;
   SignalkChart signalkChart;
+  bool startWithChart;
 
   _AnchorAlarmSettings({
     this.recordSeconds = 10,
     this.recordPoints = 1000,
     this.zoomIncrement = 0.5,
-    this.signalkChart = const SignalkChart()
+    this.signalkChart = const SignalkChart(),
+    this.startWithChart = true
   });
 
   factory _AnchorAlarmSettings.fromJson(Map<String, dynamic> json) => _$AnchorAlarmSettingsFromJson(json);
@@ -34,6 +36,7 @@ class _AnchorAlarmSettings {
 class _Map extends StatelessWidget {
   final BoatInstrumentController _controller;
   final SignalkChart _signalkChart;
+  final bool _showMap;
   final double _zoom;
   final ll.LatLng _position;
   final ll.LatLng? _anchorPosition;
@@ -55,6 +58,7 @@ class _Map extends StatelessWidget {
   _Map(
     this._controller,
     this._signalkChart,
+    this._showMap,
     this._zoom,
     this._position,
     this._anchorPosition,
@@ -92,7 +96,7 @@ class _Map extends StatelessWidget {
     var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition??_position, _currentRadius!, 270);
 
     String url = '';
-    if(_signalkChart.tilemapUrl.isNotEmpty) {
+    if(_showMap && _signalkChart.defined) {
       if(_signalkChart.proxy && _controller.httpApiUri.host.isNotEmpty) {
         // We don't use the Uri.replace() method as this performs URL encoding,
         // e.g. replaces'{' with '%7B', which isn't the template format.
@@ -173,6 +177,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   static final List<ll.LatLng> _positions = [];
   late DateTime _lastPositionTime;
   static double _zoom = 19;
+  bool _showMap = false;
   _Map? _map;
 
   @override
@@ -189,12 +194,20 @@ class _AnchorState extends State<AnchorAlarmBox> {
       'navigation.anchor.maxRadius',
       'navigation.anchor.currentRadius'
     });
+    _showMap = _settings.signalkChart.defined && _settings.startWithChart;
   }
 
   @override
   void dispose() {
     _lockTimer?.cancel();
     super.dispose();
+  }
+
+  void _toggleMap() {
+    if(widget.config.editMode) return;
+    setState(() {
+      _showMap = !_showMap;
+    });
   }
 
   void _changeZoom(int direction) {
@@ -243,6 +256,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       _map = _Map(
         widget.config.controller,
         _settings.signalkChart,
+        _showMap,
         zoom,
         _position!,
         _anchorPosition,
@@ -270,6 +284,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
           _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
         ])),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
+            if(_settings.signalkChart.defined) _button(_toggleMap, bg, iconStack: Stack(children: [Icon(Icons.map), if(!_showMap) Icon(Icons.close)])),
             _button(() {_changeZoom(1);}, bg, iconData: Icons.add),
             _button(_resetZoom, bg, iconData: Icons.all_out),
             _button(() {_changeZoom(-1);}, bg, iconData: Icons.remove)
@@ -546,9 +561,20 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
         title: SignalkChartsDropdownMenu(
           widget._controller,
           s.signalkChart,
-          (value) {s.signalkChart = value;}
+          (value) {
+            setState(() {
+              s.signalkChart = value;
+            });
+          }
         )
-      )
+      ),
+      if(s.signalkChart.defined) SwitchListTile(title: const Text("Show Map on Start:"),
+        value: s.startWithChart,
+        onChanged: (bool value) {
+          setState(() {
+            s.startWithChart = value;
+          });
+        }),
     ];
 
     return ListView(children: list);

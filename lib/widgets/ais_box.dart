@@ -17,12 +17,14 @@ class _AISDisplaySettings {
   double predictionMinutes;
   int vesselTimeout;
   SignalkChart signalkChart;
+  bool startWithChart;
 
   _AISDisplaySettings({
     this.showNames = true,
     this.predictionMinutes = 5,
     this.vesselTimeout = 10,
-    this.signalkChart = const SignalkChart()
+    this.signalkChart = const SignalkChart(),
+    this.startWithChart = true
   });
 
   factory _AISDisplaySettings.fromJson(Map<String, dynamic> json) => _$AISDisplaySettingsFromJson(json);
@@ -63,6 +65,7 @@ final Map<DistanceUnits, _ScaleConvert> _dist2m = {
 class _Map extends StatelessWidget {
   final BoatInstrumentController _controller;
   final _AISDisplaySettings _settings;
+  final bool _showMap;
   final Function() _onReady;
   final ll.LatLng _position;
   final double _zoom;
@@ -74,6 +77,7 @@ class _Map extends StatelessWidget {
   _Map(
     this._controller,
     this._settings,
+    this._showMap,
     this._onReady,
     this._position,
     this._zoom,
@@ -189,7 +193,7 @@ class _Map extends StatelessWidget {
     var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
     try {
       String url = '';
-      if(_settings.signalkChart.tilemapUrl.isNotEmpty) {
+      if(_settings.signalkChart.defined && _showMap) {
         if(_settings.signalkChart.proxy && _controller.httpApiUri.host.isNotEmpty) {
           // We don't use the Uri.replace() method as this performs URL encoding,
           // e.g. replaces'{' with '%7B', which isn't the template format.
@@ -274,6 +278,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
   static final Map<String, _Vessel> _vessels = {};
 
   late final _AISDisplaySettings _settings;
+  bool _showMap = false;
   Timer? _lockTimer;
   double _zoom = 14;
   static double _range = 2;
@@ -293,12 +298,18 @@ class _AISDisplayState extends State<AISDisplayBox> {
       'design.aisShipType',
       'navigation.state'
     });
+    _showMap = _settings.signalkChart.defined && _settings.startWithChart;
   }
 
   @override
   void dispose() {
     _lockTimer?.cancel();
     super.dispose();
+  }
+
+  void _toggleMap() {
+    if(widget.config.editMode) return;
+    _showMap = !_showMap;
   }
 
   void _changeRange(bool increase) {
@@ -372,6 +383,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
       _map = _Map(
         widget.config.controller,
         _settings,
+        _showMap,
         _onReady,
         self.position,
         _zoom,
@@ -386,6 +398,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
         if(_map == null) MaxTextWidget('-'),
         if(_map != null) AbsorbPointer(child: _map!),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
+            if(_settings.signalkChart.defined) _button(_toggleMap, bg, iconStack: Stack(children: [Icon(Icons.map), if(!_showMap) Icon(Icons.close)])),
             _button(() {_changeRange(false);}, bg, iconData: Icons.add),
             _button(() {_changeRange(true);}, bg, iconData: Icons.remove)
         ])),
@@ -532,9 +545,20 @@ class _AISDisplaySettingsState extends State<_AISDisplaySettingsWidget> {
         title: SignalkChartsDropdownMenu(
           widget._controller,
           s.signalkChart,
-          (value) {s.signalkChart = value;}
+          (value) {
+            setState(() {
+              s.signalkChart = value;
+            });
+          }
         )
-      )
+      ),
+      if(s.signalkChart.defined) SwitchListTile(title: const Text("Show Map on Start:"),
+        value: s.startWithChart,
+        onChanged: (bool value) {
+          setState(() {
+            s.startWithChart = value;
+          });
+        }),
     ];
 
     return ListView(children: list);

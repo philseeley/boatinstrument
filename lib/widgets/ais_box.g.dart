@@ -14,6 +14,7 @@ _AISDisplaySettings _$AISDisplaySettingsFromJson(Map<String, dynamic> json) =>
       signalkChart: json['signalkChart'] == null
           ? const SignalkChart()
           : SignalkChart.fromJson(json['signalkChart'] as Map<String, dynamic>),
+      startWithChart: json['startWithChart'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$AISDisplaySettingsToJson(_AISDisplaySettings instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$AISDisplaySettingsToJson(_AISDisplaySettings instance) =>
       'predictionMinutes': instance.predictionMinutes,
       'vesselTimeout': instance.vesselTimeout,
       'signalkChart': instance.signalkChart.toJson(),
+      'startWithChart': instance.startWithChart,
     };

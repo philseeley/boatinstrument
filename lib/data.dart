@@ -299,6 +299,7 @@ class SignalkChart {
   @override
   int get hashCode => identifier.hashCode;
   
+  bool get defined => tilemapUrl.isNotEmpty;
 }
 
 class SignalkChartsDropdownMenu extends StatefulWidget {
@@ -364,16 +365,10 @@ class _SignalkChartsDropdownMenuState extends State<SignalkChartsDropdownMenu> {
       return const Text('Waiting for SignalK...');
     }
 
-    SignalkChart iv = widget._initialValue;
-    if(widget._initialValue.identifier.isEmpty) {
-       iv = _values.firstOrNull??SignalkChart();
-       widget._onSelected(iv);
-    }
-
     return DropdownMenu<SignalkChart>(
       expandedInsets: EdgeInsets.zero,
       enableSearch: false,
-      initialSelection: iv,
+      initialSelection: widget._initialValue,
       dropdownMenuEntries: _values.map<DropdownMenuEntry<SignalkChart>>((SignalkChart v) {return DropdownMenuEntry<SignalkChart>(
           style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
           value: v,
