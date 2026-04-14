@@ -1037,7 +1037,7 @@ class BatteryPowerGraph extends GraphBox {
   @override
   String get id => sid;
 
-  BatteryPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Power Usage', BatteryPowerGraphBackground(), step: 1000, zeroBase: false);
+  BatteryPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Battery Power', BatteryPowerGraphBackground(), step: 1000, zeroBase: false);
 
   @override
   double convert(double value) {

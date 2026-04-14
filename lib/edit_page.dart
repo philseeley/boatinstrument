@@ -284,10 +284,10 @@ class _EditPageState extends State<_EditPage> {
       _widgetSubMenuEntry(box, 'Electrical', [
         _widgetSubMenuEntry(box, 'Batteries', [
           _widgetMenuEntry(BatteriesBox.sid, 'All'),
-          _widgetMenuEntry(BatteryPowerGraph.sid, 'Power Usage'),
           _widgetMenuEntry(BatteryVoltMeterBox.sid, 'Volt Meter'),
           _widgetMenuEntry(BatteryVoltageBox.sid, 'Voltage'),
           _widgetMenuEntry(BatteryCurrentBox.sid, 'Current'),
+          _widgetMenuEntry(BatteryPowerGraph.sid, 'Power'),
           _widgetMenuEntry(BatteryTemperatureBox.sid, 'Temperature'),
         ]),
         _widgetSubMenuEntry(box, 'Solar', [
