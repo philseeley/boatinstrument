@@ -3,6 +3,9 @@ part of 'boatinstrument_controller.dart';
 const String bi = 'boatinstrument';
 const String degreesSymbol = '\u00B0'; // degrees symbol.
 const String degreesUnits = '${degreesSymbol}T'; // degrees symbol.
+const String milliSecondsUnits = 'ms';
+const String secondsUnits = 'secs';
+const String minutesUnits = 'mins';
 const String deltaChar = '\u0394';
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';

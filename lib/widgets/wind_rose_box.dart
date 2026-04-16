@@ -542,16 +542,18 @@ class _SettingsState extends State<_SettingsWidget> {
       ListTile(
         leading: const Text("Auto Switch Delay:"),
         title: Slider(
-            min: 1,
-            max: 60,
-            divisions: 60,
-            value: s.autoSwitchingDelay.toDouble(),
-            label: "${s.autoSwitchingDelay}",
-            onChanged: (double value) {
-              setState(() {
-                s.autoSwitchingDelay = value.toInt();
-              });
-            }),
+          min: 1,
+          max: 60,
+          divisions: 12,
+          value: s.autoSwitchingDelay.toDouble(),
+          label: "${s.autoSwitchingDelay}",
+          onChanged: (double value) {
+            setState(() {
+              s.autoSwitchingDelay = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${s.autoSwitchingDelay} $secondsUnits'),
       ),
     ]);
   }

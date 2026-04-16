@@ -143,16 +143,18 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
         leading: const Text("Value Smoothing:"),
         title: Slider(
-            min: 0,
-            max: 20,
-            divisions: 21,
-            value: settings.valueSmoothing.toDouble(),
-            label: "${settings.valueSmoothing.toInt()}",
-            onChanged: (double value) {
-              setState(() {
-                settings.valueSmoothing = value.toInt();
-              });
-            }),
+          min: 0,
+          max: 20,
+          divisions: 21,
+          value: settings.valueSmoothing.toDouble(),
+          label: "${settings.valueSmoothing.toInt()}",
+          onChanged: (double value) {
+            setState(() {
+              settings.valueSmoothing = value.toInt();
+            });
+          }
+        ),
+        trailing: Text(settings.valueSmoothing.toString()),
       ),
       SwitchListTile(title: const Text("Dark Mode:"),
           value: settings.darkMode,
@@ -222,16 +224,18 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
         leading: const Text("Meters to NM threshold:"),
         title: Slider(
-            min: 100,
-            max: 1000,
-            divisions: 900,
-            value: settings.m2nmThreshold.toDouble(),
-            label: "${settings.m2nmThreshold.toInt()}",
-            onChanged: settings.distanceUnits != DistanceUnits.nmM ? null : (double value) {
-              setState(() {
-                settings.m2nmThreshold = value.toInt();
-              });
-            }),
+          min: 100,
+          max: 1000,
+          divisions: 18,
+          value: settings.m2nmThreshold.toDouble(),
+          label: "${settings.m2nmThreshold.toInt()}",
+          onChanged: settings.distanceUnits != DistanceUnits.nmM ? null : (double value) {
+            setState(() {
+              settings.m2nmThreshold = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${settings.m2nmThreshold} ${DistanceUnits.meters.unit}'),
       ),
       ListTile(
           leading: const Text("Speed:       "),
@@ -327,7 +331,7 @@ class _SettingsState extends State<SettingsPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: c._signalk.signalkMinPeriod.toString(),
               onChanged: (value) => c._signalk.signalkMinPeriod = int.parse(value)),
-          trailing: const Text('ms')
+          trailing: const Text(milliSecondsUnits)
         ),
         ListTile(
           leading: const Text("Connection Timeout:"),
@@ -336,7 +340,7 @@ class _SettingsState extends State<SettingsPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: c._signalk.signalkConnectionTimeout.toString(),
               onChanged: (value) => c._signalk.signalkConnectionTimeout = int.parse(value)),
-          trailing: const Text('ms')
+          trailing: const Text(milliSecondsUnits)
         ),
         ListTile(
           leading: const Text("Real-time Data Timeout:"),
@@ -345,7 +349,7 @@ class _SettingsState extends State<SettingsPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: c._signalk.realTimeDataTimeout.toString(),
               onChanged: (value) => c._signalk.realTimeDataTimeout = int.parse(value)),
-          trailing: const Text('ms')
+          trailing: const Text(milliSecondsUnits)
         ),
         ListTile(
           leading: const Text("Infrequent Data Timeout:"),
@@ -354,7 +358,7 @@ class _SettingsState extends State<SettingsPage> {
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               initialValue: c._signalk.infrequentDataTimeout.toString(),
               onChanged: (value) => c._signalk.infrequentDataTimeout = int.parse(value)),
-          trailing: const Text('ms')
+          trailing: const Text(milliSecondsUnits)
         ),
         _Divider('Authentication'), //=====================================================
         ListTile(
@@ -399,17 +403,18 @@ class _SettingsState extends State<SettingsPage> {
       ListTile(
         leading: const Text("Notification Mute Timeout:"),
         title: Slider(
-            min: 5,
-            max: 60,
-            divisions: 11,
-            value: settings.notificationMuteTimeout.toDouble(),
-            label: "${settings.notificationMuteTimeout.toInt()}",
-            onChanged: (double value) {
-              setState(() {
-                settings.notificationMuteTimeout = value.toInt();
-              });
-            }),
-        trailing: const Text('minutes')
+          min: 5,
+          max: 60,
+          divisions: 11,
+          value: settings.notificationMuteTimeout.toDouble(),
+          label: "${settings.notificationMuteTimeout.toInt()}",
+          onChanged: (double value) {
+            setState(() {
+              settings.notificationMuteTimeout = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${settings.notificationMuteTimeout} $minutesUnits')
       ),
       SwitchListTile(title: const Text("Enable Experimental Boxes:"),
           value: settings.enableExperimentalBoxes,

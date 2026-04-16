@@ -263,16 +263,18 @@ class _RudderAngleSettingsState extends State<_RudderAngleSettingsWidget> {
       ListTile(
         leading: const Text("Max Angle:"),
         title: Slider(
-            min: 20,
-            max: 90,
-            divisions: 71,
-            value: s.maxAngle.toDouble(),
-            label: "${s.maxAngle.toInt()}",
-            onChanged: (double value) {
-              setState(() {
-                s.maxAngle = value.toInt();
-              });
-            }),
+          min: 20,
+          max: 90,
+          divisions: 71,
+          value: s.maxAngle.toDouble(),
+          label: "${s.maxAngle.toInt()}",
+          onChanged: (double value) {
+            setState(() {
+              s.maxAngle = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${s.maxAngle.toInt()} $degreesSymbol'),
       ),
       SwitchListTile(title: const Text("Auto Scale:"),
           value: s.autoScale,

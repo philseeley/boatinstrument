@@ -26,7 +26,7 @@ class _RemoteControlSettings {
     this.controlRotatePages = true,
     this.controlBrightness = true,
     this.enableLock = false,
-    this.lockSeconds = 5
+    this.lockSeconds = 6
   });
 }
 
@@ -268,14 +268,16 @@ class _RemoteControlSettingsState extends State<_RemoteControlSettingsWidget> {
         title: Slider(
           min: 2.0,
           max: 120.0,
-          divisions: 58,
+          divisions: 59,
           value: s.lockSeconds.toDouble(),
           label: "${s.lockSeconds.toInt()}s",
           onChanged: (double value) {
             setState(() {
               s.lockSeconds = value.toInt();
             });
-          }),
+          }
+        ),
+        trailing: Text('${s.lockSeconds} $secondsUnits'),
       ),
     ]);
   }

@@ -513,31 +513,34 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
       ListTile(
         leading: const Text("Record Position Period:"),
         title: Slider(
-            min: 1,
-            max: 60,
-            divisions: 6,
-            value: s.recordSeconds.toDouble(),
-            label: "${s.recordSeconds}",
-            onChanged: (double value) {
-              setState(() {
-                s.recordSeconds = value.toInt();
-              });
-            }),
-        trailing: const Text('sec'),
+          min: 1,
+          max: 60,
+          divisions: 6,
+          value: s.recordSeconds.toDouble(),
+          label: "${s.recordSeconds}",
+          onChanged: (double value) {
+            setState(() {
+              s.recordSeconds = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${s.recordSeconds} $secondsUnits'),
       ),
       ListTile(
         leading: const Text("Record Points:"),
         title: Slider(
-            min: 100,
-            max: 10000,
-            divisions: 99,
-            value: s.recordPoints.toDouble(),
-            label: "${s.recordPoints}",
-            onChanged: (double value) {
-              setState(() {
-                s.recordPoints = value.toInt();
-              });
-            }),
+          min: 100,
+          max: 10000,
+          divisions: 99,
+          value: s.recordPoints.toDouble(),
+          label: "${s.recordPoints}",
+          onChanged: (double value) {
+            setState(() {
+              s.recordPoints = value.toInt();
+            });
+          }
+        ),
+        trailing: Text(s.recordPoints.toString()),
       ),
       ListTile(
         title: Text('Records for ${(s.recordSeconds*s.recordPoints/60/60).toStringAsFixed(2)} hours'),
@@ -545,16 +548,18 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
       ListTile(
         leading: const Text("Zoom Increment:"),
         title: Slider(
-            min: 0.25,
-            max: 2,
-            divisions: 7,
-            value: s.zoomIncrement.toDouble(),
-            label: "${s.zoomIncrement}",
-            onChanged: (double value) {
-              setState(() {
-                s.zoomIncrement = value;
-              });
-            }),
+          min: 0.25,
+          max: 2,
+          divisions: 7,
+          value: s.zoomIncrement.toDouble(),
+          label: "${s.zoomIncrement}",
+          onChanged: (double value) {
+            setState(() {
+              s.zoomIncrement = value;
+            });
+          }
+        ),
+        trailing: Text(s.zoomIncrement.toString()),
       ),
       ListTile(
         leading: const Text("SignalK Chart:"),
@@ -574,7 +579,8 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
           setState(() {
             s.startWithChart = value;
           });
-        }),
+        }
+      ),
     ];
 
     return ListView(children: list);

@@ -522,8 +522,9 @@ class _AISDisplaySettingsState extends State<_AISDisplaySettingsWidget> {
             setState(() {
               s.predictionMinutes = value;
             });
-          }),
-        trailing: Text('mins'),
+          }
+        ),
+        trailing: Text('${s.predictionMinutes.toInt()} $minutesUnits'),
       ),
       ListTile(
         leading: const Text("Vessel Timeout:"),
@@ -537,8 +538,9 @@ class _AISDisplaySettingsState extends State<_AISDisplaySettingsWidget> {
             setState(() {
               s.vesselTimeout = value.toInt();
             });
-          }),
-        trailing: Text('mins'),
+          }
+        ),
+        trailing: Text('${s.vesselTimeout} $minutesUnits'),
       ),
       ListTile(
         leading: const Text("SignalK Chart:"),

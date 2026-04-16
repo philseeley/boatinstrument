@@ -29,7 +29,7 @@ class _AutopilotControlPerBoxSettings {
 
   _AutopilotControlPerBoxSettings({
     this.enableLock = true,
-    this.lockSeconds = 5,
+    this.lockSeconds = 6,
     this.showLabels = true
   });
 }
@@ -539,30 +539,34 @@ class _AutopilotReefingBoxSettingsState extends State<_AutopilotReefingBoxSettin
       ListTile(
         leading: const Text('Upwind Angle:  '),
         title: Slider(
-            min: 10,
-            max: 85,
-            divisions: 15,
-            value: s.upwindAngle.toDouble(),
-            label: s.upwindAngle.toString(),
-            onChanged: (double value) {
-              setState(() {
-                s.upwindAngle = value.toInt();
-              });
-            }),
+          min: 10,
+          max: 85,
+          divisions: 15,
+          value: s.upwindAngle.toDouble(),
+          label: s.upwindAngle.toString(),
+          onChanged: (double value) {
+            setState(() {
+              s.upwindAngle = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${s.upwindAngle.toInt()} $degreesSymbol'),
       ),
       ListTile(
         leading: const Text('Downwind Angle:'),
         title: Slider(
-            min: 95,
-            max: 160,
-            divisions: 13,
-            value: s.downwindAngle.toDouble(),
-            label: s.downwindAngle.toString(),
-            onChanged: (double value) {
-              setState(() {
-                s.downwindAngle = value.toInt();
-              });
-            }),
+          min: 95,
+          max: 160,
+          divisions: 13,
+          value: s.downwindAngle.toDouble(),
+          label: s.downwindAngle.toString(),
+          onChanged: (double value) {
+            setState(() {
+              s.downwindAngle = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${s.downwindAngle.toInt()} $degreesSymbol'),
       ),
     ]);
   }
@@ -721,16 +725,18 @@ class _AutopilotControlPerBoxSettingsState extends State<_AutopilotControlPerBox
       ListTile(
         leading: const Text("Lock Timeout:"),
         title: Slider(
-            min: 2.0,
-            max: 120.0,
-            divisions: 58,
-            value: s.lockSeconds.toDouble(),
-            label: "${s.lockSeconds.toInt()}s",
-            onChanged: (double value) {
-              setState(() {
-                s.lockSeconds = value.toInt();
-              });
-            }),
+          min: 2.0,
+          max: 120.0,
+          divisions: 59,
+          value: s.lockSeconds.toDouble(),
+          label: "${s.lockSeconds.toInt()}s",
+          onChanged: (double value) {
+            setState(() {
+              s.lockSeconds = value.toInt();
+            });
+          }
+        ),
+        trailing: Text('${s.lockSeconds.toInt()} $secondsUnits'),
       ),
       SwitchListTile(title: const Text("Show Labels:"),
           value: s.showLabels,
