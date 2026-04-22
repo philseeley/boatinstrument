@@ -20,7 +20,7 @@ _RemoteControlSettings _$RemoteControlSettingsFromJson(
   controlRotatePages: json['controlRotatePages'] as bool? ?? true,
   controlBrightness: json['controlBrightness'] as bool? ?? true,
   enableLock: json['enableLock'] as bool? ?? false,
-  lockSeconds: (json['lockSeconds'] as num?)?.toInt() ?? 5,
+  lockSeconds: (json['lockSeconds'] as num?)?.toInt() ?? 6,
 );
 
 Map<String, dynamic> _$RemoteControlSettingsToJson(

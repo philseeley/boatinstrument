@@ -10,7 +10,7 @@ _AutopilotControlPerBoxSettings _$AutopilotControlPerBoxSettingsFromJson(
   Map<String, dynamic> json,
 ) => _AutopilotControlPerBoxSettings(
   enableLock: json['enableLock'] as bool? ?? true,
-  lockSeconds: (json['lockSeconds'] as num?)?.toInt() ?? 5,
+  lockSeconds: (json['lockSeconds'] as num?)?.toInt() ?? 6,
   showLabels: json['showLabels'] as bool? ?? true,
 );
 
