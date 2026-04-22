@@ -270,6 +270,30 @@ class BoatInstrumentController {
     return distanceUnits.unit;
   }
 
+  double shortDistanceToDisplay(double distance) {
+    switch (distanceUnits) {
+      case DistanceUnits.meters:
+      case DistanceUnits.km:
+      case DistanceUnits.nmM:
+        return distance;
+      case DistanceUnits.miles:
+      case DistanceUnits.nm:
+        return m2ft(distance);
+    }
+  }
+
+  String shortDistanceUnitsToDisplay() {
+    switch (distanceUnits) {
+      case DistanceUnits.meters:
+      case DistanceUnits.km:
+      case DistanceUnits.nmM:
+        return DistanceUnits.meters.unit;
+      case DistanceUnits.miles:
+      case DistanceUnits.nm:
+        return feetUnits;
+    }
+  }
+
   double speedToDisplay(double speed) {
     switch (speedUnits) {
       case SpeedUnits.mps:

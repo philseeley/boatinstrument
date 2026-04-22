@@ -84,12 +84,14 @@ class _Map extends StatelessWidget {
     Color bgColor = Theme.of(context).colorScheme.surface;
     TextStyle th = Theme.of(context).textTheme.bodyMedium!;
     var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
+    var maxRadiusText = _controller.shortDistanceToDisplay((_maxRadius??0)).round().toString();
+    var currentRadiusText = _controller.shortDistanceToDisplay(_currentRadius??_sampleRadius).round().toString();
     try {
-      tp.text = TextSpan(text: (_maxRadius??0).round().toString(), style: th);
+      tp.text = TextSpan(text: maxRadiusText, style: th);
       tp.layout();
       maxTextWidth = tp.width;
 
-      tp.text = TextSpan(text: (_currentRadius??_sampleRadius).round().toString(), style: th);
+      tp.text = TextSpan(text: currentRadiusText, style: th);
       tp.layout();
       currentTextWidth = tp.width;
     } finally {
@@ -135,9 +137,9 @@ class _Map extends StatelessWidget {
         MarkerLayer(markers: [
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _currentColor))),
-          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
-          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
-          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text((_currentRadius??_sampleRadius).round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
+          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
+          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
+          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
         ])
       ],
     );
@@ -515,6 +517,7 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
   @override
   Widget build(BuildContext context) {
     _AnchorAlarmSettings s = widget._settings;
+    var c = widget._controller;
 
     List<Widget> list = [
       ListTile(
@@ -556,17 +559,17 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
         leading: const Text("Sample Radius:"),
         title: Slider(
           min: 20,
-          max: 100,
-          divisions: 16,
+          max: 200,
+          divisions: 18,
           value: s.sampleRadius,
-          label: "${s.sampleRadius.toInt()}",
+          label: c.shortDistanceToDisplay(s.sampleRadius).round().toString(),
           onChanged: (double value) {
             setState(() {
               s.sampleRadius = value;
             });
           }
         ),
-        trailing: Text('${s.sampleRadius.toInt()} ${DistanceUnits.meters.unit}'),
+        trailing: Text('${c.shortDistanceToDisplay(s.sampleRadius).round()} ${c.shortDistanceUnitsToDisplay()}'),
       ),
       ListTile(
         leading: const Text("Zoom Increment:"),
