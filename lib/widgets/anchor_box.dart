@@ -16,6 +16,7 @@ part 'anchor_box.g.dart';
 class _AnchorAlarmSettings {
   int recordSeconds;
   int recordPoints;
+  double sampleRadius;
   double zoomIncrement;
   SignalkChart signalkChart;
   bool startWithChart;
@@ -23,6 +24,7 @@ class _AnchorAlarmSettings {
   _AnchorAlarmSettings({
     this.recordSeconds = 10,
     this.recordPoints = 1000,
+    this.sampleRadius = 30,
     this.zoomIncrement = 0.5,
     this.signalkChart = const SignalkChart(),
     this.startWithChart = true
@@ -44,6 +46,7 @@ class _Map extends StatelessWidget {
   final double? _currentRadius;
   final double? _maxRadius;
   final double? _newMaxRadius;
+  final double _sampleRadius;
   final Color _currentColor;
   final Color _maxColor;
   final double? _headingTrue;
@@ -67,6 +70,7 @@ class _Map extends StatelessWidget {
     this._currentColor,
     this._maxRadius,
     this._newMaxRadius,
+    this._sampleRadius,
     this._maxColor,
     this._headingTrue,
     this._windAngleApparent,
@@ -85,7 +89,7 @@ class _Map extends StatelessWidget {
       tp.layout();
       maxTextWidth = tp.width;
 
-      tp.text = TextSpan(text: (_currentRadius??0).round().toString(), style: th);
+      tp.text = TextSpan(text: (_currentRadius??_sampleRadius).round().toString(), style: th);
       tp.layout();
       currentTextWidth = tp.width;
     } finally {
@@ -93,7 +97,7 @@ class _Map extends StatelessWidget {
     }
 
     var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition??_position, _newMaxRadius??_maxRadius!, 90);
-    var currentRadiusPos = (_currentRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_anchorPosition??_position, _currentRadius!, 270);
+    var currentRadiusPos = ll.Distance().offset(_anchorPosition??_position, _currentRadius??_sampleRadius, 270);
 
     String url = '';
     if(_showMap && _signalkChart.defined) {
@@ -121,6 +125,7 @@ class _Map extends StatelessWidget {
         CircleLayer(circles: [
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_currentRadius != null) CircleMarker(point: _anchorPosition??_position, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
@@ -131,7 +136,8 @@ class _Map extends StatelessWidget {
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _currentColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(_maxRadius!.round().toString(), style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
-          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
+          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(_currentRadius!.round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
+          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text((_currentRadius??_sampleRadius).round().toString(), style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
         ])
       ],
     );
@@ -218,13 +224,13 @@ class _AnchorState extends State<AnchorAlarmBox> {
   }
 
   void _resetZoom() {
-    if(widget.config.editMode || _currentRadius == null) return;
+    if(widget.config.editMode && _position != null) return;
 
-    double max = m.max(_maxRadius??_currentRadius!, _currentRadius!);
+    double max = m.max(_maxRadius??_currentRadius??_settings.sampleRadius, _currentRadius??_settings.sampleRadius);
     double h = m.sqrt(max*max*2);
     var cameraFit = CameraFit.coordinates(padding: EdgeInsets.all(50), coordinates: [
-      ll.Distance().offset(_anchorPosition!, h, 135),
-      ll.Distance().offset(_anchorPosition!, h, 315),
+      ll.Distance().offset(_anchorPosition??_position!, h, 135),
+      ll.Distance().offset(_anchorPosition??_position!, h, 315),
     ]);
 
     var camera = cameraFit.fit(_map!._mapController.camera);
@@ -265,6 +271,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         dropColor,
         _maxRadius,
         _newMaxRadius,
+        _settings.sampleRadius,
         raiseColor,
         _headingTrue,
         _windAngleApparent,
@@ -544,6 +551,22 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
       ),
       ListTile(
         title: Text('Records for ${(s.recordSeconds*s.recordPoints/60/60).toStringAsFixed(2)} hours'),
+      ),
+      ListTile(
+        leading: const Text("Sample Radius:"),
+        title: Slider(
+          min: 20,
+          max: 100,
+          divisions: 16,
+          value: s.sampleRadius,
+          label: "${s.sampleRadius.toInt()}",
+          onChanged: (double value) {
+            setState(() {
+              s.sampleRadius = value;
+            });
+          }
+        ),
+        trailing: Text('${s.sampleRadius.toInt()} ${DistanceUnits.meters.unit}'),
       ),
       ListTile(
         leading: const Text("Zoom Increment:"),
