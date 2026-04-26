@@ -92,6 +92,7 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
 
       if(![HttpStatus.ok, HttpStatus.accepted].contains(response.statusCode)) {
         if(mounted) {
+          widget.config.controller.l.e('Autopilot responded "${response.reasonPhrase}" "${response.body}"');
           widget.config.controller.showMessage(context, response.reasonPhrase ?? '', error: true);
         }
       }
@@ -356,7 +357,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
         _adjustHeading(diff<0?1:-1);        
       }
 
-      await Future.delayed(Duration(milliseconds: 200));
+      // Allow time for the actions to take affect.
+      await Future.delayed(Duration(seconds: 1));
     } while(reachedAngleCount < 3);
   }
 
@@ -406,6 +408,14 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
 
     if(await widget.config.controller.askToConfirm(context, msg)) {
       await _sendCommand('steering/autopilot/state', '{"value": "${_savedState!.name}"}');
+      
+      // The changing of the Autopilot state is not synchronous. So we need to check it's actually happened.
+      AutopilotState newState = AutopilotState.standby;
+      do {
+        var stateString = await widget.config.controller.getPathString('steering.autopilot.state');
+        newState = (stateString == null) ? AutopilotState.standby : AutopilotState.values.byName(stateString);
+      } while (newState != _savedState!);
+
       if(_savedState == AutopilotState.auto) {
         await _sendCommand('steering/autopilot/target/headingMagnetic', '{"value": ${rad2Deg(_savedAngle!)}}');
         _targetWindAngleApparent = null;
@@ -465,10 +475,7 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
       try {
         switch (u.path) {
           case 'steering.autopilot.state':
-            var newAutopilotState = (u.value == null) ? AutopilotState.standby : AutopilotState.values.byName(u.value);
-            // If the state changes, then we reset.
-            if(newAutopilotState != _autopilotState) _savedAngle = _savedState = null;
-            _autopilotState = newAutopilotState;
+            _autopilotState = (u.value == null) ? AutopilotState.standby : AutopilotState.values.byName(u.value);
             break;
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = (u.value == null) ? null : (u.value as num).toDouble();

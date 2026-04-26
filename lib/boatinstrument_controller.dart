@@ -1378,7 +1378,7 @@ class BoatInstrumentController {
     return (json.decode(response.body)['value'] as num).toDouble();
   }
 
-  Future<String?> getPathString(String path, {String context = 'self'}) async {
+  Future<String?> getPathString(String path, {String context = 'vessels.self'}) async {
     Uri uri = _pathUri(path, context);
 
     http.Response response = await httpGet(
@@ -1390,7 +1390,8 @@ class BoatInstrumentController {
 
     if(response.statusCode != HttpStatus.ok) return null;
 
-    return (response.body);
+    var data = json.decode(response.body);
+    return (data is String) ? data : data['value'];
   }
 
   void _setTime(String timeStr) async {
