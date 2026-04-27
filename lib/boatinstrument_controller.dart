@@ -522,9 +522,11 @@ class BoatInstrumentController {
   }
 
   void showMessage(BuildContext context, String msg, {bool error = false, int millisecondsDuration = 4000, SnackBarAction? action}) {
+    l.i('ShowMessage:${error?'ERROR:':''}$msg');
+
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            backgroundColor: (error) ? Colors.orange : null,
+            backgroundColor: error ? Colors.orange : null,
             duration: Duration(milliseconds: millisecondsDuration),
             persist: false,
             action: action,
