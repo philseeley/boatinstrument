@@ -101,6 +101,24 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     }
   }
 
+  Future<void> _setState(AutopilotState state, {bool waitForChange = true}) async {
+    await _sendCommand('steering/autopilot/state', '{"value": "${state.name}"}');
+    
+    if(waitForChange) {
+      // The changing of the Autopilot state is not synchronous. So we need to check it's actually happened.
+      int count = 0;
+      AutopilotState newState = AutopilotState.standby;
+      do {
+        var stateString = await widget.config.controller.getPathString('steering.autopilot.state');
+        newState = (stateString == null) ? AutopilotState.standby : AutopilotState.values.byName(stateString);
+        if(++count > 5) {
+          if(mounted) widget.config.controller.showMessage(context, 'Failed to set the Autopilot state to ${state.displayName}', error: true);
+          return;
+        }
+      } while (newState != state);
+    }
+  }
+
   Future<void> _adjustHeading(int direction) async {
     await _sendCommand("steering/autopilot/actions/adjustHeading", '{"value": $direction}');
   }
@@ -141,12 +159,6 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
     widget.config.controller.configure();
   }
 
-  Future<void> _setState(AutopilotState state) async {
-    if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
-      await _sendCommand("steering/autopilot/state", '{"value": "${state.name}"}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
 
@@ -157,7 +169,11 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
       Color fc = Theme.of(context).colorScheme.onSurface;
       Color bc = widget.config.controller.val2PSColor(context, state == AutopilotState.standby?-1:1, none: Colors.grey);
       stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
-        onPressed: disabled ? null : () {_setState(state);},
+        onPressed: disabled ? null : () async {
+          if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
+            await _setState(state, waitForChange: false);
+          }
+        },
         child: Text(widget._perBoxSettings.showLabels ? state.displayName : state.displayName.substring(0, 1)),
       ));
     }
@@ -339,12 +355,15 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
     // We need to check we have reached the desired angle as it's possible that N2K messages might
     // have been missed. We check a few times just to make sure.
     int reachedAngleCount = 0;
+    int count = 0;
     do {
       actual = rad2Deg(await widget.config.controller.getPathDouble('steering.autopilot.target.windAngleApparent'));
 
-      if(actual == desired) ++reachedAngleCount;
-
       int diff = desired - actual;
+      if(count > 10 && diff.abs() == 1) diff = 0; // To account for rounding errors converting from Radians to Degrees.
+
+      if(diff == 0) ++reachedAngleCount;
+
       int tens = diff ~/ 10;
       int units = diff - (tens*10);
 
@@ -357,8 +376,13 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
         _adjustHeading(diff<0?1:-1);        
       }
 
+      if(reachedAngleCount == 0 && ++count > 16) {
+        if(mounted) widget.config.controller.showMessage(context, 'Failed to set the Autopilot vane to $desired', error: true);
+        return;
+      }
+
       // Allow time for the actions to take affect.
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(Duration(milliseconds: 500));
     } while(reachedAngleCount < 3);
   }
 
@@ -374,8 +398,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
           if(_targetHeadingTrue==null && (_targetHeadingMagnetic==null || _magneticVariation==null)) throw Exception('Inconsistent heading data');
 
           // We can only change to wind angle from auto.
-          if(_autopilotState == AutopilotState.route) await _sendCommand('steering/autopilot/state', '{"value": "${AutopilotState.auto.name}"}');
-          await _sendCommand('steering/autopilot/state', '{"value": "${AutopilotState.wind.name}"}');
+          if(_autopilotState == AutopilotState.route) await _setState(AutopilotState.auto);
+          await _setState(AutopilotState.wind);
           setState(() {
             _savedAngle = (_targetHeadingTrue!=null)?_targetHeadingTrue!-_magneticVariation!:_targetHeadingMagnetic!;
             _savedState = AutopilotState.auto;
@@ -407,15 +431,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
     }
 
     if(await widget.config.controller.askToConfirm(context, msg)) {
-      await _sendCommand('steering/autopilot/state', '{"value": "${_savedState!.name}"}');
+      await _setState(_savedState!);
       
-      // The changing of the Autopilot state is not synchronous. So we need to check it's actually happened.
-      AutopilotState newState = AutopilotState.standby;
-      do {
-        var stateString = await widget.config.controller.getPathString('steering.autopilot.state');
-        newState = (stateString == null) ? AutopilotState.standby : AutopilotState.values.byName(stateString);
-      } while (newState != _savedState!);
-
       if(_savedState == AutopilotState.auto) {
         await _sendCommand('steering/autopilot/target/headingMagnetic', '{"value": ${rad2Deg(_savedAngle!)}}');
         _targetWindAngleApparent = null;
