@@ -136,7 +136,7 @@ class _Map extends StatelessWidget {
         ]),
         MarkerLayer(markers: [
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
-          Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _currentColor))),
+          Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _maxColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
           if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
           if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
