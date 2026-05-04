@@ -101,22 +101,8 @@ abstract class AutopilotControlBoxState<T extends AutopilotControlBox> extends S
     }
   }
 
-  Future<void> _setState(AutopilotState state, {bool waitForChange = true}) async {
+  Future<void> _sendStateCommand(AutopilotState state) async {
     await _sendCommand('steering/autopilot/state', '{"value": "${state.name}"}');
-    
-    if(waitForChange) {
-      // The changing of the Autopilot state is not synchronous. So we need to check it's actually happened.
-      int count = 0;
-      AutopilotState newState = AutopilotState.standby;
-      do {
-        var stateString = await widget.config.controller.getPathString('steering.autopilot.state');
-        newState = (stateString == null) ? AutopilotState.standby : AutopilotState.values.byName(stateString);
-        if(++count > 5) {
-          if(mounted) widget.config.controller.showMessage(context, 'Failed to set the Autopilot state to ${state.displayName}', error: true);
-          return;
-        }
-      } while (newState != state);
-    }
   }
 
   Future<void> _adjustHeading(int direction) async {
@@ -159,6 +145,11 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
     widget.config.controller.configure();
   }
 
+  void _setState(AutopilotState state) {
+    _AutopilotReefingControlBoxState.clearStavedState();
+    _sendStateCommand(state);
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -171,7 +162,7 @@ class _AutopilotStateControlBoxState extends AutopilotControlBoxState<AutopilotS
       stateButtons.add(ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: fc, backgroundColor: bc),
         onPressed: disabled ? null : () async {
           if(await widget.config.controller.askToConfirm(context, 'Change to "${state.displayName}"?')) {
-            await _setState(state, waitForChange: false);
+            _setState(state);
           }
         },
         child: Text(widget._perBoxSettings.showLabels ? state.displayName : state.displayName.substring(0, 1)),
@@ -322,7 +313,6 @@ ${(super.getHelp() as HelpPage).text}''');
 
 class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<AutopilotReefingControlBox> {
   _AutopilotReefingSettings _settings = _AutopilotReefingSettings();
-  double? _targetWindAngleApparent;
   double? _targetHeadingTrue;
   double? _targetHeadingMagnetic;
   double? _magneticVariation;
@@ -332,6 +322,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
   static AutopilotState _autopilotState = AutopilotState.standby;
   static double? _savedAngle;
   static AutopilotState? _savedState;
+  // This only needs to be static so that it can be cleared from the _AutopilotStateControlBoxState.
+  static double? _targetWindAngleApparent;
 
 
   @override
@@ -347,6 +339,27 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
       'navigation.headingTrue',
       'environment.wind.angleApparent',
     });
+    // This is a static variable, but only because it needs clearing from another class.
+    // So we make sure it starts as null when we initialise. 
+    _targetWindAngleApparent = null;
+  }
+
+  static void clearStavedState() {
+    _savedState = _savedAngle = _targetWindAngleApparent = null;
+  }
+
+  Future<void> _setState(AutopilotState state) async {
+    await _sendStateCommand(state);
+    
+    // The changing of the Autopilot state is not synchronous. So we need to check it's actually happened.
+    int count = 0;
+    while (_autopilotState != state) {
+      await Future.delayed(Duration(milliseconds: 500));
+      if(++count > 10) {
+        if(mounted) widget.config.controller.showMessage(context, 'Failed to set the Autopilot state to ${state.displayName}', error: true);
+        return;
+      }
+    }
   }
 
   Future<void> _setWindAngle(int desired) async {
@@ -397,11 +410,13 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
         case AutopilotState.route:
           if(_targetHeadingTrue==null && (_targetHeadingMagnetic==null || _magneticVariation==null)) throw Exception('Inconsistent heading data');
 
+          // We need to save the target heading before changing the state, as the target heading will update when on a wind vane mode.
+          _savedAngle = (_targetHeadingTrue!=null)?_targetHeadingTrue!-_magneticVariation!:_targetHeadingMagnetic!;
+
           // We can only change to wind angle from auto.
           if(_autopilotState == AutopilotState.route) await _setState(AutopilotState.auto);
           await _setState(AutopilotState.wind);
           setState(() {
-            _savedAngle = (_targetHeadingTrue!=null)?_targetHeadingTrue!-_magneticVariation!:_targetHeadingMagnetic!;
             _savedState = AutopilotState.auto;
             _autopilotState = AutopilotState.wind;
           });
@@ -441,7 +456,7 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
       }
 
       setState(() {
-        _savedAngle = _savedState = null;
+        clearStavedState();
       });
     }
   }
@@ -493,6 +508,8 @@ class _AutopilotReefingControlBoxState extends AutopilotControlBoxState<Autopilo
         switch (u.path) {
           case 'steering.autopilot.state':
             _autopilotState = (u.value == null) ? AutopilotState.standby : AutopilotState.values.byName(u.value);
+            // The sailor may have taken over from the helm.
+            if(_autopilotState == AutopilotState.standby) clearStavedState();
             break;
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = (u.value == null) ? null : (u.value as num).toDouble();
@@ -849,6 +866,8 @@ class _AutopilotStatusState extends HeadedTextBoxState<AutopilotStatusBox> {
         switch (u.path) {
           case 'steering.autopilot.state':
             _autopilotState = (u.value == null) ? null : AutopilotState.values.byName(u.value);
+            // The sailor may have taken over from the helm.
+            if(_autopilotState == AutopilotState.standby) _AutopilotReefingControlBoxState.clearStavedState();
             break;
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = (u.value == null) ? null : (u.value as num).toDouble();
