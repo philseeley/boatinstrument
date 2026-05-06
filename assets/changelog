@@ -23,6 +23,7 @@
              Autopilot Reefing Controls now synchronise state changes and removed some timing issues.
              Web view marked as Deprecated
              AWA units should be degrees, not degrees true.
+             Timers Setup now indicates if the timers are running.
   * 0.9.0 When adding HTTP headers, we now make sure the names are not blank
             as that causes connection errors.
           The Autopilot Boxes now recognise an HTTP 202 (Accepted) as a good status.

@@ -453,6 +453,8 @@ class _Timer {
   String id;
   TimeOfDay time;
   bool delta;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  bool running = false;
 
   _Timer({
     this.id = '',
@@ -510,7 +512,7 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
   void initState() {
     super.initState();
     _settings = _TimersSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
-    widget.config.controller.configure();
+    widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.*'}, dataType: SignalKDataType.static);
     header = 'Timers';
     if(!widget.config.editMode) actions = [IconButton(onPressed: _edit, icon: Icon(Icons.settings))];
   }
@@ -530,7 +532,8 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
         return ListTile(key: UniqueKey(),
           leading: Row(mainAxisSize: MainAxisSize.min, children: [
             IconButton(onPressed: editMode?null:() {start(widget.config.controller, timer);}, icon: Icon(Icons.play_arrow)),
-            IconButton(onPressed: editMode?null:() {stop(widget.config.controller, timer);}, icon: Icon(Icons.stop))
+            IconButton(onPressed: editMode?null:() {stop(widget.config.controller, timer);}, icon: Icon(Icons.stop)),
+            Icon(timer.running?Icons.run_circle_outlined:Icons.remove)
           ]),
           title: Row(children: [Text('${TimeOfDayConverter.format(timer.time)} '), Icon(timer.delta?Icons.change_history:Icons.timer), Text(' ${timer.id}')]),
         );
@@ -570,6 +573,22 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
       'delta': timer.delta,
       'expires': null
     });
+  }
+
+  void _processData(List<Update> updates) {
+    for(var u in updates) {
+      if(u.value != null) {
+        String id = u.path.substring('$bi.timers.'.length);
+        var timers = _settings!.timers.where((t) => t.id == id);
+        for(var timer in timers) {
+          timer.running = u.value['expires'] != null;
+        }
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
   }
 }
 
