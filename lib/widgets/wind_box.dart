@@ -212,7 +212,7 @@ class WindAngleApparentBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return degreesUnits;
+    return degreesSymbol;
   }
 }
 
