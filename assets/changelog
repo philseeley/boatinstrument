@@ -6,6 +6,7 @@
            When connecting, we do an explicit IP lookup to stop additional lookups
              for any subsequent connections and also cache the HTTP Client.
            Settings Sliders now show the value after the Slider.
+           We now ask for confirmation when deleting a server config.
 
            New Boxes:
              Webcam(ONVIF)

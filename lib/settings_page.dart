@@ -521,13 +521,16 @@ class _SettingsState extends State<SettingsPage> {
     });
   }
 
-  void _deleteServer() {
+  void _deleteServer() async {
     var settings = widget._controller._settings!;
+    var controller = widget._controller;
 
-    setState(() {
-      settings.signalkServerSettings.removeAt(settings.signalkServerNum);
-      if(settings.signalkServerNum >= settings.signalkServerSettings.length) settings.signalkServerNum = settings.signalkServerSettings.length-1;
-    });
+    if(await controller.askToConfirm(context, 'Delete server "${controller._signalk.id}"', alwaysAsk: true)) {
+      setState(() {
+        settings.signalkServerSettings.removeAt(settings.signalkServerNum);
+        if(settings.signalkServerNum >= settings.signalkServerSettings.length) settings.signalkServerNum = settings.signalkServerSettings.length-1;
+      });
+    }
   }
 
   void _editHttpHeaders () async {
