@@ -41,16 +41,22 @@ String rad2Cardinal(double? direction) {
   return  (direction == null) ? '-' : cardinalDirections[((direction+(f/2))/f).toInt()];
 }
 String duration2HumanString (Duration d) {
-  List<String> parts = d.toString().split(':');
+  String str = d.toString();
+  String sign = '';
+  if(str[0] == '-') {
+    sign = '-';
+    str = str.substring(1);
+  }
+  List<String> parts = str.split(':');
   int hours = int.parse(parts[0]);
   int days = hours~/24;
-  if(days.abs() > 0) {
-    return '${days}d${hours%24}h';
-  } else if(hours.abs() > 0) {
-    return '${hours}h${parts[1]}m';
+  if(days > 0) {
+    return '$sign${days}d${hours%24}h';
+  } else if(hours > 0) {
+    return '$sign${hours}h${parts[1]}m';
   }
   int s = double.parse(parts[2]).round();
-  return fmt.format('${parts[1]}m{:02d}s', s);
+  return fmt.format('$sign${parts[1]}m{:02d}s', s);
 }
 String duration2String(Duration d) {
   List<String> parts = d.toString().split(':');
