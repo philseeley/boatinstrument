@@ -131,8 +131,8 @@ class _Map extends StatelessWidget {
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
-          if(_maxRadius != null && _headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius!, rad2Deg(_headingTrue))]),
-          if(_maxRadius != null && _headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius!/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
+          if(_headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius??_sampleRadius, rad2Deg(_headingTrue))]),
+          if(_headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, (_maxRadius??_sampleRadius)/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
