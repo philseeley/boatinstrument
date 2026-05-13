@@ -1090,13 +1090,13 @@ class BoatInstrumentController {
 
       _unsubscribe();
 
-      List<Map<String, String>> subscribe = [];
+      List<Map<String, dynamic>> subscribe = [];
 
       for(String path in _paths) {
         subscribe.add({
           "path": path,
           "policy": 'instant',
-          "minPeriod": _signalk.signalkMinPeriod.toString()
+          "minPeriod": _signalk.signalkMinPeriod
         });
       }
 
@@ -1109,13 +1109,13 @@ class BoatInstrumentController {
     }
 
     if(connecting) {
-      List<Map<String, String>> subscribe = [];
+      List<Map<String, dynamic>> subscribe = [];
 
       for(String path in _controlPaths) {
         subscribe.add({
           "path": path,
           "policy": 'instant',
-          "minPeriod": _signalk.signalkMinPeriod.toString()
+          "minPeriod": _signalk.signalkMinPeriod
         });
       }
 
@@ -1211,18 +1211,45 @@ class BoatInstrumentController {
     _networkTimeout();
 
     DateTime now = this.now();
-    Duration realTimeDuration = Duration(milliseconds: realTimeDataTimeout);
-    Duration infrequentDuration = Duration(milliseconds: infrequentDataTimeout);
+    final Duration realTimeDuration = Duration(milliseconds: realTimeDataTimeout);
+    final Duration infrequentDuration = Duration(milliseconds: infrequentDataTimeout);
 
     dynamic d = json.decode(data);
 
     // The initial connection returns our own vessel's URN. 
     if(d['updates'] == null) {
+      // Initial connection gives this:
+      // {
+      //     "name": "signalk-server",
+      //     "version": "2.27.0",
+      //     "self": "vessels.urn:mrn:imo:mmsi:123456789",
+      //     "roles": [
+      //         "master",
+      //         "main"
+      //     ],
+      //     "timestamp": "2026-05-13T12:38:36.085Z"
+      // }
       _selfURN = d['self'];
     } else {
+      // Updates look like this:
+      // {
+      //     "context": "vessels.urn:mrn:imo:mmsi:123456789",
+      //     "updates": [
+      //         {
+      //             "$source": "derived-data",
+      //             "timestamp": "2026-05-13T12:34:37.919Z",
+      //             "values": [
+      //                 {
+      //                     "path": "environment.depth.belowSurface",
+      //                     "value": 15.769
+      //                 }
+      //             ]
+      //         }
+      //     ]
+      // }
       if(_selfURN == null) throw Exception('Own vessel not identified');
 
-      String context = d['context'];
+      final String context = d['context'];
 
       for(_BoxData bd in _boxData) {
         bd.updates.clear();
@@ -1230,35 +1257,43 @@ class BoatInstrumentController {
 
       for (dynamic u in d['updates']) {
         try {
-          DateTime timeStamp = DateTime.parse(u['timestamp']);
+          final DateTime timeStamp = DateTime.parse(u['timestamp']);
+          bool timeSynced = false;
+
           if(_time == null) {
             _timeSync(timeStamp);
             now = this.now();
           }
 
+          final Duration d = now.difference(timeStamp);
+
           for (dynamic v in u['values']) {
-            String path = v['path'];
+            final String path = v['path'];
+
             for (_BoxData bd in _boxData) {
               if(bd.onlySelf && context != selfURN) continue;
 
               for (RegExp r in bd.regExpPaths) {
                 if (r.hasMatch(path)) {
-                  Duration d = now.difference(timeStamp);
                   if (
                     // Note: the demo server has old timestamps on replayed data, but
                     // current timestamps on notifications.
                     _settings!.demoMode ||
                     bd.dataType == SignalKDataType.static ||
                     (
-                      (bd.dataType == SignalKDataType.realTime) && d < realTimeDuration
+                      bd.dataType == SignalKDataType.realTime && d < realTimeDuration
                     ) ||
                     (
-                      (bd.dataType == SignalKDataType.infrequent) && d < infrequentDuration
+                      bd.dataType == SignalKDataType.infrequent && d < infrequentDuration
                     )
                   ) {
                     dynamic value = v['value'];
 
-                    _timeSync(timeStamp);
+                    // We've validated the timestamp is not old, but we only need to sync the time once for each timestamp.
+                    if(!timeSynced && bd.dataType == SignalKDataType.realTime) {
+                      _timeSync(timeStamp);
+                      timeSynced = true;
+                    }
 
                     if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
 
@@ -1278,12 +1313,14 @@ class BoatInstrumentController {
 
       for(_BoxData bd in _boxData) {
         if(bd.onUpdate != null) {
+          // We now check the timestamps of paths that the box has previously received and
+          // any that have expired we add a null for.
           var pt = bd.pathTimestamps;
           for(String path in pt.keys.toSet()) { // We make a copy of the keys as we might remove some.
             Duration d = now.difference(pt[path]!);
             if (
-            ((bd.dataType == SignalKDataType.realTime) && d > realTimeDuration) ||
-            ((bd.dataType == SignalKDataType.infrequent) && d > infrequentDuration)
+              (bd.dataType == SignalKDataType.realTime && d > realTimeDuration) ||
+              (bd.dataType == SignalKDataType.infrequent && d > infrequentDuration)
             ) {
               bd.updates.add(Update(context, path, null));
               bd.pathTimestamps.remove(path);
