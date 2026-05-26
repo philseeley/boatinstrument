@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'double_value_box.dart';
 import 'package:latlong_formatter/latlong_formatter.dart';
+import 'package:vector_math/vector_math.dart' as vm;
 
 part 'navigation_box.g.dart';
 
@@ -590,5 +591,76 @@ class NavigationTripLogBox extends DoubleValueBox {
   @override
   String units(double value) {
     return config.controller.distanceUnitsToDisplay(value);
+  }
+}
+
+class HeadingDeltaBox extends DoubleValueSemiGaugeBox {
+  static const String sid = 'navigation-heading-delta';
+  @override
+  String get id => sid;
+
+  const HeadingDeltaBox(BoxWidgetConfig config, {super.key}) : super(config, 'HDG', GaugeOrientation.up, 'navigation.headingTrue', minValue: -5, maxValue: 5);
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return deltaChar; // Delta symbol
+  }
+
+  @override
+  DoubleValueSemiGaugeBoxState<HeadingDeltaBox> createState() => _HeadingDeltaBoxState();
+}
+
+class _HeadingDeltaBoxState extends DoubleValueSemiGaugeBoxState<HeadingDeltaBox> {
+  double? _lastValue;
+
+  @override
+  Widget build(BuildContext context) {
+    if(value != null) {
+      double diff = value! - (_lastValue??value!);
+      _lastValue = value!;
+      // Deal with changes around N.
+      diff = (diff + 180) % 360 - 180;
+      if (diff < widget.minValue! || diff > widget.maxValue!) {
+        value = displayValue = null;
+        inRange = -1;
+        if(diff > widget.maxValue!) inRange = 1;
+      }
+      else {
+        // The changes are calculated in Radians, which are small values,
+        // so we change to Degrees for display.
+        // Note: we don't use rad2Deg() as this rounds.
+        value = displayValue = diff * vm.radians2Degrees;
+      }
+    }
+    Widget w = super.build(context);
+    value = _lastValue;
+    return w;
+  }
+
+  // We override this because we don't want to check min and max as the gauge needs these to
+  // be adjusted for the diff, not the absolute value.
+  @override
+  processUpdates(List<Update> updates) {
+    if(updates[0].value == null) {
+      value = displayValue = null;
+      inRange = 0;
+    } else {
+      try {
+        double next = widget.extractValue(updates[0]);
+
+        value = averageAngle(value ?? next, next, smooth: 20);
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $updates", error: e);
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
   }
 }

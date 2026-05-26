@@ -126,6 +126,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(ONVIFDisplayBox.sid, experimental: true, (config) {return ONVIFDisplayBox(config, key: UniqueKey());}),
   BoxDetails(ONVIFControlBox.sid, experimental: true, (config) {return ONVIFControlBox(config, key: UniqueKey());}),
   BoxDetails(AISDisplayBox.sid, experimental: true, (config) {return AISDisplayBox(config, key: UniqueKey());}),
+  BoxDetails(HeadingDeltaBox.sid, gauge: true, (config) {return HeadingDeltaBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -224,6 +225,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(PositionBox.sid, 'Position'),
         _widgetMenuEntry(CourseOverGroundBox.sid, 'Course Over Ground'),
         _widgetMenuEntry(HeadingTrueBox.sid, 'Heading'),
+        _widgetMenuEntry(HeadingDeltaBox.sid, 'Heading Delta'),
         _widgetMenuEntry(HeadingMagneticBox.sid, 'Magnetic Heading'),
         _widgetSubMenuEntry(box, 'Next Waypoint', [
           _widgetMenuEntry(NextPointDistanceBox.sid, 'Distance'),

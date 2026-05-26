@@ -12,6 +12,7 @@
            New Boxes:
              Webcam(ONVIF)
              AIS
+             Heading Delta
 
            Box updates:
              Anchor Alarm reworked to show Charts/Maps
