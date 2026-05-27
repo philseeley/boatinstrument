@@ -818,7 +818,7 @@ class _AutopilotStatusState extends HeadedTextBoxState<AutopilotStatusBox> {
     widget.config.controller.configure(onUpdate: _processData, paths: {
       "steering.autopilot.state",
       "steering.autopilot.target.windAngleApparent",
-      "navigation.currentRoute.waypoints",
+      "navigation.courseGreatCircle.nextPoint.name",
       "steering.autopilot.target.headingTrue",
       "steering.autopilot.target.headingMagnetic",
       "navigation.magneticVariation",
@@ -872,8 +872,8 @@ class _AutopilotStatusState extends HeadedTextBoxState<AutopilotStatusBox> {
           case 'steering.autopilot.target.windAngleApparent':
             _targetWindAngleApparent = (u.value == null) ? null : (u.value as num).toDouble();
             break;
-          case 'navigation.currentRoute.waypoints':
-            _waypoint = (u.value == null) ? null : u.value[1]['name'];
+          case 'navigation.courseGreatCircle.nextPoint.name':
+            _waypoint = (u.value == null) ? null : u.value;
             break;
           case 'steering.autopilot.target.headingTrue':
             _targetHeadingTrue = (u.value == null) ? null : (u.value as num).toDouble();
