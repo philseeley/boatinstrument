@@ -8,6 +8,7 @@ import 'package:boatinstrument/log_display.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:media_kit/media_kit.dart';
@@ -32,6 +33,7 @@ void main(List<String> cmdlineArgs) {
 
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+  FlutterForegroundTask.initCommunicationPort();
   runApp(ChangeNotifierProvider(create: (context) => ThemeProvider(), child: BoatInstrumentApp(args)));
 }
 
@@ -183,6 +185,8 @@ class MainPageState extends State<MainPage> {
       _controller.toggleRotatePages();
     }
 
+    await BoatInstrumentController.enableBackgroundRunning();
+
     rebuild();
   }
 
@@ -224,7 +228,7 @@ class MainPageState extends State<MainPage> {
     var theme = Theme.of(context);
     var ts = theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface);
 
-    return Scaffold(
+    return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _askExit();}, child: Scaffold(
       appBar: appBar, 
       drawer: !_controller.quickPageSwitch?null:Drawer(
         child: ListView.builder(padding: EdgeInsets.all(pad), itemCount: _controller.pageCount, itemBuilder: (context, pageNum) {
@@ -255,7 +259,13 @@ class MainPageState extends State<MainPage> {
         },
         child: _controller.buildPage(),
       )),
-    ));
+    )));
+  }
+
+  void _askExit() async {
+    if(await _controller.askToConfirm(context, "Exit?", alwaysAsk: true)) {
+      BoatInstrumentController.exitApp();
+    }
   }
 
   void nightMode({bool? on}) {

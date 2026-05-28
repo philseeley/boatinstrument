@@ -30,6 +30,7 @@ import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:http/http.dart' as http;
 import 'package:format/format.dart' as fmt;
@@ -1464,5 +1465,85 @@ class BoatInstrumentController {
     );
 
     _settings?.boxSettings[boxWidget.id] = boxSettingsWidget.getSettingsJson();
+  }
+
+  static Future<void> enableBackgroundRunning() async {
+    if(!Platform.isAndroid && !Platform.isIOS) return;
+
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: bi,
+        channelName: 'Boat Instrument Notification',
+        channelDescription: 'This notification appears when the Boat Instrument service is running.',
+        onlyAlertOnce: true,
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(
+        showNotification: false,
+      ),
+      foregroundTaskOptions: ForegroundTaskOptions(
+        eventAction: ForegroundTaskEventAction.nothing(),
+        autoRunOnMyPackageReplaced: true,
+        allowWifiLock: true,
+      ),
+    );
+
+    if (await FlutterForegroundTask.checkNotificationPermission() != NotificationPermission.granted) {
+      if(await FlutterForegroundTask.requestNotificationPermission() != NotificationPermission.granted) {
+        await exitApp();
+      }
+    }
+
+    if (Platform.isAndroid) {
+      if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
+        await FlutterForegroundTask.requestIgnoreBatteryOptimization();
+      }
+    }
+
+    if (await FlutterForegroundTask.isRunningService) {
+      await FlutterForegroundTask.restartService();
+    } else {
+      await FlutterForegroundTask.startService(
+        notificationTitle: 'Boat Instrument is running',
+        notificationText: 'Swipe/Dismiss to exit',
+        notificationIcon: null,
+        notificationButtons: [
+          const NotificationButton(id: 'exit', text: 'Stop/Exit'),
+        ],
+        callback: startCallback,
+      );
+    }
+  }
+
+  static Future<void> exitApp() async {
+    if(Platform.isAndroid || !Platform.isIOS) {
+      await FlutterForegroundTask.stopService();
+    }
+    exit(0);
+  }
+}
+
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(_TaskHandler());
+}
+
+class _TaskHandler extends TaskHandler {
+  @override
+  Future<void> onStart(DateTime timestamp, TaskStarter starter) async {}
+
+  @override
+  void onRepeatEvent(DateTime timestamp) {}
+
+  @override
+  Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {}
+
+  @override
+  void onNotificationButtonPressed(String id) {
+    BoatInstrumentController.exitApp();
+  }
+
+  @override
+  void onNotificationDismissed() {
+    BoatInstrumentController.exitApp();
   }
 }
