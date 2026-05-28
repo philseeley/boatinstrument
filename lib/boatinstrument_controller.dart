@@ -28,6 +28,7 @@ import 'package:boatinstrument/widgets/vnc_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
+import 'package:boatinstrument/widgets/zone_box.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
@@ -1192,6 +1193,21 @@ class BoatInstrumentController {
       {
         "updates": [{
           "values": [
+            {
+              "path": path,
+              "value": value
+            }
+          ]
+        }]
+      }
+    );
+  }
+
+  void sendMetaUpdate(String path, dynamic value) {
+    _send(
+      {
+        "updates": [{
+          "meta": [
             {
               "path": path,
               "value": value

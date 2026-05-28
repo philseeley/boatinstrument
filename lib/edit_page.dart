@@ -126,6 +126,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(ONVIFDisplayBox.sid, experimental: true, (config) {return ONVIFDisplayBox(config, key: UniqueKey());}),
   BoxDetails(ONVIFControlBox.sid, experimental: true, (config) {return ONVIFControlBox(config, key: UniqueKey());}),
   BoxDetails(AISDisplayBox.sid, experimental: true, (config) {return AISDisplayBox(config, key: UniqueKey());}),
+  BoxDetails(ZoneSetupBox.sid, experimental: true, (config) {return ZoneSetupBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -338,6 +339,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
       _widgetMenuEntry(AISDisplayBox.sid, 'AIS Display'),
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
+      _widgetMenuEntry(ZoneSetupBox.sid, 'Zone/Alert Setup'),
       if(!Platform.isMacOS && !Platform.isLinux) _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
       _widgetSubMenuEntry(box, 'Camera', [
