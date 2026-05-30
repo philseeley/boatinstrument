@@ -129,50 +129,6 @@ final List<BoxDetails> boxDetails = [
 ];
 
 class _EditPageState extends State<_EditPage> {
-  static const String _boxMenuName = '__BOX_MENU__';
-
-  PopupMenuItem<BoxDetails> _widgetMenuEntry(String id, String text) {
-    BoxDetails bd = getBoxDetails(id);
-    List<Widget> c = [Text(text)];
-    if(bd.gauge) {
-      c.add(const Icon(Icons.speed));
-    }
-    if(bd.graph) {
-      c.add(const Icon(Icons.show_chart));
-    }
-    if(bd.experimental) {
-      c.add(const Icon(Icons.science_outlined));
-    }
-    if(bd.deprecated) {
-      c.add(const Icon(Icons.block));
-    }
-
-    return PopupMenuItem<BoxDetails>(enabled: !bd.experimental || widget._controller.enableExperimentalBoxes, height: 0, value: bd, child: Row(children: c));
-  }
-
-  PopupMenuItem<BoxDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<BoxDetails>> subMenuEntries) {
-    return PopupMenuItem(height: 0, child: PopupMenuButton<BoxDetails>(
-      tooltip: '',
-      shape: Border.all(color: Colors.grey),
-      itemBuilder: (context) {
-        List<PopupMenuEntry<BoxDetails>> items = [
-          PopupMenuItem<BoxDetails>(child: Row(children: [const Icon(Icons.arrow_left), Text(text, style: TextStyle(decoration: TextDecoration.underline))])),
-          ...subMenuEntries
-        ];
-        return items;
-      },
-      onSelected: (value) {
-        setState(() {
-          box.id = value.id;
-          box.settings = {};
-          Navigator.of(context).popUntil((route) { return route.settings.name == _boxMenuName; });
-          Navigator.pop(context);
-        });
-      },
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(text), const Icon(Icons.arrow_right)]),
-    ));
-  }
-
   List<PopupMenuEntry<BoxDetails>> _getWidgetMenus(_Box box) {
     List<PopupMenuEntry<BoxDetails>> popupMenuEntries = [
       PopupMenuItem<BoxDetails>(child: Row(children: [const Icon(Icons.arrow_left), Text('Box', style: TextStyle(decoration: TextDecoration.underline))])),
@@ -355,6 +311,50 @@ class _EditPageState extends State<_EditPage> {
     ];
 
     return popupMenuEntries;
+  }
+
+  static const String _boxMenuName = '__BOX_MENU__';
+
+  PopupMenuItem<BoxDetails> _widgetMenuEntry(String id, String text) {
+    BoxDetails bd = getBoxDetails(id);
+    List<Widget> c = [Text(text)];
+    if(bd.gauge) {
+      c.add(const Icon(Icons.speed));
+    }
+    if(bd.graph) {
+      c.add(const Icon(Icons.show_chart));
+    }
+    if(bd.experimental) {
+      c.add(const Icon(Icons.science_outlined));
+    }
+    if(bd.deprecated) {
+      c.add(const Icon(Icons.block));
+    }
+
+    return PopupMenuItem<BoxDetails>(enabled: !bd.experimental || widget._controller.enableExperimentalBoxes, height: 0, value: bd, child: Row(children: c));
+  }
+
+  PopupMenuItem<BoxDetails> _widgetSubMenuEntry(_Box box, String text, List<PopupMenuEntry<BoxDetails>> subMenuEntries) {
+    return PopupMenuItem(height: 0, child: PopupMenuButton<BoxDetails>(
+      tooltip: '',
+      shape: Border.all(color: Colors.grey),
+      itemBuilder: (context) {
+        List<PopupMenuEntry<BoxDetails>> items = [
+          PopupMenuItem<BoxDetails>(child: Row(children: [const Icon(Icons.arrow_left), Text(text, style: TextStyle(decoration: TextDecoration.underline))])),
+          ...subMenuEntries
+        ];
+        return items;
+      },
+      onSelected: (value) {
+        setState(() {
+          box.id = value.id;
+          box.settings = {};
+          Navigator.of(context).popUntil((route) { return route.settings.name == _boxMenuName; });
+          Navigator.pop(context);
+        });
+      },
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(text), const Icon(Icons.arrow_right)]),
+    ));
   }
 
   @override
