@@ -244,6 +244,17 @@ class BoatInstrumentController {
     }
   }
 
+  double depthFromDisplay(double depth) {
+    switch (depthUnits) {
+      case DepthUnits.m:
+        return depth;
+      case DepthUnits.ft:
+        return depth / 3.28084;
+      case DepthUnits.fa:
+        return depth / 0.546807;
+    }
+  }
+
   double distanceToDisplay(double distance, {bool fixed = false}) {
     switch (distanceUnits) {
       case DistanceUnits.meters:
@@ -916,6 +927,10 @@ class BoatInstrumentController {
 
   Future<http.Response> httpPut(Uri uri, {Map<String, String>? headers, Object? body}) async {
     return await _httpClient.put(uri, headers: _httpHeaders(headers), body: body);
+  }
+
+  Future<http.Response> httpDelete(Uri uri, {Map<String, String>? headers}) async {
+    return await _httpClient.delete(uri, headers: _httpHeaders(headers));
   }
 
   Future<http.Response> httpPost(Uri uri, {Map<String, String>? headers, Object? body}) async {
