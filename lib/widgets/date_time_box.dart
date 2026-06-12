@@ -303,7 +303,7 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
         IconButton(onPressed: _timer != null && widget._perBoxSettings.allowRestart?_restart:null, icon: Icon(Icons.restore))
       ];
     }
-    widget.config.controller.configure(onUpdate: _processData, paths: {'$bi.timers.${widget._perBoxSettings.id}'}, dataType: SignalKDataType.static);
+    widget.config.controller.configure(onUpdate: _processData, paths: {_TimersSetupBoxState.timerPath(widget._perBoxSettings.id)}, dataType: SignalKDataType.static);
   }
 
   @override
@@ -337,15 +337,23 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
       color = null;
       if(d!=null && d.isNegative) {
         color = widget.config.controller.val2PSColor(context, -1);
-        if(widget._perBoxSettings.notificationState.soundFile!=null) widget.config.controller.playSoundFile(widget._perBoxSettings.notificationState.soundFile!);
       }
     }
 
     return super.build(context);
   }
 
+  void _setAlarm() {
+    widget.config.controller.addAlarm(_TimersSetupBoxState.timerPath(_timer!.id), _expires!, widget._perBoxSettings.notificationState);
+  }
+
+  void _removeAlarm() {
+    if(_timer != null) widget.config.controller.removeAlarm(_TimersSetupBoxState.timerPath(_timer!.id));
+  }
+
   void _restart () {
-    _TimersSetupBoxState.start(widget.config.controller, _timer!);
+    _TimersSetupBoxState.start(widget.config.controller, _timer!, );
+    _setAlarm();
   }
 
   void _stop () {
@@ -354,6 +362,7 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
 
   void _processData(List<Update> updates) {
     if(updates[0].value == null) {
+      _removeAlarm();
       _timer = _expires = null;
       _updateTimer?.cancel();
       _updateTimer = null;
@@ -361,8 +370,11 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
       try {
         dynamic v = updates[0].value;
 
-        _timer = null;
         _expires = DateTime.tryParse(v['expires']??'');
+
+        if(_expires == null) _removeAlarm();
+
+        _timer = null;
         _updateTimer?.cancel();
         _updateTimer = null;
 
@@ -374,8 +386,10 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
           );
           
           _updateTimer = Timer.periodic(Duration(seconds: 1), (_) {if(mounted) setState(() {});});
+          _setAlarm();
         }
       } catch (e) {
+        _removeAlarm();
         widget.config.controller.l.e("Error parsing date/time $updates", error: e);
       }
     }
@@ -552,6 +566,8 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
     setState(() {});
   }
 
+  static String timerPath(String id) => '$bi.timers.$id';
+
   static void start(BoatInstrumentController controller, _Timer timer) {
     DateTime now = controller.now();
     DateTime expires = timer.delta?
@@ -560,7 +576,7 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
 
     if(expires.isBefore(now)) expires = expires.add(Duration(days: 1));
 
-    controller.sendUpdate('$bi.timers.${timer.id}', {
+    controller.sendUpdate(timerPath(timer.id), {
       'time': TimeOfDayConverter.format(timer.time),
       'delta': timer.delta,
       'expires': expires.toUtc().toIso8601String()
@@ -568,11 +584,13 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
   }
 
   static void stop(BoatInstrumentController controller, _Timer timer) {
-    controller.sendUpdate('$bi.timers.${timer.id}', {
+    controller.sendUpdate(timerPath(timer.id), {
       'time': TimeOfDayConverter.format(timer.time),
       'delta': timer.delta,
       'expires': null
     });
+
+    controller.removeAlarm(timerPath(timer.id));
   }
 
   void _processData(List<Update> updates) {

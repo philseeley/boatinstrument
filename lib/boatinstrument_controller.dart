@@ -126,6 +126,13 @@ class NotificationStatus {
   DateTime last = DateTime.now();
 }
 
+class _Alarm {
+  DateTime expires;
+  NotificationState notificationState;
+
+  _Alarm(this.expires, this.notificationState);
+}
+
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
   final _httpClient = http.Client();
@@ -163,6 +170,8 @@ class BoatInstrumentController {
   AudioPlayer? _audioPlayer;
   DateTime? _time;
   DateTime _timeReceived = DateTime.now();
+  final Map<String, _Alarm> _alarms = {};
+  late final Timer _alarmTimer;
   final Map<String, NotificationStatus> _notifications = {};
   final Set<String> _backgroundIDs = {};
   final Set<String> _paths = {};
@@ -172,6 +181,8 @@ class BoatInstrumentController {
 
   BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enablePoweroff, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
+
+    _alarmTimer = Timer.periodic(Duration(seconds: 1), _checkAlarms);
 
     for(BoxDetails bd in boxDetails) {
       if(bd.deprecated) {
@@ -216,6 +227,7 @@ class BoatInstrumentController {
   Set<String> get staticPaths => _staticPaths;
 
   void dispose() {
+    _alarmTimer.cancel();
     _httpClient.close();
   }
 
@@ -432,8 +444,24 @@ class BoatInstrumentController {
     }
   }
 
-  void playSoundFile(String soundFile) {
-    _audioPlayer?.play(AssetSource(soundFile));
+  void playSoundFile(String? soundFile) {
+    if(soundFile != null) _audioPlayer?.play(AssetSource(soundFile));
+  }
+
+  void addAlarm(String id, DateTime expires, NotificationState notificationState) {
+    _alarms[id] = _Alarm(expires, notificationState);
+  }
+
+  void removeAlarm(String id) {
+    _alarms.remove(id);
+  }
+
+  void _checkAlarms(_) {
+    for(var a in _alarms.values) {
+      Duration d = a.expires.difference(now());
+
+      if(d.isNegative) {print('PLAYING===================');playSoundFile(a.notificationState.soundFile);}
+    }
   }
 
   Future<void> _loadDefaultConfig(bool portrait) async {
@@ -652,7 +680,7 @@ class BoatInstrumentController {
       _addRemoteControlSubscriptions();
 
       for(var id in _backgroundIDs) {
-        getBoxDetails(id).background!.call(this);
+        getBoxDetails(id).background!(this);
       }
 
       // We need to calculate the total number of boxes on the page so that we
@@ -730,8 +758,8 @@ class BoatInstrumentController {
                   _audioPlayer?.release();
                 }));
 
-            if (playSound && newState.soundFile != null) {
-              playSoundFile(newState.soundFile!);
+            if (playSound) {
+              playSoundFile(newState.soundFile);
             }
           }
         } catch(e) {
