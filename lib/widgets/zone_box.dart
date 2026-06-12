@@ -10,7 +10,7 @@ part 'zone_box.g.dart';
 enum AlertType implements EnumMenuEntry {
   aws('Apparent Wind Speed', 'environment.wind.speedApparent', true),
   dbs('Depth Below Surface', 'environment.depth.belowSurface', false),
-  test('Test One', 'test.one', true),
+  test('Test One', 'test.one', false),
   dbk('Depth Below Keel', 'environment.depth.belowKeel', false);
 
   @override
@@ -39,9 +39,10 @@ class _Zone {
   factory _Zone.fromJson(Map<String, dynamic> json) =>
     _$ZoneFromJson(json);
 
-  Map<String, dynamic> toJson({double? upper}) {
+  Map<String, dynamic> toJson() {
     var json = _$ZoneToJson(this);
-    if(upper != null) json['upper'] = upper;
+    if(lower == null) json.remove('lower');
+    if(upper == null) json.remove('upper');
     return json;
   }
 }
@@ -68,16 +69,36 @@ class _Meta {
   Map<String, dynamic> toJson() => _$MetaToJson(this);
 }
 
+@JsonSerializable()
+class _AlertZone {
+  double value;
+  NotificationState state;
+  String message;
+
+  _AlertZone({
+    this.value = 0,
+    this.state = NotificationState.warn,
+    this.message = ''
+  });
+
+  factory _AlertZone.fromJson(Map<String, dynamic> json) =>
+    _$AlertZoneFromJson(json);
+
+  Map<String, dynamic> toJson() {
+    return _$AlertZoneToJson(this);
+  }
+}
+
 @JsonSerializable(explicitToJson: true)
 class _Alert {
   AlertType type;
-  late _Meta meta;
+  List<_AlertZone> zones;
 
   _Alert({
     this.type = AlertType.aws,
-    _Meta? meta
+    this.zones = const []
   }) {
-    this.meta = meta??_Meta();
+    if(zones.isEmpty) zones = [];
   }
 
   factory _Alert.fromJson(Map<String, dynamic> json) =>
@@ -116,26 +137,22 @@ mixin _UnitConversion {
   BoatInstrumentController get controller;
 
   String _units(AlertType type) {
-    switch(type) {      
+    switch(type) {
       case AlertType.aws:
         return controller.windSpeedUnits.unit;
-      case AlertType.dbs:
-        return controller.depthUnits.unit;
       case AlertType.test:
-        return controller.windSpeedUnits.unit;
+      case AlertType.dbs:
       case AlertType.dbk:
         return controller.depthUnits.unit;
     }
   }
 
   String _toDisplay(AlertType type, double value) {
-    switch(type) {      
+    switch(type) {
       case AlertType.aws:
         return controller.windSpeedToDisplay(value).toString();
-      case AlertType.dbs:
-        return controller.depthToDisplay(value).toString();
       case AlertType.test:
-        return controller.windSpeedToDisplay(value).toString();
+      case AlertType.dbs:
       case AlertType.dbk:
         return controller.depthToDisplay(value).toString();
     }
@@ -143,13 +160,11 @@ mixin _UnitConversion {
 
   double _fromDisplay(AlertType type, String strValue) {
     var value = double.parse(strValue);
-    switch(type) {      
+    switch(type) {
       case AlertType.aws:
         return controller.windSpeedFromDisplay(value);
-      case AlertType.dbs:
-        return controller.depthFromDisplay(value);
       case AlertType.test:
-        return controller.windSpeedFromDisplay(value);
+      case AlertType.dbs:
       case AlertType.dbk:
         return controller.depthFromDisplay(value);
     }
@@ -178,7 +193,7 @@ class ZoneSetupBox extends BoxWidget {
   @override
   Widget? getHelp() => const HelpPage(url: 'doc:zones.md');
 
-//   @override
+//   @override//TODO
 //   Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''In **Auto** mode the Rose will switch between the "Normal" and "Close Haul" displays if the needle transitions over 60 degrees for more than the **Auto Switch Delay**.
   
 // The **Switch Button** allows you to cycle through the Wind Rose types from the display. If the button is "Unlocked" the display is in "Auto" mode.''');
@@ -198,7 +213,6 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     widget.config.controller.configure();
     header = 'Alerts';
     if(!widget.config.editMode) actions = [IconButton(onPressed: _edit, icon: Icon(Icons.settings))];
-    // _getCurrentAlerts();
   }
 
   @override
@@ -206,7 +220,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     var editMode = widget.config.editMode;
     var alerts = _settings!.alerts;
     if(editMode && alerts.isEmpty) {
-      alerts = [
+      alerts = [//TODO
         // Alarm(id: 't1', time: TimeOfDay(hour: 1, minute: 12)),
         // Alarm(id: 't1', time: TimeOfDay(hour: 1, minute: 12), delta: true)
       ];
@@ -221,7 +235,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
         bool first = true;
         for(var z in m.zones) {
           if(!first) zonesStr.writeln();
-          zonesStr.write('${_toDisplay(m.alert!.type, z.lower??0)}: ${z.state.displayName}');//TODO
+          zonesStr.write('${_toDisplay(m.alert!.type, m.alert!.type.increasing?z.lower??0:z.upper??double.infinity)}: ${z.state.displayName}');
           first = false;
         }
         return ListTile(
@@ -312,18 +326,31 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
         if(_settings!.emergencyAlert) 'sound'
       ];
 
-      List<Map<String, dynamic>> jsonZones = [];
-      var zones = List<_Zone>.from(alert.meta.zones);
-      if(zones.isEmpty || zones[0].lower != 0) {
-        var zone = zones.firstOrNull;
-        String msg = zone==null?' Normal':' < ${_toDisplay(alert.type, zone.lower??0)}';//TODO
-        zones.insert(0, _Zone(lower: 0, state: NotificationState.normal, message: '${alert.type.displayName}$msg'));//TODO
-      } 
+      // We make a copy as we might be adding a "Normal" zone.
+      var zones = List<_AlertZone>.from(alert.zones);
+      var lastZone = alert.type.increasing?zones.firstOrNull:zones.lastOrNull;
+      String msg = lastZone==null?'Normal':'${alert.type.increasing?'<':'>'} ${_toDisplay(alert.type, lastZone.value)}';
+      zones.insert(alert.type.increasing?0:zones.length, _AlertZone(value: alert.type.increasing?0:lastZone?.value??0, state: NotificationState.normal, message: '${alert.type.displayName} $msg'));
 
+      List<Map<String, dynamic>> jsonZones = [];
       for(int z = 0; z<zones.length; ++z) {
         var zone = zones[z];
-        if(zone.message.isEmpty) zone.message = '${alert.type.displayName} > ${_toDisplay(alert.type, zone.lower??0)}';//TODO
-        jsonZones.add(zone.toJson(upper: z<zones.length-1?zones[z+1].lower:null));
+        if(zone.message.isEmpty) zone.message = '${alert.type.displayName} ${alert.type.increasing?'>':'<'} ${_toDisplay(alert.type, zone.value)}';
+        var normalZone = _Zone(
+          lower: z>0?zone.value:null,
+          upper: z<zones.length-1?zones[z+1].value:null,
+          state: zone.state,
+          message: zone.message
+        );
+        if(!alert.type.increasing) {
+          normalZone = _Zone(
+            lower: z>0?zones[z-1].value:null,
+            upper: z<zones.length-1?zone.value:null,
+            state: zone.state,
+            message: zone.message
+          );
+        }
+        jsonZones.add(normalZone.toJson());
       }
 
       data['zones'] = jsonZones;
@@ -372,7 +399,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     }
     
     // Need to set a normal range to stop the server keeping old ranges.
-    _Alert removeAlert = _Alert(type: alert.type, meta: _Meta(alert: alert, zones: []));
+    _Alert removeAlert = _Alert(type: alert.type, zones: []);
     _setZones(removeAlert, existingData: existingData);
   }
 
@@ -422,25 +449,20 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
       Expanded(child: ListView.builder(itemCount: s.alerts.length, itemBuilder: (context, a) {
         var alert = s.alerts[a];
         List<Widget> zones = [];
-        for(int z = 0; z<alert.meta.zones.length; ++z) {
-          var zone = alert.meta.zones[z];
+        for(int z = 0; z<alert.zones.length; ++z) {
+          var zone = alert.zones[z];
           zones.add(Row(children: [
             Expanded(child: Padding(padding: EdgeInsets.all(pad), child: BiTextFormField(
               decoration: InputDecoration(labelText: '${_units(alert.type)}:'),
               keyboardType: TextInputType.number,
               inputFormatters: [BiTextFormField.doubleOnly],
-              initialValue: _toDisplay(alert.type, zone.lower??0),//TODO
-              onChanged: (value) => zone.lower = _fromDisplay(alert.type, value)
+              initialValue: _toDisplay(alert.type, zone.value),
+              onChanged: (value) => zone.value = _fromDisplay(alert.type, value)
             ))),
             Expanded(child: Padding(padding: EdgeInsets.all(pad), child: EnumDropdownMenu(
               NotificationState.values,
               zone.state,
               (v) {zone.state = v!;}
-            ))),
-            Expanded(child: Padding(padding: EdgeInsets.all(pad), child: BiTextFormField(
-              decoration: InputDecoration(labelText: 'Message:'),
-              initialValue: zone.message,
-              onChanged: (value) => zone.message = value
             ))),
             IconButton(onPressed: () {_deleteZone(alert, z);}, icon: Icon(Icons.delete))
           ]));
@@ -460,6 +482,9 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
   }
 
   void _checkPaths () {//TODO check for duplicate paths
+    for(var alert in widget._settings.alerts) {
+      alert.zones.sort((a, b) => a.value.compareTo(b.value));
+    }
     Navigator.pop(context);
     // if(widget._settings.timers.every((timer) {return timer.id.isNotEmpty;})) {
     //   Navigator.pop(context);
@@ -490,13 +515,13 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
 
   void _addZone(_Alert alert) {
     setState(() {
-      alert.meta.zones.add(_Zone(lower: 0, state: NotificationState.warn, message: ''));//TODO
+      alert.zones.add(_AlertZone());
     });
   }
 
   void _deleteZone(_Alert alert, int z) {
     setState(() {
-      alert.meta.zones.removeAt(z);
+      alert.zones.removeAt(z);
     });
   }
 }

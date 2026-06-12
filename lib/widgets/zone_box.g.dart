@@ -43,16 +43,33 @@ Map<String, dynamic> _$MetaToJson(_Meta instance) => <String, dynamic>{
   'zones': instance.zones.map((e) => e.toJson()).toList(),
 };
 
+_AlertZone _$AlertZoneFromJson(Map<String, dynamic> json) => _AlertZone(
+  value: (json['value'] as num?)?.toDouble() ?? 0,
+  state:
+      $enumDecodeNullable(_$NotificationStateEnumMap, json['state']) ??
+      NotificationState.warn,
+  message: json['message'] as String? ?? '',
+);
+
+Map<String, dynamic> _$AlertZoneToJson(_AlertZone instance) =>
+    <String, dynamic>{
+      'value': instance.value,
+      'state': _$NotificationStateEnumMap[instance.state]!,
+      'message': instance.message,
+    };
+
 _Alert _$AlertFromJson(Map<String, dynamic> json) => _Alert(
   type: $enumDecodeNullable(_$AlertTypeEnumMap, json['type']) ?? AlertType.aws,
-  meta: json['meta'] == null
-      ? null
-      : _Meta.fromJson(json['meta'] as Map<String, dynamic>),
+  zones:
+      (json['zones'] as List<dynamic>?)
+          ?.map((e) => _AlertZone.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$AlertToJson(_Alert instance) => <String, dynamic>{
   'type': _$AlertTypeEnumMap[instance.type]!,
-  'meta': instance.meta.toJson(),
+  'zones': instance.zones.map((e) => e.toJson()).toList(),
 };
 
 const _$AlertTypeEnumMap = {
