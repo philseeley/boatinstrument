@@ -468,7 +468,7 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   Future<void> _exit () async {
-    if(await widget._controller.askToConfirm(context, 'Exit?', alwaysAsk: true)) exit(0);
+    if(await widget._controller.askToConfirm(context, 'Exit?', alwaysAsk: true)) BoatInstrumentController.exitApp();
   }
   
   Future<void> _showHelpPage () async {
