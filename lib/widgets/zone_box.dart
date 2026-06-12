@@ -479,16 +479,27 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
     ]));
   }
 
-  void _checkPaths () {//TODO check for duplicate paths
-    for(var alert in widget._settings.alerts) {
-      alert.zones.sort((a, b) => a.value.compareTo(b.value));
+  void _checkPaths () {
+    bool duplicates = false;
+    var alerts = widget._settings.alerts;
+    for(int a1=0; a1<alerts.length; ++a1) {
+      for(int a2=a1+1; a2<alerts.length; ++a2) {
+        if(alerts[a1].type == alerts[a2].type) {
+          duplicates = true;
+          break;
+        }
+      }
+      if(duplicates) break;
     }
-    Navigator.pop(context);
-    // if(widget._settings.timers.every((timer) {return timer.id.isNotEmpty;})) {
-    //   Navigator.pop(context);
-    // } else {
-    //   widget._controller.showMessage(context, 'Timer IDs cannot be blank');
-    // }
+    if(!duplicates) {
+      // Applying Zones to the server assumes they are already ordered.
+      for(var alert in widget._settings.alerts) {
+        alert.zones.sort((a, b) => a.value.compareTo(b.value));
+      }
+      Navigator.pop(context);
+    } else {
+      widget._controller.showMessage(context, 'Alarms can only be defined once');
+    }
   }
 
   void _audioSettings(_Alert alert) async {
