@@ -443,6 +443,7 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
     return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _checkPaths();}, child: Column(children: [
       Row(children: [
         IconButton(tooltip: 'Add Alert', icon: const Icon(Icons.add), onPressed: _addAlert),
+        IconButton(tooltip: 'Audio Settings', icon: const Icon(Icons.notifications), onPressed: () {_audioSettings();}),
       ]),
       Expanded(child: ListView.builder(itemCount: s.alerts.length, itemBuilder: (context, a) {
         var alert = s.alerts[a];
@@ -462,17 +463,15 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
               zone.state,
               (v) {zone.state = v!;}
             ))),
-            IconButton(onPressed: () {_deleteZone(alert, z);}, icon: Icon(Icons.delete))
+            IconButton(tooltip: 'Delete threshold', onPressed: () {_deleteZone(alert, z);}, icon: Icon(Icons.delete))
           ]));
         }
         return Column(children: [
           ListTile(
-            leading: IconButton(tooltip: 'Audio Settings', icon: const Icon(Icons.notifications), onPressed: () {_audioSettings(alert);}),
+            leading: IconButton(tooltip: 'Add threshold', onPressed: () {_addZone(alert);}, icon: Icon(Icons.add)),
             title: EnumDropdownMenu(AlertType.values, alert.type, (v) {alert.type = v!;}),
-            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                IconButton(onPressed: () {_addZone(alert);}, icon: Icon(Icons.add)),
-                IconButton(onPressed: () {_deleteAlert(a);}, icon: Icon(Icons.delete))
-            ])),
+            trailing: IconButton(tooltip: 'Delete Alert', onPressed: () {_deleteAlert(a);}, icon: Icon(Icons.delete))
+          ),
           Column(children: zones)
         ]);
       }))
@@ -498,11 +497,11 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
       }
       Navigator.pop(context);
     } else {
-      widget._controller.showMessage(context, 'Alarms can only be defined once');
+      widget._controller.showMessage(context, 'Alerts can only be defined once');
     }
   }
 
-  void _audioSettings(_Alert alert) async {
+  void _audioSettings() async {
     await Navigator.push(
         context, MaterialPageRoute(builder: (context) {
           return _AudioSettings(widget._settings);

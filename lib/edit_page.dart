@@ -339,7 +339,7 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(AnchorAlarmBox.sid, 'Anchor Alarm'),
       _widgetMenuEntry(AISDisplayBox.sid, 'AIS Display'),
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
-      _widgetMenuEntry(ZoneSetupBox.sid, 'Zone/Alarm Setup'),
+      _widgetMenuEntry(ZoneSetupBox.sid, 'Alerts/Zones Setup'),
       if(!Platform.isMacOS && !Platform.isLinux) _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
       _widgetSubMenuEntry(box, 'Camera', [
