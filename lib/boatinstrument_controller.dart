@@ -28,6 +28,7 @@ import 'package:boatinstrument/widgets/vnc_box.dart';
 import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
+import 'package:boatinstrument/widgets/zone_box.dart';
 import 'package:bonsoir/bonsoir.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -241,6 +242,17 @@ class BoatInstrumentController {
         return depth * 3.28084;
       case DepthUnits.fa:
         return depth * 0.546807;
+    }
+  }
+
+  double depthFromDisplay(double depth) {
+    switch (depthUnits) {
+      case DepthUnits.m:
+        return depth;
+      case DepthUnits.ft:
+        return depth / 3.28084;
+      case DepthUnits.fa:
+        return depth / 0.546807;
     }
   }
 
@@ -918,6 +930,10 @@ class BoatInstrumentController {
     return await _httpClient.put(uri, headers: _httpHeaders(headers), body: body);
   }
 
+  Future<http.Response> httpDelete(Uri uri, {Map<String, String>? headers}) async {
+    return await _httpClient.delete(uri, headers: _httpHeaders(headers));
+  }
+
   Future<http.Response> httpPost(Uri uri, {Map<String, String>? headers, Object? body}) async {
     return await _httpClient.post(uri, headers: _httpHeaders(headers), body: body);
   }
@@ -1193,6 +1209,21 @@ class BoatInstrumentController {
       {
         "updates": [{
           "values": [
+            {
+              "path": path,
+              "value": value
+            }
+          ]
+        }]
+      }
+    );
+  }
+
+  void sendMetaUpdate(String path, dynamic value) {
+    _send(
+      {
+        "updates": [{
+          "meta": [
             {
               "path": path,
               "value": value

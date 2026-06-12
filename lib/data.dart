@@ -482,7 +482,7 @@ abstract class BoxWidget extends StatefulWidget {
   // can be used to display text in Markdown format: 
   // e.g.
   //   @override
-  //   Widget? getHelp(BuildContext context) => const HelpPage(text: 'My simple help.');
+  //   Widget? getHelp() => const HelpPage(text: 'My simple help.');
   Widget? getHelp() => null;
 
   // If the Settings are not obvious, these should return help page Widgets.
@@ -1519,6 +1519,8 @@ class _EditListWidgetState extends State<EditListWidget> {
 }
 
 class BiTextFormField extends OnscreenKeyboardTextFormField {
+  static final TextInputFormatter doubleOnly = FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'));
+
   BiTextFormField({
     super.enabled,
     super.inputFormatters,
