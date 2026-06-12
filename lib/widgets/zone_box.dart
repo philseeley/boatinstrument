@@ -218,9 +218,9 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     var editMode = widget.config.editMode;
     var alerts = _settings!.alerts;
     if(editMode && alerts.isEmpty) {
-      alerts = [//TODO
-        // Alarm(id: 't1', time: TimeOfDay(hour: 1, minute: 12)),
-        // Alarm(id: 't1', time: TimeOfDay(hour: 1, minute: 12), delta: true)
+      _metas = [
+        _Meta(alert: _Alert(type: AlertType.aws)),
+        _Meta(alert: _Alert(type: AlertType.dbs))
       ];
     }
     if(_metas == null) {
