@@ -217,15 +217,9 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
   Widget build(BuildContext context) {
     var editMode = widget.config.editMode;
     var alerts = _settings!.alerts;
-    if(editMode && alerts.isEmpty) {
-      _metas = [
-        _Meta(alert: _Alert(type: AlertType.aws)),
-        _Meta(alert: _Alert(type: AlertType.dbs))
-      ];
-    }
     if(_metas == null) {
       _getCurrentAlerts();
-      body = Text('Retrieving data');
+      body = Text(alerts.isEmpty?'No Alerts defined\nin Settings':'Retrieving data');
     } else {
       body = ListView.builder(itemCount: _metas!.length, itemBuilder: (context, i) {
         _Meta m = _metas![i];
