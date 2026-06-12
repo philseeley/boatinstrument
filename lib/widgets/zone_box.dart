@@ -193,10 +193,8 @@ class ZoneSetupBox extends BoxWidget {
   @override
   Widget? getHelp() => const HelpPage(url: 'doc:zones.md');
 
-//   @override//TODO
-//   Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''In **Auto** mode the Rose will switch between the "Normal" and "Close Haul" displays if the needle transitions over 60 degrees for more than the **Auto Switch Delay**.
-  
-// The **Switch Button** allows you to cycle through the Wind Rose types from the display. If the button is "Unlocked" the display is in "Auto" mode.''');
+  @override
+  Widget? getSettingsHelp() => const HelpPage(url: 'doc:zones.md');
 }
 
 class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversion {

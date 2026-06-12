@@ -42,6 +42,10 @@ Whilst in **Edit Mode** dummy values are shown, usually the value "12.3". This a
 
 Occasionally Experimental Boxes cause issues that cannot be fixed and will be marked as **Deprecated** ![deprecated](assets/icons/__THEME__/block.png) and removed in future releases. A warning will be displayed over the Box when the app is started. If you are making use of a **Deprecated** Box then please raise an [Issue](https://github.com/philseeley/boatinstrument/issues) for discussion.
 
+# SignalK Zones/Alarms
+
+Alarms or alerts can be set using SignalK Zones via the **Zone/Alarm** Box, see [Zones](doc:zones.md).
+
 # SignalK Server Settings
 
 Whilst the app connects to a single SignalK Server multiple servers can be defined, each with its own connection details like ClientID and Authentication Token. Each server should be given a unique **Server ID**.
