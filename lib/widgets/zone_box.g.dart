@@ -82,6 +82,7 @@ const _$AlertTypeEnumMap = {
   AlertType.stw: 'stw',
   AlertType.wtGt: 'wtGt',
   AlertType.wtLt: 'wtLt',
+  AlertType.wptDistGc: 'wptDistGc',
 };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(

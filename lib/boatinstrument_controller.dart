@@ -287,6 +287,21 @@ class BoatInstrumentController {
     }
   }
 
+  double distanceFromDisplay(double distance) {
+    switch (distanceUnits) {
+      case DistanceUnits.meters:
+        return distance;
+      case DistanceUnits.km:
+        return distance / 0.001;
+      case DistanceUnits.miles:
+        return miles2m(distance);
+      case DistanceUnits.nm:
+        return nm2m(distance);
+      case DistanceUnits.nmM:
+        return nm2m(distance);
+    }
+  }
+
   String distanceUnitsToDisplay(double distance, {bool fixed = false}) {
     if(!fixed && distanceUnits == DistanceUnits.nmM &&
         distance.abs() <= m2nmThreshold) {

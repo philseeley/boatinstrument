@@ -18,6 +18,7 @@ enum AlertType implements EnumMenuEntry {
   stw('Speed Through Water', 'navigation.speedThroughWater', true, 0.0),
   wtGt('Water Temperature Increasing', 'environment.water.temperature', true, kelvinOffset),
   wtLt('Water Temperature Decreasing', 'environment.water.temperature', false, kelvinOffset),
+  wptDistGc('Waypoint Distance (GC)', 'navigation.courseGreatCircle.nextPoint.distance', false, 0.0),
   ;
 
   @override
@@ -48,6 +49,8 @@ mixin _UnitConversion {
       case AlertType.wtGt:
       case AlertType.wtLt:
         return controller.temperatureUnits.unit;
+      case AlertType.wptDistGc:
+        return controller.distanceUnits.unit;
     }
   }
 
@@ -66,6 +69,8 @@ mixin _UnitConversion {
       case AlertType.wtGt:
       case AlertType.wtLt:
         return controller.temperatureToDisplay(value).toString();
+      case AlertType.wptDistGc:
+        return controller.distanceToDisplay(value, fixed: true).toString();
     }
   }
 
@@ -85,6 +90,8 @@ mixin _UnitConversion {
       case AlertType.wtGt:
       case AlertType.wtLt:
         return controller.temperatureFromDisplay(value);
+      case AlertType.wptDistGc:
+        return controller.distanceFromDisplay(value);
     }
   }
 }
