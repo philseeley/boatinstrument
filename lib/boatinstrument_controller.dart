@@ -332,6 +332,19 @@ class BoatInstrumentController {
     }
   }
 
+  double speedFromDisplay(double speed) {
+    switch (speedUnits) {
+      case SpeedUnits.mps:
+        return speed;
+      case SpeedUnits.kph:
+        return speed / 3.6;
+      case SpeedUnits.mph:
+        return speed / 2.236936;
+      case SpeedUnits.kts:
+        return kts2ms(speed);
+    }
+  }
+
   double windSpeedToDisplay(double speed) {
     switch (windSpeedUnits) {
       case SpeedUnits.mps:
@@ -460,7 +473,7 @@ class BoatInstrumentController {
     for(var a in _alarms.values) {
       Duration d = a.expires.difference(now());
 
-      if(d.isNegative) {print('PLAYING===================');playSoundFile(a.notificationState.soundFile);}
+      if(d.isNegative) playSoundFile(a.notificationState.soundFile);
     }
   }
 

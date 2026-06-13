@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -8,18 +9,84 @@ import 'package:json_annotation/json_annotation.dart';
 part 'zone_box.g.dart';
 
 enum AlertType implements EnumMenuEntry {
-  aws('Apparent Wind Speed', 'environment.wind.speedApparent', true),
-  dbs('Depth Below Surface', 'environment.depth.belowSurface', false),
-  test('Test One', 'test.one', false),
-  dbk('Depth Below Keel', 'environment.depth.belowKeel', false);
+  aws('Apparent Wind Speed', 'environment.wind.speedApparent', true, 0.0),
+  tws('True Wind Speed', 'environment.wind.speedTrue', true, 0.0),
+  dbs('Depth Below Surface', 'environment.depth.belowSurface', false, 0.0),
+  dbk('Depth Below Keel', 'environment.depth.belowKeel', false, 0.0),
+  dbt('Depth Below Transducer', 'environment.depth.belowTransducer', false, 0.0),
+  sog('Speed Over Ground', 'navigation.speedOverGround', true, 0.0),
+  stw('Speed Through Water', 'navigation.speedThroughWater', true, 0.0),
+  wtGt('Water Temperature Increasing', 'environment.water.temperature', true, kelvinOffset),
+  wtLt('Water Temperature Decreasing', 'environment.water.temperature', false, kelvinOffset),
+  ;
 
   @override
   String get displayName => _displayName;
   final String _displayName;
   final String path;
   final bool increasing;
+  final double base;
 
-  const AlertType(this._displayName, this.path, this.increasing);
+  const AlertType(this._displayName, this.path, this.increasing, this.base);
+}
+
+mixin _UnitConversion {
+  BoatInstrumentController get controller;
+
+  String _units(AlertType type) {
+    switch(type) {
+      case AlertType.aws:
+      case AlertType.tws:
+        return controller.windSpeedUnits.unit;
+      case AlertType.dbs:
+      case AlertType.dbk:
+      case AlertType.dbt:
+        return controller.depthUnits.unit;
+      case AlertType.sog:
+      case AlertType.stw:
+        return controller.speedUnits.unit;
+      case AlertType.wtGt:
+      case AlertType.wtLt:
+        return controller.temperatureUnits.unit;
+    }
+  }
+
+  String _toDisplay(AlertType type, double value) {
+    switch(type) {
+      case AlertType.aws:
+      case AlertType.tws:
+        return controller.windSpeedToDisplay(value).toString();
+      case AlertType.dbs:
+      case AlertType.dbk:
+      case AlertType.dbt:
+        return controller.depthToDisplay(value).toString();
+      case AlertType.sog:
+      case AlertType.stw:
+        return controller.speedToDisplay(value).toString();
+      case AlertType.wtGt:
+      case AlertType.wtLt:
+        return controller.temperatureToDisplay(value).toString();
+    }
+  }
+
+  double _fromDisplay(AlertType type, String strValue) {
+    var value = double.parse(strValue);
+    switch(type) {
+      case AlertType.aws:
+      case AlertType.tws:
+        return controller.windSpeedFromDisplay(value);
+      case AlertType.dbs:
+      case AlertType.dbk:
+      case AlertType.dbt:
+        return controller.depthFromDisplay(value);
+      case AlertType.sog:
+      case AlertType.stw:
+        return controller.speedFromDisplay(value);
+      case AlertType.wtGt:
+      case AlertType.wtLt:
+        return controller.temperatureFromDisplay(value);
+    }
+  }
 }
 
 @JsonSerializable()
@@ -133,44 +200,6 @@ class _Settings {
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
 }
 
-mixin _UnitConversion {
-  BoatInstrumentController get controller;
-
-  String _units(AlertType type) {
-    switch(type) {
-      case AlertType.aws:
-        return controller.windSpeedUnits.unit;
-      case AlertType.test:
-      case AlertType.dbs:
-      case AlertType.dbk:
-        return controller.depthUnits.unit;
-    }
-  }
-
-  String _toDisplay(AlertType type, double value) {
-    switch(type) {
-      case AlertType.aws:
-        return controller.windSpeedToDisplay(value).toString();
-      case AlertType.test:
-      case AlertType.dbs:
-      case AlertType.dbk:
-        return controller.depthToDisplay(value).toString();
-    }
-  }
-
-  double _fromDisplay(AlertType type, String strValue) {
-    var value = double.parse(strValue);
-    switch(type) {
-      case AlertType.aws:
-        return controller.windSpeedFromDisplay(value);
-      case AlertType.test:
-      case AlertType.dbs:
-      case AlertType.dbk:
-        return controller.depthFromDisplay(value);
-    }
-  }
-}
-
 class ZoneSetupBox extends BoxWidget {
 
   const ZoneSetupBox(super.config, {super.key});
@@ -227,7 +256,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
         bool first = true;
         for(var z in m.zones) {
           if(!first) zonesStr.writeln();
-          zonesStr.write('${_toDisplay(m.alert!.type, m.alert!.type.increasing?z.lower??0:z.upper??double.infinity)}: ${z.state.displayName}');
+          zonesStr.write('${_toDisplay(m.alert!.type, m.alert!.type.increasing?z.lower??m.alert!.type.base:z.upper??double.infinity)}: ${z.state.displayName}');
           first = false;
         }
         return ListTile(
@@ -322,7 +351,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
       var zones = List<_AlertZone>.from(alert.zones);
       var lastZone = alert.type.increasing?zones.firstOrNull:zones.lastOrNull;
       String msg = lastZone==null?'Normal':'${alert.type.increasing?'<':'>'} ${_toDisplay(alert.type, lastZone.value)}';
-      zones.insert(alert.type.increasing?0:zones.length, _AlertZone(value: alert.type.increasing?0:lastZone?.value??0, state: NotificationState.normal, message: '${alert.type.displayName} $msg'));
+      zones.insert(alert.type.increasing?0:zones.length, _AlertZone(value: alert.type.increasing?alert.type.base:lastZone?.value??alert.type.base, state: NotificationState.normal, message: '${alert.type.displayName} $msg'));
 
       List<Map<String, dynamic>> jsonZones = [];
       for(int z = 0; z<zones.length; ++z) {
@@ -355,7 +384,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
         },
         body: '{"value": ${json.encode(data)}}'
       );
-      if(r.statusCode != 202) {
+      if(![HttpStatus.ok, HttpStatus.accepted].contains(r.statusCode)) {
         if(mounted) widget.config.controller.showMessage(context, r.reasonPhrase??'Failed to update zone "$uri', error: true);
       }
 
@@ -463,7 +492,12 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
         return Column(children: [
           ListTile(
             leading: IconButton(tooltip: 'Add threshold', onPressed: () {_addZone(alert);}, icon: Icon(Icons.add)),
-            title: EnumDropdownMenu(AlertType.values, alert.type, (v) {alert.type = v!;}),
+            title: EnumDropdownMenu(AlertType.values, alert.type, (v) {
+              setState(() {
+                alert.zones.clear();
+                alert.type = v!;
+              });
+            }),
             trailing: IconButton(tooltip: 'Delete Alert', onPressed: () {_deleteAlert(a);}, icon: Icon(Icons.delete))
           ),
           Column(children: zones)
@@ -517,7 +551,7 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
 
   void _addZone(_Alert alert) {
     setState(() {
-      alert.zones.add(_AlertZone());
+      alert.zones.add(_AlertZone(value: alert.type.base));
     });
   }
 

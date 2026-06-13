@@ -74,9 +74,14 @@ Map<String, dynamic> _$AlertToJson(_Alert instance) => <String, dynamic>{
 
 const _$AlertTypeEnumMap = {
   AlertType.aws: 'aws',
+  AlertType.tws: 'tws',
   AlertType.dbs: 'dbs',
-  AlertType.test: 'test',
   AlertType.dbk: 'dbk',
+  AlertType.dbt: 'dbt',
+  AlertType.sog: 'sog',
+  AlertType.stw: 'stw',
+  AlertType.wtGt: 'wtGt',
+  AlertType.wtLt: 'wtLt',
 };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
