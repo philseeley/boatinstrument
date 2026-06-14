@@ -170,7 +170,7 @@ class _NotificationLogDisplayState extends State<NotificationLogDisplay> {
         itemBuilder: (BuildContext context, int index) {
           _NotificationItem ni = notifications[index];
           return ListTile(
-            leading: Text(dateFmt.format(ni.status.last)),
+            leading: Text(dateFmt.format(ni.status.last.toLocal())),
             title: Row(children: [
               Text(ni.status.message),
               if(ni.status.mute) Icon(Icons.volume_off)

@@ -8,6 +8,7 @@
            Settings Sliders now show the value after the Slider.
            We now ask for confirmation when deleting a server config.
            Human readable durations now show the sign correctly.
+           Notifications log now shows local times rather than UTC.
 
            New Boxes:
              Webcam(ONVIF)
