@@ -75,7 +75,7 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   
   @override
   String units(double value) {
-    return 'V';
+    return voltageUnits;
   }
 
   @override
@@ -173,7 +173,7 @@ class BatteryVoltageBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'V';
+    return voltageUnits;
   }
   @override
   bool get hasPerBoxSettings => true;
@@ -209,7 +209,7 @@ class BatteryCurrentBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'A';
+    return currentUnits;
   }
   @override
   bool get hasPerBoxSettings => true;
@@ -281,7 +281,7 @@ class InverterCurrentBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'A';
+    return currentUnits;
   }
   @override
   bool get hasPerBoxSettings => true;
@@ -317,7 +317,7 @@ class SolarVoltageBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'V';
+    return voltageUnits;
   }
   @override
   bool get hasPerBoxSettings => true;
@@ -353,7 +353,7 @@ class SolarCurrentBox extends DoubleValueBox {
 
   @override
   String units(double value) {
-    return 'A';
+    return currentUnits;
   }
 
   @override

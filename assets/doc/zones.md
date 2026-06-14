@@ -4,6 +4,8 @@ Alerts can be set using SignalK Zones. This is a two step process, first define 
 
 By default, when an Alert is received an audio tone is played. This can be overridden for each Alert level through the Audio Settings ![enable](assets/icons/__THEME__/notifications.png).
 
+**Note:** values like Battery Current may need to have negative thresholds set, e.g. to alarm if a battery is discharging more than 100A, then -100 should be set as the threshold.
+
 ## Defining Alerts
 
 For each value, e.g. True Wind Speed, you can define multiple thresholds, e.g. a Warning at 15kts, an Alarm at 20kts and then an Emergency at 25kts.

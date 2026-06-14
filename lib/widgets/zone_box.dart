@@ -9,16 +9,23 @@ import 'package:json_annotation/json_annotation.dart';
 part 'zone_box.g.dart';
 
 enum AlertType implements EnumMenuEntry {
-  aws('Apparent Wind Speed', 'environment.wind.speedApparent', true, 0.0),
-  tws('True Wind Speed', 'environment.wind.speedTrue', true, 0.0),
-  dbs('Depth Below Surface', 'environment.depth.belowSurface', false, 0.0),
-  dbk('Depth Below Keel', 'environment.depth.belowKeel', false, 0.0),
-  dbt('Depth Below Transducer', 'environment.depth.belowTransducer', false, 0.0),
-  sog('Speed Over Ground', 'navigation.speedOverGround', true, 0.0),
-  stw('Speed Through Water', 'navigation.speedThroughWater', true, 0.0),
+  aws('Apparent Wind Speed', 'environment.wind.speedApparent', true, 0),
+  tws('True Wind Speed', 'environment.wind.speedTrue', true, 0),
+  dbs('Depth Below Surface', 'environment.depth.belowSurface', false, 0),
+  dbk('Depth Below Keel', 'environment.depth.belowKeel', false, 0),
+  dbt('Depth Below Transducer', 'environment.depth.belowTransducer', false, 0),
+  sog('Speed Over Ground', 'navigation.speedOverGround', true, 0),
+  stw('Speed Through Water', 'navigation.speedThroughWater', true, 0),
   wtGt('Water Temperature Increasing', 'environment.water.temperature', true, kelvinOffset),
   wtLt('Water Temperature Decreasing', 'environment.water.temperature', false, kelvinOffset),
-  wptDistGc('Waypoint Distance (GC)', 'navigation.courseGreatCircle.nextPoint.distance', false, 0.0),
+  wptDistGc('Waypoint Distance (GC)', 'navigation.courseGreatCircle.nextPoint.distance', false, 0),
+  batVoltage('Battery Voltage', 'electrical.batteries', false, 0, item: 'voltage'),
+  batCurrent('Battery Current', 'electrical.batteries', false, -1000000, item: 'current'),
+  tankFreshwater('Freshwater Tank', 'tanks.freshWater', false, 0, item: 'currentLevel'),
+  tankWastewater('Wastewater Tank', 'tanks.wasteWater', true, 0, item: 'currentLevel'),
+  tankBlackWater('Black Water Tank', 'tanks.blackWater', true, 0, item: 'currentLevel'),
+  tankFuel('Fuel Tank', 'tanks.fuel', false, 0, item: 'currentLevel'),
+  tankLubrication('Lubrication Tank', 'tanks.lubrication', false, 0, item: 'currentLevel'),
   ;
 
   @override
@@ -27,8 +34,9 @@ enum AlertType implements EnumMenuEntry {
   final String path;
   final bool increasing;
   final double base;
+  final String? item;
 
-  const AlertType(this._displayName, this.path, this.increasing, this.base);
+  const AlertType(this._displayName, this.path, this.increasing, this.base, {this.item});
 }
 
 mixin _UnitConversion {
@@ -51,6 +59,16 @@ mixin _UnitConversion {
         return controller.temperatureUnits.unit;
       case AlertType.wptDistGc:
         return controller.distanceUnits.unit;
+      case AlertType.batVoltage:
+        return voltageUnits;
+      case AlertType.batCurrent:
+        return currentUnits;
+      case AlertType.tankFreshwater:
+      case AlertType.tankWastewater:
+      case AlertType.tankBlackWater:
+      case AlertType.tankFuel:
+      case AlertType.tankLubrication:
+        return capacityUnits;
     }
   }
 
@@ -71,6 +89,15 @@ mixin _UnitConversion {
         return controller.temperatureToDisplay(value).toString();
       case AlertType.wptDistGc:
         return controller.distanceToDisplay(value, fixed: true).toString();
+      case AlertType.batVoltage:
+      case AlertType.batCurrent:
+        return value.toString();
+      case AlertType.tankFreshwater:
+      case AlertType.tankWastewater:
+      case AlertType.tankBlackWater:
+      case AlertType.tankFuel:
+      case AlertType.tankLubrication:
+        return capacityToDisplay(value).toString();
     }
   }
 
@@ -92,6 +119,15 @@ mixin _UnitConversion {
         return controller.temperatureFromDisplay(value);
       case AlertType.wptDistGc:
         return controller.distanceFromDisplay(value);
+      case AlertType.batVoltage:
+      case AlertType.batCurrent:
+        return value;
+      case AlertType.tankFreshwater:
+      case AlertType.tankWastewater:
+      case AlertType.tankBlackWater:
+      case AlertType.tankFuel:
+      case AlertType.tankLubrication:
+        return capacityFromDisplay(value);
     }
   }
 }
@@ -166,10 +202,12 @@ class _AlertZone {
 @JsonSerializable(explicitToJson: true)
 class _Alert {
   AlertType type;
+  String? id;
   List<_AlertZone> zones;
 
   _Alert({
     this.type = AlertType.aws,
+    this.id,
     this.zones = const []
   }) {
     if(zones.isEmpty) zones = [];
@@ -284,8 +322,16 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     List<String> ps = [...uri.pathSegments]
       ..removeLast()
       ..addAll(['vessels', 'self'])
-      ..addAll(alert.type.path.split('.'))
-      ..add('meta');
+      ..addAll(alert.type.path.split('.'));
+
+    if(alert.type.item != null) {
+      if(alert.id == null) throw Exception('ID not set for Alert ${alert.type.displayName}');
+
+      ps..add(alert.id!)
+      ..add(alert.type.item!);
+    }
+    ps.add('meta');
+
     return uri.replace(pathSegments: ps);
   }
 
@@ -364,21 +410,21 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
       for(int z = 0; z<zones.length; ++z) {
         var zone = zones[z];
         if(zone.message.isEmpty) zone.message = '${alert.type.displayName} ${alert.type.increasing?'>':'<'} ${_toDisplay(alert.type, zone.value)}';
-        var normalZone = _Zone(
-          lower: z>0?zone.value:null,
+        var jsonZone = _Zone(
+          lower: z>0 || zones.length==1?zone.value:null,
           upper: z<zones.length-1?zones[z+1].value:null,
           state: zone.state,
           message: zone.message
         );
         if(!alert.type.increasing) {
-          normalZone = _Zone(
-            lower: z>0?zones[z-1].value:null,
+          jsonZone = _Zone(
+            lower: zones.length==1?zone.value:(z>0?zones[z-1].value:null),
             upper: z<zones.length-1?zone.value:null,
             state: zone.state,
             message: zone.message
           );
         }
-        jsonZones.add(normalZone.toJson());
+        jsonZones.add(jsonZone.toJson());
       }
 
       data['zones'] = jsonZones;
@@ -411,7 +457,6 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     var existingData = await _getMeta(uri);
 
     try {
-
       var r = await widget.config.controller.httpDelete(
         uri,
         headers: {
@@ -419,7 +464,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
           "accept": "application/json"
         },
       );
-      if(r.statusCode != 202) {
+      if(![HttpStatus.ok, HttpStatus.accepted].contains(r.statusCode)) {
         if(mounted) widget.config.controller.showMessage(context, r.reasonPhrase??'Failed to delete zone "$uri', error: true);
       }
     } catch (e) {
@@ -427,7 +472,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     }
     
     // Need to set a normal range to stop the server keeping old ranges.
-    _Alert removeAlert = _Alert(type: alert.type, zones: []);
+    _Alert removeAlert = _Alert(type: alert.type, zones: [], id: alert.id);
     _setZones(removeAlert, existingData: existingData);
   }
 
@@ -506,6 +551,14 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
               });
             }),
             trailing: IconButton(tooltip: 'Delete Alert', onPressed: () {_deleteAlert(a);}, icon: Icon(Icons.delete))
+          ),
+          if(alert.type.item != null) ListTile(
+            leading: Text("ID:"),
+            title: SignalkPathDropdownMenu(
+              widget._controller,
+              alert.id??'',
+              alert.type.path,
+              (value) => alert.id = value)
           ),
           Column(children: zones)
         ]);

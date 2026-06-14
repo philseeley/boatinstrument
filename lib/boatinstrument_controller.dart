@@ -754,9 +754,9 @@ class BoatInstrumentController {
   void _onNotification(BuildContext context, List<Update> updates) {
     DateTime now = this.now();
 
-    _notifications.removeWhere((path, notification) {
-      return now.difference(notification.last) > Duration(minutes: _settings!.notificationMuteTimeout);
-    });
+    var d = Duration(minutes: _settings!.notificationMuteTimeout);
+    _notifications.removeWhere((path, notification) => 
+      now.difference(notification.last) > d);
 
     for(Update u in updates) {
       if (u.value == null) {

@@ -7,6 +7,9 @@ const String milliSecondsUnits = 'ms';
 const String secondsUnits = 'secs';
 const String minutesUnits = 'mins';
 const String feetUnits = 'ft';
+const String voltageUnits = 'V';
+const String currentUnits = 'A';
+const String capacityUnits = '%';
 const String deltaChar = '\u0394';
 const double kelvinOffset = 273.15;
 const String mainHelpURL = 'doc:help.md';
@@ -62,6 +65,14 @@ String duration2String(Duration d) {
   List<String> parts = d.toString().split(':');
   int s = double.parse(parts[2]).round();
   return fmt.format('{}:{}:{:02d}', parts[0], parts[1], s);
+}
+
+double capacityToDisplay(double fraction) {
+  return fraction * 100;
+}
+
+double capacityFromDisplay(double percent) {
+  return percent * 0.01;
 }
 
 double averageAngle(double current, double next, { int smooth = 1, bool relative=false }) {
@@ -1519,7 +1530,7 @@ class _EditListWidgetState extends State<EditListWidget> {
 }
 
 class BiTextFormField extends OnscreenKeyboardTextFormField {
-  static final TextInputFormatter doubleOnly = FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'));
+  static final TextInputFormatter doubleOnly = FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*$'));
 
   BiTextFormField({
     super.enabled,

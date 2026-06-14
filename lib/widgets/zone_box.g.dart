@@ -60,6 +60,7 @@ Map<String, dynamic> _$AlertZoneToJson(_AlertZone instance) =>
 
 _Alert _$AlertFromJson(Map<String, dynamic> json) => _Alert(
   type: $enumDecodeNullable(_$AlertTypeEnumMap, json['type']) ?? AlertType.aws,
+  id: json['id'] as String?,
   zones:
       (json['zones'] as List<dynamic>?)
           ?.map((e) => _AlertZone.fromJson(e as Map<String, dynamic>))
@@ -69,6 +70,7 @@ _Alert _$AlertFromJson(Map<String, dynamic> json) => _Alert(
 
 Map<String, dynamic> _$AlertToJson(_Alert instance) => <String, dynamic>{
   'type': _$AlertTypeEnumMap[instance.type]!,
+  'id': instance.id,
   'zones': instance.zones.map((e) => e.toJson()).toList(),
 };
 
@@ -83,6 +85,13 @@ const _$AlertTypeEnumMap = {
   AlertType.wtGt: 'wtGt',
   AlertType.wtLt: 'wtLt',
   AlertType.wptDistGc: 'wptDistGc',
+  AlertType.batVoltage: 'batVoltage',
+  AlertType.batCurrent: 'batCurrent',
+  AlertType.tankFreshwater: 'tankFreshwater',
+  AlertType.tankWastewater: 'tankWastewater',
+  AlertType.tankBlackWater: 'tankBlackWater',
+  AlertType.tankFuel: 'tankFuel',
+  AlertType.tankLubrication: 'tankLubrication',
 };
 
 _Settings _$SettingsFromJson(Map<String, dynamic> json) => _Settings(
