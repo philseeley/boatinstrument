@@ -14,6 +14,7 @@
              Webcam(ONVIF)
              AIS
              Alerts/Zones Setup
+             Battery State of Charge Box and Bar Gauge.
 
            Box updates:
              Anchor Alarm reworked to show Charts/Maps.
