@@ -42,6 +42,24 @@ enum AlertType implements EnumMenuEntry {
 mixin _UnitConversion {
   BoatInstrumentController get controller;
 
+  Uri _metaUri (_Alert alert) {
+    Uri uri = controller.httpApiUri;
+    List<String> ps = [...uri.pathSegments]
+      ..removeLast()
+      ..addAll(['vessels', 'self'])
+      ..addAll(alert.type.path.split('.'));
+
+    if(alert.type.item != null) {
+      if(alert.id == null) throw Exception('ID not set for Alert ${alert.type.displayName}');
+
+      ps..add(alert.id!)
+      ..add(alert.type.item!);
+    }
+    ps.add('meta');
+
+    return uri.replace(pathSegments: ps);
+  }
+
   String _units(AlertType type) {
     switch(type) {
       case AlertType.aws:
@@ -317,24 +335,6 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     return super.build(context);
   }
 
-  Uri _metaUri (_Alert alert) {
-    Uri uri = widget.config.controller.httpApiUri;
-    List<String> ps = [...uri.pathSegments]
-      ..removeLast()
-      ..addAll(['vessels', 'self'])
-      ..addAll(alert.type.path.split('.'));
-
-    if(alert.type.item != null) {
-      if(alert.id == null) throw Exception('ID not set for Alert ${alert.type.displayName}');
-
-      ps..add(alert.id!)
-      ..add(alert.type.item!);
-    }
-    ps.add('meta');
-
-    return uri.replace(pathSegments: ps);
-  }
-
   Future<Map<String, dynamic>> _getMeta (Uri uri) async {
     try {
       var r = await widget.config.controller.httpGet(uri);
@@ -456,6 +456,7 @@ class _ZoneSetupBoxState extends HeadedBoxState<ZoneSetupBox> with _UnitConversi
     // Need to keep existing data for other meta fields.
     var existingData = await _getMeta(uri);
 
+    // We have to completely delete the metadata otherwise a change of zones does not get applied.
     try {
       var r = await widget.config.controller.httpDelete(
         uri,
@@ -604,6 +605,25 @@ class __AlertsSetupSettingsState extends State<_AlertsSetupSettings> with _UnitC
   }
 
   Future<void> _deleteAlert(int i) async {
+    if(await widget._controller.askToConfirm(context, 'Also delete from server config file?')) {
+      var alert = widget._settings.alerts[i];
+
+      Uri uri = _metaUri(alert);
+      try {
+        var r = await widget._controller.httpDelete(
+          uri,
+          headers: {
+            "Content-Type": "application/json",
+            "accept": "application/json"
+          },
+        );
+        if(![HttpStatus.ok, HttpStatus.accepted].contains(r.statusCode)) {
+          if(mounted) widget._controller.showMessage(context, r.reasonPhrase??'Failed to delete zone from file "$uri', error: true);
+        }
+      } catch (e) {
+        widget._controller.l.e('Unexpected error deleting zone from file "$uri"', error: e);
+      }
+    }
     setState(() {
       widget._settings.alerts.removeAt(i);
     });
