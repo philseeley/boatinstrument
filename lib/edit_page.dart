@@ -75,6 +75,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(BatteryVoltageBox.sid, (config) {return BatteryVoltageBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryCurrentBox.sid, (config) {return BatteryCurrentBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(BatteryTemperatureBox.sid, (config) {return BatteryTemperatureBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(BatteryStateOfChargeBox.sid, (config) {return BatteryStateOfChargeBox.fromSettings(config, key: UniqueKey());}),
+  BoxDetails(BatteryStateOfChargeBarGaugeBox.sid, gauge: true, (config) {return BatteryStateOfChargeBarGaugeBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(InverterCurrentBox.sid, (config) {return InverterCurrentBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(SolarVoltageBox.sid, (config) {return SolarVoltageBox.fromSettings(config, key: UniqueKey());}),
   BoxDetails(SolarCurrentBox.sid, (config) {return SolarCurrentBox.fromSettings(config, key: UniqueKey());}),
@@ -246,6 +248,8 @@ class _EditPageState extends State<_EditPage> {
           _widgetMenuEntry(BatteryCurrentBox.sid, 'Current'),
           _widgetMenuEntry(BatteryPowerGraph.sid, 'Power'),
           _widgetMenuEntry(BatteryTemperatureBox.sid, 'Temperature'),
+          _widgetMenuEntry(BatteryStateOfChargeBox.sid, 'State of Charge'),
+          _widgetMenuEntry(BatteryStateOfChargeBarGaugeBox.sid, 'State of Charge'),
         ]),
         _widgetSubMenuEntry(box, 'Solar', [
           _widgetMenuEntry(SolarVoltageBox.sid, 'Voltage'),

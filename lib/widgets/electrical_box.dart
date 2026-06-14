@@ -211,6 +211,7 @@ class BatteryCurrentBox extends DoubleValueBox {
   String units(double value) {
     return currentUnits;
   }
+
   @override
   bool get hasPerBoxSettings => true;
 
@@ -247,6 +248,7 @@ class BatteryTemperatureBox extends DoubleValueBox {
   String units(double value) {
     return config.controller.temperatureUnits.unit;
   }
+
   @override
   bool get hasPerBoxSettings => true;
 
@@ -257,6 +259,87 @@ class BatteryTemperatureBox extends DoubleValueBox {
 
   @override
   Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.temperature" the ID is "start"');
+}
+
+class BatteryStateOfChargeBox extends DoubleValueBox {
+  static const sid = 'electrical-battery-state-of-charge';
+  @override
+  String get id => sid;
+
+  final _ElectricalSettings _settings;
+
+  const BatteryStateOfChargeBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
+
+  factory BatteryStateOfChargeBox.fromSettings(BoxWidgetConfig config, {key}) {
+    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
+
+    return BatteryStateOfChargeBox._init(s, config, 'SoC:${s.id}', '$batteriesBasePath.${s.id}.capacity.stateOfCharge', key: key);
+  }
+
+  @override
+  double convert(double value) {
+    return capacityToDisplay(value);
+  }
+
+  @override
+  String units(double value) {
+    return capacityUnits;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.capacity.stateOfCharge" the ID is "start"');
+}
+
+class BatteryStateOfChargeBarGaugeBox extends DoubleValueBarGaugeBox {
+  static const sid = 'electrical-battery-state-of-charge-bar-gauge';
+  @override
+  String get id => sid;
+
+  final _ElectricalSettings _settings;
+
+  const BatteryStateOfChargeBarGaugeBox._init(this._settings, config, title, path, {super.key, super.ranges}) :
+    super(config, title, path, maxValue: 1.0, step: 10, showPercent: true, smoothing: false, dataType: SignalKDataType.infrequent);
+
+  factory BatteryStateOfChargeBarGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
+    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
+
+    return BatteryStateOfChargeBarGaugeBox._init(s, config,
+      'Battery:${s.id}', '$batteriesBasePath.${s.id}.capacity.stateOfCharge',
+      key: key, ranges: [
+        GaugeRange(0.0, 0.2, Colors.red),
+        GaugeRange(0.2, 0.7, Colors.orange),
+        GaugeRange(0.7, 1.0, Colors.green)
+      ]);
+  }
+
+  @override
+  double convert(double value) {
+    return capacityToDisplay(value);
+  }
+  
+  @override
+  String units(double value) {
+    return capacityUnits;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _ElectricalSettingsWidget(config.controller, _settings, batteryTitle, batteriesBasePath);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$batteriesBasePath.start.capacity.stateOfCharge" the ID is "start"');
 }
 
 class InverterCurrentBox extends DoubleValueBox {
