@@ -1,5 +1,6 @@
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class StarlinkBox extends BoxWidget {
   static const sid = 'starlink';
@@ -99,6 +100,102 @@ class _StarlinkBoxState extends State<StarlinkBox> with DoubleValeBoxPainter {
         } catch (e) {
           widget.config.controller.l.e("Error converting $u", error: e);
         }
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
+  }
+}
+
+class NoForeignLandBox extends BoxWidget {
+  static const sid = 'noforeignland';
+  @override
+  String get id => sid;
+
+  const NoForeignLandBox(super.config, {super.key});
+
+  @override
+  State<NoForeignLandBox> createState() => _NoForeignLandBNoxState();
+
+  @override
+  Widget? getHelp() => const HelpPage(text: '''Ensure the **@noforeignland/signalk-to-noforeignland** plugin is installed and configured on SignalK.
+  
+Press and hold the ![delta](assets/icons/__THEME__/change_history.png) button to show how long ago the location save or upload occurred.''');
+}
+
+class _NoForeignLandBNoxState extends HeadedBoxState<NoForeignLandBox> {
+  DateTime? _savePoint;
+  DateTime? _sentToApi;
+  String? _source;
+  int _statusBoolean = 1;
+  bool _showDelta = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'noforeignland.*'}, dataType: SignalKDataType.static);
+    actions = [
+      GestureDetector(
+        onTapDown: (_) => _setShowDelta(true),
+        onTapUp: (_) => _setShowDelta(false),
+        onTapCancel: () => _setShowDelta(false),
+        child: Icon(Icons.change_history),
+      )
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var now = widget.config.controller.now();
+    var textBgColor = Theme.of(context).colorScheme.surface;
+
+    var oldest = _savePoint??_sentToApi??now;
+    String dateFmt = (oldest.month != now.month || oldest.day != now.day)?'MMM-dd ':'';
+    DateFormat fmt = DateFormat('${dateFmt}HH:mm');
+
+    header = 'NFL: ${_statusBoolean==0?'Ok':'Error'} ${_source??''}';
+
+    var text = 'Saved: ${_fmtDateTime(now, fmt, _savePoint)}\nSent:  ${_fmtDateTime(now, fmt, _sentToApi)}';
+
+    body =  Stack(alignment: AlignmentGeometry.center, children: [
+      Image(image: AssetImage('assets/noforeignland.png')),
+      MaxTextWidget(text, textBgColor: textBgColor)
+    ]);
+
+    return super.build(context);
+  }
+
+  void _setShowDelta(bool value) {
+    setState(() {
+      _showDelta = value;
+    });
+  }
+
+  String _fmtDateTime(DateTime now, DateFormat fmt, DateTime? dt) {
+    return dt==null?'-':_showDelta?duration2HumanString(now.difference(dt.toLocal())):fmt.format(dt.toLocal());
+  }
+  
+  void _onUpdate(List<Update> updates) {
+    for (Update u in updates) {
+      try {
+        switch (u.path) {
+          case 'noforeignland.savepoint':
+            _savePoint = u.value==null?null:DateTime.parse(u.value);
+            break;
+          case 'noforeignland.sent_to_api':
+            _sentToApi = u.value==null?null:DateTime.parse(u.value);
+            break;
+          case 'noforeignland.source':
+            _source = u.value;
+            break;
+          case 'noforeignland.status_boolean':
+            _statusBoolean = u.value==null?1:(u.value as num).toInt();
+            break;
+        }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
       }
     }
 

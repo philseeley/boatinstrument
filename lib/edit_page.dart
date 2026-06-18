@@ -129,6 +129,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(ONVIFControlBox.sid, experimental: true, (config) {return ONVIFControlBox(config, key: UniqueKey());}),
   BoxDetails(AISDisplayBox.sid, experimental: true, (config) {return AISDisplayBox(config, key: UniqueKey());}),
   BoxDetails(ZoneSetupBox.sid, experimental: true, (config) {return ZoneSetupBox(config, key: UniqueKey());}),
+  BoxDetails(NoForeignLandBox.sid, (config) {return NoForeignLandBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -277,6 +278,7 @@ class _EditPageState extends State<_EditPage> {
       ]),
       _widgetSubMenuEntry(box, 'Network', [
         _widgetMenuEntry(StarlinkBox.sid, 'Starlink'),
+        _widgetMenuEntry(NoForeignLandBox.sid, 'No Foreign Land'),
       ]),
       _widgetSubMenuEntry(box, 'Hardware', [
         _widgetSubMenuEntry(box, 'Raspberry Pi', [
