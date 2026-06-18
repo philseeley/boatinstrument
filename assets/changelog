@@ -1,4 +1,6 @@
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
+           On Android and iOS the app keeps running when in the background or the
+             phone is locked, provided it it given the required permissions.
            Multiple SignalK Servers can be defined.
            Boxes can now be marked as Deprecated.
            When reconnecting we reinitialise the time sync or when we set the
