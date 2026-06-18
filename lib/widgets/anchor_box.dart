@@ -44,6 +44,7 @@ class _Map extends StatelessWidget {
   final ll.LatLng? _anchorPosition;
   final ll.LatLng? _newAnchorPosition;
   final double? _currentRadius;
+  final double? _newCurrentRadius;
   final double? _maxRadius;
   final double? _newMaxRadius;
   final double _sampleRadius;
@@ -67,6 +68,7 @@ class _Map extends StatelessWidget {
     this._anchorPosition,
     this._newAnchorPosition,
     this._currentRadius,
+    this._newCurrentRadius,
     this._currentColor,
     this._maxRadius,
     this._newMaxRadius,
@@ -84,8 +86,8 @@ class _Map extends StatelessWidget {
     Color bgColor = Theme.of(context).colorScheme.surface;
     TextStyle th = Theme.of(context).textTheme.bodyMedium!;
     var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
-    var maxRadiusText = _controller.shortDistanceToDisplay((_maxRadius??0)).round().toString();
-    var currentRadiusText = _controller.shortDistanceToDisplay(_currentRadius??_sampleRadius).round().toString();
+    var maxRadiusText = _controller.shortDistanceToDisplay((_newMaxRadius??_maxRadius??0)).round().toString();
+    var currentRadiusText = _controller.shortDistanceToDisplay(_newCurrentRadius??_currentRadius??_sampleRadius).round().toString();
     try {
       tp.text = TextSpan(text: maxRadiusText, style: th);
       tp.layout();
@@ -126,7 +128,7 @@ class _Map extends StatelessWidget {
         if(url.isNotEmpty) TileLayer(urlTemplate: url),
         CircleLayer(circles: [
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
-          if(_currentRadius != null) CircleMarker(point: _anchorPosition??_position, radius: _currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
@@ -180,6 +182,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   double? _maxRadius;
   double? _newMaxRadius;
   double? _currentRadius;
+  double? _newCurrentRadius;
   bool _unlocked = false;
   Timer? _lockTimer;
   static final List<ll.LatLng> _positions = [];
@@ -270,6 +273,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         _anchorPosition,
         _newAnchorPosition,
         _currentRadius,
+        _newCurrentRadius,
         dropColor,
         _maxRadius,
         _newMaxRadius,
@@ -321,7 +325,8 @@ class _AnchorState extends State<AnchorAlarmBox> {
     var box = Rect.fromCircle(center: Offset(size.width/2, size.height/2), radius: 30);
     if(box.contains(d.localPosition)) {
       setState(() {
-        _newAnchorPosition = _map!.toLatLong(d.localPosition);
+        _newAnchorPosition = _anchorPosition;
+        _newCurrentRadius = _currentRadius;
       });
     }
   }
@@ -330,6 +335,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     if(_newAnchorPosition != null) {
       setState(() {
         _newAnchorPosition = _map!.toLatLong(d.localPosition);
+        _newCurrentRadius = ll.Distance().distance(_newAnchorPosition!, _position!);
       });
     }
     if(_newMaxRadius != null) {
@@ -343,7 +349,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     if(_newAnchorPosition != null) {
       _sendCommand('setAnchorPosition',
           '{"position": {"latitude": ${_newAnchorPosition!.latitude}, "longitude": ${_newAnchorPosition!.longitude}}}');
-      _newAnchorPosition = null;
+      _newAnchorPosition = _newCurrentRadius = null;
     }
     if(_newMaxRadius != null) {
       _resizeMaxRadius(_newMaxRadius!);

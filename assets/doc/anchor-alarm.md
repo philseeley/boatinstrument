@@ -10,6 +10,8 @@ When you drop your anchor press the ![anchor](assets/icons/__THEME__/anchor.png)
 
 Once set, you can unlock and drag the anchor to move it and resize the alarm radius by dragging on the **Radius** text.
 
+**Touchscreen Tip:** when resizing the alarm radius by dragging on the size text, drag down a small amount to see the changing radius value.
+
 **Note:** the alarm radius cannot be set less than the current boat position and any attempt will set the radius to the boat position plus 5m.
 
 ![unlock](assets/icons/__THEME__/lock.png) Locks/Unlocks the ability to adjust or raise the anchor
