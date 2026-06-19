@@ -226,11 +226,12 @@ class TrueWindSpeedGraph extends GraphBox {
   String get id => sid;
 
   TrueWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'TWS', TrueWindSpeedGraphBackground(), step: kts2ms(5),
-  ranges: [
-        GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
-        GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
-        GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
-      ]);
+    ranges: [
+      GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
+      GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
+      GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
+    ]
+  );
 
   @override
   double convert(double value) {
@@ -240,6 +241,28 @@ class TrueWindSpeedGraph extends GraphBox {
   @override
   String units(double value) {
     return config.controller.windSpeedUnits.unit;
+  }
+}
+
+class TrueWindDirectionGraphBackground extends BackgroundData {
+  TrueWindDirectionGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, TrueWindDirectionGraph.sid, {'environment.wind.directionTrue'});
+}
+
+class TrueWindDirectionGraph extends GraphBox {
+  static const String sid = 'wind-direction-true-graph';
+  @override
+  String get id => sid;
+
+  TrueWindDirectionGraph(BoxWidgetConfig config, {super.key}) : super(config, 'TWD', TrueWindDirectionGraphBackground(), step: deg2Rad(90), zeroBase: false, precision: 0, minLen: 3);
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value).toDouble();
+  }
+
+  @override
+  String units(double value) {
+    return degreesUnits;
   }
 }
 
@@ -253,11 +276,12 @@ class ApparentWindSpeedGraph extends GraphBox {
   String get id => sid;
 
   ApparentWindSpeedGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWS', ApparentWindSpeedGraphBackground(), step: kts2ms(5),
-  ranges: [
-        GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
-        GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
-        GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
-      ]);
+    ranges: [
+      GaugeRange(kts2ms(10), kts2ms(10), Colors.green),
+      GaugeRange(kts2ms(20), kts2ms(20), Colors.orange),
+      GaugeRange(kts2ms(30), kts2ms(30), Colors.red),
+    ]
+  );
 
   @override
   double convert(double value) {
@@ -267,5 +291,33 @@ class ApparentWindSpeedGraph extends GraphBox {
   @override
   String units(double value) {
     return config.controller.windSpeedUnits.unit;
+  }
+}
+
+class ApparentWindAngleGraphBackground extends BackgroundData {
+  ApparentWindAngleGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ApparentWindAngleGraph.sid, {'environment.wind.angleApparent'});
+}
+
+class ApparentWindAngleGraph extends GraphBox {
+  static const String sid = 'wind-angle-apparent-graph';
+  @override
+  String get id => sid;
+
+  ApparentWindAngleGraph(BoxWidgetConfig config, {super.key}) : super(config, 'AWA', ApparentWindAngleGraphBackground(), step: deg2Rad(90), zeroBase: false, vertical: true, mirror: true, precision: 0, minLen: 3,
+    blockRanges: true,
+    ranges: [
+      GaugeRange(deg2Rad(-60), deg2Rad(-20), Colors.red),
+      GaugeRange(deg2Rad(20), deg2Rad(60), Colors.green)
+    ]
+  );
+
+  @override
+  double convert(double value) {
+    return rad2Deg(value).toDouble();
+  }
+
+  @override
+  String units(double value) {
+    return degreesSymbol;
   }
 }

@@ -483,8 +483,9 @@ class _GraphPainter extends CustomPainter {
   final bool _zeroBase;
   final bool _mirror;
   final List<GaugeRange> _ranges;
+  final bool _blockRanges;
 
-  _GraphPainter(this._context, this._widget, this._data, this._vertical, this._mirror, this._minutes, this._step, this._zeroBase, this._ranges);
+  _GraphPainter(this._context, this._widget, this._data, this._vertical, this._mirror, this._minutes, this._step, this._zeroBase, this._ranges, this._blockRanges);
 
   void _paintRText(Canvas canvas, TextPainter tp, Offset offset) {
     canvas.save();
@@ -548,16 +549,13 @@ class _GraphPainter extends CustomPainter {
 
     Paint paint = Paint()
       ..strokeWidth = 0.0
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..color = theme.colorScheme.onSurface;
 
     double hStep = h/(maxDisplay - minDisplay);
 
     double steps = (maxDisplay - minDisplay) / _step;
     double lineStep = h / steps;
-
-    paint..color = theme.colorScheme.onSurface
-      ..strokeWidth = 0.0
-      ..style = PaintingStyle.fill;
 
     if(_vertical) {
       canvas.translate(h/2, w/2);
@@ -571,10 +569,18 @@ class _GraphPainter extends CustomPainter {
 
     for(GaugeRange r in _ranges) {
       paint.color = r.color;
-      double y = hStep*(r.max-minDisplay);
-      if(y <= h) {
-        if(!_mirror) y = h-y;
-        canvas.drawRect(Rect.fromLTRB(0, y-1, w, y+1), paint);
+      double maxY = hStep*(r.max-minDisplay);
+      double minY = hStep*(r.min-minDisplay);
+      if(maxY <= h) {
+        if(!_mirror) {
+          maxY = h-maxY;
+          minY = h-minY;
+        }
+        if(_blockRanges) {
+          canvas.drawRect(Rect.fromLTRB(0, minY, w, maxY), paint);
+        } else {
+          canvas.drawRect(Rect.fromLTRB(0, minY-1, w, minY+1), paint);
+        }
       }
     }
 
@@ -698,9 +704,10 @@ abstract class GraphBox extends BoxWidget {
   final bool vertical;
   final bool mirror;
   final List<GaugeRange> ranges;
+  final bool blockRanges;
 
   GraphBox(super.config, this.title, this.backgroundData,
-    {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.vertical = false, this.mirror = false, this.ranges = const [], super.key}) {
+    {required this.step, this.zeroBase = true, this.precision = 1, this.minLen = 2, this.vertical = false, this.mirror = false, this.ranges = const [], this.blockRanges = false, super.key}) {
     _settings = _$GraphSettingsFromJson(config.settings);
   }
 
@@ -785,7 +792,7 @@ class GraphBoxState extends State<GraphBox> {
       Expanded(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _GraphPainter(context, widget, widget.backgroundData.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges)
+          painter: _GraphPainter(context, widget, widget.backgroundData.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges, widget.blockRanges)
       )))),
     ]);
   }
