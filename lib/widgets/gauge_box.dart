@@ -686,14 +686,14 @@ enum GraphDuration implements EnumMenuEntry {
 }
 
 @JsonSerializable()
-class _GraphSettings {
+class GraphSettings {
   GraphDuration displayDuration;
 
-  _GraphSettings({this.displayDuration = GraphDuration.fifteenMinutes});
+  GraphSettings({this.displayDuration = GraphDuration.fifteenMinutes});
 }
 
 abstract class GraphBox extends BoxWidget {
-  late final _GraphSettings _settings;
+  late final GraphSettings _settings;
   final BackgroundData backgroundData;
 
   final String title;
@@ -789,11 +789,11 @@ class GraphBoxState extends State<GraphBox> {
           IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
         ]))
       ])),
-      Expanded(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
+      Expanded(child: ClipRRect(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
           painter: _GraphPainter(context, widget, widget.backgroundData.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges, widget.blockRanges)
-      )))),
+      ))))),
     ]);
   }
 
@@ -811,7 +811,7 @@ class GraphBoxState extends State<GraphBox> {
 }
 
 class _GraphSettingsWidget extends BoxSettingsWidget {
-  final _GraphSettings _settings;
+  final GraphSettings _settings;
 
   const _GraphSettingsWidget(this._settings);
 
@@ -828,7 +828,7 @@ class _SettingsState extends State<_GraphSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _GraphSettings s = widget._settings;
+    GraphSettings s = widget._settings;
 
     return ListView(children: [
       ListTile(

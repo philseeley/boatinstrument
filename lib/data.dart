@@ -9,6 +9,7 @@ const String minutesUnits = 'mins';
 const String feetUnits = 'ft';
 const String voltageUnits = 'V';
 const String currentUnits = 'A';
+const String electricalPowerUnits = 'W';
 const String capacityUnits = '%';
 const String deltaChar = '\u0394';
 const double kelvinOffset = 273.15;

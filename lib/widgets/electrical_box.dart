@@ -5,6 +5,7 @@ import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
 import 'package:circular_buffer/circular_buffer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:format/format.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
@@ -1047,6 +1048,13 @@ class _ElectricalSwitchBoxState extends State<ElectricalSwitchBox> with SwitchCo
   }
 }
 
+@JsonSerializable()
+class ElectricalPowerGraphSettings extends GraphSettings {
+  double step;
+
+  ElectricalPowerGraphSettings({super.displayDuration = GraphDuration.fifteenMinutes, this.step = 1000});
+}
+
 class Power {
   double voltage = 0;
   double current = 0;
@@ -1106,6 +1114,27 @@ abstract class PowerGraphBackground extends BackgroundData {
   }
 }
 
+abstract class PowerGraph extends GraphBox {
+  final ElectricalPowerGraphSettings settings;
+
+  PowerGraph(this.settings, super.config, super.title, super.backgroundData, {required super.step, super.zeroBase, super.key});
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return electricalPowerUnits;
+  }
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _PowerGraphSettingsWidget(settings);
+  }
+}
+
 class BatteryPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
 
@@ -1115,21 +1144,17 @@ class BatteryPowerGraphBackground extends PowerGraphBackground {
   Map<String, Power> get power => _power;
 }
 
-class BatteryPowerGraph extends GraphBox {
+class BatteryPowerGraph extends PowerGraph {
   static const String sid = 'electrical-battery-power-graph';
   @override
   String get id => sid;
 
-  BatteryPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Battery Power', BatteryPowerGraphBackground(), step: 1000, zeroBase: false);
+  BatteryPowerGraph._init(ElectricalPowerGraphSettings settings, BoxWidgetConfig config, double step, {super.key}) : super(settings, config, 'Battery Power', BatteryPowerGraphBackground(), step: step, zeroBase: false);
 
-  @override
-  double convert(double value) {
-    return value;
-  }
+  factory BatteryPowerGraph.fromSettings(BoxWidgetConfig config, {Key? key}) {
+    ElectricalPowerGraphSettings s = _$ElectricalPowerGraphSettingsFromJson(config.settings);
 
-  @override
-  String units(double value) {
-    return 'W';
+    return BatteryPowerGraph._init(s, config, s.step, key: key);
   }
 }
 
@@ -1142,20 +1167,63 @@ class SolarPowerGraphBackground extends PowerGraphBackground {
   Map<String, Power> get power => _power;
 }
 
-class SolarPowerGraph extends GraphBox {
+class SolarPowerGraph extends PowerGraph {
   static const String sid = 'electrical-solar-power-graph';
   @override
   String get id => sid;
 
-  SolarPowerGraph(BoxWidgetConfig config, {super.key}) : super(config, 'Solar Power', SolarPowerGraphBackground(), step: 1000, zeroBase: false);
+  SolarPowerGraph._init(ElectricalPowerGraphSettings settings, BoxWidgetConfig config, double step, {super.key}) : super(settings, config, 'Solar Power', SolarPowerGraphBackground(), step: step);
+
+  factory SolarPowerGraph.fromSettings(BoxWidgetConfig config, {Key? key}) {
+    ElectricalPowerGraphSettings s = _$ElectricalPowerGraphSettingsFromJson(config.settings);
+
+    return SolarPowerGraph._init(s, config, s.step, key: key);
+  }
+}
+
+class _PowerGraphSettingsWidget extends BoxSettingsWidget {
+  final ElectricalPowerGraphSettings _settings;
+
+  const _PowerGraphSettingsWidget(this._settings);
 
   @override
-  double convert(double value) {
-    return value;
+  Map<String, dynamic> getSettingsJson() {
+    return _$ElectricalPowerGraphSettingsToJson(_settings);
   }
 
   @override
-  String units(double value) {
-    return 'W';
+  createState() => _SettingsState();
+}
+
+class _SettingsState extends State<_PowerGraphSettingsWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    ElectricalPowerGraphSettings s = widget._settings;
+
+    return ListView(children: [
+      ListTile(
+        leading: const Text("Display Duration:"),
+        title: EnumDropdownMenu(
+          GraphDuration.values,
+          s.displayDuration,
+          (v) {
+            setState(() {
+              s.displayDuration = v!;
+            });
+          }
+        )
+      ),
+      ListTile(
+        leading: const Text("Graph Step:"),
+        title: BiTextFormField(
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          initialValue: s.step.toInt().toString(),
+          onChanged: (value) => s.step = int.parse(value).toDouble()
+        ),
+        trailing: const Text(electricalPowerUnits)
+      ),
+    ]);
   }
 }

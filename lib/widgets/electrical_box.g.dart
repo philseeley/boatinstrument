@@ -43,3 +43,36 @@ _ElectricalSwitchesSettings _$ElectricalSwitchesSettingsFromJson(
 Map<String, dynamic> _$ElectricalSwitchesSettingsToJson(
   _ElectricalSwitchesSettings instance,
 ) => <String, dynamic>{'useSliderForDimming': instance.useSliderForDimming};
+
+ElectricalPowerGraphSettings _$ElectricalPowerGraphSettingsFromJson(
+  Map<String, dynamic> json,
+) => ElectricalPowerGraphSettings(
+  displayDuration:
+      $enumDecodeNullable(_$GraphDurationEnumMap, json['displayDuration']) ??
+      GraphDuration.fifteenMinutes,
+  step: (json['step'] as num?)?.toDouble() ?? 1000,
+);
+
+Map<String, dynamic> _$ElectricalPowerGraphSettingsToJson(
+  ElectricalPowerGraphSettings instance,
+) => <String, dynamic>{
+  'displayDuration': _$GraphDurationEnumMap[instance.displayDuration]!,
+  'step': instance.step,
+};
+
+const _$GraphDurationEnumMap = {
+  GraphDuration.oneMinutes: 'oneMinutes',
+  GraphDuration.twoMinutes: 'twoMinutes',
+  GraphDuration.threeMinutes: 'threeMinutes',
+  GraphDuration.fourMinutes: 'fourMinutes',
+  GraphDuration.fiveMinutes: 'fiveMinutes',
+  GraphDuration.tenMinutes: 'tenMinutes',
+  GraphDuration.fifteenMinutes: 'fifteenMinutes',
+  GraphDuration.thirtyMinutes: 'thirtyMinutes',
+  GraphDuration.oneHour: 'oneHour',
+  GraphDuration.twoHours: 'twoHours',
+  GraphDuration.fourHours: 'fourHours',
+  GraphDuration.sixHours: 'sixHours',
+  GraphDuration.twelveHours: 'twelveHours',
+  GraphDuration.oneDay: 'oneDay',
+};

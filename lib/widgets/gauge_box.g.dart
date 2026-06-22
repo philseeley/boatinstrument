@@ -6,8 +6,8 @@ part of 'gauge_box.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_GraphSettings _$GraphSettingsFromJson(Map<String, dynamic> json) =>
-    _GraphSettings(
+GraphSettings _$GraphSettingsFromJson(Map<String, dynamic> json) =>
+    GraphSettings(
       displayDuration:
           $enumDecodeNullable(
             _$GraphDurationEnumMap,
@@ -16,7 +16,7 @@ _GraphSettings _$GraphSettingsFromJson(Map<String, dynamic> json) =>
           GraphDuration.fifteenMinutes,
     );
 
-Map<String, dynamic> _$GraphSettingsToJson(_GraphSettings instance) =>
+Map<String, dynamic> _$GraphSettingsToJson(GraphSettings instance) =>
     <String, dynamic>{
       'displayDuration': _$GraphDurationEnumMap[instance.displayDuration]!,
     };
