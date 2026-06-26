@@ -1070,15 +1070,15 @@ abstract class PowerGraphBackground extends BackgroundData {
 
   @override
   processUpdates(List<Update> updates) {
-    if(updates[0].value == null) {
-      power.clear();
-    } else {
-      DateTime now = controller!.now();
+    DateTime now = controller!.now();
 
-      for (Update u in updates) {
-        try {
-          List<String> ps = u.path.split('.');
-          String id = ps[2];
+    for (Update u in updates) {
+      try {
+        List<String> ps = u.path.split('.');
+        String id = ps[2];
+        if(u.value == null) {
+          power.remove(id);
+        } else {
           Power p = power.putIfAbsent(id, () => Power(now));
           p.timestamp = now;
 
@@ -1090,27 +1090,27 @@ abstract class PowerGraphBackground extends BackgroundData {
               p.current = (u.value as num).toDouble();
               break;
           }
-        } catch (e) {
-          controller!.l.e("Error converting $u", error: e);
         }
+      } catch (e) {
+        controller!.l.e("Error converting $u", error: e);
       }
-      
-      value = 0;
-      Duration d = Duration(milliseconds: controller!.realTimeDataTimeout);
-      for(String id in List.from(power.keys)) {
-        Power p = power[id]!;
-        if(now.difference(p.timestamp) > d) {
-          power.remove(id);
-        } else {
-          value = value! + (p.voltage * p.current);
-        }
-      }
-    
-      if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
-        data = CircularBuffer<DataPoint>.of(data, data.capacity+BackgroundData.dataIncrement);
-      }
-      data.add(DataPoint(now, value!));
     }
+    
+    value = 0;
+    Duration d = Duration(milliseconds: controller!.realTimeDataTimeout);
+    for(String id in List.from(power.keys)) {
+      Power p = power[id]!;
+      if(now.difference(p.timestamp) > d) {
+        power.remove(id);
+      } else {
+        value = value! + (p.voltage * p.current);
+      }
+    }
+  
+    if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
+      data = CircularBuffer<DataPoint>.of(data, data.capacity+BackgroundData.dataIncrement);
+    }
+    data.add(DataPoint(now, value!));
   }
 }
 
