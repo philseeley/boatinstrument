@@ -591,7 +591,7 @@ class _GraphPainter extends CustomPainter {
     try {
       for (int i = 0; i <= steps; ++i) {
         int v = (minDisplay+(i*_step)).toInt();
-        String t = (v.abs() >= 1000) ? '${(v/1000).toInt()}k' : v.toString();
+        String t = (v.abs() >= 1000) ? '${(v/1000).toStringAsFixed(1)}k' : v.toString();
         tp.text = TextSpan(
             text: t,
             style: style);
