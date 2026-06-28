@@ -1064,7 +1064,7 @@ class Power {
 
 abstract class PowerGraphBackground extends BackgroundData {
 
-  PowerGraphBackground(String sid, String basePath, {controller}) : super(controller: controller, sid, {'$basePath.*.voltage', '$basePath.*.current'});
+  PowerGraphBackground(String sid, String basePath, {controller, SignalKDataType dataType = SignalKDataType.realTime}) : super(controller: controller, sid, {'$basePath.*.voltage', '$basePath.*.current'}, dataType: dataType);
 
   Map<String, Power> get power;
 
@@ -1097,14 +1097,8 @@ abstract class PowerGraphBackground extends BackgroundData {
     }
     
     value = 0;
-    Duration d = Duration(milliseconds: controller!.realTimeDataTimeout);
-    for(String id in List.from(power.keys)) {
-      Power p = power[id]!;
-      if(now.difference(p.timestamp) > d) {
-        power.remove(id);
-      } else {
-        value = value! + (p.voltage * p.current);
-      }
+    for(Power p in power.values) {
+      value = value! + (p.voltage * p.current);
     }
   
     if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
@@ -1138,7 +1132,7 @@ abstract class PowerGraph extends GraphBox {
 class BatteryPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
 
-  BatteryPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, BatteryPowerGraph.sid, batteriesBasePath);
+  BatteryPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, BatteryPowerGraph.sid, batteriesBasePath, dataType: SignalKDataType.infrequent);
 
   @override
   Map<String, Power> get power => _power;
