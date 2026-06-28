@@ -1335,18 +1335,19 @@ abstract class BackgroundData {
   static final Map<String, BackgroundDataBuffer> dataBuffers = {};
   static final Map<String, double?> values = {};
 
-  String id;
-  BoatInstrumentController? controller;
-  late Duration duration;
-  double? minValue;
-  double? maxValue;
-  bool smoothing;
+  final String id;
+  final BoatInstrumentController? controller;
+  late final Duration duration;
+  final double? minValue;
+  final double? maxValue;
+  final bool smoothing;
+  final SignalKDataType dataType;
 
-  BackgroundData(this.id, Set<String> paths, {this.controller, this.smoothing = true, this.minValue, this.maxValue}) {
+  BackgroundData(this.id, Set<String> paths, {this.controller, this.smoothing = true, this.minValue, this.maxValue, this.dataType = SignalKDataType.realTime}) {
     if(controller != null) {
       duration = Duration(minutes: _$BackgroundDataSettingsFromJson(controller!.getBoxSettingsJson(id)).dataDuration.minutes);
 
-      controller!.configure(onUpdate: processUpdates, paths: paths, isBox: false);
+      controller!.configure(onUpdate: processUpdates, paths: paths, isBox: false, dataType: dataType);
     }
   }
 
