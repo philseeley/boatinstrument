@@ -403,7 +403,8 @@ class DebugBox extends BoxWidget {
 
 class _DebugBoxState extends State<DebugBox> {
   bool _pause = true;
-  String? _data;
+  final StringBuffer _data = StringBuffer();
+  final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -414,7 +415,7 @@ class _DebugBoxState extends State<DebugBox> {
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      _data = null;
+      _data.clear();
     }
 
     return Padding(padding: const EdgeInsets.all(5), child:
@@ -424,7 +425,15 @@ class _DebugBoxState extends State<DebugBox> {
           IconButton(onPressed: _clear, icon: const Icon(Icons.clear))
         ]),
         Text('Subscription: ${widget._settings.path}'),
-        Text(_data??'NO DATA')
+        Expanded(child: Scrollbar(
+          controller: _controller,
+          thumbVisibility: true,
+          trackVisibility: true,
+          child: SingleChildScrollView(
+            controller: _controller,
+            child: Text(_data.isEmpty?'NO DATA':_data.toString())
+          )
+        ))
       ]));
   }
 
@@ -436,7 +445,7 @@ class _DebugBoxState extends State<DebugBox> {
 
   void _clear (){
     setState(() {
-      _data = null;
+      _data.clear();
     });
   }
 
@@ -447,7 +456,7 @@ class _DebugBoxState extends State<DebugBox> {
 
     if(mounted) {
         setState(() {
-        _data = '${_data??''}\n${updates.toString()}';
+        _data.writeln(updates);
       });
     }
   }
