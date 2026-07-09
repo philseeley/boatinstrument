@@ -251,6 +251,69 @@ class _TimerDisplaySettings {
     this.allowRestart = true,
     this.allowStop = false
   });
+
+  factory _TimerDisplaySettings.fromJson(SettingsData json) =>
+      _$TimerDisplaySettingsFromJson(json);
+
+  SettingsData toJson() => _$TimerDisplaySettingsToJson(this);
+}
+
+class _Alarm {
+  DateTime expires;
+  NotificationState notificationState;
+
+  _Alarm(this.expires, this.notificationState);
+}
+
+class TimerBackgroundTask extends BackgroundTask {
+  final BoatInstrumentController _controller;
+  final Map<String, NotificationState> _notificationStates = {};
+  final Map<String, _Alarm> _alarms = {};
+  late final Timer _alarmTimer;
+
+  TimerBackgroundTask(this._controller, List<SettingsData> settings) {
+    Set<String> paths = {};
+
+    for(var sd in settings) {
+      var s = _TimerDisplaySettings.fromJson(sd);
+      var path = _TimersSetupBoxState.timerPath(s.id);
+      _notificationStates[path] = s.notificationState;
+      paths.add(path);
+    }
+
+    _controller.configure(onUpdate: _processData, paths: paths, isBox: false, dataType: SignalKDataType.static);
+
+    _alarmTimer = Timer.periodic(Duration(seconds: 1), _checkAlarms);
+  }
+
+  @override
+  void dispose() {
+    _alarmTimer.cancel();
+    super.dispose();
+  }
+
+   void _checkAlarms(_) {
+    for(var a in _alarms.values) {
+      Duration d = a.expires.difference(_controller.now());
+
+      if(d.isNegative) _controller.playSoundFile(a.notificationState.soundFile);
+    }
+  }
+
+  void _processData(List<Update> updates) {//print(updates);
+    for(var u in updates) {
+      if(u.value == null) {
+        _alarms.remove(u.path);
+      } else {
+        var expires = DateTime.tryParse(u.value['expires']??'');
+        if(expires == null) {
+          _alarms.remove(u.path);
+        } else {
+          _alarms[u.path] = _Alarm(expires, _notificationStates[u.path]!);
+        }
+      }
+  }
+  }
 }
 
 class TimerDisplayBox extends BoxWidget {
@@ -261,7 +324,7 @@ class TimerDisplayBox extends BoxWidget {
   String get id => sid;
 
   TimerDisplayBox(super.config, {super.key})  {
-    _perBoxSettings = _$TimerDisplaySettingsFromJson(config.settings);
+    _perBoxSettings = _TimerDisplaySettings.fromJson(config.settings);
   }
 
   @override
@@ -343,17 +406,8 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
     return super.build(context);
   }
 
-  void _setAlarm() {
-    widget.config.controller.addAlarm(_TimersSetupBoxState.timerPath(_timer!.id), _expires!, widget._perBoxSettings.notificationState);
-  }
-
-  void _removeAlarm() {
-    if(_timer != null) widget.config.controller.removeAlarm(_TimersSetupBoxState.timerPath(_timer!.id));
-  }
-
   void _restart () {
-    _TimersSetupBoxState.start(widget.config.controller, _timer!, );
-    _setAlarm();
+    _TimersSetupBoxState.start(widget.config.controller, _timer!);
   }
 
   void _stop () {
@@ -362,7 +416,6 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
 
   void _processData(List<Update> updates) {
     if(updates[0].value == null) {
-      _removeAlarm();
       _timer = _expires = null;
       _updateTimer?.cancel();
       _updateTimer = null;
@@ -371,8 +424,6 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
         dynamic v = updates[0].value;
 
         _expires = DateTime.tryParse(v['expires']??'');
-
-        if(_expires == null) _removeAlarm();
 
         _timer = null;
         _updateTimer?.cancel();
@@ -386,10 +437,8 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
           );
           
           _updateTimer = Timer.periodic(Duration(seconds: 1), (_) {if(mounted) setState(() {});});
-          _setAlarm();
         }
       } catch (e) {
-        _removeAlarm();
         widget.config.controller.l.e("Error parsing date/time $updates", error: e);
       }
     }
@@ -410,8 +459,8 @@ class _TimerDisplaySettingsWidget extends BoxSettingsWidget {
   createState() => _TimerDisplaySettingsState();
 
   @override
-  Map<String, dynamic> getSettingsJson() {
-    return _$TimerDisplaySettingsToJson(_settings);
+  SettingsData getSettingsJson() {
+    return _settings.toJson();
   }
 }
 
@@ -589,8 +638,6 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
       'delta': timer.delta,
       'expires': null
     });
-
-    controller.removeAlarm(timerPath(timer.id));
   }
 
   void _processData(List<Update> updates) {

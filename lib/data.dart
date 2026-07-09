@@ -18,6 +18,8 @@ const String idChars = '[0-9a-zA-Z_-]';
 const double pad = 5.0;
 const double buttonIconSize = 48;
 
+typedef SettingsData = Map<String, dynamic>;
+
 bool embeddedKeyboard = false;
 
 int rad2Deg(double? rad) => ((rad??0) * vm.radians2Degrees).round();
@@ -312,9 +314,9 @@ class SignalkChart {
     this.tilemapUrl = ''
   });
 
-  factory SignalkChart.fromJson(Map<String, dynamic> json) => _$SignalkChartFromJson(json);
+  factory SignalkChart.fromJson(SettingsData json) => _$SignalkChartFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SignalkChartToJson(this);
+  SettingsData toJson() => _$SignalkChartToJson(this);
 
   @override
   bool operator==(other) => identifier == (other as SignalkChart).identifier;
@@ -425,7 +427,7 @@ class EnumDropdownMenu<T extends EnumMenuEntry> extends DropdownMenu<T> {
 
 class BoxWidgetConfig {
   final BoatInstrumentController controller;
-  final Map<String, dynamic> settings;
+  final SettingsData settings;
   final BoxConstraints constraints;
   final bool editMode;
 
@@ -477,7 +479,7 @@ abstract class BoxWidget extends StatefulWidget {
 
   // Should return a Widget tree for configuring the Settings.
   // This would normally be a ListView.
-  BoxSettingsWidget? getSettingsWidget(Map<String, dynamic> json) {
+  BoxSettingsWidget? getSettingsWidget(SettingsData json) {
     return null;
   }
 
@@ -611,7 +613,7 @@ abstract class BoxSettingsWidget extends StatefulWidget {
   const BoxSettingsWidget({super.key});
 
   // Should return the Settings as a JSON map.
-  Map<String, dynamic> getSettingsJson();
+  SettingsData getSettingsJson();
 }
 
 class BlankBox extends BoxWidget {
@@ -677,6 +679,10 @@ class _HelpBoxState extends State<HelpBox> {
   }
 }
 
+abstract class BackgroundTask {
+  void dispose() {}
+}
+
 class BoxDetails {
   final String id;
   final bool gauge;
@@ -685,7 +691,7 @@ class BoxDetails {
   DateTime? deprecatedDate;
   final bool deprecated;
   final BoxWidget Function(BoxWidgetConfig config) build;
-  final void Function(BoatInstrumentController controller)? background;
+  final BackgroundTask Function(BoatInstrumentController controller, List<SettingsData>)? background;
 
   BoxDetails(this.id, this.build, {this.gauge = false, this.graph = false, this.experimental = false, this.deprecatedDate, this.background}) : deprecated = deprecatedDate != null;
 }
@@ -769,7 +775,7 @@ class _Resizable {
 @JsonSerializable()
 class _Box extends _Resizable {
   String id;
-  Map<String, dynamic> settings;
+  SettingsData settings;
 
   _Box(this.id, this.settings, super.percentage);
 
@@ -781,10 +787,10 @@ class _Box extends _Resizable {
     return _Box(HelpBox.sid, {}, 1.0);
   }
 
-  factory _Box.fromJson(Map<String, dynamic> json) =>
+  factory _Box.fromJson(SettingsData json) =>
       _$BoxFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BoxToJson(this);
+  SettingsData toJson() => _$BoxToJson(this);
 }
 
 @JsonSerializable()
@@ -793,10 +799,10 @@ class _Row extends _Resizable {
 
   _Row(this.boxes, super.percentage);
 
-  factory _Row.fromJson(Map<String, dynamic> json) =>
+  factory _Row.fromJson(SettingsData json) =>
       _$RowFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RowToJson(this);
+  SettingsData toJson() => _$RowToJson(this);
 }
 
 @JsonSerializable()
@@ -805,10 +811,10 @@ class _Column extends _Resizable {
 
   _Column(this.rows, super.percentage);
 
-  factory _Column.fromJson(Map<String, dynamic> json) =>
+  factory _Column.fromJson(SettingsData json) =>
       _$ColumnFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ColumnToJson(this);
+  SettingsData toJson() => _$ColumnToJson(this);
 }
 
 @JsonSerializable()
@@ -817,10 +823,10 @@ class _PageRow extends _Resizable {
 
   _PageRow(this.columns, super.percentage);
 
-  factory _PageRow.fromJson(Map<String, dynamic> json) =>
+  factory _PageRow.fromJson(SettingsData json) =>
       _$PageRowFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PageRowToJson(this);
+  SettingsData toJson() => _$PageRowToJson(this);
 }
 
 @JsonSerializable()
@@ -831,10 +837,10 @@ class _Page {
 
   _Page(this.name, this.timeout, this.pageRows);
 
-  factory _Page.fromJson(Map<String, dynamic> json) =>
+  factory _Page.fromJson(SettingsData json) =>
       _$PageFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PageToJson(this);
+  SettingsData toJson() => _$PageToJson(this);
 
   static _Page _newPage() => _Page('Page Name', null, [_PageRow([_Column([_Row([_Box.help()], 1)], 1)], 1)]);
 
@@ -1009,10 +1015,10 @@ class _HttpHeader {
     this.name = '',
     this.value = ''});
 
-  factory _HttpHeader.fromJson(Map<String, dynamic> json) =>
+  factory _HttpHeader.fromJson(SettingsData json) =>
       _$HttpHeaderFromJson(json);
 
-  Map<String, dynamic> toJson() => _$HttpHeaderToJson(this);
+  SettingsData toJson() => _$HttpHeaderToJson(this);
 }
 
 @JsonSerializable()
@@ -1052,10 +1058,10 @@ class _SignalKServerSettings {
     if(httpHeaders.isEmpty) httpHeaders = [];
   }
 
-  factory _SignalKServerSettings.fromJson(Map<String, dynamic> json) =>
+  factory _SignalKServerSettings.fromJson(SettingsData json) =>
       _$SignalKServerSettingsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SignalKServerSettingsToJson(this);
+  SettingsData toJson() => _$SignalKServerSettingsToJson(this);
 
 }
 
@@ -1088,7 +1094,7 @@ class _Settings {
   FluidRateUnits fluidRateUnits;
   PortStarboardColors portStarboardColors;
   late List<_Page> pages;
-  late Map<String, dynamic> boxSettings;
+  late SettingsData boxSettings;
 
   static File? _store;
 
@@ -1122,7 +1128,7 @@ class _Settings {
     this.fluidRateUnits = FluidRateUnits.litersPerHour,
     this.portStarboardColors = PortStarboardColors.redGreen,
     this.pages = const [],
-    Map<String, dynamic>? boxSettings
+    SettingsData? boxSettings
   }) :
     boxSettings = boxSettings??{}
   {
@@ -1132,10 +1138,10 @@ class _Settings {
     if(signalkServerSettings.isEmpty) signalkServerSettings = [_SignalKServerSettings()];
   }
 
-  factory _Settings.fromJson(Map<String, dynamic> json) =>
+  factory _Settings.fromJson(SettingsData json) =>
       _$SettingsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SettingsToJson(this);
+  SettingsData toJson() => _$SettingsToJson(this);
 
   static Future<_Settings> load(String configFile) async {
     if(configFile.startsWith('/')) {
@@ -1330,7 +1336,7 @@ class BackgroundDataSettings {
 
 typedef BackgroundDataBuffer = CircularBuffer<DataPoint>;
 
-abstract class BackgroundData {
+abstract class BackgroundData extends BackgroundTask {
   static const int dataIncrement = 1000;
   static final Map<String, BackgroundDataBuffer> dataBuffers = {};
   static final Map<String, double?> values = {};
@@ -1386,12 +1392,12 @@ abstract class BackgroundData {
 class BackgroundDataSettingsWidget extends BoxSettingsWidget {
   late final BackgroundDataSettings _settings;
 
-  BackgroundDataSettingsWidget(Map<String, dynamic> json, {super.key}) {
+  BackgroundDataSettingsWidget(SettingsData json, {super.key}) {
     _settings = _$BackgroundDataSettingsFromJson(json);
   }
 
   @override
-  Map<String, dynamic> getSettingsJson() {
+  SettingsData getSettingsJson() {
     return _$BackgroundDataSettingsToJson(_settings);
   }
 

@@ -126,11 +126,9 @@ class NotificationStatus {
   DateTime last = DateTime.now();
 }
 
-class _Alarm {
-  DateTime expires;
-  NotificationState notificationState;
-
-  _Alarm(this.expires, this.notificationState);
+class _BackgroundData {
+  List<SettingsData> settings = [];
+  BackgroundTask? backgroundTaskInstance;
 }
 
 class BoatInstrumentController {
@@ -170,10 +168,8 @@ class BoatInstrumentController {
   AudioPlayer? _audioPlayer;
   DateTime? _time;
   DateTime _timeReceived = DateTime.now();
-  final Map<String, _Alarm> _alarms = {};
-  late final Timer _alarmTimer;
   final Map<String, NotificationStatus> _notifications = {};
-  final Set<String> _backgroundIDs = {};
+  final Map<String, _BackgroundData> _backgroundTasks = {};
   final Set<String> _paths = {};
   final Set<String> _controlPaths = {};
   final Set<String> _staticPaths = {};
@@ -181,8 +177,6 @@ class BoatInstrumentController {
 
   BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enablePoweroff, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
-
-    _alarmTimer = Timer.periodic(Duration(seconds: 1), _checkAlarms);
 
     for(BoxDetails bd in boxDetails) {
       if(bd.deprecated) {
@@ -227,7 +221,6 @@ class BoatInstrumentController {
   Set<String> get staticPaths => _staticPaths;
 
   void dispose() {
-    _alarmTimer.cancel();
     _httpClient.close();
   }
 
@@ -476,22 +469,6 @@ class BoatInstrumentController {
     if(soundFile != null) _audioPlayer?.play(AssetSource(soundFile));
   }
 
-  void addAlarm(String id, DateTime expires, NotificationState notificationState) {
-    _alarms[id] = _Alarm(expires, notificationState);
-  }
-
-  void removeAlarm(String id) {
-    _alarms.remove(id);
-  }
-
-  void _checkAlarms(_) {
-    for(var a in _alarms.values) {
-      Duration d = a.expires.difference(now());
-
-      if(d.isNegative) playSoundFile(a.notificationState.soundFile);
-    }
-  }
-
   Future<void> _loadDefaultConfig(bool portrait) async {
     String config = portrait ?
       'default-config-portrait.json' :
@@ -572,7 +549,8 @@ class BoatInstrumentController {
   }
 
   void _configureBackgroundData() {
-    _backgroundIDs.clear();
+    _stopBackgroundTasks();
+    _backgroundTasks.clear();
     
     for(var page in _settings!.pages) {
       for(var pageRow in page.pageRows) {
@@ -581,12 +559,29 @@ class BoatInstrumentController {
             _boxesOnPage += row.boxes.length;
             for(var box in row.boxes) {
               if(getBoxDetails(box.id).background != null) {
-                _backgroundIDs.add(box.id);
+                var backgroundTask = _backgroundTasks.putIfAbsent(box.id, () => _BackgroundData());
+                backgroundTask.settings.add(box.settings);
               }
             }
           }
         }
       }
+    }
+  }
+
+  void _stopBackgroundTasks() {
+    for(var backgroundTask in _backgroundTasks.values) {
+      backgroundTask.backgroundTaskInstance?.dispose();
+      backgroundTask.backgroundTaskInstance = null;
+    }
+  }
+
+  void _runBackgroundTasks() {
+    _stopBackgroundTasks();
+
+    for(var id in _backgroundTasks.keys) {
+      var backgroundTask = _backgroundTasks[id]!;
+      backgroundTask.backgroundTaskInstance = getBoxDetails(id).background!(this, backgroundTask.settings);
     }
   }
 
@@ -707,10 +702,8 @@ class BoatInstrumentController {
 
       _addRemoteControlSubscriptions();
 
-      for(var id in _backgroundIDs) {
-        getBoxDetails(id).background!(this);
-      }
-
+      _runBackgroundTasks();
+      
       // We need to calculate the total number of boxes on the page so that we
       // know when tha last one calls configure(). As we're using LayoutBuilders
       // this will be after buildPage() returns.
