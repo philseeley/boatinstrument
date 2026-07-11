@@ -164,6 +164,7 @@ class BoatInstrumentController {
   WebSocketChannel? _controlChannel;
   StreamSubscription? _dataStreamSubscription;
   StreamSubscription? _controlStreamSubscription;
+  Socket? _tcpSocket;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
   DateTime? _time;
@@ -994,8 +995,11 @@ class BoatInstrumentController {
     return uri.replace(host: ip.first.address);
   }
 
-  Future<void> _discoverServices() async {
+  // Returns true if we're connecting to a WebSocket and false if it's a TCP Socket.
+  Future<bool> _discoverServices() async {
     try {
+      _httpApiUri = _wsUri = Uri();
+
       Uri url = Uri.parse(_signalk.signalkUrl);
       String host = url.host;
       int port = url.port;
@@ -1006,6 +1010,8 @@ class BoatInstrumentController {
         host = 'demo.signalk.org';
         port = 443;
         scheme = 'https';
+      } else if(scheme == 'tcp') {
+        return false;
       } else if(_signalk.discoverServer) {
         host = '';
         port = 0;
@@ -1039,10 +1045,39 @@ class BoatInstrumentController {
       dynamic data = json.decode(response.body);
       dynamic endPoints = data['endpoints']['v1'];
 
-      _httpApiUri = await _convert2IP(Uri.parse(endPoints['signalk-http']));
-      _wsUri = await _convert2IP(Uri.parse(endPoints['signalk-ws']));
+      _httpApiUri = Uri.parse(endPoints['signalk-http']);
+      _wsUri = Uri.parse(endPoints['signalk-ws']);
+      if(!_settings!.demoMode) {
+        _httpApiUri = await _convert2IP(_httpApiUri);
+        _wsUri = await _convert2IP(_wsUri);
+      }
     } catch(e) {
       l.e('Error discovering services', error: e);
+      rethrow;
+    }
+
+    return true;
+  }
+
+  Future<void> _connectTCPSocket() async {
+    try {
+      Uri url = Uri.parse(_signalk.signalkUrl);
+      String host = url.host;
+      int port = url.port;
+
+      l.i("Connecting to TCP Socket. Host: $host, Post: $port");
+
+      _tcpSocket = await Socket.connect(host, port);
+
+      _tcpSocket
+        ?.cast<List<int>>()
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .listen(_processData);
+
+      l.i("Connected  to TCP Socket. Host: $host, Post: $port");
+    } catch(e) {
+      l.e('Error connecting TCP Socket', error: e);
       rethrow;
     }
   }
@@ -1068,46 +1103,49 @@ class BoatInstrumentController {
       await _controlStreamSubscription?.cancel();
       await _dataChannel?.sink.close();
       await _controlChannel?.sink.close();
-      _dataChannel = _controlChannel = null;
+      _tcpSocket?.close();
+      _dataChannel = _controlChannel = _tcpSocket = null;
 
       _networkTimeout();
-      await _discoverServices();
+      if(await _discoverServices()) {
+        l.i("Connecting to: $wsUri");
 
-      l.i("Connecting to: $wsUri");
+        _dataChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
+        _controlChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
 
-      _dataChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
-      _controlChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
+        await _dataChannel?.ready;
+        await _controlChannel?.ready;
 
-      await _dataChannel?.ready;
-      await _controlChannel?.ready;
+        _dataStreamSubscription = _dataChannel?.stream.listen(
+            _processData,
+            onError: (e) {
+              l.e('WebSocket stream error', error: e);
+            },
+            onDone: () {
+              l.w('WebSocket closed');
+            }
+        );
 
-      _dataStreamSubscription = _dataChannel?.stream.listen(
-          _processData,
-          onError: (e) {
-            l.e('WebSocket stream error', error: e);
-          },
-          onDone: () {
-            l.w('WebSocket closed');
-          }
-      );
+        _controlStreamSubscription = _controlChannel?.stream.listen(
+            _processData,
+            onError: (e) {
+              l.e('WebSocket stream error', error: e);
+            },
+            onDone: () {
+              l.w('WebSocket closed');
+            }
+        );
 
-      _controlStreamSubscription = _controlChannel?.stream.listen(
-          _processData,
-          onError: (e) {
-            l.e('WebSocket stream error', error: e);
-          },
-          onDone: () {
-            l.w('WebSocket closed');
-          }
-      );
+        l.i("Connected  to: $wsUri");
 
-      _publishDeviceDetails();
+        _publishDeviceDetails();
 
-      _addRemoteControlSubscriptions();
-      
+        _addRemoteControlSubscriptions();
+      } else {
+        await _connectTCPSocket (); 
+      }
+
       _subscribe(true);
-
-      l.i("Connected to: $wsUri");
     } catch (e) {
       l.e('Error connecting WebSocket', error: e);
       _dataChannel = _controlChannel = null;
@@ -1116,7 +1154,13 @@ class BoatInstrumentController {
 
   void _send(Object data, {bool controlChannel = false}) {
     try {
-      (controlChannel?_controlChannel:_dataChannel)?.sink.add(jsonEncode(data));
+      var json = jsonEncode(data);
+
+      if(_tcpSocket != null) {
+        _tcpSocket!.write('$json\r\n');
+      } else {
+        (controlChannel?_controlChannel:_dataChannel)?.sink.add(json);
+      }
     } catch (e) {
       l.e("Error sending ${controlChannel?'control':'data'} data $data", error: e);
     }

@@ -56,6 +56,10 @@ Whilst the app connects to a single SignalK Server multiple servers can be defin
 
 If **mDNS** is enabled in your server's settings, your server should be automatically discovered. If discovery does not work, disable **Auto Discovery** and enter your server's URL.
 
+If you are connecting to a minimal SignalK server that only supports TCP Sockets, then specify a URL with a tcp scheme, e.g. 'tcp://my-server.local:8375'.
+
+**Note:** for TCP Sockets only data subscriptions are supported, i.e. no control functionality, like the Autopilot, is supported. 
+
 The **Subscription Min Period** is the minimum time between data updates. Increasing this value will reduce the load on your SignalK server.
 
 If no data is received within the **Connection Timeout** the connection is reopened.

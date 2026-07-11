@@ -11,6 +11,8 @@
            We now ask for confirmation when deleting a server config.
            Human readable durations now show the sign correctly.
            Notifications log now shows local times rather than UTC.
+           TCP Socket connections are now supported for minimal SignalK servers.
+             Thanks to Mikhail G for the idea.
 
            New Boxes:
              Webcam(ONVIF)
