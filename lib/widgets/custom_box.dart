@@ -39,7 +39,7 @@ class _CustomSettings {
 
   _CustomSettings({
     this.title = 'title',
-    this.path = 'path',
+    this.path = '',
     this.precision = 1,
     this.minLen = 2,
     this.minValue,
@@ -81,6 +81,8 @@ class CustomDoubleValueBox extends DoubleValueBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.path.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -121,6 +123,8 @@ class CustomDoubleValueSemiGaugeBox extends DoubleValueSemiGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.path.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -156,6 +160,8 @@ class CustomDoubleValueCircularGaugeBox extends DoubleValueCircularGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.path.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -191,6 +197,8 @@ class CustomDoubleValueBarGaugeBox extends DoubleValueBarGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.path.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -374,7 +382,7 @@ class _DebugSettings {
   String path;
 
   _DebugSettings({
-    this.path = 'path'
+    this.path = ''
   });
 }
 
@@ -391,6 +399,8 @@ class DebugBox extends BoxWidget {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.path.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -518,6 +528,8 @@ class CustomTextBox extends BoxWidget {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.template.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -547,10 +559,6 @@ class _CustomTextBoxState extends State<CustomTextBox> {
   @override
   Widget build(BuildContext context) {
     String text = _formatter.format(_pathData);
-
-    if(widget.config.editMode && text.isEmpty) {
-      text = 'Your text here';
-    }
 
     return Center(child: Padding(padding: EdgeInsets.all(5), child:  MaxTextWidget(text)));
   }

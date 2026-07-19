@@ -335,6 +335,8 @@ class TimerDisplayBox extends BoxWidget {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _perBoxSettings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -386,21 +388,17 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
 
     header = 'Timer:${widget._perBoxSettings.id} $expiresStr$deltaStr';
 
-    if(widget._perBoxSettings.id.isEmpty) {
-      text = 'Select a Timer\nin the settings';      
-    } else {
-      if(!widget.config.editMode) {
-        actions[0] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowStop)?_stop:null, icon: Icon(Icons.stop));
-        actions[1] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowRestart)?_restart:null, icon: Icon(Icons.restore));
-      }
+    if(!widget.config.editMode) {
+      actions[0] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowStop)?_stop:null, icon: Icon(Icons.stop));
+      actions[1] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowRestart)?_restart:null, icon: Icon(Icons.restore));
+    }
 
-      Duration? d = _expires?.difference(widget.config.controller.now());
+    Duration? d = _expires?.difference(widget.config.controller.now());
 
-      text = d==null?'-':duration2HumanString(d);
-      color = null;
-      if(d!=null && d.isNegative) {
-        color = widget.config.controller.val2PSColor(context, -1);
-      }
+    text = d==null?'-':duration2HumanString(d);
+    color = null;
+    if(d!=null && d.isNegative) {
+      color = widget.config.controller.val2PSColor(context, -1);
     }
 
     return super.build(context);

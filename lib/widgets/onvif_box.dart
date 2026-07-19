@@ -94,6 +94,8 @@ abstract class ONVIFBox extends BoxWidget {
 
   @override
   bool get hasSettings => true;
+  @override
+  bool get needsSettings => _settings.configs.isEmpty;
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
@@ -105,6 +107,8 @@ abstract class ONVIFBox extends BoxWidget {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _perBoxSettings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {

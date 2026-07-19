@@ -46,6 +46,8 @@ class RemoteControlBox extends BoxWidget {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {

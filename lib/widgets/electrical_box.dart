@@ -81,6 +81,8 @@ class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -178,6 +180,8 @@ class BatteryVoltageBox extends DoubleValueBox {
   }
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -215,6 +219,8 @@ class BatteryCurrentBox extends DoubleValueBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -252,6 +258,8 @@ class BatteryTemperatureBox extends DoubleValueBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -289,6 +297,8 @@ class BatteryStateOfChargeBox extends DoubleValueBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -333,6 +343,8 @@ class BatteryStateOfChargeBarGaugeBox extends DoubleValueBarGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -369,6 +381,8 @@ class InverterCurrentBox extends DoubleValueBox {
   }
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -405,6 +419,8 @@ class SolarVoltageBox extends DoubleValueBox {
   }
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -442,6 +458,8 @@ class SolarCurrentBox extends DoubleValueBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -920,6 +938,8 @@ class ElectricalSwitchBox extends BoxWidget {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _perBoxSettings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {

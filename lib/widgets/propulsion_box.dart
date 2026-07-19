@@ -58,6 +58,8 @@ class EngineRPMBox extends DoubleValueCircularGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -116,6 +118,8 @@ class EngineTempBox extends DoubleValueSemiGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -175,6 +179,8 @@ class EngineExhaustTempBox extends DoubleValueSemiGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -232,6 +238,8 @@ class EngineOilPressureBox extends DoubleValueSemiGaugeBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
@@ -285,6 +293,8 @@ class EngineFuelRateBox extends DoubleValueBox {
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {

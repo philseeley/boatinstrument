@@ -9,7 +9,7 @@ part of 'custom_box.dart';
 _CustomSettings _$CustomSettingsFromJson(Map<String, dynamic> json) =>
     _CustomSettings(
       title: json['title'] as String? ?? 'title',
-      path: json['path'] as String? ?? 'path',
+      path: json['path'] as String? ?? '',
       precision: (json['precision'] as num?)?.toInt() ?? 1,
       minLen: (json['minLen'] as num?)?.toInt() ?? 2,
       minValue: (json['minValue'] as num?)?.toDouble(),
@@ -66,7 +66,7 @@ const _$DoubleValueToDisplayEnumMap = {
 };
 
 _DebugSettings _$DebugSettingsFromJson(Map<String, dynamic> json) =>
-    _DebugSettings(path: json['path'] as String? ?? 'path');
+    _DebugSettings(path: json['path'] as String? ?? '');
 
 Map<String, dynamic> _$DebugSettingsToJson(_DebugSettings instance) =>
     <String, dynamic>{'path': instance.path};
