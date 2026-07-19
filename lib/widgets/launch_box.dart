@@ -80,6 +80,8 @@ class LaunchBox extends BoxWidget {
 
   @override
   bool get hasSettings => true;
+  @override
+  bool get needsSettings => _settings.configs.isEmpty;
 
   @override
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
@@ -95,6 +97,8 @@ The **Parameters** will be split into an argument list at each space. If this do
 
   @override
   bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _launchConfig == null;
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {

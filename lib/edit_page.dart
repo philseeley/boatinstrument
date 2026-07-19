@@ -371,6 +371,8 @@ class _EditPageState extends State<_EditPage> {
 
   @override
   Widget build(BuildContext context) {
+    var textGBColor = Theme.of(context).colorScheme.onSurface;
+
     List<Widget> pageRows = [];
     List<double> pageRowsPercent = [];
 
@@ -469,6 +471,9 @@ class _EditPageState extends State<_EditPage> {
             }
 
             stack.addAll([
+              if(editBoxWidget.needsSettings || editBoxWidget.needsPerBoxSettings) MaxTextWidget(color: Colors.red, textBgColor: textGBColor,
+                '${editBoxWidget.needsSettings?'Set Box Settings':''}\n\n${editBoxWidget.needsPerBoxSettings?'Set Per-Box Settings':''}'
+              ),
               Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
               Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),
               Positioned(right: 0, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: eButtons)),

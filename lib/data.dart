@@ -475,7 +475,9 @@ abstract class BoxWidget extends StatefulWidget {
   String get id;
 
   // Set if the Box has settings common to all Boxes of this type.
+  // Set the 'needs' if the defaults are not sufficient.
   bool get hasSettings => false;
+  bool get needsSettings => false;
 
   // Should return a Widget tree for configuring the Settings.
   // This would normally be a ListView.
@@ -484,7 +486,9 @@ abstract class BoxWidget extends StatefulWidget {
   }
 
   // Set if the Box has instance settings.
+  // Set the 'needs' if the defaults are not sufficient.
   bool get hasPerBoxSettings => false;
+  bool get needsPerBoxSettings => false;
 
   // Should return a Widget tree for configuring the Settings.
   // This would normally be a ListView.

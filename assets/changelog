@@ -11,6 +11,8 @@
            We now ask for confirmation when deleting a server config.
            Human readable durations now show the sign correctly.
            Notifications log now shows local times rather than UTC.
+           Boxes can now declare if their default settings are insufficient and
+             require updating. This is indicated in edit mode..
 
            New Boxes:
              Webcam(ONVIF)
