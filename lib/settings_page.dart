@@ -324,6 +324,13 @@ class _SettingsState extends State<SettingsPage> {
             onChanged: (value) => c._signalk.signalkUrl = value),
           trailing: OutlinedButton(onPressed: _editHttpHeaders, child: Text('Headers')),
         ),
+        SwitchListTile(title: const Text("Minimal Server:"),
+          value: c._signalk.minimalServer,
+          onChanged: (bool value) {
+            setState(() {
+              c._signalk.minimalServer = value;
+            });
+          }),
         ListTile(
           leading: const Text("Subscription Min Period:"),
           title: BiTextFormField(

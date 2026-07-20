@@ -56,6 +56,8 @@ Whilst the app connects to a single SignalK Server multiple servers can be defin
 
 If **mDNS** is enabled in your server's settings, your server should be automatically discovered. If discovery does not work, disable **Auto Discovery** and enter your server's URL.
 
+If your SignalK Server only implements a data streaming service, e.g. the [ESP32 NMEA Gateway](https://github.com/JaCharer/ESP32_NMEA2000_Multiprotocol_Gateway) or the [SignalK Mini](https://github.com/bareboat-necessities/signalk-mini), then enable **Minimal Server**. This allows you to manually enter Box Settings rather then select from a list retrieved from the SignalK data model.
+
 The **Subscription Min Period** is the minimum time between data updates. Increasing this value will reduce the load on your SignalK server.
 
 If no data is received within the **Connection Timeout** the connection is reopened.

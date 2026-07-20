@@ -196,6 +196,7 @@ class BoatInstrumentController {
   int get valueSmoothing => _settings!.valueSmoothing;
   int get realTimeDataTimeout => _signalk.realTimeDataTimeout;
   int get infrequentDataTimeout => _signalk.infrequentDataTimeout;
+  bool get minimalServer => _signalk.minimalServer;
   bool get darkMode => _settings!.darkMode;
   bool get quickPageSwitch => _settings!.quickPageSwitch;
   bool get brightnessControl => _settings!.brightnessControl;

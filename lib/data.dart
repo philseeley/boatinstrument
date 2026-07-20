@@ -203,7 +203,7 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
   @override
   void initState() {
     super.initState();
-    getPaths();
+    if(!widget._controller.minimalServer) getPaths();
   }
 
   void _paths(String path, Map<String, dynamic> data, bool add, List<String> paths) {
@@ -268,31 +268,38 @@ class _SignalkPathDropdownMenuState extends State<SignalkPathDropdownMenu> {
 
   @override
   Widget build(BuildContext context) {
-    if(values.isEmpty) {
-      return const Text('Waiting for SignalK');
-    }
-
     String iv = widget._initialValue;
 
-    if(widget._initialValue.isEmpty) {
-       iv = values.firstOrNull??'';
-       widget._onSelected(iv);
-    }
+    if(widget._controller.minimalServer) {
+      return BiTextFormField(
+        initialValue: iv,
+        onChanged: (value) => widget._onSelected(value)
+      );
+    } else {
+      if(values.isEmpty) {
+        return const Text('Waiting for SignalK');
+      }
 
-    return DropdownMenu<String>(
-      expandedInsets: EdgeInsets.zero,
-      enableSearch: false,
-      enableFilter: widget.searchable,
-      requestFocusOnTap: widget.searchable,
-      initialSelection: iv,
-      dropdownMenuEntries: values.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
-          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
-          value: v,
-          label: v);}).toList(),
-      onSelected: (value) {
-        widget._onSelected(value??'');
-      },
-    );
+      if(widget._initialValue.isEmpty) {
+        iv = values.firstOrNull??'';
+        widget._onSelected(iv);
+      }
+
+      return DropdownMenu<String>(
+        expandedInsets: EdgeInsets.zero,
+        enableSearch: false,
+        enableFilter: widget.searchable,
+        requestFocusOnTap: widget.searchable,
+        initialSelection: iv,
+        dropdownMenuEntries: values.map<DropdownMenuEntry<String>>((String v) {return DropdownMenuEntry<String>(
+            style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey)),
+            value: v,
+            label: v);}).toList(),
+        onSelected: (value) {
+          widget._onSelected(value??'');
+        },
+      );
+    }
   }
 }
 
@@ -1026,6 +1033,7 @@ class _SignalKServerSettings {
   String id;
   bool discoverServer;
   String signalkUrl;
+  bool minimalServer;
   late List<_HttpHeader> httpHeaders;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
@@ -1041,6 +1049,7 @@ class _SignalKServerSettings {
     String? id,
     this.discoverServer = true,
     this.signalkUrl = '',
+    this.minimalServer = false,
     this.httpHeaders = const [],
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
