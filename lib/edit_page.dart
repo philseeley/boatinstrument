@@ -455,6 +455,8 @@ class _EditPageState extends State<_EditPage> {
               layoutBoxWidget
             ];
 
+            // Note: this instance of the BoxWidget is only used to check for Settings and Help. It is then discarded.
+            // It is the instance of the BoxWidget created dynamically by the LayoutBuilder, see above, that gets used.
             BoxWidget editBoxWidget = getBoxDetails(box.id).build(BoxWidgetConfig(widget._controller, box.settings, const BoxConstraints(maxWidth: 1.0, maxHeight: 1.0), true));
 
             List<Widget> settingsButtons = [];
