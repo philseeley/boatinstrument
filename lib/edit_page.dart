@@ -471,8 +471,8 @@ class _EditPageState extends State<_EditPage> {
             }
 
             stack.addAll([
-              if(editBoxWidget.needsSettings || editBoxWidget.needsPerBoxSettings) MaxTextWidget(color: Colors.red, textBgColor: textGBColor,
-                '${editBoxWidget.needsSettings?'Set Box Settings':''}\n\n${editBoxWidget.needsPerBoxSettings?'Set Per-Box Settings':''}'
+              if(editBoxWidget.needsSettings || editBoxWidget.needsPerBoxSettings) MaxTextWidget(textAlign: TextAlign.center, color: Colors.red, textBgColor: textGBColor,
+                '${editBoxWidget.needsSettings?'Box Type Settings\nRequired':'\n'}\n\n${editBoxWidget.needsPerBoxSettings?'Per-Box Settings\nRequired':'\n'}'
               ),
               Positioned(top: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: nButtons)),
               Positioned(bottom: 0, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: sButtons)),

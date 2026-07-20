@@ -593,8 +593,9 @@ class MaxTextWidget extends StatelessWidget {
   final TextDecoration? decoration;
   final Color? backgroundColor;
   final TextStyle? style;
+  final TextAlign? textAlign;
 
-  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, this.backgroundColor, this.style, super.key});
+  const MaxTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, this.backgroundColor, this.style, this.textAlign, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -611,9 +612,9 @@ class MaxTextWidget extends StatelessWidget {
 
       // We need to disable the device text scaling as this interferes with our text scaling.
       return Stack(alignment: alignment, children: [
-        if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling,
+        if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling, textAlign: textAlign,
           style: s.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
-        Text(text, textScaler: TextScaler.noScaling,
+        Text(text, textScaler: TextScaler.noScaling, textAlign: textAlign,
           style: s.copyWith(fontSize: fontSize, color: color, decoration: decoration, backgroundColor: backgroundColor))
       ]);
     });
