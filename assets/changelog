@@ -14,6 +14,7 @@
            Support for Minimal SignalK servers.
            Boxes can now declare if their default settings are insufficient and
              require updating. This is indicated in edit mode..
+           Support for Minimal SignalK servers.
 
            New Boxes:
              Webcam(ONVIF)
