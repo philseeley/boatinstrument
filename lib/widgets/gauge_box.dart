@@ -476,21 +476,16 @@ class _GraphPainter extends CustomPainter {
   static final intl.DateFormat _dateFormat = intl.DateFormat(intl.DateFormat.HOUR24_MINUTE);
   final BuildContext _context;
   final GraphBox _widget;
-  final List<DataPoint> _data;
-  final bool _vertical;
   final int _minutes;
   final int _step;
-  final bool _zeroBase;
-  final bool _mirror;
   final List<GaugeRange> _ranges;
-  final bool _blockRanges;
 
-  _GraphPainter(this._context, this._widget, this._data, this._vertical, this._mirror, this._minutes, this._step, this._zeroBase, this._ranges, this._blockRanges);
+  _GraphPainter(this._context, this._widget, this._minutes, this._step, this._ranges);
 
   void _paintRText(Canvas canvas, TextPainter tp, Offset offset) {
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
-    if(_vertical) canvas.rotate(deg2Rad(90).toDouble());
+    if(_widget.vertical) canvas.rotate(deg2Rad(90).toDouble());
     tp.paint(canvas, Offset(-tp.size.width/2, -tp.size.height/2));
     canvas.restore();
   }
@@ -500,9 +495,10 @@ class _GraphPainter extends CustomPainter {
     ThemeData theme = Theme.of(_context);
     double w = canvasSize.width.roundToDouble();
     double h = canvasSize.height.roundToDouble();
-    if(_vertical) (h, w) = (w, h);
+    if(_widget.vertical) (h, w) = (w, h);
+    var data = _widget.backgroundData.data;
 
-    if(_data.isEmpty) {
+    if(data.isEmpty) {
       return;
     }
 
@@ -520,23 +516,21 @@ class _GraphPainter extends CustomPainter {
       now.second - (now.second % slice),
     );
 
-    double minDisplay = _zeroBase ? 0 : double.infinity;
+    double minDisplay = _widget.zeroBase ? 0 : double.infinity;
     double maxDisplay = 0;
 
-    int dp=_data.length-1;
+    int dp=data.length-1;
     for(int i=values.length-1; i>=0; --i) {
-      double total = 0;
-      int count = 0;
 
       start = start.subtract(sliceDuration);
-      while(dp >= 0 && _data[dp].date.isAfter(start)) {
-        total += _data[dp].value;
-        ++count;
+      Average avg = _widget.backgroundData.angle ? AverageAngle(relative: _widget.backgroundData.relativeAngle) : AverageDouble();
+      while(dp >= 0 && data[dp].date.isAfter(start)) {
+        avg.add(data[dp].value);
         --dp;
       }
 
-      if(count > 0) {
-        double displayValue = _widget.convert(total)/count;
+      if(avg.count > 0) {
+        double displayValue = _widget.convert(avg.average);
         values[i] = displayValue;
         if(displayValue < minDisplay) minDisplay = displayValue;
         if(displayValue > maxDisplay) maxDisplay = displayValue;
@@ -557,7 +551,7 @@ class _GraphPainter extends CustomPainter {
     double steps = (maxDisplay - minDisplay) / _step;
     double lineStep = h / steps;
 
-    if(_vertical) {
+    if(_widget.vertical) {
       canvas.translate(h/2, w/2);
       canvas.rotate(deg2Rad(-90).toDouble());
       canvas.translate(-w/2, -h/2);
@@ -572,11 +566,11 @@ class _GraphPainter extends CustomPainter {
       double maxY = hStep*(r.max-minDisplay);
       double minY = hStep*(r.min-minDisplay);
       if(maxY <= h) {
-        if(!_mirror) {
+        if(!_widget.mirror) {
           maxY = h-maxY;
           minY = h-minY;
         }
-        if(_blockRanges) {
+        if(_widget.blockRanges) {
           canvas.drawRect(Rect.fromLTRB(0, minY, w, maxY), paint);
         } else {
           canvas.drawRect(Rect.fromLTRB(0, minY-1, w, minY+1), paint);
@@ -598,9 +592,9 @@ class _GraphPainter extends CustomPainter {
         tp.layout();
 
         double y = i*lineStep;
-        if(!_mirror) y = h-y;
-        _paintRText(canvas, tp, Offset(5+((_vertical?tp.height:tp.width)/2), y));
-        _paintRText(canvas, tp, Offset(w-5-((_vertical?tp.height:tp.width)/2), y));
+        if(!_widget.mirror) y = h-y;
+        _paintRText(canvas, tp, Offset(5+((_widget.vertical?tp.height:tp.width)/2), y));
+        _paintRText(canvas, tp, Offset(w-5-((_widget.vertical?tp.height:tp.width)/2), y));
       }
 
       int minutesStep = (_minutes/4).round();
@@ -619,15 +613,15 @@ class _GraphPainter extends CustomPainter {
             style: theme.textTheme.bodyMedium?.copyWith(backgroundColor: theme.colorScheme.surface));
         tp.layout();
 
-        _paintRText(canvas, tp, Offset(w-(m*wStep), 5+(_vertical?tp.width:tp.height)/2));
-        _paintRText(canvas, tp, Offset(w-(m*wStep), h-5-(_vertical?tp.width:tp.height)/2));
+        _paintRText(canvas, tp, Offset(w-(m*wStep), 5+(_widget.vertical?tp.width:tp.height)/2));
+        _paintRText(canvas, tp, Offset(w-(m*wStep), h-5-(_widget.vertical?tp.width:tp.height)/2));
       }
 
     } finally {
       tp.dispose();
     }
 
-    if(_mirror) {
+    if(_widget.mirror) {
       canvas.scale(1, -1);
       canvas.translate(0, -h);
     }
@@ -792,7 +786,7 @@ class GraphBoxState extends State<GraphBox> {
       Expanded(child: ClipRRect(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),
         child: RepaintBoundary(child: CustomPaint(
           size: Size.infinite,
-          painter: _GraphPainter(context, widget, widget.backgroundData.data, widget.vertical, widget.mirror, widget._settings.displayDuration.minutes, _displayStep, widget.zeroBase, _displayRanges, widget.blockRanges)
+          painter: _GraphPainter(context, widget, widget._settings.displayDuration.minutes, _displayStep, _displayRanges)
       ))))),
     ]);
   }

@@ -245,7 +245,7 @@ class TrueWindSpeedGraph extends GraphBox {
 }
 
 class TrueWindDirectionGraphBackground extends BackgroundData {
-  TrueWindDirectionGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, TrueWindDirectionGraph.sid, {'environment.wind.directionTrue'});
+  TrueWindDirectionGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, TrueWindDirectionGraph.sid, {'environment.wind.directionTrue'}, angle: true);
 }
 
 class TrueWindDirectionGraph extends GraphBox {
@@ -295,7 +295,7 @@ class ApparentWindSpeedGraph extends GraphBox {
 }
 
 class ApparentWindAngleGraphBackground extends BackgroundData {
-  ApparentWindAngleGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ApparentWindAngleGraph.sid, {'environment.wind.angleApparent'});
+  ApparentWindAngleGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ApparentWindAngleGraph.sid, {'environment.wind.angleApparent'}, angle: true, relativeAngle: true);
 }
 
 class ApparentWindAngleGraph extends GraphBox {

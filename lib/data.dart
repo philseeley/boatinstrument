@@ -85,8 +85,45 @@ double averageAngle(double current, double next, { int smooth = 1, bool relative
   vm.Vector2 avg = (v1 + v2) / 2;
 
   double avga = m.atan2(avg.x, avg.y);
-
   return ((avga >= 0) || relative) ? avga : ((2 * m.pi) + avga);
+}
+
+abstract class Average {
+  double _count = 0;
+  void add(double v);
+  double get average;
+  double get count => _count;
+}
+
+class AverageDouble extends Average {
+  double _sum = 0;
+  @override
+  void add(double v) {
+    _sum += v;
+    ++_count;
+  }
+  @override
+  double get average => _count == 0.0 ? 0.0 : _sum/_count;
+}
+
+class AverageAngle extends Average {
+  bool relative;
+  double _sumSin = 0;
+  double _sumCos = 0;
+
+  AverageAngle({this.relative = false});
+
+  @override
+  void add(double v) {
+    _sumSin += m.sin(v);
+    _sumCos += m.cos(v);
+    ++_count;
+  }
+  @override
+  double get average {
+    var avga = m.atan2(_sumSin/_count, _sumCos/_count);
+    return ((avga >= 0) || relative) ? avga : ((2 * m.pi) + avga);
+  }
 }
 
 double averageDouble(double current, double next, { int smooth = 1 }) {
@@ -1352,9 +1389,11 @@ abstract class BackgroundData extends BackgroundTask {
   final double? minValue;
   final double? maxValue;
   final bool smoothing;
+  final bool angle;
+  final bool relativeAngle;
   final SignalKDataType dataType;
 
-  BackgroundData(this.id, Set<String> paths, {this.controller, this.smoothing = true, this.minValue, this.maxValue, this.dataType = SignalKDataType.realTime}) {
+  BackgroundData(this.id, Set<String> paths, {this.controller, this.smoothing = true, this.angle = false, this.relativeAngle = false, this.minValue, this.maxValue, this.dataType = SignalKDataType.realTime}) {
     if(controller != null) {
       duration = Duration(minutes: _$BackgroundDataSettingsFromJson(controller!.getBoxSettingsJson(id)).dataDuration.minutes);
 
@@ -1376,8 +1415,14 @@ abstract class BackgroundData extends BackgroundTask {
         if ((minValue == null || next >= minValue!) &&
             (maxValue == null || next <= maxValue!)) {
           if(smoothing) {
-            value = averageDouble(value??next, next,
+            if (angle) {
+              value = averageAngle(value??next, next,
+                smooth: controller!.valueSmoothing,
+                relative: relativeAngle);
+            } else {
+              value = averageDouble(value??next, next,
                 smooth: controller!.valueSmoothing);
+            }
           } else {
             value = next;
           }
