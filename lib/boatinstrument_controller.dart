@@ -1092,20 +1092,22 @@ class BoatInstrumentController {
           }
       );
 
-      _controlStreamSubscription = _controlChannel?.stream.listen(
-          _processData,
-          onError: (e) {
-            l.e('WebSocket stream error', error: e);
-          },
-          onDone: () {
-            l.w('WebSocket closed');
-          }
-      );
+      if(_signalk.allowRemoteControl) {
+        _controlStreamSubscription = _controlChannel?.stream.listen(
+            _processData,
+            onError: (e) {
+              l.e('WebSocket stream error', error: e);
+            },
+            onDone: () {
+              l.w('WebSocket closed');
+            }
+        );
 
-      _publishDeviceDetails();
+        _publishDeviceDetails();
 
-      _addRemoteControlSubscriptions();
-      
+        _addRemoteControlSubscriptions();
+      }
+
       _subscribe(true);
 
       l.i("Connected to: $wsUri");
@@ -1196,61 +1198,59 @@ class BoatInstrumentController {
   }
 
   void _publishDeviceDetails() {
-    if(_signalk.allowRemoteControl) {
-      List<String> pageNames = [];
-      for(_Page page in _settings!.pages) {
-        pageNames.add(page.name);
-      }
+    List<String> pageNames = [];
+    for(_Page page in _settings!.pages) {
+      pageNames.add(page.name);
+    }
 
-      if(_signalk.clientID.isNotEmpty) {
-        // If we don't have permission, then updates are ignored.
-        _send(
-          {
-            "updates": [{
-              "values": [
-                {
-                  "path": "$bi.devices.${_signalk.clientID}.pages",
-                  "value": pageNames
-                }
-              ]
-            }]
-          }
-        );
-      }
-
-      if(_signalk.groupID.isNotEmpty) {
-        _send(
-          {
-            "updates": [{
-              "values": [
-                {
-                  "path": "$bi.groups.${_signalk.groupID}.pages",
-                  "value": pageNames
-                }
-              ]
-            }]
-          }
-        );
-      }
-
-      if(_signalk.supplementalGroupIDs.isNotEmpty) {
-        List<dynamic> values = [];
-        for(var groupID in _signalk.supplementalGroupIDs) {
-          values.add({
-            "path": "$bi.groups.$groupID",
-            "value": null
-
-          });
+    if(_signalk.clientID.isNotEmpty) {
+      // If we don't have permission, then updates are ignored.
+      _send(
+        {
+          "updates": [{
+            "values": [
+              {
+                "path": "$bi.devices.${_signalk.clientID}.pages",
+                "value": pageNames
+              }
+            ]
+          }]
         }
+      );
+    }
 
-        _send(
-          {
-            "updates": [{
-              "values": values
-            }]
-          }
-        );
+    if(_signalk.groupID.isNotEmpty) {
+      _send(
+        {
+          "updates": [{
+            "values": [
+              {
+                "path": "$bi.groups.${_signalk.groupID}.pages",
+                "value": pageNames
+              }
+            ]
+          }]
+        }
+      );
+    }
+
+    if(_signalk.supplementalGroupIDs.isNotEmpty) {
+      List<dynamic> values = [];
+      for(var groupID in _signalk.supplementalGroupIDs) {
+        values.add({
+          "path": "$bi.groups.$groupID",
+          "value": null
+
+        });
       }
+
+      _send(
+        {
+          "updates": [{
+            "values": values
+          }]
+        }
+      );
     }
   }
 
