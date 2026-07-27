@@ -360,6 +360,7 @@ class _WindRoseBoxState extends State<WindRoseBox> {
       if((_displayType == WindRoseType.normal && rad2Deg(_windAngleApparent).abs() <= 60) ||
          (_displayType == WindRoseType.closeHaul && rad2Deg(_windAngleApparent).abs() > 60)) {
         _autoTimer ??= Timer(Duration(seconds: widget._settings.autoSwitchingDelay), () {
+          _autoTimer == null;
           _displayType = (_displayType == WindRoseType.normal) ? WindRoseType.closeHaul : WindRoseType.normal;
         });
       } else {

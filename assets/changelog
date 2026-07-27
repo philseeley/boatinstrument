@@ -38,6 +38,9 @@
                step defined. Thanks to Bertil J for the suggestion.
              Autopilot Status change for Waypoint Name update.
              Debug Box now scrolls.
+
+           Bug Fixes:
+             Wind Rose in auto mode sometimes didn't switch.
   * 0.9.0 When adding HTTP headers, we now make sure the names are not blank
             as that causes connection errors.
           The Autopilot Boxes now recognise an HTTP 202 (Accepted) as a good status.
