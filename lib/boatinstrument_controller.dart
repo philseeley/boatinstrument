@@ -1043,7 +1043,7 @@ class BoatInstrumentController {
       _httpApiUri = await _convert2IP(Uri.parse(endPoints['signalk-http']));
       _wsUri = await _convert2IP(Uri.parse(endPoints['signalk-ws']));
       _putPathUri = _httpApiUri.replace(
-        path: 'plugins/signalk-boatinstrument-plugin/putPath');
+        path: 'plugins/$signalkPlugin/putPath');
 
     } catch(e) {
       l.e('Error discovering services', error: e);
@@ -1236,6 +1236,7 @@ class BoatInstrumentController {
 
     if(response.statusCode != HttpStatus.ok) {
       l.e('Setting path responded "${response.reasonPhrase}" "${response.body}"');
+      if(response.statusCode == HttpStatus.notFound) return '$signalkPlugin not installed';
       return response.reasonPhrase;
     }
 
@@ -1263,6 +1264,7 @@ class BoatInstrumentController {
 
     if(response.statusCode != HttpStatus.ok) {
       l.e('Setting path meta responded "${response.reasonPhrase}" "${response.body}"');
+      if(response.statusCode == HttpStatus.notFound) return '$signalkPlugin not installed';
       return response.reasonPhrase;
     }
 

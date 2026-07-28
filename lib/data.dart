@@ -1,6 +1,7 @@
 part of 'boatinstrument_controller.dart';
 
 const String bi = 'boatinstrument';
+const String signalkPlugin = 'signalk-boatinstrument-plugin';
 const String degreesSymbol = '\u00B0'; // degrees symbol.
 const String degreesUnits = '${degreesSymbol}T'; // degrees symbol.
 const String milliSecondsUnits = 'ms';
