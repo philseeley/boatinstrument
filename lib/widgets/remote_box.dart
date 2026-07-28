@@ -83,7 +83,7 @@ class _RemoteControlBoxState extends HeadedBoxState<RemoteControlBox> {
     super.dispose();
   }
   
-  void _sendAction(String action, Map<String, dynamic> params) {
+  Future<void> _sendAction(String action, Map<String, dynamic> params) async {
 
     if(widget.config.editMode) {
       return;
@@ -97,8 +97,10 @@ class _RemoteControlBoxState extends HeadedBoxState<RemoteControlBox> {
     // receiving app could get the old value and perform the action again.
     // All apps should get the action and then the null, which will be ignored.
     params.addAll({'id': action});
-    widget.config.controller.sendUpdate('$bi.${widget._settings.isGroup?'groups':'devices'}.${widget._settings.id}.action', params);
-    widget.config.controller.sendUpdate('$bi.${widget._settings.isGroup?'groups':'devices'}.${widget._settings.id}.action', null);
+    var err = await widget.config.controller.sendUpdate('${widget._settings.isGroup?'groups':'devices'}.${widget._settings.id}.action', params);
+    err ??= await widget.config.controller.sendUpdate('${widget._settings.isGroup?'groups':'devices'}.${widget._settings.id}.action', null);
+
+    if(err != null && mounted) widget.config.controller.showMessage(context, err, error: true);
   }
 
   Future<void> _unlock() async {

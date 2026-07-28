@@ -404,12 +404,12 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
     return super.build(context);
   }
 
-  void _restart () {
-    _TimersSetupBoxState.start(widget.config.controller, _timer!);
+  Future<void> _restart () async {
+    await _TimersSetupBoxState.start(context, widget.config.controller, _timer!);
   }
 
-  void _stop () {
-    _TimersSetupBoxState.stop(widget.config.controller, _timer!);
+  Future<void> _stop () async {
+    await _TimersSetupBoxState.stop(context, widget.config.controller, _timer!);
   }
 
   void _processData(List<Update> updates) {
@@ -592,8 +592,8 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
         _Timer timer = timers[i];
         return ListTile(key: UniqueKey(),
           leading: Row(mainAxisSize: MainAxisSize.min, children: [
-            IconButton(onPressed: editMode?null:() {start(widget.config.controller, timer);}, icon: Icon(Icons.play_arrow)),
-            IconButton(onPressed: editMode?null:() {stop(widget.config.controller, timer);}, icon: Icon(Icons.stop)),
+            IconButton(onPressed: editMode?null:() {start(context, widget.config.controller, timer);}, icon: Icon(Icons.play_arrow)),
+            IconButton(onPressed: editMode?null:() {stop(context, widget.config.controller, timer);}, icon: Icon(Icons.stop)),
             Icon(timer.running?Icons.run_circle_outlined:Icons.remove)
           ]),
           title: Row(children: [Text('${TimeOfDayConverter.format(timer.time)} '), Icon(timer.delta?Icons.change_history:Icons.timer), Text(' ${timer.id}')]),
@@ -613,9 +613,9 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
     setState(() {});
   }
 
-  static String timerPath(String id) => '$bi.timers.$id';
+  static String timerPath(String id, {bool set = false}) => '${set?'':'$bi.'}timers.$id';
 
-  static void start(BoatInstrumentController controller, _Timer timer) {
+  static Future<void> start(BuildContext context, BoatInstrumentController controller, _Timer timer) async {
     DateTime now = controller.now();
     DateTime expires = timer.delta?
       now.add(Duration(hours: timer.time.hour, minutes: timer.time.minute)):
@@ -623,19 +623,23 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
 
     if(expires.isBefore(now)) expires = expires.add(Duration(days: 1));
 
-    controller.sendUpdate(timerPath(timer.id), {
+    var err = await controller.sendUpdate(timerPath(timer.id, set: true), {
       'time': TimeOfDayConverter.format(timer.time),
       'delta': timer.delta,
       'expires': expires.toUtc().toIso8601String()
     });
+
+    if(err != null && context.mounted) controller.showMessage(context, err, error: true);
   }
 
-  static void stop(BoatInstrumentController controller, _Timer timer) {
-    controller.sendUpdate(timerPath(timer.id), {
+  static Future<void> stop(BuildContext context, BoatInstrumentController controller, _Timer timer) async {
+    var r = await controller.sendUpdate(timerPath(timer.id, set: true), {
       'time': TimeOfDayConverter.format(timer.time),
       'delta': timer.delta,
       'expires': null
     });
+
+    if(r != null && context.mounted) controller.showMessage(context, r, error: true);
   }
 
   void _processData(List<Update> updates) {

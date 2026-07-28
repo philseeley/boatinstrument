@@ -158,6 +158,7 @@ class BoatInstrumentController {
 
   Uri _httpApiUri = Uri();
   Uri _wsUri = Uri();
+  Uri _putPathUri = Uri();
   int _boxesOnPage = 0;
   final List<_BoxData> _boxData = [];
   WebSocketChannel? _dataChannel;
@@ -1041,6 +1042,9 @@ class BoatInstrumentController {
 
       _httpApiUri = await _convert2IP(Uri.parse(endPoints['signalk-http']));
       _wsUri = await _convert2IP(Uri.parse(endPoints['signalk-ws']));
+      _putPathUri = _httpApiUri.replace(
+        path: 'plugins/signalk-boatinstrument-plugin/putPath');
+
     } catch(e) {
       l.e('Error discovering services', error: e);
       rethrow;
@@ -1101,7 +1105,7 @@ class BoatInstrumentController {
           }
       );
 
-      _publishDeviceDetails();
+      await _publishDeviceDetails();
 
       _addRemoteControlSubscriptions();
       
@@ -1194,7 +1198,7 @@ class BoatInstrumentController {
     }
   }
 
-  void _publishDeviceDetails() {
+  Future<void> _publishDeviceDetails() async {
     if(_signalk.allowRemoteControl) {
       List<String> pageNames = [];
       for(_Page page in _settings!.pages) {
@@ -1202,75 +1206,50 @@ class BoatInstrumentController {
       }
 
       if(_signalk.clientID.isNotEmpty) {
-        // If we don't have permission, then updates are ignored.
-        _send(
-          {
-            "updates": [{
-              "values": [
-                {
-                  "path": "$bi.devices.${_signalk.clientID}.pages",
-                  "value": pageNames
-                }
-              ]
-            }]
-          }
-        );
+        await sendUpdate("devices.${_signalk.clientID}.pages", pageNames);
       }
 
       if(_signalk.groupID.isNotEmpty) {
-        _send(
-          {
-            "updates": [{
-              "values": [
-                {
-                  "path": "$bi.groups.${_signalk.groupID}.pages",
-                  "value": pageNames
-                }
-              ]
-            }]
-          }
-        );
+        await sendUpdate("groups.${_signalk.groupID}.pages", pageNames);
       }
 
       if(_signalk.supplementalGroupIDs.isNotEmpty) {
-        List<dynamic> values = [];
         for(var groupID in _signalk.supplementalGroupIDs) {
-          values.add({
-            "path": "$bi.groups.$groupID",
-            "value": null
-
-          });
+          await sendUpdate("groups.$groupID", null);
         }
-
-        _send(
-          {
-            "updates": [{
-              "values": values
-            }]
-          }
-        );
       }
     }
   }
 
-  void sendUpdate(String path, dynamic value) {
-    _send(
-      {
-        "updates": [{
-          "values": [
-            {
-              "path": path,
-              "value": value
-            }
-          ]
-        }]
-      }
+  Future<String?> sendUpdate(String path, dynamic value) async {
+    http.Response response = await httpPost(
+      _putPathUri,
+      headers: {
+        "Content-Type": "application/json",
+        "accept": "application/json"
+      },
+      body: jsonEncode({
+        "path": path,
+        "value": value
+      })
     );
+
+    if(response.statusCode != HttpStatus.ok) {
+      l.e('Setting path responded "${response.reasonPhrase}" "${response.body}"');
+      return response.reasonPhrase;
+    }
+
+    return null;
   }
 
-  void sendMetaUpdate(String path, dynamic value) {
-    _send(
-      {
+  Future<String?> sendMetaUpdate(String path, dynamic value) async {
+    http.Response response = await httpPost(
+      _putPathUri,
+      headers: {
+        "Content-Type": "application/json",
+        "accept": "application/json"
+      },
+      body: jsonEncode({
         "updates": [{
           "meta": [
             {
@@ -1279,8 +1258,15 @@ class BoatInstrumentController {
             }
           ]
         }]
-      }
+      })
     );
+
+    if(response.statusCode != HttpStatus.ok) {
+      l.e('Setting path meta responded "${response.reasonPhrase}" "${response.body}"');
+      return response.reasonPhrase;
+    }
+
+    return null;
   }
 
   void _networkTimeout () {
