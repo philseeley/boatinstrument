@@ -1222,50 +1222,76 @@ class BoatInstrumentController {
   }
 
   Future<String?> sendUpdate(String path, dynamic value) async {
-    http.Response response = await httpPost(
-      _putPathUri,
-      headers: {
-        "Content-Type": "application/json",
-        "accept": "application/json"
-      },
-      body: jsonEncode({
-        "path": path,
-        "value": value
-      })
-    );
+    if(_signalk.usePlugin) {
+      http.Response response = await httpPost(
+        _putPathUri,
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "application/json"
+        },
+        body: jsonEncode({
+          "path": path,
+          "value": value
+        })
+      );
 
-    if(response.statusCode != HttpStatus.ok) {
-      l.e('Setting path responded "${response.reasonPhrase}" "${response.body}"');
-      if(response.statusCode == HttpStatus.notFound) return '$signalkPlugin not installed';
-      return response.reasonPhrase;
+      if(response.statusCode != HttpStatus.ok) {
+        l.e('Setting path responded "${response.reasonPhrase}" "${response.body}"');
+        if(response.statusCode == HttpStatus.notFound) return '$signalkPlugin not installed';
+        return response.reasonPhrase;
+      }
+    } else {
+      _send({
+        "updates": [{
+          "values": [
+            {
+              "path": '$bi.$path',
+              "value": value
+            }
+          ]
+        }]
+      });
     }
 
     return null;
   }
 
   Future<String?> sendMetaUpdate(String path, dynamic value) async {
-    http.Response response = await httpPost(
-      _putPathUri,
-      headers: {
-        "Content-Type": "application/json",
-        "accept": "application/json"
-      },
-      body: jsonEncode({
+    if(_signalk.usePlugin) {
+      http.Response response = await httpPost(
+        _putPathUri,
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "application/json"
+        },
+        body: jsonEncode({
+          "updates": [{
+            "meta": [
+              {
+                "path": path,
+                "value": value
+              }
+            ]
+          }]
+        })
+      );
+
+      if(response.statusCode != HttpStatus.ok) {
+        l.e('Setting path meta responded "${response.reasonPhrase}" "${response.body}"');
+        if(response.statusCode == HttpStatus.notFound) return '$signalkPlugin not installed';
+        return response.reasonPhrase;
+      }
+    } else {
+      _send({
         "updates": [{
           "meta": [
             {
-              "path": path,
+              "path": '$bi.$path',
               "value": value
             }
           ]
         }]
-      })
-    );
-
-    if(response.statusCode != HttpStatus.ok) {
-      l.e('Setting path meta responded "${response.reasonPhrase}" "${response.body}"');
-      if(response.statusCode == HttpStatus.notFound) return '$signalkPlugin not installed';
-      return response.reasonPhrase;
+    });
     }
 
     return null;

@@ -324,7 +324,13 @@ class _SettingsState extends State<SettingsPage> {
             onChanged: (value) => c._signalk.signalkUrl = value),
           trailing: OutlinedButton(onPressed: _editHttpHeaders, child: Text('Headers')),
         ),
-        ListTile(
+        SwitchListTile(title: const Text("Use SignalK Plugin:"),
+          value: c._signalk.usePlugin,
+          onChanged: (bool value) {
+            setState(() {
+              c._signalk.usePlugin = value;
+            });
+          }),        ListTile(
           leading: const Text("Subscription Min Period:"),
           title: BiTextFormField(
               keyboardType: TextInputType.number,

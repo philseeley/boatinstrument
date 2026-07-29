@@ -1069,6 +1069,7 @@ class _SignalKServerSettings {
   String id;
   bool discoverServer;
   String signalkUrl;
+  bool usePlugin;
   late List<_HttpHeader> httpHeaders;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
@@ -1084,6 +1085,7 @@ class _SignalKServerSettings {
     String? id,
     this.discoverServer = true,
     this.signalkUrl = '',
+    this.usePlugin = true,
     this.httpHeaders = const [],
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,
