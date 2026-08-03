@@ -1395,7 +1395,7 @@ class BoatInstrumentController {
                     bd.updates.add(Update(context, path,value));
                     bd.pathTimestamps[path] = now;
                   } else {
-                   l.i('Discarding old data now: "$now", diff: "$d", update: "$u"');
+                   l.i('Discarding old data DateTime.now: ${DateTime.now()}, _timeReceived: $_timeReceived, bi.now(): "$now", diff: "$d", update: "$u"');
                   }
                 }
               }
