@@ -1,6 +1,7 @@
 part of 'boatinstrument_controller.dart';
 
 const String bi = 'boatinstrument';
+const String signalkPlugin = 'signalk-boatinstrument-plugin';
 const String degreesSymbol = '\u00B0'; // degrees symbol.
 const String degreesUnits = '${degreesSymbol}T'; // degrees symbol.
 const String milliSecondsUnits = 'ms';
@@ -1068,6 +1069,7 @@ class _SignalKServerSettings {
   String id;
   bool discoverServer;
   String signalkUrl;
+  bool usePlugin;
   late List<_HttpHeader> httpHeaders;
   int signalkMinPeriod;
   int signalkConnectionTimeout;
@@ -1083,6 +1085,7 @@ class _SignalKServerSettings {
     String? id,
     this.discoverServer = true,
     this.signalkUrl = '',
+    this.usePlugin = true,
     this.httpHeaders = const [],
     this.signalkMinPeriod = 500,
     this.signalkConnectionTimeout = 20000,

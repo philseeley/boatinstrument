@@ -56,6 +56,8 @@ Whilst the app connects to a single SignalK Server multiple servers can be defin
 
 If **mDNS** is enabled in your server's settings, your server should be automatically discovered. If discovery does not work, disable **Auto Discovery** and enter your server's URL.
 
+The app uses the **signalk-boatinstrument-plugin** to perform some of its functionality. If you have not or cannot install this, you can disable its use. This will not affect the display of information, but it can result in odd timing issues when using functionality like Timers or Remote Control, see [Know Issues](https://philseeley.github.io/docs/boatinstrument/main.html#not-using-the-signalk-boatinstrument-plugin).
+
 The **Subscription Min Period** is the minimum time between data updates. Increasing this value will reduce the load on your SignalK server.
 
 If no data is received within the **Connection Timeout** the connection is reopened.

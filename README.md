@@ -45,7 +45,7 @@ Raspberry PI 4 - Flutter-Pi:
 
 **Note:** working on an HDMI monitor without X-Windows/Wayland.
 
-<img src="media/raspberry-pi-flutter-pi.jpeg" width="400">
+[<img src="media/youtube.png" width="200">](https://youtu.be/6yAPS6pfM7s)
 
 ## MacOS
 Ventura:

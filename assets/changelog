@@ -1,7 +1,10 @@
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
-           On Android and iOS the app keeps running when in the background or the
+           On Android the app keeps running when in the background or the
              phone is locked, provided it it given the required permissions.
+             This allows Boxes like the Anchor Alarm to alert you.
            Multiple SignalK Servers can be defined.
+           Inter-Instrument communications is now supported by a SignalK
+             Server Plugin, e.g. Timers and Remote Control. 
            Boxes can now be marked as Deprecated.
            When reconnecting we reinitialise the time sync or when we set the
              Operating System time.
@@ -41,6 +44,8 @@
 
            Bug Fixes:
              Wind Rose in auto mode sometimes didn't switch.
+             The new Plugin fixes issues with multiple clients setting the same
+               paths, e.g. Timers.
   * 0.9.0 When adding HTTP headers, we now make sure the names are not blank
             as that causes connection errors.
           The Autopilot Boxes now recognise an HTTP 202 (Accepted) as a good status.

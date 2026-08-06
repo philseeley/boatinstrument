@@ -185,7 +185,7 @@ class MainPageState extends State<MainPage> {
       _controller.toggleRotatePages();
     }
 
-    await BoatInstrumentController.enableBackgroundRunning();
+    await _controller.enableBackgroundRunning();
 
     rebuild();
   }
