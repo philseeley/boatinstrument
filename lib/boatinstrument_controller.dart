@@ -1561,8 +1561,8 @@ class BoatInstrumentController {
     _settings?.boxSettings[boxWidget.id] = boxSettingsWidget.getSettingsJson();
   }
 
-  static Future<void> enableBackgroundRunning() async {
-    if(!Platform.isAndroid && !Platform.isIOS) return;
+  Future<void> enableBackgroundRunning() async {
+    if(!Platform.isAndroid) return;
 
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
@@ -1571,13 +1571,10 @@ class BoatInstrumentController {
         channelDescription: 'This notification appears when the Boat Instrument service is running.',
         onlyAlertOnce: true,
       ),
-      iosNotificationOptions: const IOSNotificationOptions(
-        showNotification: false,
-      ),
+      iosNotificationOptions: const IOSNotificationOptions(),
       foregroundTaskOptions: ForegroundTaskOptions(
         eventAction: ForegroundTaskEventAction.nothing(),
-        autoRunOnMyPackageReplaced: true,
-        allowWifiLock: true,
+        allowAutoRestart: true,
       ),
     );
 
@@ -1587,10 +1584,8 @@ class BoatInstrumentController {
       }
     }
 
-    if (Platform.isAndroid) {
-      if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
-        await FlutterForegroundTask.requestIgnoreBatteryOptimization();
-      }
+    if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
+      await FlutterForegroundTask.requestIgnoreBatteryOptimization();
     }
 
     if (await FlutterForegroundTask.isRunningService) {
@@ -1599,7 +1594,6 @@ class BoatInstrumentController {
       await FlutterForegroundTask.startService(
         notificationTitle: 'Boat Instrument is running',
         notificationText: 'Swipe/Dismiss to exit',
-        notificationIcon: null,
         notificationButtons: [
           const NotificationButton(id: 'exit', text: 'Stop/Exit'),
         ],
@@ -1609,7 +1603,7 @@ class BoatInstrumentController {
   }
 
   static Future<void> exitApp() async {
-    if(Platform.isAndroid || !Platform.isIOS) {
+    if(Platform.isAndroid) {
       await FlutterForegroundTask.stopService();
     }
     exit(0);

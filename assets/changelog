@@ -1,6 +1,7 @@
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
-           On Android and iOS the app keeps running when in the background or the
+           On Android the app keeps running when in the background or the
              phone is locked, provided it it given the required permissions.
+             This allows Boxes like the Anchor Alarm to alert you.
            Multiple SignalK Servers can be defined.
            Inter-Instrument communications is now supported by a SignalK
              Server Plugin, e.g. Timers and Remote Control. 
