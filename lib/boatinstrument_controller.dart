@@ -197,6 +197,7 @@ class BoatInstrumentController {
   int get valueSmoothing => _settings!.valueSmoothing;
   int get realTimeDataTimeout => _signalk.realTimeDataTimeout;
   int get infrequentDataTimeout => _signalk.infrequentDataTimeout;
+  bool get minimalServer => _signalk.minimalServer;
   bool get darkMode => _settings!.darkMode;
   bool get quickPageSwitch => _settings!.quickPageSwitch;
   bool get brightnessControl => _settings!.brightnessControl;
@@ -1095,20 +1096,22 @@ class BoatInstrumentController {
           }
       );
 
-      _controlStreamSubscription = _controlChannel?.stream.listen(
-          _processData,
-          onError: (e) {
-            l.e('WebSocket stream error', error: e);
-          },
-          onDone: () {
-            l.w('WebSocket closed');
-          }
-      );
+      if(_signalk.allowRemoteControl) {
+        _controlStreamSubscription = _controlChannel?.stream.listen(
+            _processData,
+            onError: (e) {
+              l.e('WebSocket stream error', error: e);
+            },
+            onDone: () {
+              l.w('WebSocket closed');
+            }
+        );
 
-      await _publishDeviceDetails();
+        await _publishDeviceDetails();
 
-      _addRemoteControlSubscriptions();
-      
+        _addRemoteControlSubscriptions();
+      }
+
       _subscribe(true);
 
       l.i("Connected to: $wsUri");

@@ -330,7 +330,15 @@ class _SettingsState extends State<SettingsPage> {
             setState(() {
               c._signalk.usePlugin = value;
             });
-          }),        ListTile(
+          }),
+        SwitchListTile(title: const Text("Minimal Server:"),
+          value: c._signalk.minimalServer,
+          onChanged: (bool value) {
+            setState(() {
+              c._signalk.minimalServer = value;
+            });
+          }),
+        ListTile(
           leading: const Text("Subscription Min Period:"),
           title: BiTextFormField(
               keyboardType: TextInputType.number,

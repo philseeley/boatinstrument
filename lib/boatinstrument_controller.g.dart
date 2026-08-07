@@ -100,6 +100,7 @@ _SignalKServerSettings _$SignalKServerSettingsFromJson(
   discoverServer: json['discoverServer'] as bool? ?? true,
   signalkUrl: json['signalkUrl'] as String? ?? '',
   usePlugin: json['usePlugin'] as bool? ?? true,
+  minimalServer: json['minimalServer'] as bool? ?? false,
   httpHeaders:
       (json['httpHeaders'] as List<dynamic>?)
           ?.map((e) => _HttpHeader.fromJson(e as Map<String, dynamic>))
@@ -129,6 +130,7 @@ Map<String, dynamic> _$SignalKServerSettingsToJson(
   'discoverServer': instance.discoverServer,
   'signalkUrl': instance.signalkUrl,
   'usePlugin': instance.usePlugin,
+  'minimalServer': instance.minimalServer,
   'httpHeaders': instance.httpHeaders,
   'signalkMinPeriod': instance.signalkMinPeriod,
   'signalkConnectionTimeout': instance.signalkConnectionTimeout,
