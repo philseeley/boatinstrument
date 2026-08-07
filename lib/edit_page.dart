@@ -317,7 +317,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(CustomDoubleValueSemiGaugeBox.sid, 'Semi Gauge'),
         _widgetMenuEntry(CustomDoubleValueCircularGaugeBox.sid, 'Circular Gauge'),
         _widgetMenuEntry(CustomDoubleValueBarGaugeBox.sid, 'Bar Gauge'),
-        _widgetMenuEntry(LaunchBox.sid, 'App Launcher'),
+        if(!Platform.isAndroid && !Platform.isIOS) _widgetMenuEntry(LaunchBox.sid, 'App Launcher'),
         _widgetMenuEntry(DebugBox.sid, 'Debug'),
       ]),
     ];
