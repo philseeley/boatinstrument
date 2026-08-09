@@ -565,8 +565,8 @@ class _AnchorAlarmSettingsState extends State<_AnchorAlarmSettingsWidget> {
         leading: const Text("Sample Radius:"),
         title: Slider(
           min: 20,
-          max: 200,
-          divisions: 18,
+          max: 300,
+          divisions: 28,
           value: s.sampleRadius,
           label: c.shortDistanceToDisplay(s.sampleRadius).round().toString(),
           onChanged: (double value) {
