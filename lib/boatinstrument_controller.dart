@@ -123,7 +123,7 @@ class NotificationStatus {
   int count = 0;
   bool mute = false;
   String message = "";
-  DateTime last = DateTime.now();
+  DateTime last = DateTime.timestamp();
 }
 
 class _BackgroundData {
@@ -167,8 +167,8 @@ class BoatInstrumentController {
   StreamSubscription? _controlStreamSubscription;
   Timer? _networkTimer;
   AudioPlayer? _audioPlayer;
-  DateTime? _time;
-  DateTime _timeReceived = DateTime.now();
+  DateTime? _timestamp;
+  DateTime _osTimestampReceived = DateTime.timestamp();
   final Map<String, NotificationStatus> _notifications = {};
   final Map<String, _BackgroundData> _backgroundTasks = {};
   final Set<String> _paths = {};
@@ -226,10 +226,10 @@ class BoatInstrumentController {
     _httpClient.close();
   }
 
-  DateTime now() {
-    DateTime now = DateTime.now();
-    if(_time != null) return _time!.add(now.difference(_timeReceived));
-    return now;
+  DateTime timestamp() {
+    DateTime osTimestamp = DateTime.timestamp();
+    if(_timestamp != null) return _timestamp!.add(osTimestamp.difference(_osTimestampReceived));
+    return osTimestamp;
   }
 
   DateTime _deprecatedRemovalDate(DateTime deprecatedOn) => deprecatedOn.add(Duration(days: 30*7));
@@ -747,11 +747,11 @@ class BoatInstrumentController {
   }
 
   void _onNotification(BuildContext context, List<Update> updates) {
-    DateTime now = this.now();
+    DateTime timestamp = this.timestamp();
 
     var d = Duration(minutes: _settings!.notificationMuteTimeout);
     _notifications.removeWhere((path, notification) => 
-      now.difference(notification.last) > d);
+      timestamp.difference(notification.last) > d);
 
     for(Update u in updates) {
       if (u.value == null) {
@@ -765,7 +765,7 @@ class BoatInstrumentController {
           bool playSound = (u.value['method']??[]).contains('sound');
 
           notificationStatus.message = u.value['message']??'"${u.path}" has no message';
-          notificationStatus.last = now;
+          notificationStatus.last = timestamp;
 
           if((newState != notificationStatus.state || notificationStatus.count < newState.count) && !notificationStatus.mute) {            
             notificationStatus.count = (newState == notificationStatus.state) ? notificationStatus.count+1 : 1;
@@ -1067,7 +1067,7 @@ class BoatInstrumentController {
 
       // On reconnect ensure we re-sync time as server may have been restarted
       // and updated its time.
-      _time = null;
+      _timestamp = null;
 
       await _dataStreamSubscription?.cancel();
       await _controlStreamSubscription?.cancel();
@@ -1308,7 +1308,7 @@ class BoatInstrumentController {
   void _processData(dynamic data) {
     _networkTimeout();
 
-    DateTime now = this.now();
+    DateTime timestamp = this.timestamp();
     final Duration realTimeDuration = Duration(milliseconds: realTimeDataTimeout);
     final Duration infrequentDuration = Duration(milliseconds: infrequentDataTimeout);
 
@@ -1355,15 +1355,18 @@ class BoatInstrumentController {
 
       for (dynamic u in d['updates']) {
         try {
-          final DateTime timeStamp = DateTime.parse(u['timestamp']);
+          final DateTime dataTimestamp = DateTime.parse(u['timestamp']);
           bool timeSynced = false;
 
-          if(_time == null) {
-            _timeSync(timeStamp);
-            now = this.now();
+          // On startup we need to sync time to the first update. If this is old data, then
+          // this will correct itself when current data is received.
+          if(_timestamp == null) {
+            l.i('Initial time sync to "$dataTimestamp, update: "$u"');
+            _timeSync(dataTimestamp);
+            timestamp = this.timestamp();
           }
 
-          final Duration d = now.difference(timeStamp);
+          final Duration d = timestamp.difference(dataTimestamp);
 
           for (dynamic v in u['values']) {
             final String path = v['path'];
@@ -1389,16 +1392,16 @@ class BoatInstrumentController {
 
                     // We've validated the timestamp is not old, but we only need to sync the time once for each timestamp.
                     if(!timeSynced && bd.dataType == SignalKDataType.realTime) {
-                      _timeSync(timeStamp);
+                      _timeSync(dataTimestamp);
                       timeSynced = true;
                     }
 
                     if(_settings!.setTime && !_timeSet && path == 'navigation.datetime') _setTime(value);
 
                     bd.updates.add(Update(context, path,value));
-                    bd.pathTimestamps[path] = now;
+                    bd.pathTimestamps[path] = timestamp;
                   } else {
-                   l.i('Discarding old data DateTime.now: ${DateTime.now()}, _timeReceived: $_timeReceived, bi.now(): "$now", diff: "$d", update: "$u"');
+                   l.i('Discarding old data DateTime.timestamp(): "${DateTime.timestamp()}", _timestamp: "$_timestamp" _osTimestampReceived: "$_osTimestampReceived", bi.timestamp(): "$timestamp", diff: "$d", update: "$u"');
                   }
                 }
               }
@@ -1415,7 +1418,7 @@ class BoatInstrumentController {
           // any that have expired we add a null for.
           var pt = bd.pathTimestamps;
           for(String path in pt.keys.toSet()) { // We make a copy of the keys as we might remove some.
-            Duration d = now.difference(pt[path]!);
+            Duration d = timestamp.difference(pt[path]!);
             if (
               (bd.dataType == SignalKDataType.realTime && d > realTimeDuration) ||
               (bd.dataType == SignalKDataType.infrequent && d > infrequentDuration)
@@ -1433,10 +1436,10 @@ class BoatInstrumentController {
     }
   }
 
-  void _timeSync(DateTime timeStamp) {
-    if(_time == null || timeStamp.isAfter(_time!)) {
-      _time = timeStamp;
-      _timeReceived = DateTime.now();
+  void _timeSync(DateTime newTimeStamp) {
+    if(_timestamp == null || newTimeStamp.isAfter(_timestamp!)) {
+      _timestamp = newTimeStamp;
+      _osTimestampReceived = DateTime.timestamp();
     }
   }
 
@@ -1546,7 +1549,7 @@ class BoatInstrumentController {
 
     _timeSet = true;
     // We need to resync as OS time might have changed.
-    _time = null;
+    _timestamp = null;
   }
 
   Future<void> showSettingsPage (BuildContext context, BoxWidget boxWidget) async {

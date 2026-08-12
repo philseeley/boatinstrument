@@ -450,7 +450,7 @@ class _SunlightBox extends HeadedTextBoxState<SunlightBox> {
   @override
   Widget build(BuildContext context) {
     final fmt = DateFormat(widget._settings.timeFormat);
-    final now = widget.config.controller.now();
+    final now = widget.config.controller.timestamp();
 
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
@@ -620,7 +620,7 @@ class _MoonBox extends HeadedTextBoxState<MoonBox> {
     if(widget._perBoxSettings.showMoon) textBgColor = td.colorScheme.surface;
 
     if(widget.config.editMode) {
-      _rise = _set = widget.config.controller.now().toLocal();
+      _rise = _set = widget.config.controller.timestamp().toLocal();
       _fraction = 1.0;
       _phaseName = 'Full';
     }

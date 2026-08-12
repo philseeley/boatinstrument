@@ -506,7 +506,7 @@ class _GraphPainter extends CustomPainter {
     Duration sliceDuration = Duration(seconds: slice);
 
     List<double?> values = List.filled(((_minutes*60)/slice).ceil(), null);
-    DateTime now = _widget.config.controller.now();
+    DateTime now = _widget.config.controller.timestamp();
     DateTime start = DateTime.utc(
       now.year,
       now.month,

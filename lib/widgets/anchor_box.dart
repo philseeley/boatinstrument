@@ -194,7 +194,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   @override
   void initState() {
     super.initState();
-    _lastPositionTime = widget.config.controller.now();
+    _lastPositionTime = widget.config.controller.timestamp();
 
     _settings = _AnchorAlarmSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {
@@ -444,7 +444,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
                     (u.value['latitude'] as num).toDouble(),
                     (u.value['longitude'] as num).toDouble());
 
-              DateTime now = widget.config.controller.now();
+              DateTime now = widget.config.controller.timestamp();
               if(now.difference(_lastPositionTime) >= Duration(seconds: _settings.recordSeconds)) {
                 _lastPositionTime = now;
                 _positions.add(_position!);

@@ -148,7 +148,7 @@ class _NoForeignLandBNoxState extends HeadedBoxState<NoForeignLandBox> {
 
   @override
   Widget build(BuildContext context) {
-    var now = widget.config.controller.now();
+    var now = widget.config.controller.timestamp();
     var textBgColor = Theme.of(context).colorScheme.surface;
 
     var oldest = _savePoint??_sentToApi??now;

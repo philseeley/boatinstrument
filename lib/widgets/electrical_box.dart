@@ -1090,7 +1090,7 @@ abstract class PowerGraphBackground extends BackgroundData {
 
   @override
   processUpdates(List<Update> updates) {
-    DateTime now = controller!.now();
+    DateTime now = controller!.timestamp();
 
     for (Update u in updates) {
       try {

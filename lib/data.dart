@@ -1438,7 +1438,7 @@ abstract class BackgroundData extends BackgroundTask {
           } else {
             value = next;
           }
-          DateTime now = controller!.now();
+          DateTime now = controller!.timestamp();
           if(data.isNotEmpty && data.first.date.isAfter(now.subtract(duration)) && data.length/data.capacity > 0.8) {
             data = CircularBuffer<DataPoint>.of(data, data.capacity+dataIncrement);
           }

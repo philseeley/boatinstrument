@@ -93,7 +93,7 @@ class _DateTimeBoxState extends HeadedTextBoxState<DateTimeBox> {
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     if(widget.config.editMode) {
-      _dateTime = widget.config.controller.now();
+      _dateTime = widget.config.controller.timestamp();
     }
 
     text = '';
@@ -294,7 +294,7 @@ class TimerBackgroundTask extends BackgroundTask {
 
    void _checkAlarms(_) {
     for(var a in _alarms.values) {
-      Duration d = a.expires.difference(_controller.now());
+      Duration d = a.expires.difference(_controller.timestamp());
 
       if(d.isNegative) _controller.playSoundFile(a.notificationState.soundFile);
     }
@@ -380,7 +380,7 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
   @override
   Widget build(BuildContext context) {
     if(widget.config.editMode) {
-      _expires = widget.config.controller.now().add(Duration(minutes: 123));
+      _expires = widget.config.controller.timestamp().add(Duration(minutes: 123));
     }
 
     String expiresStr = _expires==null?'':TimeOfDayConverter.timeFormat.format(_expires!.toLocal());
@@ -393,7 +393,7 @@ class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
       actions[1] = IconButton(onPressed: (_timer!=null&&widget._perBoxSettings.allowRestart)?_restart:null, icon: Icon(Icons.restore));
     }
 
-    Duration? d = _expires?.difference(widget.config.controller.now());
+    Duration? d = _expires?.difference(widget.config.controller.timestamp());
 
     text = d==null?'-':duration2HumanString(d);
     color = null;
@@ -616,7 +616,7 @@ class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
   static String timerPath(String id, {bool set = false}) => '${set?'':'$bi.'}timers.$id';
 
   static Future<void> start(BuildContext context, BoatInstrumentController controller, _Timer timer) async {
-    DateTime now = controller.now();
+    DateTime now = controller.timestamp();
     DateTime expires = timer.delta?
       now.add(Duration(hours: timer.time.hour, minutes: timer.time.minute)):
       DateTime(now.year, now.month, now.day, timer.time.hour, timer.time.minute);
@@ -791,7 +791,7 @@ class _StopwatchBoxState extends State<StopwatchBox> {
 
   @override
   Widget build(BuildContext context) {
-    if(_startTime!= null) _duration = widget.config.controller.now().difference(_startTime!);
+    if(_startTime!= null) _duration = widget.config.controller.timestamp().difference(_startTime!);
 
     StringBuffer lapsList = StringBuffer();
     for(int i=0; i<_laps.length; ++i) {
@@ -820,10 +820,10 @@ class _StopwatchBoxState extends State<StopwatchBox> {
   void _start ({bool restart = true}) {
     setState(() {
       if(!restart && _paused) {
-        _startTime = widget.config.controller.now().subtract(_duration);
+        _startTime = widget.config.controller.timestamp().subtract(_duration);
       } else {
         _laps.clear();
-        _startTime = widget.config.controller.now();
+        _startTime = widget.config.controller.timestamp();
       }
       _paused = false;
     });

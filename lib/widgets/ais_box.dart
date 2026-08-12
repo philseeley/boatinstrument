@@ -416,7 +416,7 @@ class _AISDisplayState extends State<AISDisplayBox> {
 
   Future<void> _onUpdate(List<Update> updates) async {
     var c = widget.config.controller;
-    var now = c.now();
+    var now = c.timestamp();
 
     for (Update u in updates) {
       try {
