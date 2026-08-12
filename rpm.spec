@@ -28,6 +28,9 @@ mkdir -p %{buildroot}/usr/share/applications
 mv %{_sourcedir}/../../build/linux/*/release/bundle %{buildroot}/usr/share/%{name}
 cp %{_sourcedir}/../../name.phil.seeley.boatinstrument.desktop %{buildroot}/usr/share/applications
 
+find %{buildroot}/usr/share/%{name}/lib -name '*.so' -print0 | \
+  xargs -0 -r patchelf --set-rpath '$ORIGIN'
+
 %files
 /usr/share/applications/name.phil.seeley.boatinstrument.desktop
 /usr/share/%{name}
