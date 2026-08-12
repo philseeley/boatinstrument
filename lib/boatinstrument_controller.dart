@@ -1041,8 +1041,14 @@ class BoatInstrumentController {
       dynamic data = json.decode(response.body);
       dynamic endPoints = data['endpoints']['v1'];
 
-      _httpApiUri = await _convert2IP(Uri.parse(endPoints['signalk-http']));
-      _wsUri = await _convert2IP(Uri.parse(endPoints['signalk-ws']));
+      _httpApiUri = Uri.parse(endPoints['signalk-http']);
+      _wsUri = Uri.parse(endPoints['signalk-ws']);
+
+      if(!_settings!.demoMode) {
+        _httpApiUri = await _convert2IP(_httpApiUri);
+        _wsUri = await _convert2IP(_wsUri);
+      }
+
       _putPathUri = _httpApiUri.replace(
         path: 'plugins/$signalkPlugin/putPath');
 
