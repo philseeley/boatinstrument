@@ -317,7 +317,7 @@ class BatteryStateOfChargeBarGaugeBox extends DoubleValueBarGaugeBox {
   final _ElectricalSettings _settings;
 
   const BatteryStateOfChargeBarGaugeBox._init(this._settings, config, title, path, {super.key, super.ranges}) :
-    super(config, title, path, maxValue: 1.0, step: 10, showPercent: true, smoothing: false, dataType: SignalKDataType.infrequent);
+    super(config, title, path, maxValue: 1.0, step: 0.25, showPercent: true, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory BatteryStateOfChargeBarGaugeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
