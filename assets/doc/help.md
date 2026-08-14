@@ -60,6 +60,10 @@ The app uses the **signalk-boatinstrument-plugin** to perform some of its functi
 
 If your SignalK Server only implements a data streaming service, e.g. the [ESP32 NMEA Gateway](https://github.com/JaCharer/ESP32_NMEA2000_Multiprotocol_Gateway) or the [SignalK Mini](https://github.com/bareboat-necessities/signalk-mini), then enable **Minimal Server**. This allows you to manually enter Box Settings rather then select from a list retrieved from the SignalK data model.
 
+If you are connecting to a minimal SignalK server that only supports TCP Sockets, then specify a URL with a tcp scheme, e.g. 'tcp://my-server.local:8375'.
+
+**Note:** for TCP Sockets only data subscriptions are supported, i.e. no control functionality, like the Autopilot, is supported.
+
 The **Subscription Min Period** is the minimum time between data updates. Increasing this value will reduce the load on your SignalK server.
 
 If no data is received within the **Connection Timeout** the connection is reopened.

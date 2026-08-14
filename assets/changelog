@@ -17,6 +17,8 @@
            Boxes can now declare if their default settings are insufficient and
              require updating. This is indicated in edit mode.
            Support for Minimal SignalK servers.
+           TCP Socket connections are now supported for minimal SignalK servers.
+             Thanks to Mikhail G for the idea.
 
            New Boxes:
              Webcam(ONVIF)
