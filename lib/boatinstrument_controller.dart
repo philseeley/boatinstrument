@@ -1132,16 +1132,6 @@ class BoatInstrumentController {
             }
         );
 
-        _controlStreamSubscription = _controlChannel?.stream.listen(
-            _processData,
-            onError: (e) {
-              l.e('WebSocket stream error', error: e);
-            },
-            onDone: () {
-              l.w('WebSocket closed');
-            }
-        );
-
         if(_signalk.allowRemoteControl) {
           _controlStreamSubscription = _controlChannel?.stream.listen(
               _processData,
