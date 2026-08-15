@@ -709,6 +709,107 @@ class _MoonPerBoxSettingsState extends State<_MoonPerBoxSettingsWidget> {
   }
 }
 
+class TideLocalBox extends CelestialBox {
+  static const String sid = 'environment-tide-local';
+
+  TideLocalBox(super.config, {super.key});
+
+  @override
+  Widget? getHelp() => const HelpPage(text: 'Ensure the **signalk-tides** plugin v2.0.0+ is installed on signalk.');
+
+  @override
+  State<TideLocalBox> createState() => _TideLocalBoxState();
+}
+
+class _TideLocalBoxState extends HeadedTextBoxState<TideLocalBox> {
+  bool _utc = false;
+  double? _heightLow;
+  DateTime? _timeLow;
+  double? _heightHigh;
+  DateTime? _timeHigh;
+  double? _heightNow;
+  bool? _rising;
+  String? _stationName;
+  Duration? _timeToNextExtreme;
+  DateFormat _dateFormat = DateFormat();
+
+  @override
+  void initState() {
+    super.initState();
+    alignment = Alignment.topCenter;
+    _dateFormat = DateFormat(widget._settings.timeFormat);
+
+    widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.tide.*'}, dataType: SignalKDataType.infrequent);
+  }
+
+  String _depthStr(double? depth) => '${depth==null?'-':fmt.format('{:5.1f}', widget.config.controller.depthToDisplay(depth!))}${widget.config.controller.depthUnits.unit}';
+  String _timeStr(DateTime? time) => time==null?'-':_dateFormat.format(_utc?time!.toUtc():time!.toLocal());
+
+  @override
+  Widget build(BuildContext context) {
+    var c = widget.config.controller;
+    TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
+
+    StringBuffer textBuffer = StringBuffer();
+
+    textBuffer.writeln('H:${_depthStr(_heightHigh)} ${_timeStr(_timeHigh)}');
+    textBuffer.writeln('${_rising==null?'-':_rising!?'\u2191':'\u2193'}:${_depthStr(_heightNow)} ${_timeToNextExtreme==null?'-':duration2HumanString(_timeToNextExtreme!)}');
+    textBuffer.writeln('L:${_depthStr(_heightLow)} ${_timeStr(_timeLow)}');
+
+    header = 'Tide:${_stationName??''}';
+    text = textBuffer.toString();
+    color = widget.config.controller.val2PSColor(context, _rising==null?0:_rising!?1:-1);
+    actions = [TextButton(onPressed: _toggleUTC, child: Text('UTC', style: style.copyWith(decoration: _utc ? null : TextDecoration.lineThrough)))];
+
+    return super.build(context);
+  }
+
+  void _toggleUTC() {
+    setState(() {
+      _utc = !_utc;
+    });
+  }
+
+  void _onUpdate(List<Update> updates) {
+    for (Update u in updates) {
+      try {        
+        switch (u.path) {
+          case 'environment.tide.heightLow':
+            _heightLow = doubleOrNull(u.value);
+            break;
+          case 'environment.tide.timeLow':
+            _timeLow = dateTimeOrNull(u.value);
+            break;
+          case 'environment.tide.heightHigh':
+            _heightHigh = doubleOrNull(u.value);
+            break;
+          case 'environment.tide.timeHigh':
+            _timeHigh = dateTimeOrNull(u.value);
+            break;
+          case 'environment.tide.heightNow':
+            _heightNow = doubleOrNull(u.value);
+            break;
+          case 'environment.tide.state':
+            _rising = u.value==null?null:u.value == 'rising';
+            break;
+          case 'environment.tide.stationName':
+            _stationName = u.value;
+            break;
+          case 'environment.tide.timeToNextExtreme':
+            _timeToNextExtreme = u.value==null?null:Duration(seconds: (u.value as num).toInt());
+            break;
+        }
+      } catch (e) {
+        widget.config.controller.l.e("Error converting $u", error: e);
+      }
+    }
+
+    if(mounted) {
+      setState(() {});
+    }
+  }
+}
+
 class OutsidePressureGraphBackground extends BackgroundData {
   OutsidePressureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, OutsidePressureGraph.sid, {'environment.outside.pressure'});
 }

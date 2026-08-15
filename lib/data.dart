@@ -37,6 +37,9 @@ double m2ft (double m) => m * 3.28084;
 double m2nm (double m) => m * 0.000539957;
 double m2miles (double m) => m * 0.000621371;
 double miles2m (double miles) => miles / 0.000621371;
+double? doubleOrNull(dynamic value) => value==null?null:(value as num).toDouble();
+int? intOrNull(dynamic value) => value==null?null:(value as num).toInt();
+DateTime? dateTimeOrNull(dynamic value) => value==null?null:DateTime.parse(value);
 
 String rad2Cardinal(double? direction) {
   const List<String> cardinalDirections = [

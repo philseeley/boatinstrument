@@ -68,6 +68,7 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(OutsidePressureBox.sid, (config) {return OutsidePressureBox(config, key: UniqueKey());}),
   BoxDetails(SunlightBox.sid, (config) {return SunlightBox(config, key: UniqueKey());}),
   BoxDetails(MoonBox.sid, (config) {return MoonBox(config, key: UniqueKey());}),
+  BoxDetails(TideLocalBox.sid, (config) {return TideLocalBox(config, key: UniqueKey());}),
   BoxDetails(DebugBox.sid, (config) {return DebugBox(config, key: UniqueKey());}),
   BoxDetails(AnchorAlarmBox.sid, gauge: true, (config) {return AnchorAlarmBox(config, key: UniqueKey());}),
   BoxDetails(BatteriesBox.sid, (config) {return BatteriesBox(config, key: UniqueKey());}),
@@ -174,6 +175,7 @@ class _EditPageState extends State<_EditPage> {
         _widgetMenuEntry(SetAndDriftBox.sid, 'Set & Drift'),
         _widgetMenuEntry(SunlightBox.sid, 'Sunlight'),
         _widgetMenuEntry(MoonBox.sid, 'Moonlight'),
+        _widgetMenuEntry(TideLocalBox.sid, 'Tide'),
       ]),
       _widgetSubMenuEntry(box, 'Navigation', [
         _widgetMenuEntry(CompassRoseBox.sid, 'Compass Rose'),
