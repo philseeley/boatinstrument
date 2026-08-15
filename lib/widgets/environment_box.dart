@@ -742,12 +742,11 @@ class _TideLocalBoxState extends HeadedTextBoxState<TideLocalBox> {
     widget.config.controller.configure(onUpdate: _onUpdate, paths: {'environment.tide.*'}, dataType: SignalKDataType.infrequent);
   }
 
-  String _depthStr(double? depth) => '${depth==null?'-':fmt.format('{:5.1f}', widget.config.controller.depthToDisplay(depth!))}${widget.config.controller.depthUnits.unit}';
-  String _timeStr(DateTime? time) => time==null?'-':_dateFormat.format(_utc?time!.toUtc():time!.toLocal());
+  String _depthStr(double? depth) => '${depth==null?'-':fmt.format('{:5.1f}', widget.config.controller.depthToDisplay(depth))}${widget.config.controller.depthUnits.unit}';
+  String _timeStr(DateTime? time) => time==null?'-':_dateFormat.format(_utc?time.toUtc():time.toLocal());
 
   @override
   Widget build(BuildContext context) {
-    var c = widget.config.controller;
     TextStyle style = Theme.of(context).textTheme.titleMedium!.copyWith(height: 1.0);
 
     StringBuffer textBuffer = StringBuffer();
