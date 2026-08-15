@@ -28,4 +28,4 @@ Debian Bullseye(11), Bookworm(12) and Trixie(13) are supported.
 
 https://philseeley.github.io/fedora-repo/
 
-Fedora 41, 42 and 43 are supported.
+Fedora 42, 43 and 44 are supported.
