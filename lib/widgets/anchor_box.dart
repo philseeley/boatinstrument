@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as m;
 
+import 'package:boatinstrument/repeatable_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
@@ -43,6 +44,7 @@ class _Map extends StatelessWidget {
   final ll.LatLng _position;
   final ll.LatLng? _anchorPosition;
   final ll.LatLng? _newAnchorPosition;
+  final ll.LatLng? _boatPosition;
   final double? _currentRadius;
   final double? _newCurrentRadius;
   final double? _maxRadius;
@@ -67,6 +69,7 @@ class _Map extends StatelessWidget {
     this._position,
     this._anchorPosition,
     this._newAnchorPosition,
+    this._boatPosition,
     this._currentRadius,
     this._newCurrentRadius,
     this._currentColor,
@@ -101,7 +104,7 @@ class _Map extends StatelessWidget {
     }
 
     var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition??_position, _newMaxRadius??_maxRadius!, 90);
-    var currentRadiusPos = ll.Distance().offset(_anchorPosition??_position, _currentRadius??_sampleRadius, 270);
+    var currentRadiusPos = ll.Distance().offset(_boatPosition??_newAnchorPosition??_anchorPosition??_position, _newCurrentRadius??_currentRadius??_sampleRadius, 270);
 
     String url = '';
     if(_showMap && _signalkChart.defined) {
@@ -127,9 +130,10 @@ class _Map extends StatelessWidget {
       children: [
         if(url.isNotEmpty) TileLayer(urlTemplate: url),
         CircleLayer(circles: [
+          if(_boatPosition != null) CircleMarker(point: _boatPosition!, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
-          if(_currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
-          if(_currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_boatPosition == null && _currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_boatPosition == null && _currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
@@ -137,6 +141,7 @@ class _Map extends StatelessWidget {
           if(_headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, (_maxRadius??_sampleRadius)/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
+          if(_boatPosition != null) Marker(point: _boatPosition!, child: Icon(Icons.highlight_off, color: _currentColor)),
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _maxColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
@@ -172,11 +177,13 @@ class AnchorAlarmBox extends BoxWidget {
 
 class _AnchorState extends State<AnchorAlarmBox> {
   static const int _radiusIncrement = 5;
+  static const int _sampleRadiusIncrement = 10;
 
   late final _AnchorAlarmSettings _settings;
   ll.LatLng? _position;
   ll.LatLng? _anchorPosition;
   ll.LatLng? _newAnchorPosition;
+  static ll.LatLng? _boatPosition;
   double? _headingTrue;
   double? _windAngleApparent;
   double? _maxRadius;
@@ -272,6 +279,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         _position!,
         _anchorPosition,
         _newAnchorPosition,
+        _boatPosition,
         _currentRadius,
         _newCurrentRadius,
         dropColor,
@@ -290,10 +298,11 @@ class _AnchorState extends State<AnchorAlarmBox> {
         if(_map != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
         Positioned(top: pad, left: pad, right: pad, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           _button(_map==null?null:_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
+          _button(_currentRadius==null?_positionBoat:null, dropColor, iconData: Icons.close),
           _button(_maxRadius==null?_drop:null, dropColor, iconData: Icons.anchor),
           _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
-          _button(_maxRadius==null?null:() {_changeMaxRadius(-_radiusIncrement);}, dropColor, iconData: Icons.remove),
-          _button(_maxRadius==null?null:() {_changeMaxRadius(_radiusIncrement);}, dropColor, iconData: Icons.add),
+          _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(-1);}, dropColor, iconData: Icons.remove, repeat: _maxRadius==null),
+          _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(1);}, dropColor, iconData: Icons.add, repeat: _maxRadius==null),
           _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
         ])),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
@@ -306,8 +315,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
     ]));
   }
 
-  IconButton _button(Function()? onPressed, Color color, {IconData? iconData, Stack? iconStack}) {
-    return IconButton.filled(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+  Widget _button(void Function()? onPressed, Color color, {IconData? iconData, Stack? iconStack, bool repeat = false}) {
+    if(repeat) {
+      return RepeatableIconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+    } else {
+      return IconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+    }
   }
 
   void _panStart(DragStartDetails d) {
@@ -377,7 +390,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
   }
 
+  void _positionBoat() {
+    _boatPosition = _position;
+  }
+
   void _drop() {
+    _boatPosition = null;
     _sendCommand('dropAnchor', '');
   }
 
@@ -392,8 +410,17 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _sendCommand('setRadius', '{"radius": ${newMaxRadius.round()}}');
   }
 
-  void _changeMaxRadius(int amount) {
-    _resizeMaxRadius(_maxRadius!+amount);
+  void _changeRadius(int direction) {
+    if(_maxRadius != null) {
+      _maxRadius = _maxRadius!+(_radiusIncrement*direction);
+      if(_maxRadius! <= 0) _maxRadius = _radiusIncrement.toDouble();
+      _resizeMaxRadius(_maxRadius!);
+    } else {
+      setState(() {
+        _settings.sampleRadius += _sampleRadiusIncrement*direction;
+        if(_settings.sampleRadius <= 0) _settings.sampleRadius = _sampleRadiusIncrement.toDouble();
+      });
+    }
   }
 
   void _raise() async {
@@ -401,7 +428,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       await _sendCommand('raiseAnchor', '');
       setState(() {
         _unlocked = false;
-        _anchorPosition = _maxRadius = _currentRadius = null;
+        _boatPosition = _anchorPosition = _maxRadius = _currentRadius = null;
       });
     }
   }
