@@ -293,12 +293,13 @@ class _AnchorState extends State<AnchorAlarmBox> {
       );
     }
 
-    return Padding(padding: const EdgeInsets.all(pad), child: Column(children: [
-      Expanded(child: Stack(children: [
-        if(_map != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
+    if(_map == null) return MaxTextWidget('-');
+
+    return Stack(children: [
+        GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
         Positioned(top: pad, left: pad, right: pad, child: Column(spacing: pad, children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            _button(_map==null?null:_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
+            _button(_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
             _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(-1);}, dropColor, iconData: Icons.remove, repeat: _maxRadius==null),
             _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(1);}, dropColor, iconData: Icons.add, repeat: _maxRadius==null),
             _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
@@ -309,14 +310,14 @@ class _AnchorState extends State<AnchorAlarmBox> {
             _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
           ])
         ])),
-        if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
+        Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
             if(_settings.signalkChart.defined) _button(_toggleMap, bg, iconStack: Stack(children: [Icon(Icons.map), if(!_showMap) Icon(Icons.close)])),
             _button(() {_changeZoom(1);}, bg, iconData: Icons.add),
             _button(_resetZoom, bg, iconData: Icons.all_out),
             _button(() {_changeZoom(-1);}, bg, iconData: Icons.remove)
         ])),
-      ]))
-    ]));
+      ]);
+    // ]);
   }
 
   Widget _button(void Function()? onPressed, Color color, {IconData? iconData, Stack? iconStack, bool repeat = false}) {
