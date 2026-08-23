@@ -43,7 +43,7 @@ class _Map extends StatelessWidget {
   final ll.LatLng _position;
   final ll.LatLng? _anchorPosition;
   final ll.LatLng? _newAnchorPosition;
-  final ll.LatLng? _boatPosition;
+  final ll.LatLng? _desiredPosition;
   final double? _currentRadius;
   final double? _newCurrentRadius;
   final double? _maxRadius;
@@ -68,7 +68,7 @@ class _Map extends StatelessWidget {
     this._position,
     this._anchorPosition,
     this._newAnchorPosition,
-    this._boatPosition,
+    this._desiredPosition,
     this._currentRadius,
     this._newCurrentRadius,
     this._currentColor,
@@ -103,7 +103,7 @@ class _Map extends StatelessWidget {
     }
 
     var maxRadiusPos = (_maxRadius == null)?ll.LatLng(0, 0):ll.Distance().offset(_newAnchorPosition??_anchorPosition??_position, _newMaxRadius??_maxRadius!, 90);
-    var currentRadiusPos = ll.Distance().offset(_boatPosition??_newAnchorPosition??_anchorPosition??_position, _newCurrentRadius??_currentRadius??_sampleRadius, 270);
+    var currentRadiusPos = ll.Distance().offset(_newAnchorPosition??_anchorPosition??_desiredPosition??_position, _newCurrentRadius??_currentRadius??_sampleRadius, 270);
 
     String url = '';
     if(_showMap && _signalkChart.defined) {
@@ -129,18 +129,19 @@ class _Map extends StatelessWidget {
       children: [
         if(url.isNotEmpty) TileLayer(urlTemplate: url),
         CircleLayer(circles: [
-          if(_boatPosition != null) CircleMarker(point: _boatPosition, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_currentRadius == null && _desiredPosition != null) CircleMarker(point: _desiredPosition, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
-          if(_boatPosition == null && _currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
-          if(_boatPosition == null && _currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_desiredPosition == null && _currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
           if(_headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius??_sampleRadius, rad2Deg(_headingTrue))]),
-          if(_headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, (_maxRadius??_sampleRadius)/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
+          if(_headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, (_maxRadius??_sampleRadius)/2, rad2Deg(_headingTrue!+_windAngleApparent!))]),
+          if(_anchorPosition == null && _headingTrue != null && _windAngleApparent != null && _desiredPosition != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_desiredPosition, ll.Distance().offset(_desiredPosition, _sampleRadius, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
-          if(_boatPosition != null) Marker(point: _boatPosition, child: Icon(Icons.highlight_off, color: _currentColor)),
+          if(_desiredPosition != null) Marker(point: _desiredPosition, child: Icon(Icons.highlight_off, color: _currentColor)),
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _maxColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
@@ -182,7 +183,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   ll.LatLng? _position;
   ll.LatLng? _anchorPosition;
   ll.LatLng? _newAnchorPosition;
-  static ll.LatLng? _boatPosition;
+  static ll.LatLng? _desiredPosition;
   double? _headingTrue;
   double? _windAngleApparent;
   double? _maxRadius;
@@ -278,7 +279,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
         _position!,
         _anchorPosition,
         _newAnchorPosition,
-        _boatPosition,
+        _desiredPosition,
         _currentRadius,
         _newCurrentRadius,
         dropColor,
@@ -304,7 +305,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
             _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
           ]),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            _button(_currentRadius==null?_positionBoat:null, dropColor, iconData: Icons.close),
+            _button(_currentRadius==null?_toggleDesiredPosition:null, dropColor, iconData: (_desiredPosition==null)?Icons.location_on:Icons.location_off),
             _button(_maxRadius==null?_drop:null, dropColor, iconData: Icons.anchor),
             _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
           ])
@@ -394,16 +395,16 @@ class _AnchorState extends State<AnchorAlarmBox> {
     }
   }
 
-  void _positionBoat() {
-    _boatPosition = _position;
+  void _toggleDesiredPosition() {
+    _desiredPosition = (_desiredPosition==null)?_position:null;
   }
 
   void _drop() {
-    _boatPosition = null;
     _sendCommand('dropAnchor', '');
   }
 
   void _setMaxRadius() {
+    _desiredPosition = null;
     _setLockTimer();
     _sendCommand('setRadius', '');
   }
@@ -432,7 +433,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       await _sendCommand('raiseAnchor', '');
       setState(() {
         _unlocked = false;
-        _boatPosition = _anchorPosition = _maxRadius = _currentRadius = null;
+        _desiredPosition = _anchorPosition = _maxRadius = _currentRadius = null;
       });
     }
   }
