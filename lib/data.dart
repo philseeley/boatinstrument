@@ -626,6 +626,32 @@ class HeadedTextBoxState<T extends BoxWidget> extends HeadedBoxState<T> {
   }
 }
 
+class BorderedTextWidget extends StatelessWidget {
+  final String text;
+  final Alignment alignment;
+  final Color? color;
+  final Color? textBgColor;
+  final TextDecoration? decoration;
+  final Color? backgroundColor;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+  final TextScaler? textScaler;
+
+  const BorderedTextWidget(this.text, {this.alignment = Alignment.center, this.color, this.textBgColor, this.decoration, this.backgroundColor, this.style, this.textAlign, this.textScaler, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle s = style??Theme.of(context).textTheme.titleMedium!;
+
+    return Stack(alignment: alignment, children: [
+      if(textBgColor != null) Text(text, textScaler: textScaler, textAlign: textAlign,
+        style: s.copyWith(foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 4..color = textBgColor!)),
+      Text(text, textScaler: textScaler, textAlign: textAlign,
+        style: s.copyWith(color: color, decoration: decoration, backgroundColor: backgroundColor))
+    ]);
+  }
+}
+
 class MaxTextWidget extends StatelessWidget {
   final String text;
   final Alignment alignment;
@@ -652,12 +678,8 @@ class MaxTextWidget extends StatelessWidget {
       }
 
       // We need to disable the device text scaling as this interferes with our text scaling.
-      return Stack(alignment: alignment, children: [
-        if(textBgColor != null) Text(text, textScaler: TextScaler.noScaling, textAlign: textAlign,
-          style: s.copyWith(fontSize: fontSize, foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 6..color = textBgColor!)),
-        Text(text, textScaler: TextScaler.noScaling, textAlign: textAlign,
-          style: s.copyWith(fontSize: fontSize, color: color, decoration: decoration, backgroundColor: backgroundColor))
-      ]);
+      return BorderedTextWidget(text, textScaler: TextScaler.noScaling, textAlign: textAlign,
+          style: s.copyWith(fontSize: fontSize), decoration: decoration, color: color, textBgColor: textBgColor, backgroundColor: backgroundColor);
     });
   }
 }
@@ -1499,7 +1521,7 @@ mixin DoubleValeBoxPainter {
     Color fg = Theme.of(context).colorScheme.onSurface;
     Color bg = Theme.of(context).colorScheme.surface;
     TextStyle style = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0);
-    TextStyle styleBg = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0, foreground: Paint()..color = textBgColor??Colors.black..style = PaintingStyle.stroke..strokeWidth = 6);
+    TextStyle styleBg = Theme.of(context).textTheme.bodyMedium!.copyWith(height: 1.0, foreground: Paint()..color = textBgColor??Colors.black..style = PaintingStyle.stroke..strokeWidth = 4);
 
     String speedText = '-';
     if(value != null) speedText = fmt.format('{:${minLen+(precision > 0?1:0)+precision}.${precision}f}', value);
