@@ -1617,3 +1617,115 @@ class BiTextFormField extends OnscreenKeyboardTextFormField {
     required String initialValue,
     super.key}) : super(enableOnscreenKeyboard: embeddedKeyboard, controller: TextEditingController(text: initialValue));
 }
+
+/// An IconButton that calls [onPressed] repeatedly while the user
+/// holds it down (press-and-hold-to-repeat), e.g. for +/- steppers,
+/// volume controls, scroll buttons, etc.
+///
+/// - Single tap calls once immediately.
+/// - Holding calls again after [initialDelay], then repeats every
+///   [repeatInterval] (optionally accelerating via [minInterval]).
+class RepeatingIconButton extends StatefulWidget {
+  final Widget icon;
+  final VoidCallback? onPressed;
+  final Duration initialDelay;
+  final Duration repeatInterval;
+  final Duration minInterval;
+  final double acceleration;
+  final double? iconSize;
+  final Color? color;
+  final String? tooltip;
+  final ButtonStyle? style;
+
+  const RepeatingIconButton({
+    super.key,
+    required this.icon,
+    required this.onPressed,
+    this.initialDelay = const Duration(milliseconds: 500),
+    this.repeatInterval = const Duration(milliseconds: 150),
+    this.minInterval = const Duration(milliseconds: 50),
+    this.acceleration = 0.90, // multiply interval each tick; 1.0 = no accel
+    this.iconSize,
+    this.color,
+    this.tooltip,
+    this.style,
+  });
+
+  @override
+  State<RepeatingIconButton> createState() => _RepeatingIconButtonState();
+}
+
+class _RepeatingIconButtonState extends State<RepeatingIconButton> {
+  Timer? _timer;
+  Duration _currentInterval = Duration.zero;
+  bool _called = false; // tracks whether tap-down already called once
+
+  void _call() {
+    if (!mounted) return;
+    widget.onPressed?.call();
+  }
+
+  void _startRepeating() {
+    _called = true;
+    _call(); // call immediately on press
+
+    _currentInterval = widget.repeatInterval;
+
+    _timer = Timer(widget.initialDelay, _scheduleNextRepeat);
+  }
+
+  void _scheduleNextRepeat() {
+    _call();
+
+    // Accelerate, clamped to minInterval.
+    final nextMs = (_currentInterval.inMilliseconds * widget.acceleration)
+        .clamp(widget.minInterval.inMilliseconds, widget.repeatInterval.inMilliseconds)
+        .round();
+    _currentInterval = Duration(milliseconds: nextMs);
+
+    _timer = Timer(_currentInterval, _scheduleNextRepeat);
+  }
+
+  void _stopRepeating() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      // Listener gives us reliable down/up/cancel even outside GestureDetector quirks.
+      onPointerDown: (_) => _startRepeating(),
+      onPointerUp: (_) => _stopRepeating(),
+      onPointerCancel: (_) => _stopRepeating(),
+      child: IconButton(
+        icon: widget.icon,
+        iconSize: widget.iconSize,
+        color: widget.color,
+        tooltip: widget.tooltip,
+        style: widget.style,
+        // onPressed still required for accessibility (screen readers,
+        // keyboard activation) but Listener handles the hold-repeat logic.
+        // Guard against double-firing when Listener already called on tap-down.
+        onPressed: widget.onPressed==null?null:() {
+          if (_called) {
+            // Already called via Listener's onPointerDown for this press
+            // cycle; this is IconButton's synthetic tap callback — ignore
+            // it, but reset the flag so the *next* press cycle works.
+            _called = false;
+          } else {
+            // Reached via keyboard/screen-reader/switch-control activation,
+            // which never goes through Listener's pointer events.
+            _call();
+          }
+        },
+      ),
+    );
+  }
+}

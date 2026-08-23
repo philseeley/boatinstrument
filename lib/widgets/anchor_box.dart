@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as m;
 
-import 'package:boatinstrument/repeatable_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
@@ -322,7 +321,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
 
   Widget _button(void Function()? onPressed, Color color, {IconData? iconData, Stack? iconStack, bool repeat = false}) {
     if(repeat) {
-      return RepeatableIconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+      return RepeatingIconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
     } else {
       return IconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
     }
