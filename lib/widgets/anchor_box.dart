@@ -130,7 +130,7 @@ class _Map extends StatelessWidget {
       children: [
         if(url.isNotEmpty) TileLayer(urlTemplate: url),
         CircleLayer(circles: [
-          if(_boatPosition != null) CircleMarker(point: _boatPosition!, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_boatPosition != null) CircleMarker(point: _boatPosition, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_boatPosition == null && _currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_boatPosition == null && _currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
@@ -141,7 +141,7 @@ class _Map extends StatelessWidget {
           if(_headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, (_maxRadius??_sampleRadius)/2, rad2Deg(_headingTrue!+_windAngleApparent!))])
         ]),
         MarkerLayer(markers: [
-          if(_boatPosition != null) Marker(point: _boatPosition!, child: Icon(Icons.highlight_off, color: _currentColor)),
+          if(_boatPosition != null) Marker(point: _boatPosition, child: Icon(Icons.highlight_off, color: _currentColor)),
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _maxColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
@@ -296,14 +296,18 @@ class _AnchorState extends State<AnchorAlarmBox> {
     return Padding(padding: const EdgeInsets.all(pad), child: Column(children: [
       Expanded(child: Stack(children: [
         if(_map != null) GestureDetector(onPanStart: _unlocked?_panStart:null, onPanUpdate: _unlocked?_panUpdate:null, onPanEnd: _unlocked?_panEnd:null, child: AbsorbPointer(child: _map!)),
-        Positioned(top: pad, left: pad, right: pad, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          _button(_map==null?null:_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
-          _button(_currentRadius==null?_positionBoat:null, dropColor, iconData: Icons.close),
-          _button(_maxRadius==null?_drop:null, dropColor, iconData: Icons.anchor),
-          _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
-          _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(-1);}, dropColor, iconData: Icons.remove, repeat: _maxRadius==null),
-          _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(1);}, dropColor, iconData: Icons.add, repeat: _maxRadius==null),
-          _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
+        Positioned(top: pad, left: pad, right: pad, child: Column(spacing: pad, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            _button(_map==null?null:_toggleLocked, dropColor, iconData: _unlocked?Icons.lock_open:Icons.lock),
+            _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(-1);}, dropColor, iconData: Icons.remove, repeat: _maxRadius==null),
+            _button((_maxRadius==null && _anchorPosition!=null)?null:() {_changeRadius(1);}, dropColor, iconData: Icons.add, repeat: _maxRadius==null),
+            _button(_unlocked?_raise:null, raiseColor, iconStack: Stack(children: [Icon(Icons.anchor), Icon(Icons.close)])),
+          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            _button(_currentRadius==null?_positionBoat:null, dropColor, iconData: Icons.close),
+            _button(_maxRadius==null?_drop:null, dropColor, iconData: Icons.anchor),
+            _button((_currentRadius!=null && _maxRadius == null)?_setMaxRadius:null, dropColor, iconData: Icons.highlight_off),
+          ])
         ])),
         if(_map != null) Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
             if(_settings.signalkChart.defined) _button(_toggleMap, bg, iconStack: Stack(children: [Icon(Icons.map), if(!_showMap) Icon(Icons.close)])),
