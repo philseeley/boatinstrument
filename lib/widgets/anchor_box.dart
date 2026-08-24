@@ -86,16 +86,16 @@ class _Map extends StatelessWidget {
     double maxTextWidth = 0;
     double currentTextWidth = 0;
     Color bgColor = Theme.of(context).colorScheme.surface;
-    TextStyle th = Theme.of(context).textTheme.bodyMedium!;
+    TextStyle s = Theme.of(context).textTheme.bodyMedium!;
     var tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
     var maxRadiusText = _controller.shortDistanceToDisplay((_newMaxRadius??_maxRadius??0)).round().toString();
     var currentRadiusText = _controller.shortDistanceToDisplay(_newCurrentRadius??_currentRadius??_sampleRadius).round().toString();
     try {
-      tp.text = TextSpan(text: maxRadiusText, style: th);
+      tp.text = TextSpan(text: maxRadiusText, style: s);
       tp.layout();
       maxTextWidth = tp.width;
 
-      tp.text = TextSpan(text: currentRadiusText, style: th);
+      tp.text = TextSpan(text: currentRadiusText, style: s);
       tp.layout();
       currentTextWidth = tp.width;
     } finally {
@@ -144,9 +144,9 @@ class _Map extends StatelessWidget {
           if(_desiredPosition != null) Marker(point: _desiredPosition, child: Icon(Icons.highlight_off, color: _currentColor)),
           if(_anchorPosition != null) Marker(point: _newAnchorPosition??_anchorPosition!, child: Icon(Icons.anchor, color: _currentColor)),
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _maxColor))),
-          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: th.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
-          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
-          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: th.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
+          if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: s.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
+          if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: s.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
+          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: s.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
         ])
       ],
     );
@@ -254,9 +254,10 @@ class _AnchorState extends State<AnchorAlarmBox> {
 
   @override
   Widget build(BuildContext context) {
-    var bg = Theme.of(context).colorScheme.onSurface;
-    var dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
-    var raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
+    final fg = Theme.of(context).colorScheme.surface;
+    final bg = Theme.of(context).colorScheme.onSurface;
+    final dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
+    final raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
 
     var zoom = _zoom;
     if(widget.config.editMode) {
@@ -316,15 +317,18 @@ class _AnchorState extends State<AnchorAlarmBox> {
             _button(_resetZoom, bg, iconData: Icons.all_out),
             _button(() {_changeZoom(-1);}, bg, iconData: Icons.remove)
         ])),
+        Positioned(bottom: pad, left: pad, child: BorderedTextWidget(widget.config.controller.shortDistanceUnitsToDisplay(), color: fg, textBgColor: bg)),
       ]);
     // ]);
   }
 
   Widget _button(void Function()? onPressed, Color color, {IconData? iconData, Stack? iconStack, bool repeat = false}) {
+    final style = IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface);
+
     if(repeat) {
-      return RepeatingIconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+      return RepeatingIconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: style);
     } else {
-      return IconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: IconButton.styleFrom(backgroundColor: color, foregroundColor: Theme.of(context).colorScheme.surface));
+      return IconButton(onPressed: onPressed, icon: iconStack??Icon(iconData), style: style);
     }
   }
 
