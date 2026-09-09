@@ -136,6 +136,8 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AISDisplayBox.sid, experimental: true, (config) {return AISDisplayBox(config, key: UniqueKey());}),
   BoxDetails(ZoneSetupBox.sid, experimental: true, (config) {return ZoneSetupBox(config, key: UniqueKey());}),
   BoxDetails(NoForeignLandBox.sid, (config) {return NoForeignLandBox(config, key: UniqueKey());}),
+  BoxDetails(DeviceBatteryBox.sid, (config) {return DeviceBatteryBox(config, key: UniqueKey());}),
+  BoxDetails(DeviceBatteryBarGaugeBox.sid, gauge: true, (config) {return DeviceBatteryBarGaugeBox(config, key: UniqueKey());}),
 ];
 
 class _EditPageState extends State<_EditPage> {
@@ -270,6 +272,10 @@ class _EditPageState extends State<_EditPage> {
           _widgetMenuEntry(WindVoltageBox.sid, 'Voltage'),
           _widgetMenuEntry(WindCurrentBox.sid, 'Current'),
           _widgetMenuEntry(WindPowerGraph.sid, 'Power'),
+        ]),
+        _widgetSubMenuEntry(box, 'Device Battery', [
+          _widgetMenuEntry(DeviceBatteryBox.sid, 'Level'),
+          _widgetMenuEntry(DeviceBatteryBarGaugeBox.sid, 'Level'),
         ]),
         _widgetMenuEntry(InverterCurrentBox.sid, 'Inverter Current'),
         _widgetMenuEntry(ElectricalSwitchesBox.sid, 'Switches'),

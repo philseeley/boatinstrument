@@ -1,5 +1,6 @@
   * 0.11.0 New Boxes:
              Wind Generator Current, Voltage and Power Graph.
+             Device Battery level.
 
            Box updates:
              Anchor Alarm allows you to set a Desired Location.

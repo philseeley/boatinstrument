@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:battery_plus/battery_plus.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:boatinstrument/widgets/double_value_box.dart';
 import 'package:boatinstrument/widgets/gauge_box.dart';
@@ -1341,5 +1343,125 @@ class _SettingsState extends State<_PowerGraphSettingsWidget> {
         trailing: const Text(electricalPowerUnits)
       ),
     ]);
+  }
+}
+
+class DeviceBatteryBox extends BoxWidget {
+  static const sid = 'electrical-device-battery';
+  @override
+  String get id => sid;
+
+  const DeviceBatteryBox(super.config, {super.key});
+
+  @override
+  HeadedTextBoxState<DeviceBatteryBox> createState() => _DeviceBatteryBoxState();
+}
+
+class _DeviceBatteryBoxState extends HeadedTextBoxState<DeviceBatteryBox> {
+  final _battery = Battery();
+  BatteryState? _state;
+  int? _level;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+    _getData();
+  }
+
+  Future<void> _getData() async {
+    _level = await _battery.batteryLevel;
+    _state = await _battery.batteryState;
+    if(mounted) setState(() {});
+
+    _timer = Timer(Duration(seconds: 5), _getData);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color fg = Theme.of(context).colorScheme.onSurface;
+
+    header = 'Battery:${_state==null?'-':_state!.name} %';
+    text = _level==null?'-':_level.toString();
+    color = _level==null?fg:_level!>70?Colors.green:_level!>20?Colors.orange:Colors.red;
+
+    return super.build(context);
+  }
+}
+
+class DeviceBatteryBarGaugeBox extends DoubleValueBarGaugeBox {
+  static const sid = 'electrical-device-battery-bar-gauge';
+  @override
+  String get id => sid;
+
+  DeviceBatteryBarGaugeBox(BoxWidgetConfig config, {super.key}) :
+    super(
+      config,
+      'Battery',
+      '',
+      maxValue: 100,
+      step: 10,
+      showPercent: true,
+      smoothing: false,
+      backgroundRanges: false,
+      ranges: [
+        GaugeRange(0, 20, Colors.red),
+        GaugeRange(20, 70, Colors.orange),
+        GaugeRange(70, 100, Colors.green)
+      ]
+    );
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+  
+  @override
+  String units(double value) {
+    return '%';
+  }
+
+  @override
+  DoubleValueBarGaugeBoxState createState() => DeviceBatteryBarGaugeBoxState();
+}
+
+class DeviceBatteryBarGaugeBoxState extends DoubleValueBarGaugeBoxState<DeviceBatteryBarGaugeBox> {
+  final _battery = Battery();
+  int? _level;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.config.controller.configure();
+    _getData();
+  }
+
+  Future<void> _getData() async {
+    _level = await _battery.batteryLevel;
+    if(mounted) setState(() {});
+
+    _timer = Timer(Duration(seconds: 5), _getData);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    value = (_level??0)/100;
+    displayValue = (_level??0).toDouble();
+
+    return super.build(context);
   }
 }

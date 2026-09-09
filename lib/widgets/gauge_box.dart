@@ -468,7 +468,6 @@ abstract class DoubleValueBarGaugeBox extends DoubleValueGaugeBox {
 class DoubleValueBarGaugeBoxState<T extends DoubleValueBarGaugeBox> extends DoubleValueGaugeBoxState<T> {
   @override
   Widget build(BuildContext context) {
-    const double pad = 5.0;
     final TextStyle style = Theme.of(context).textTheme.titleMedium!;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
