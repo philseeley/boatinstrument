@@ -772,7 +772,6 @@ class GraphBoxState extends State<GraphBox> {
 
   @override
   Widget build(BuildContext context) {
-    const double pad = 5.0;
     double currentValue = widget.backgroundData.data.lastOrNull?.value??0;
     double displayValue = widget.convert(currentValue);
     String kUnits = '';
@@ -789,8 +788,8 @@ class GraphBoxState extends State<GraphBox> {
         Text('${widget.title} ${widget._settings.displayDuration.displayName}', style: Theme.of(context).textTheme.titleMedium),
         Expanded(child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           Expanded(child: HeaderText(currentValueString, textAlign: TextAlign.center)),
-          IconButton(icon: Icon(Icons.add), onPressed: _increaseTime),
-          IconButton(icon: Icon(Icons.remove), onPressed: _decreaseTime),
+          IconButton(icon: Icon(Icons.add), onPressed: _decreaseTime),
+          IconButton(icon: Icon(Icons.remove), onPressed: _increaseTime),
         ]))
       ])),
       Expanded(child: ClipRRect(child: Padding(padding: const EdgeInsets.only(top: pad, left: pad*3, right: pad*3, bottom: pad*3),

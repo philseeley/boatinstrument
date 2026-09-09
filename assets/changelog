@@ -4,6 +4,8 @@
 
            Box updates:
              Anchor Alarm allows you to set a Desired Location.
+             Graphs - swap + and - actions to be consistent with expected behavior,
+               i.e. + zooms in on data and - zooms out, like zooming a map.
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
            On Android the app keeps running when in the background or the
              phone is locked, provided it it given the required permissions.
