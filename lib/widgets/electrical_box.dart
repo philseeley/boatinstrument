@@ -47,6 +47,8 @@ const String invertersBasePath = 'electrical.inverters';
 const String inverterTitle = 'Inverter';
 const String solarBasePath = 'electrical.solar';
 const String solarTitle = 'Solar';
+const String windBasePath = 'electrical.windGenerator';
+const String windTitle = 'WindGen';
 
 class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   static const sid = 'electrical-battery-voltage-meter';
@@ -468,6 +470,83 @@ class SolarCurrentBox extends DoubleValueBox {
 
   @override
   Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$solarBasePath.1.current" the ID is "1"');
+}
+
+class WindVoltageBox extends DoubleValueBox {
+  static const sid = 'electrical-wind-voltage';
+  @override
+  String get id => sid;
+
+  final _ElectricalSettings _settings;
+
+  const WindVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
+
+  factory WindVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
+    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
+
+    return WindVoltageBox._init(s, config, 'WindGen:${s.id}', '$windBasePath.${s.id}.voltage', key: key);
+  }
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return voltageUnits;
+  }
+  @override
+  bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _ElectricalSettingsWidget(config.controller, _settings, windTitle, windBasePath);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$windBasePath.1.voltage" the ID is "1"');
+}
+
+class WindCurrentBox extends DoubleValueBox {
+  static const sid = 'electrical-wind-current';
+  @override
+  String get id => sid;
+
+  final _ElectricalSettings _settings;
+
+  const WindCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
+
+  factory WindCurrentBox.fromSettings(BoxWidgetConfig config, {key}) {
+    _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
+
+    return WindCurrentBox._init(s, config, 'WindGen:${s.id}', '$windBasePath.${s.id}.current', key: key);
+  }
+
+  @override
+  double convert(double value) {
+    return value;
+  }
+
+  @override
+  String units(double value) {
+    return currentUnits;
+  }
+
+  @override
+  bool get hasPerBoxSettings => true;
+  @override
+  bool get needsPerBoxSettings => _settings.id.isEmpty;
+
+  @override
+  BoxSettingsWidget getPerBoxSettingsWidget() {
+    return _ElectricalSettingsWidget(config.controller, _settings, windTitle, windBasePath);
+  }
+
+  @override
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$windBasePath.1.current" the ID is "1"');
 }
 
 class BatteriesBox extends BoxWidget {
@@ -1192,6 +1271,29 @@ class SolarPowerGraph extends PowerGraph {
     ElectricalPowerGraphSettings s = _$ElectricalPowerGraphSettingsFromJson(config.settings);
 
     return SolarPowerGraph._init(s, config, s.step, key: key);
+  }
+}
+
+class WindPowerGraphBackground extends PowerGraphBackground {
+  static final Map<String, Power> _power = {};
+
+  WindPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, WindPowerGraph.sid, windBasePath);
+
+  @override
+  Map<String, Power> get power => _power;
+}
+
+class WindPowerGraph extends PowerGraph {
+  static const String sid = 'electrical-wind-power-graph';
+  @override
+  String get id => sid;
+
+  WindPowerGraph._init(ElectricalPowerGraphSettings settings, BoxWidgetConfig config, double step, {super.key}) : super(settings, config, 'Wind Power', WindPowerGraphBackground(), step: step);
+
+  factory WindPowerGraph.fromSettings(BoxWidgetConfig config, {Key? key}) {
+    ElectricalPowerGraphSettings s = _$ElectricalPowerGraphSettingsFromJson(config.settings);
+
+    return WindPowerGraph._init(s, config, s.step, key: key);
   }
 }
 

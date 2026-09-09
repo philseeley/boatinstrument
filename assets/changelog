@@ -1,4 +1,7 @@
-  * 0.11.0 Box updates:
+  * 0.11.0 New Boxes:
+             Wind Generator Current, Voltage and Power Graph.
+
+           Box updates:
              Anchor Alarm allows you to set a Desired Location.
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
            On Android the app keeps running when in the background or the
