@@ -951,6 +951,7 @@ class BoatInstrumentController {
   }
 
   String pageName(int p) => _settings!.pages[p].name;
+  String pageIcon(int p) => _settings!.pages[p].icon;
 
   String currentPageTitle() {
     return '${_pageNum+1}/${_settings!.pages.length} ${pageName(_pageNum)}';

@@ -908,9 +908,10 @@ class _PageRow extends _Resizable {
 class _Page {
   String name;
   int? timeout;
+  String icon;
   List<_PageRow> pageRows;
 
-  _Page(this.name, this.timeout, this.pageRows);
+  _Page(this.name, this.timeout, this.pageRows, {this.icon = ''});
 
   factory _Page.fromJson(SettingsData json) =>
       _$PageFromJson(json);

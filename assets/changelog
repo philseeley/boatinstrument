@@ -1,4 +1,7 @@
-  * 0.11.0 New Boxes:
+  * 0.11.0 The Quick Page Switch menu can now show Icons instead of
+             the Page Name.
+  
+           New Boxes:
              Wind Generator Current, Voltage and Power Graph.
              Device Battery level.
 

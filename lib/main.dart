@@ -225,15 +225,22 @@ class MainPageState extends State<MainPage> {
       );
     }
 
-    var theme = Theme.of(context);
-    var ts = theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface);
+    final theme = Theme.of(context);
+    final fg = theme.colorScheme.onSurface;
+    final ts = theme.textTheme.bodyMedium!.copyWith(color: fg);
+    final awesomeTS = ts.copyWith(fontFamily: 'Awesome');
 
     return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _askExit();}, child: Scaffold(
       appBar: appBar, 
       drawer: !_controller.quickPageSwitch?null:Drawer(
         child: ListView.builder(padding: EdgeInsets.all(pad), itemCount: _controller.pageCount, itemBuilder: (context, pageNum) {
+          final iconName = _controller.pageIcon(pageNum); 
+          var text = Text(_controller.pageName(pageNum), style: ts);
+
+          if(iconName.isNotEmpty) text = Text(String.fromCharCode(awesomeFontData[iconName]??0), style: awesomeTS);
+
           return Padding(padding: EdgeInsets.all(pad), child: TextButton(
-            child: Text(_controller.pageName(pageNum), style: ts),
+            child: text,
             onPressed: () {
               _controller.gotoPageNumber(pageNum);
               Navigator.of(context).pop();

@@ -13,11 +13,17 @@ class _EditPagesState extends State<EditPagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    _Settings settings = widget._controller._settings!;
+    final c = widget._controller;
+    final settings = c._settings!;
+    final theme = Theme.of(context);
+    final awesomeTS = theme.textTheme.bodyMedium!.copyWith(fontFamily: 'Awesome', color: theme.colorScheme.onSurface);
 
     List<Widget> pageList = [];
     for(int p = 0; p < settings.pages.length; ++p) {
       _Page page = settings.pages[p];
+      final iconName = c.pageIcon(p);
+      Widget icon = const Text('-');
+      if(iconName.isNotEmpty) icon = Text(String.fromCharCode(awesomeFontData[iconName]??0), style: awesomeTS);
 
       pageList.add(ListTile(key: UniqueKey(),
           leading: IconButton(icon: const Icon(Icons.edit), onPressed: () {_editPage(page);}),
@@ -31,6 +37,7 @@ class _EditPagesState extends State<EditPagesPage> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 initialValue: (page.timeout??'').toString(),
                 onChanged: (value) => page.timeout = int.tryParse(value))),
+            IconButton(icon: icon, onPressed: () {_selectPageIcon(page);}),
             IconButton(icon: const Icon(Icons.content_copy), onPressed: () {_copyPage(p, page);}),
             IconButton(icon: const Icon(Icons.delete), onPressed: () {_deletePage(p);}),
             ReorderableDragStartListener(index: p, child: const Icon(Icons.drag_handle))
@@ -75,9 +82,20 @@ class _EditPagesState extends State<EditPagesPage> {
 
   void _editPage (_Page page) async {
     await Navigator.push(
-            context, MaterialPageRoute(builder: (context) {
+      context, MaterialPageRoute(builder: (context) {
         return _EditPage(widget._controller, page);
-      }));
+      })
+    );
+  }
+
+  void _selectPageIcon (_Page page) async {
+    await Navigator.push(
+      context, MaterialPageRoute(builder: (context) {
+        return _SelectIconPage(widget._controller, page);
+      })
+    );
+    // Update as Page Icons may have changed.
+    setState(() {});
   }
 
   void _copyPage(int pageNum, _Page page) {
@@ -101,6 +119,23 @@ class _EditPagesState extends State<EditPagesPage> {
         if(widget._controller._pageNum >= s.pages.length) widget._controller._pageNum = s.pages.length-1;
       });
     }
+  }
+}
+
+class _SelectIconPage extends StatelessWidget {
+  final BoatInstrumentController controller;
+  final _Page page;
+
+  const _SelectIconPage(this.controller, this.page);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('${page.name} page icon')),
+      body: ListView(children: [
+        ListTile(title: AwesomeFontDropdownMenu(page.icon, (icon) {page.icon = icon;})),
+      ])
+    );
   }
 }
 

@@ -77,11 +77,13 @@ _Page _$PageFromJson(Map<String, dynamic> json) => _Page(
   (json['pageRows'] as List<dynamic>)
       .map((e) => _PageRow.fromJson(e as Map<String, dynamic>))
       .toList(),
+  icon: json['icon'] as String? ?? '',
 );
 
 Map<String, dynamic> _$PageToJson(_Page instance) => <String, dynamic>{
   'name': instance.name,
   'timeout': instance.timeout,
+  'icon': instance.icon,
   'pageRows': instance.pageRows,
 };
 
