@@ -49,8 +49,8 @@ const String invertersBasePath = 'electrical.inverters';
 const String inverterTitle = 'Inverter';
 const String solarBasePath = 'electrical.solar';
 const String solarTitle = 'Solar';
-const String windBasePath = 'electrical.windGenerator';
-const String windTitle = 'WindGen';
+const String chargerBasePath = 'electrical.chargers';
+const String chargerTitle = 'Charger';
 
 class BatteryVoltMeterBox extends DoubleValueSemiGaugeBox {
   static const sid = 'electrical-battery-voltage-meter';
@@ -474,19 +474,19 @@ class SolarCurrentBox extends DoubleValueBox {
   Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$solarBasePath.1.current" the ID is "1"');
 }
 
-class WindVoltageBox extends DoubleValueBox {
-  static const sid = 'electrical-wind-voltage';
+class ChargerVoltageBox extends DoubleValueBox {
+  static const sid = 'electrical-charger-voltage';
   @override
   String get id => sid;
 
   final _ElectricalSettings _settings;
 
-  const WindVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
+  const ChargerVoltageBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
-  factory WindVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
+  factory ChargerVoltageBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return WindVoltageBox._init(s, config, 'WindGen:${s.id}', '$windBasePath.${s.id}.voltage', key: key);
+    return ChargerVoltageBox._init(s, config, '$chargerTitle:${s.id}', '$chargerBasePath.${s.id}.voltage', key: key);
   }
 
   @override
@@ -505,26 +505,26 @@ class WindVoltageBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(config.controller, _settings, windTitle, windBasePath);
+    return _ElectricalSettingsWidget(config.controller, _settings, chargerTitle, chargerBasePath);
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$windBasePath.1.voltage" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$chargerBasePath.1.voltage" the ID is "1"');
 }
 
-class WindCurrentBox extends DoubleValueBox {
-  static const sid = 'electrical-wind-current';
+class ChargerCurrentBox extends DoubleValueBox {
+  static const sid = 'electrical-charger-current';
   @override
   String get id => sid;
 
   final _ElectricalSettings _settings;
 
-  const WindCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
+  const ChargerCurrentBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
 
-  factory WindCurrentBox.fromSettings(BoxWidgetConfig config, {key}) {
+  factory ChargerCurrentBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
 
-    return WindCurrentBox._init(s, config, 'WindGen:${s.id}', '$windBasePath.${s.id}.current', key: key);
+    return ChargerCurrentBox._init(s, config, '$chargerTitle:${s.id}', '$chargerBasePath.${s.id}.current', key: key);
   }
 
   @override
@@ -544,11 +544,11 @@ class WindCurrentBox extends DoubleValueBox {
 
   @override
   BoxSettingsWidget getPerBoxSettingsWidget() {
-    return _ElectricalSettingsWidget(config.controller, _settings, windTitle, windBasePath);
+    return _ElectricalSettingsWidget(config.controller, _settings, chargerTitle, chargerBasePath);
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$windBasePath.1.current" the ID is "1"');
+  Widget? getPerBoxSettingsHelp() => const HelpPage(text: 'For a path of "$chargerBasePath.1.current" the ID is "1"');
 }
 
 class BatteriesBox extends BoxWidget {
@@ -1276,26 +1276,26 @@ class SolarPowerGraph extends PowerGraph {
   }
 }
 
-class WindPowerGraphBackground extends PowerGraphBackground {
+class ChargerPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
 
-  WindPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, WindPowerGraph.sid, windBasePath);
+  ChargerPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ChargerPowerGraph.sid, chargerBasePath);
 
   @override
   Map<String, Power> get power => _power;
 }
 
-class WindPowerGraph extends PowerGraph {
-  static const String sid = 'electrical-wind-power-graph';
+class ChargerPowerGraph extends PowerGraph {
+  static const String sid = 'electrical-charger-power-graph';
   @override
   String get id => sid;
 
-  WindPowerGraph._init(ElectricalPowerGraphSettings settings, BoxWidgetConfig config, double step, {super.key}) : super(settings, config, 'Wind Power', WindPowerGraphBackground(), step: step);
+  ChargerPowerGraph._init(ElectricalPowerGraphSettings settings, BoxWidgetConfig config, double step, {super.key}) : super(settings, config, 'Charger Power', ChargerPowerGraphBackground(), step: step);
 
-  factory WindPowerGraph.fromSettings(BoxWidgetConfig config, {Key? key}) {
+  factory ChargerPowerGraph.fromSettings(BoxWidgetConfig config, {Key? key}) {
     ElectricalPowerGraphSettings s = _$ElectricalPowerGraphSettingsFromJson(config.settings);
 
-    return WindPowerGraph._init(s, config, s.step, key: key);
+    return ChargerPowerGraph._init(s, config, s.step, key: key);
   }
 }
 
