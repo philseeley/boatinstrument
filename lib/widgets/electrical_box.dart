@@ -281,7 +281,7 @@ class BatteryStateOfChargeBox extends DoubleValueBox {
 
   final _ElectricalSettings _settings;
 
-  const BatteryStateOfChargeBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, smoothing: false, dataType: SignalKDataType.infrequent);
+  const BatteryStateOfChargeBox._init(this._settings, config, title, path, {super.key}) : super(config, title, path, precision: 0, smoothing: false, dataType: SignalKDataType.infrequent);
 
   factory BatteryStateOfChargeBox.fromSettings(BoxWidgetConfig config, {key}) {
     _ElectricalSettings s = _$ElectricalSettingsFromJson(config.settings);
