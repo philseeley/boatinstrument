@@ -228,7 +228,7 @@ class MainPageState extends State<MainPage> {
     final theme = Theme.of(context);
     final fg = theme.colorScheme.onSurface;
     final ts = theme.textTheme.bodyMedium!.copyWith(color: fg);
-    final awesomeTS = ts.copyWith(fontFamily: 'Awesome');
+    final awesomeTS = ts.copyWith(fontFamily: 'Awesome', fontSize: ts.fontSize!*2);
 
     return PopScope(canPop: false, onPopInvokedWithResult: (didPop, result) {if(didPop) return; _askExit();}, child: Scaffold(
       appBar: appBar, 
