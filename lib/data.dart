@@ -183,17 +183,12 @@ void _dynamic2String(dynamic d, StringBuffer s) {
   }
 }
 
-class AwesomeFontDropdownMenu extends StatefulWidget {
+class AwesomeFontDropdownMenu extends StatelessWidget {
   final String _initialValue;
   final ValueChanged<String> _onSelected;
 
   const AwesomeFontDropdownMenu(this._initialValue, this._onSelected, {super.key});
 
-  @override
-  State<AwesomeFontDropdownMenu> createState() => _AwesomeFontDropdownMenuState();
-}
-
-class _AwesomeFontDropdownMenuState extends State<AwesomeFontDropdownMenu> {
   static List<DropdownMenuEntry<String>>? _menuEntries;
 
   @override
@@ -211,13 +206,14 @@ class _AwesomeFontDropdownMenuState extends State<AwesomeFontDropdownMenu> {
       enableSearch: false,
       enableFilter: true,
       filterCallback: (List<DropdownMenuEntry<String>>entries, String search) {
+        search = search.trim();
         return entries.where((entry) => entry.value.contains(search)).toList();
       },
       requestFocusOnTap: true,
-      initialSelection: widget._initialValue,
+      initialSelection: _initialValue,
       dropdownMenuEntries: _menuEntries!,
       onSelected: (value) {
-        widget._onSelected(value??'');
+        _onSelected(value??'');
       },
     );
   }
