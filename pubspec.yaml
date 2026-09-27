@@ -48,7 +48,6 @@ dependencies:
   file_picker:
   filesystem_picker:
   provider:
-  flutter_inappwebview:
   screen_brightness:
   flutter_email_sender:
   intl:
