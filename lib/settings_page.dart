@@ -337,6 +337,11 @@ class _SettingsState extends State<SettingsPage> {
           trailing: IconButton(onPressed: _addServer, icon: Icon(Icons.add)),
         ),
         ListTile(
+          leading: Text('Trusted CAs:'),
+          title: OutlinedButton(onPressed: _importCAs, child: Text('Import')),
+          trailing: IconButton(onPressed: _removeCAs, icon: Icon(Icons.delete)),
+        ),
+        ListTile(
           leading: const Text("Server ID:"),
           title: BiTextFormField(
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(idChars))],
@@ -561,6 +566,28 @@ class _SettingsState extends State<SettingsPage> {
     }));
   }
 
+  void _importCAs() async {
+    FilePickerResult? fpResult = await FilePicker.platform.pickFiles();
+
+    if(fpResult != null) {
+      try {
+        Directory dir = await path_provider.getApplicationDocumentsDirectory();
+        String caPath = '${dir.path}/local-cas.pem';
+        await File(fpResult.files.single.path!).copy(caPath);
+      } catch (e) {
+        widget._controller.l.e('Failed to import CAs', error: e);
+      }
+    }
+  }
+
+  void _removeCAs() async {
+    if(await widget._controller.askToConfirm(context, 'Delete Trusted CAs?', alwaysAsk: true)) {
+      Directory dir = await path_provider.getApplicationDocumentsDirectory();
+      final cas = File('${dir.path}/local-cas.pem');
+      cas.deleteSync();
+    }
+  }
+
   void _addServer() {
     var settings = widget._controller._settings!;
 
@@ -574,7 +601,7 @@ class _SettingsState extends State<SettingsPage> {
     var settings = widget._controller._settings!;
     var controller = widget._controller;
 
-    if(await controller.askToConfirm(context, 'Delete server "${controller._signalk.id}"', alwaysAsk: true)) {
+    if(await controller.askToConfirm(context, 'Delete server "${controller._signalk.id}"?', alwaysAsk: true)) {
       setState(() {
         settings.signalkServerSettings.removeAt(settings.signalkServerNum);
         if(settings.signalkServerNum >= settings.signalkServerSettings.length) settings.signalkServerNum = settings.signalkServerSettings.length-1;

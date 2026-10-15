@@ -1051,7 +1051,7 @@ class BoatInstrumentController {
       _httpApiUri = Uri.parse(endPoints['signalk-http']);
       _wsUri = Uri.parse(endPoints['signalk-ws']);
 
-      if(!_settings!.demoMode) {
+      if(_httpApiUri.scheme != 'https') {
         _httpApiUri = await _convert2IP(_httpApiUri);
         _wsUri = await _convert2IP(_wsUri);
       }
@@ -1090,6 +1090,17 @@ class BoatInstrumentController {
   }
 
   Future<void> connect() async {
+    try {
+      final context = SecurityContext.defaultContext;
+      Directory dir = await path_provider.getApplicationDocumentsDirectory();
+      final cas = File('${dir.path}/local-cas.pem');
+      if(await cas.exists()) {
+        context.setTrustedCertificatesBytes(cas.readAsBytesSync());
+      }
+    } catch (e) {
+      l.e('Failed to load local CAs', error: e);
+    }
+
     try {
       for(_BoxData bd in _boxData) {
         if(bd.onUpdate != null) {

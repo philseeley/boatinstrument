@@ -58,6 +58,8 @@ If **mDNS** is enabled in your server's settings, your server should be automati
 
 The app uses the **signalk-boatinstrument-plugin** to perform some of its functionality. If you have not or cannot install this, you can disable its use. This will not affect the display of information, but it can result in odd timing issues when using functionality like Timers or Remote Control, see [Know Issues](https://philseeley.github.io/docs/boatinstrument/main.html#not-using-the-signalk-boatinstrument-plugin).
 
+If your SignalK Server is configured to use TLS with a locally signed certificate, then you can import a **Trusted CAs** file in PEM format. **Note:** this file can contain multiple CA certificates and is shared across all server definitions.
+
 If your SignalK Server only implements a data streaming service, e.g. the [ESP32 NMEA Gateway](https://github.com/JaCharer/ESP32_NMEA2000_Multiprotocol_Gateway) or the [SignalK Mini](https://github.com/bareboat-necessities/signalk-mini), then enable **Minimal Server**. This allows you to manually enter Box Settings rather then select from a list retrieved from the SignalK data model.
 
 If you are connecting to a minimal SignalK server that only supports TCP Sockets, then specify a URL with a tcp scheme, e.g. 'tcp://my-server.local:8375'.
@@ -72,7 +74,7 @@ If a Box receives no data within the **Real-time Data Timeout** the box is clear
 
 You can set additional HTTP Headers if the connection to the SignalK server requires them, e.g. for proxies.
 
-In **Demo Mode** the app connects to https://demo.signalk.org. Note that no HTTP headers, including authentication, will be added.
+In **Demo Mode** the app connects to https://demo.signalk.org. Note that HTTP headers, including authentication, will not be added.
 
 Certain Boxes, like the **Autopilot Controls**, and [App Remote Control](doc:remote-control.md) require [Authentication](doc:authentication.md) to be set-up.
 
