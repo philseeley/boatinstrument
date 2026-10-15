@@ -1,5 +1,7 @@
   * 0.11.0 The Quick Page Switch menu can now show Icons instead of
              the Page Name.
+            Trusted CA Certificates can now be added if your SignalK server
+              uses TLS with a locally signed certificate.
   
            New Boxes:
              Charger Current, Voltage and Power Graph.
