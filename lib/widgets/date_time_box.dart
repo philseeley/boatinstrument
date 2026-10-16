@@ -711,11 +711,8 @@ class _TimersSetupSettingsState extends State<_TimersSetupSettings> {
       Row(children: [
         IconButton(tooltip: 'Add Timer', icon: const Icon(Icons.add),onPressed: _addTimer),
       ]),
-      Expanded(child: ReorderableListView(buildDefaultDragHandles: false, children: items, onReorder: (oldIndex, newIndex) {
+      Expanded(child: ReorderableListView(buildDefaultDragHandles: false, children: items, onReorderItem: (oldIndex, newIndex) {
         setState(() {
-          if (oldIndex < newIndex) {
-            newIndex -= 1;
-          }
           _Timer t = s.timers.removeAt(oldIndex);
           s.timers.insert(newIndex, t);
         });

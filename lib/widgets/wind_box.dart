@@ -217,7 +217,7 @@ class WindAngleApparentBox extends DoubleValueBox {
 }
 
 class TrueWindSpeedGraphBackground extends BackgroundData {
-  TrueWindSpeedGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, TrueWindSpeedGraph.sid, {'environment.wind.speedTrue'});
+  TrueWindSpeedGraphBackground({super.controller}) : super(TrueWindSpeedGraph.sid, {'environment.wind.speedTrue'});
 }
 
 class TrueWindSpeedGraph extends GraphBox {
@@ -245,7 +245,7 @@ class TrueWindSpeedGraph extends GraphBox {
 }
 
 class TrueWindDirectionGraphBackground extends BackgroundData {
-  TrueWindDirectionGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, TrueWindDirectionGraph.sid, {'environment.wind.directionTrue'}, angle: true);
+  TrueWindDirectionGraphBackground({super.controller}) : super(TrueWindDirectionGraph.sid, {'environment.wind.directionTrue'}, angle: true);
 }
 
 class TrueWindDirectionGraph extends GraphBox {
@@ -267,7 +267,7 @@ class TrueWindDirectionGraph extends GraphBox {
 }
 
 class ApparentWindSpeedGraphBackground extends BackgroundData {
-  ApparentWindSpeedGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ApparentWindSpeedGraph.sid, {'environment.wind.speedApparent'});
+  ApparentWindSpeedGraphBackground({super.controller}) : super(ApparentWindSpeedGraph.sid, {'environment.wind.speedApparent'});
 }
 
 class ApparentWindSpeedGraph extends GraphBox {
@@ -295,7 +295,7 @@ class ApparentWindSpeedGraph extends GraphBox {
 }
 
 class ApparentWindAngleGraphBackground extends BackgroundData {
-  ApparentWindAngleGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ApparentWindAngleGraph.sid, {'environment.wind.angleApparent'}, angle: true, relativeAngle: true);
+  ApparentWindAngleGraphBackground({super.controller}) : super(ApparentWindAngleGraph.sid, {'environment.wind.angleApparent'}, angle: true, relativeAngle: true);
 }
 
 class ApparentWindAngleGraph extends GraphBox {

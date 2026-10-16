@@ -28,7 +28,7 @@ class CrossTrackErrorBox extends DoubleValueBox {
 }
 
 class CrossTrackErrorGraphBackground extends BackgroundData {
-  CrossTrackErrorGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'}, smoothing: false);
+  CrossTrackErrorGraphBackground({super.controller}) : super(CrossTrackErrorGraph.sid, {'navigation.*.crossTrackError'}, smoothing: false);
 }
 
 class CrossTrackErrorGraph extends GraphBox {
@@ -164,7 +164,7 @@ class MaxSpeedOverGroundBox extends SpeedOverGroundBox {
 }
 
 class SpeedOverGroundGraphBackground extends BackgroundData {
-  SpeedOverGroundGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, SpeedOverGroundGraph.sid, {'navigation.speedOverGround'});
+  SpeedOverGroundGraphBackground({super.controller}) : super(SpeedOverGroundGraph.sid, {'navigation.speedOverGround'});
 }
 
 class SpeedOverGroundGraph extends GraphBox {

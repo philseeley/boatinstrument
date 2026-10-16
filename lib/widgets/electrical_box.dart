@@ -1165,7 +1165,7 @@ class Power {
 
 abstract class PowerGraphBackground extends BackgroundData {
 
-  PowerGraphBackground(String sid, String basePath, {controller, SignalKDataType dataType = SignalKDataType.realTime}) : super(controller: controller, sid, {'$basePath.*.voltage', '$basePath.*.current'}, dataType: dataType);
+  PowerGraphBackground(String sid, String basePath, {super.controller, super.dataType}) : super(sid, {'$basePath.*.voltage', '$basePath.*.current'});
 
   Map<String, Power> get power;
 
@@ -1233,7 +1233,7 @@ abstract class PowerGraph extends GraphBox {
 class BatteryPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
 
-  BatteryPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, BatteryPowerGraph.sid, batteriesBasePath, dataType: SignalKDataType.infrequent);
+  BatteryPowerGraphBackground({super.controller}) : super(BatteryPowerGraph.sid, batteriesBasePath, dataType: SignalKDataType.infrequent);
 
   @override
   Map<String, Power> get power => _power;
@@ -1256,7 +1256,7 @@ class BatteryPowerGraph extends PowerGraph {
 class SolarPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
 
-  SolarPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, SolarPowerGraph.sid, solarBasePath);
+  SolarPowerGraphBackground({super.controller}) : super(SolarPowerGraph.sid, solarBasePath);
 
   @override
   Map<String, Power> get power => _power;
@@ -1279,7 +1279,7 @@ class SolarPowerGraph extends PowerGraph {
 class ChargerPowerGraphBackground extends PowerGraphBackground {
   static final Map<String, Power> _power = {};
 
-  ChargerPowerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, ChargerPowerGraph.sid, chargerBasePath);
+  ChargerPowerGraphBackground({super.controller}) : super(ChargerPowerGraph.sid, chargerBasePath);
 
   @override
   Map<String, Power> get power => _power;

@@ -54,7 +54,7 @@ class MinDepthBelowSurfaceBox extends DepthBelowSurfaceBox {
 }
 
 class DepthBelowSurfaceGraphBackground extends BackgroundData {
-  DepthBelowSurfaceGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, DepthBelowSurfaceGraph.sid, {'environment.depth.belowSurface'}, smoothing: false);
+  DepthBelowSurfaceGraphBackground({super.controller}) : super(DepthBelowSurfaceGraph.sid, {'environment.depth.belowSurface'}, smoothing: false);
 }
 
 class DepthBelowSurfaceGraph extends GraphBox {
@@ -92,7 +92,7 @@ class MinDepthBelowKeelBox extends DepthBelowKeelBox {
 }
 
 class DepthBelowKeelGraphBackground extends BackgroundData {
-  DepthBelowKeelGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, DepthBelowKeelGraph.sid, {'environment.depth.belowKeel'}, smoothing: false);
+  DepthBelowKeelGraphBackground({super.controller}) : super(DepthBelowKeelGraph.sid, {'environment.depth.belowKeel'}, smoothing: false);
 }
 
 class DepthBelowKeelGraph extends GraphBox {
@@ -132,7 +132,7 @@ class MinDepthBelowTransducerBox extends DepthBelowTransducerBox {
 }
 
 class DepthBelowTransducerGraphBackground extends BackgroundData {
-  DepthBelowTransducerGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, DepthBelowTransducerGraph.sid, {'environment.depth.belowTransducer'}, smoothing: false);
+  DepthBelowTransducerGraphBackground({super.controller}) : super(DepthBelowTransducerGraph.sid, {'environment.depth.belowTransducer'}, smoothing: false);
 }
 
 class DepthBelowTransducerGraph extends GraphBox {
@@ -171,7 +171,7 @@ class WaterTemperatureBox extends DoubleValueBox {
 }
 
 class WaterTemperatureGraphBackground extends BackgroundData {
-  WaterTemperatureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, WaterTemperatureGraph.sid, {'environment.water.temperature'});
+  WaterTemperatureGraphBackground({super.controller}) : super(WaterTemperatureGraph.sid, {'environment.water.temperature'});
 }
 
 class WaterTemperatureGraph extends GraphBox {
@@ -309,7 +309,7 @@ class OutsideTemperatureBox extends DoubleValueBox {
 }
 
 class OutsideTemperatureGraphBackground extends BackgroundData {
-  OutsideTemperatureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, OutsideTemperatureGraph.sid, {'environment.outside.temperature'});
+  OutsideTemperatureGraphBackground({super.controller}) : super(OutsideTemperatureGraph.sid, {'environment.outside.temperature'});
 }
 
 class OutsideTemperatureGraph extends GraphBox {
@@ -810,7 +810,7 @@ class _TideLocalBoxState extends HeadedTextBoxState<TideLocalBox> {
 }
 
 class OutsidePressureGraphBackground extends BackgroundData {
-  OutsidePressureGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, OutsidePressureGraph.sid, {'environment.outside.pressure'});
+  OutsidePressureGraphBackground({super.controller}) : super(OutsidePressureGraph.sid, {'environment.outside.pressure'});
 }
 
 class OutsidePressureGraph extends GraphBox {

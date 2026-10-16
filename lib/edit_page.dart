@@ -42,7 +42,6 @@ final List<BoxDetails> boxDetails = [
   BoxDetails(AutopilotReefingControlBox.sid, experimental: true, (config) {return AutopilotReefingControlBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlHorizontalBox.sid, (config) {return AutopilotHeadingControlHorizontalBox(config, key: UniqueKey());}),
   BoxDetails(AutopilotHeadingControlVerticalBox.sid, (config) {return AutopilotHeadingControlVerticalBox(config, key: UniqueKey());}),
-  BoxDetails(WebViewBox.sid, experimental: true, deprecatedDate: DateTime(2026, 07), (config) {return WebViewBox(config, key: UniqueKey());}),
   BoxDetails(RudderAngleBox.sid, gauge: true, (config) {return RudderAngleBox(config, key: UniqueKey());}),
   BoxDetails(CustomTextBox.sid, (config) {return CustomTextBox(config, key: UniqueKey());}),
   BoxDetails(CustomDoubleValueBox.sid, (config) {return CustomDoubleValueBox.fromSettings(config, key: UniqueKey());}),
@@ -322,7 +321,6 @@ class _EditPageState extends State<_EditPage> {
       _widgetMenuEntry(AISDisplayBox.sid, 'AIS Display'),
       _widgetMenuEntry(RemoteControlBox.sid, 'Remote Control'),
       _widgetMenuEntry(ZoneSetupBox.sid, 'Alerts/Zones Setup'),
-      if(!Platform.isMacOS && !Platform.isLinux) _widgetMenuEntry(WebViewBox.sid, 'Web View'),
       _widgetMenuEntry(VNCBox.sid, 'VNC'),
       _widgetSubMenuEntry(box, 'Camera', [
         _widgetMenuEntry(ONVIFDisplayBox.sid, 'Display'),

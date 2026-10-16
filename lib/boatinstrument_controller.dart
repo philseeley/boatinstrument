@@ -25,7 +25,6 @@ import 'package:boatinstrument/widgets/remote_box.dart';
 import 'package:boatinstrument/widgets/hardware.dart';
 import 'package:boatinstrument/widgets/tank_box.dart';
 import 'package:boatinstrument/widgets/vnc_box.dart';
-import 'package:boatinstrument/widgets/webview_box.dart';
 import 'package:boatinstrument/widgets/wind_box.dart';
 import 'package:boatinstrument/widgets/wind_rose_box.dart';
 import 'package:boatinstrument/widgets/zone_box.dart';
@@ -1027,7 +1026,7 @@ class BoatInstrumentController {
             if (e is BonsoirDiscoveryServiceFoundEvent) {
               e.service.resolve(discovery.serviceResolver);
             } else if (e is BonsoirDiscoveryServiceResolvedEvent) {
-              host = e.service.host!;
+              host = e.service.hostname!;
               port = e.service.port;
               discovery.stop();
               break;
@@ -1458,7 +1457,7 @@ class BoatInstrumentController {
                     bd.updates.add(Update(context, path,value));
                     bd.pathTimestamps[path] = timestamp;
                   } else {
-                   l.i('Discarding old data DateTime.timestamp(): "${DateTime.timestamp()}", _timestamp: "$_timestamp" _osTimestampReceived: "$_osTimestampReceived", bi.timestamp(): "$timestamp", diff: "$d", update: "$u"');
+                   l.i('Discarding old data DateTime.timestamp(): "${DateTime.timestamp()}", _timestamp: "$_timestamp", _osTimestampReceived: "$_osTimestampReceived", bi.timestamp(): "$timestamp", diff: "$d", update: "$u"');
                   }
                 }
               }
