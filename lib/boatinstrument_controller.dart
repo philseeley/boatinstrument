@@ -1026,7 +1026,7 @@ class BoatInstrumentController {
             if (e is BonsoirDiscoveryServiceFoundEvent) {
               e.service.resolve(discovery.serviceResolver);
             } else if (e is BonsoirDiscoveryServiceResolvedEvent) {
-              host = e.service.host!;
+              host = e.service.hostname!;
               port = e.service.port;
               discovery.stop();
               break;

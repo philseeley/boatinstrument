@@ -53,11 +53,8 @@ class _EditPagesState extends State<EditPagesPage> {
             IconButton(tooltip: 'Settings', icon: const Icon(Icons.settings), onPressed: _showSettingsPage),
           ],
         ),
-        body: ReorderableListView(buildDefaultDragHandles: false, children: pageList, onReorder: (oldIndex, newIndex) {
+        body: ReorderableListView(buildDefaultDragHandles: false, children: pageList, onReorderItem: (oldIndex, newIndex) {
           setState(() {
-            if (oldIndex < newIndex) {
-              newIndex -= 1;
-            }
             _Page p = settings.pages.removeAt(oldIndex);
             settings.pages.insert(newIndex, p);
           });
@@ -546,11 +543,11 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   void _import () async {
-    FilePickerResult? fpResult = await FilePicker.platform.pickFiles();
+    var fpResult = await FilePicker.pickFile();
 
     if(fpResult != null) {
       try {
-        File f = File(fpResult.files.single.path!);
+        File f = File(fpResult.path!);
         widget._controller._settings = await _Settings.readSettings(f);
         setState(() {});
       } catch (e) {
@@ -567,13 +564,13 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   void _importCAs() async {
-    FilePickerResult? fpResult = await FilePicker.platform.pickFiles();
+    final fpResult = await FilePicker.pickFile();
 
     if(fpResult != null) {
       try {
         Directory dir = await path_provider.getApplicationDocumentsDirectory();
         String caPath = '${dir.path}/local-cas.pem';
-        await File(fpResult.files.single.path!).copy(caPath);
+        await File(fpResult.path!).copy(caPath);
       } catch (e) {
         widget._controller.l.e('Failed to import CAs', error: e);
       }

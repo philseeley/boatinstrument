@@ -3,7 +3,8 @@ import 'dart:math' as m;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_math/flutter_geo_math.dart';
+import 'package:flutter_map_math/flutter_geo_math.dart' as geo_math;
+import 'package:flutter_map_math/lat_lng.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart' as ll;
 
@@ -112,10 +113,10 @@ class _Map extends StatelessWidget {
   }
 
   Polyline _polyLine(_Vessel v) {
-    var end = FlutterMapMath.destinationPoint(v.position.latitude, v.position.longitude, (v.sog??0) * (_settings.predictionMinutes*60), rad2Deg(v.cogTrue??v.headingTrue).toDouble());
+    LatLng end = geo_math.FlutterMapMath().destinationPoint(v.position.latitude, v.position.longitude, (v.sog??0) * (_settings.predictionMinutes*60), rad2Deg(v.cogTrue??v.headingTrue).toDouble());
 
     return Polyline(
-      points: [v.position, end],
+      points: [v.position, ll.LatLng(end.latitude, end.longitude)],
       color: Colors.yellow
     );
   }

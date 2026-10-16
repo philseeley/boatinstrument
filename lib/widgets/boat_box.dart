@@ -26,7 +26,7 @@ class MaxSpeedThroughWaterBox extends SpeedThroughWaterBox {
 }
 
 class SpeedThroughWaterGraphBackground extends BackgroundData {
-  SpeedThroughWaterGraphBackground({BoatInstrumentController? controller}) : super(controller: controller, SpeedThroughWaterGraph.sid, {'navigation.speedThroughWater'});
+  SpeedThroughWaterGraphBackground({super.controller}) : super(SpeedThroughWaterGraph.sid, {'navigation.speedThroughWater'});
 }
 
 class SpeedThroughWaterGraph extends GraphBox {
