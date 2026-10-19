@@ -1,6 +1,7 @@
 part of 'boatinstrument_controller.dart';
 
 const String bi = 'boatinstrument';
+const String trustsFilename = 'local-trusts.pem';
 const String signalkPlugin = 'signalk-boatinstrument-plugin';
 const String degreesSymbol = '\u00B0'; // degrees symbol.
 const String degreesUnits = '${degreesSymbol}T'; // degrees symbol.
@@ -1141,6 +1142,16 @@ class _SignalKServerSettings {
 
 }
 
+Future<Directory> documentsDirectory() async {
+  final appDir =  await path_provider.getApplicationDocumentsDirectory();
+
+  if(Platform.isLinux || Platform.isWindows) {
+   return Directory(path.join(appDir.path, bi));
+  } else {
+    return Directory(appDir.path);
+  }
+}
+
 @JsonSerializable()
 class _Settings {
   int version;
@@ -1223,8 +1234,21 @@ class _Settings {
     if(configFile.startsWith('/')) {
       _store = File(configFile);
     } else {
-      Directory directory = await path_provider.getApplicationDocumentsDirectory();
-      _store = File('${directory.path}/$configFile');
+      Directory directory = await documentsDirectory();
+      if((Platform.isLinux || Platform.isWindows) &&
+        !directory.existsSync()) {
+        directory.create();
+
+        // Migrate existing config files.
+        final appDir = await path_provider.getApplicationDocumentsDirectory();
+        for(final f in appDir.listSync().whereType<File>().where((f) => path.basename(f.path).startsWith(bi))) {
+          final newPath = path.join(directory.path, path.basename(f.path));
+          CircularLogger().i('Moving "${f.path} to $newPath');
+          f.rename(newPath);
+        }
+      }
+
+      _store = File(path.join(directory.path, configFile));
     }
 
     return await readSettings(_store!);

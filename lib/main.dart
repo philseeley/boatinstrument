@@ -12,9 +12,9 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
 import 'theme_provider.dart';
 
 class BiDesktopKeyboardLayout extends DesktopKeyboardLayout {
@@ -41,8 +41,8 @@ void logError(FlutterErrorDetails details) async {
   FlutterError.dumpErrorToConsole(details);
   String errorStr = '${details.exceptionAsString()}\n${details.stack}';
   CircularLogger().e(errorStr);
-  Directory directory = await path_provider.getApplicationDocumentsDirectory();
-  File('${directory.path}/boatinstrument-error.log').writeAsStringSync(
+  Directory directory = await documentsDirectory();
+  File(path.join(directory.path, '$bi-error.log')).writeAsStringSync(
     '${DateTime.now()}\n$errorStr\n',
     mode: FileMode.append,
     flush: true);

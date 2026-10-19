@@ -166,7 +166,6 @@ class _SettingsState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLinux = Platform.isLinux;
     var c = widget._controller;
     var settings = c._settings!;
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -217,7 +216,7 @@ class _SettingsState extends State<SettingsPage> {
               settings.keepAwake = value;
             });
           }),
-      if(!isLinux) SwitchListTile(title: const Text("Show Brightness Controls:"),
+      if(!Platform.isLinux) SwitchListTile(title: const Text("Show Brightness Controls:"),
           value: settings.brightnessControl,
           onChanged: widget._controller._noBrightnessControls ? null : (bool value) {
             setState(() {
@@ -315,6 +314,11 @@ class _SettingsState extends State<SettingsPage> {
           }),
       if(!settings.demoMode) ...[
         ListTile(
+          leading: Text('Trusted CAs:'),
+          title: OutlinedButton(onPressed: _importCAs, child: Text('Import')),
+          trailing: IconButton(onPressed: _removeCAs, icon: Icon(Icons.delete)),
+        ),
+        ListTile(
           leading: Text('Server:'),
           title: DropdownMenu<int>(
             key: UniqueKey(),
@@ -332,11 +336,6 @@ class _SettingsState extends State<SettingsPage> {
             },
           ),
           trailing: IconButton(onPressed: _addServer, icon: Icon(Icons.add)),
-        ),
-        ListTile(
-          leading: Text('Trusted CAs:'),
-          title: OutlinedButton(onPressed: _importCAs, child: Text('Import')),
-          trailing: IconButton(onPressed: _removeCAs, icon: Icon(Icons.delete)),
         ),
         ListTile(
           leading: const Text("Server ID:"),
@@ -491,7 +490,7 @@ class _SettingsState extends State<SettingsPage> {
         actions: [
           if(widget._controller._enablePoweroff) IconButton(tooltip: 'Poweroff', icon: const Icon(Icons.power_settings_new), onPressed: _poweroff),
           if(widget._controller._enableExit) IconButton(tooltip: 'Exit', icon: const Icon(Icons.exit_to_app), onPressed: _exit),
-          if(!isLinux) IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
+          if(!Platform.isLinux && !Platform.isWindows) IconButton(tooltip: 'Export', icon: const Icon(Icons.share), onPressed: _share),
           IconButton(tooltip: 'Import', icon: const Icon(Icons.file_open), onPressed: _import),
           IconButton(tooltip: 'Subscriptions', icon: const Icon(Icons.mediation),onPressed: _showPathSubscriptions),
           IconButton(tooltip: 'Help', icon: const Icon(Icons.help), onPressed: _showHelpPage),
@@ -568,8 +567,8 @@ class _SettingsState extends State<SettingsPage> {
 
     if(fpResult != null) {
       try {
-        Directory dir = await path_provider.getApplicationDocumentsDirectory();
-        String caPath = '${dir.path}/local-cas.pem';
+        Directory dir = await documentsDirectory();
+        String caPath = path.join(dir.path, trustsFilename);
         await File(fpResult.path!).copy(caPath);
       } catch (e) {
         widget._controller.l.e('Failed to import CAs', error: e);
@@ -579,8 +578,8 @@ class _SettingsState extends State<SettingsPage> {
 
   void _removeCAs() async {
     if(await widget._controller.askToConfirm(context, 'Delete Trusted CAs?', alwaysAsk: true)) {
-      Directory dir = await path_provider.getApplicationDocumentsDirectory();
-      final cas = File('${dir.path}/local-cas.pem');
+      Directory dir = await documentsDirectory();
+      final cas = File(path.join(dir.path, trustsFilename));
       cas.deleteSync();
     }
   }

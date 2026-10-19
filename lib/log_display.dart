@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:path/path.dart' as path;
 import 'package:share_plus/share_plus.dart';
 
 class LogDisplay extends StatefulWidget {
@@ -34,7 +34,7 @@ class _LogDisplayState extends State<LogDisplay> {
       appBar: AppBar(
         title: const Text("Log"),
         actions: [
-          if(!Platform.isLinux) IconButton(tooltip: 'Export Files', icon: const Icon(Icons.upload), onPressed: () {_upload(context);}),
+          if(!Platform.isLinux && !Platform.isWindows) IconButton(tooltip: 'Export Files', icon: const Icon(Icons.upload), onPressed: () {_upload(context);}),
           IconButton(tooltip: 'Share', icon: const Icon(Icons.share),
               onPressed: () {
                 _share(entries);
@@ -64,9 +64,9 @@ class _LogDisplayState extends State<LogDisplay> {
   void _share (List<String> entries) async {
     String text = entries.join('\n');
 
-    if(Platform.isLinux) {
-      Directory dir = await path_provider.getApplicationDocumentsDirectory();
-      File f = File('${dir.path}/$bi.log');
+    if(Platform.isLinux || Platform.isWindows) {
+      Directory dir = await documentsDirectory();
+      File f = File(path.join(dir.path, '$bi.log'));
       f.writeAsStringSync(text, flush: true);
       if(mounted) widget._controller.showMessage(context, 'Log written to "${f.path}"');
     } else {
@@ -75,7 +75,7 @@ class _LogDisplayState extends State<LogDisplay> {
   }
 
   void _upload (BuildContext context) async {
-    Directory dir = await path_provider.getApplicationDocumentsDirectory();
+    Directory dir = await documentsDirectory();
 
     if(context.mounted) {
       String? path = await FilesystemPicker.open(

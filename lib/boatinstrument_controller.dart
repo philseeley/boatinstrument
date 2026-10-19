@@ -34,6 +34,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:http/http.dart' as http;
 import 'package:format/format.dart' as fmt;
+import 'package:path/path.dart' as path;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:markdown_widget/markdown_widget.dart';
@@ -1091,8 +1092,8 @@ class BoatInstrumentController {
   Future<void> connect() async {
     try {
       final context = SecurityContext.defaultContext;
-      Directory dir = await path_provider.getApplicationDocumentsDirectory();
-      final cas = File('${dir.path}/local-cas.pem');
+      Directory dir = await documentsDirectory();
+      final cas = File(path.join(dir.path, trustsFilename));
       if(await cas.exists()) {
         context.setTrustedCertificatesBytes(cas.readAsBytesSync());
       }
