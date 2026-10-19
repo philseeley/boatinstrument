@@ -14,6 +14,11 @@ https://apps.apple.com/au/app/boat-instrument/id6614616870
 
 https://apps.microsoft.com/detail/9plncxg5wh39
 
+**Note:** the Apple Bonjour service is required. This can be installed from the PowerShell:
+
+    PS C:\> winget install --id Apple.Bonjour -e
+
+
 ## Linux
 
 ### Debian
