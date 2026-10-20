@@ -18,7 +18,6 @@ https://apps.microsoft.com/detail/9plncxg5wh39
 
     PS C:\> winget install --id Apple.Bonjour -e
 
-
 ## Linux
 
 ### Debian
@@ -27,10 +26,6 @@ https://philseeley.github.io/debian-ppa/
 
 For the Debian builds there are two flavours, one for Desktops and one for dedicated devices. The latter uses the flutter-pi engine to render to the console frame-buffer directly, without the need to install X11/Wayland.
 
-Debian Bullseye(11), Bookworm(12) and Trixie(13) are supported.
-
 ### Fedora
 
 https://philseeley.github.io/fedora-repo/
-
-Fedora 42, 43 and 44 are supported.

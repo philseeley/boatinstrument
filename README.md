@@ -143,5 +143,5 @@ If the new Box is to display a single value, consider subclassing the
 
 For Boxes with settings, the JSON serialising code should be generated with:
 ```shell
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
