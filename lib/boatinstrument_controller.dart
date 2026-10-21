@@ -34,6 +34,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_onscreen_keyboard/flutter_onscreen_keyboard.dart';
 import 'package:http/http.dart' as http;
 import 'package:format/format.dart' as fmt;
+import 'package:location/location.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart' show DateFormat;
@@ -54,6 +55,7 @@ import 'package:resizable_widget/resizable_widget.dart';
 import 'package:boatinstrument/widgets/autopilot_box.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:latlong2/latlong.dart' as ll;
 
 import 'log_display.dart';
 
@@ -131,6 +133,22 @@ class _BackgroundData {
   BackgroundTask? backgroundTaskInstance;
 }
 
+class DeviceLocationData {
+  final ll.LatLng position;
+  final double? positionAccuracy;
+  final double? heading;
+  final double? headingAccuracy;
+
+  const DeviceLocationData (
+    this.position,
+    this.positionAccuracy,
+    this.heading,
+    this.headingAccuracy
+  );
+}
+
+typedef LocationCallback = void Function(DeviceLocationData);
+
 class BoatInstrumentController {
   final CircularLogger l = CircularLogger();
   final _httpClient = http.Client();
@@ -176,6 +194,9 @@ class BoatInstrumentController {
   final Set<String> _controlPaths = {};
   final Set<String> _staticPaths = {};
 
+  final _location = Location();
+  StreamSubscription<LocationData>? _locationSubscription;
+  final Set<LocationCallback> _locationCallbacks = {};
 
   BoatInstrumentController(this._mainPageState, this._noAudio, this._noBrightnessControls, this._enableExit, this._enablePoweroff, this._enableSetTime) {
     _audioPlayer = _noAudio ? null : AudioPlayer();
@@ -470,6 +491,35 @@ class BoatInstrumentController {
 
   void playSoundFile(String? soundFile) {
     if(soundFile != null) _audioPlayer?.play(AssetSource(soundFile));
+  }
+
+  bool get deviceLocationAvailable => Platform.isAndroid || Platform.isIOS;
+
+  void listenToLocation(LocationCallback onLocation) {
+    _locationCallbacks.add(onLocation);
+    if(_locationCallbacks.length == 1) {
+      _locationSubscription = _location.onLocationChanged.listen(_onLocation);
+    }
+  }
+
+  void stopListeningToLocation(LocationCallback onLocation) {
+    _locationCallbacks.remove(onLocation);
+    if(_locationCallbacks.isEmpty) {
+      _locationSubscription?.cancel();
+    }
+  }
+
+  void _onLocation(LocationData locationData) {
+    final deviceLocationData = DeviceLocationData(
+      ll.LatLng(locationData.latitude, locationData.longitude),
+      locationData.accuracy,
+      (locationData.heading==null)?null:deg2Rad(locationData.heading!.toInt()),
+      (locationData.headingAccuracy == null)?null:deg2Rad(locationData.headingAccuracy!.toInt())
+    );
+
+    for (var callback in _locationCallbacks) {
+      callback(deviceLocationData);
+    }
   }
 
   Future<void> _loadDefaultConfig(bool portrait) async {

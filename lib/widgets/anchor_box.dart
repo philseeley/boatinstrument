@@ -36,6 +36,8 @@ class _AnchorAlarmSettings {
 }
 
 class _Map extends StatelessWidget {
+  static const Color deviceLocationColor = Colors.orange;
+
   final BoatInstrumentController _controller;
   final SignalkChart _signalkChart;
   final bool _showMap;
@@ -54,6 +56,8 @@ class _Map extends StatelessWidget {
   final double? _headingTrue;
   final double? _windAngleApparent;
   final List<ll.LatLng> _positions;
+  final DeviceLocationData? _deviceLocationData;
+  final double _boxSize;
 
   final MapController _mapController = MapController();
 
@@ -78,7 +82,9 @@ class _Map extends StatelessWidget {
     this._maxColor,
     this._headingTrue,
     this._windAngleApparent,
-    this._positions
+    this._positions,
+    this._deviceLocationData,
+    this._boxSize
   );
 
   @override
@@ -133,12 +139,17 @@ class _Map extends StatelessWidget {
           if(_maxRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newMaxRadius??_maxRadius!, useRadiusInMeter: true, borderColor: _maxColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_currentRadius != null) CircleMarker(point: _newAnchorPosition??_anchorPosition??_position, radius: _newCurrentRadius??_currentRadius!, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
           if(_desiredPosition == null && _currentRadius == null && _maxRadius == null) CircleMarker(point: _position, radius: _sampleRadius, useRadiusInMeter: true, borderColor: _currentColor, color: Colors.transparent, borderStrokeWidth: 2),
+          if(_deviceLocationData != null && _deviceLocationData!.positionAccuracy != null) CircleMarker(point: _deviceLocationData!.position, radius: _deviceLocationData!.positionAccuracy!, useRadiusInMeter: true, borderColor: deviceLocationColor, color: Colors.transparent, borderStrokeWidth: 2),
         ]),
         PolylineLayer(polylines: [
           if(_positions.isNotEmpty) Polyline(points: _positions, color: Colors.yellow),
           if(_headingTrue != null) Polyline(color: _currentColor, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, _maxRadius??_sampleRadius, rad2Deg(_headingTrue))]),
           if(_headingTrue != null && _windAngleApparent != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_position, ll.Distance().offset(_position, (_maxRadius??_sampleRadius)/2, rad2Deg(_headingTrue!+_windAngleApparent!))]),
-          if(_anchorPosition == null && _headingTrue != null && _windAngleApparent != null && _desiredPosition != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_desiredPosition, ll.Distance().offset(_desiredPosition, _sampleRadius, rad2Deg(_headingTrue!+_windAngleApparent!))])
+          if(_anchorPosition == null && _headingTrue != null && _windAngleApparent != null && _desiredPosition != null) Polyline(color: Colors.blue, strokeWidth: 2, points: [_desiredPosition, ll.Distance().offset(_desiredPosition, _sampleRadius, rad2Deg(_headingTrue!+_windAngleApparent!))]),
+          if(_deviceLocationData != null && _deviceLocationData!.heading != null) ...[
+            Polyline(color: deviceLocationColor, strokeWidth: 2, points: [_deviceLocationData!.position, ll.Distance().offset(_deviceLocationData!.position, _boxSize, rad2Deg(_deviceLocationData!.heading!-(_deviceLocationData!.headingAccuracy??0)))]),
+            if(_deviceLocationData!.headingAccuracy != null) Polyline(color: deviceLocationColor, strokeWidth: 2, points: [_deviceLocationData!.position, ll.Distance().offset(_deviceLocationData!.position, _boxSize, rad2Deg(_deviceLocationData!.heading!+_deviceLocationData!.headingAccuracy!))])
+          ]
         ]),
         MarkerLayer(markers: [
           if(_desiredPosition != null) Marker(point: _desiredPosition, child: Icon(Icons.highlight_off, color: _currentColor)),
@@ -146,7 +157,8 @@ class _Map extends StatelessWidget {
           Marker(point: _position, child: Transform.rotate(angle: (_headingTrue??0), child: Icon(_headingTrue == null?Icons.highlight_off:Icons.navigation, color: _maxColor))),
           if(_maxRadius != null) Marker(width: maxTextWidth, alignment: Alignment.centerLeft, point: maxRadiusPos, child: Text(maxRadiusText, style: s.copyWith(backgroundColor: _maxColor), textScaler: TextScaler.noScaling)),
           if(_currentRadius != null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: s.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
-          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: s.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling))
+          if(_currentRadius == null && _maxRadius == null) Marker(width: currentTextWidth, alignment: Alignment.centerRight, point: currentRadiusPos, child: Text(currentRadiusText, style: s.copyWith(backgroundColor: _currentColor), textScaler: TextScaler.noScaling)),
+          if(_deviceLocationData != null) Marker(point: _deviceLocationData!.position, child: Transform.rotate(angle: (_deviceLocationData!.heading??0), child: Icon(_deviceLocationData!.heading == null?Icons.highlight_off:Icons.navigation, color: deviceLocationColor))),
         ])
       ],
     );
@@ -190,6 +202,8 @@ class _AnchorState extends State<AnchorAlarmBox> {
   double? _newMaxRadius;
   double? _currentRadius;
   double? _newCurrentRadius;
+  static bool _getDevicePosition = false;
+  DeviceLocationData? _deviceLocationData;
   bool _unlocked = false;
   Timer? _lockTimer;
   static final List<ll.LatLng> _positions = [];
@@ -213,10 +227,13 @@ class _AnchorState extends State<AnchorAlarmBox> {
       'navigation.anchor.currentRadius'
     });
     _showMap = _settings.signalkChart.defined && _settings.startWithChart;
+
+    _toggleDevicePosition(on: _getDevicePosition);
   }
 
   @override
   void dispose() {
+    _toggleDevicePosition(on: false);
     _lockTimer?.cancel();
     super.dispose();
   }
@@ -258,6 +275,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
     final bg = Theme.of(context).colorScheme.onSurface;
     final dropColor = widget.config.controller.val2PSColor(context, 1, none: Colors.grey);
     final raiseColor = widget.config.controller.val2PSColor(context, -1, none: Colors.grey);
+    final boxSize = m.min(widget.config.constraints.maxWidth, widget.config.constraints.maxHeight);
 
     var zoom = _zoom;
     if(widget.config.editMode) {
@@ -290,7 +308,9 @@ class _AnchorState extends State<AnchorAlarmBox> {
         raiseColor,
         _headingTrue,
         _windAngleApparent,
-        _positions
+        _positions,
+        _deviceLocationData,
+        boxSize
       );
     }
 
@@ -312,6 +332,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
           ])
         ])),
         Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
+            if(widget.config.controller.deviceLocationAvailable) _button(_toggleDevicePosition, bg, iconData: _getDevicePosition?Icons.location_on:Icons.location_off),
             if(_settings.signalkChart.defined) _button(_toggleMap, bg, iconStack: Stack(children: [Icon(Icons.map), if(!_showMap) Icon(Icons.close)])),
             _button(() {_changeZoom(1);}, bg, iconData: Icons.add),
             _button(_resetZoom, bg, iconData: Icons.all_out),
@@ -438,6 +459,27 @@ class _AnchorState extends State<AnchorAlarmBox> {
       setState(() {
         _unlocked = false;
         _desiredPosition = _anchorPosition = _maxRadius = _currentRadius = null;
+      });
+    }
+  }
+
+  void _toggleDevicePosition({bool? on}) {
+    if(on == null) _getDevicePosition = !_getDevicePosition;
+
+    if(on??_getDevicePosition) {
+      widget.config.controller.listenToLocation(_onLocation);
+    } else {
+      widget.config.controller.stopListeningToLocation(_onLocation);
+      _deviceLocationData = null;
+    }
+
+    if(mounted) setState(() {});
+  }
+
+  void _onLocation(DeviceLocationData deviceLocationData) {
+    if(mounted) {
+      setState(() {
+        _deviceLocationData = deviceLocationData;
       });
     }
   }
