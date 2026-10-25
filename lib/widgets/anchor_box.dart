@@ -473,7 +473,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
       _deviceLocationData = null;
     }
 
-    if(mounted) setState(() {});
+    if(mounted && on == null) setState(() {});
   }
 
   void _onLocation(DeviceLocationData deviceLocationData) {
