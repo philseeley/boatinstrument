@@ -46,6 +46,14 @@ _TimerDisplaySettings _$TimerDisplaySettingsFromJson(
       NotificationState.warn,
   allowRestart: json['allowRestart'] as bool? ?? true,
   allowStop: json['allowStop'] as bool? ?? false,
+  enableBackupAlarm: json['enableBackupAlarm'] as bool? ?? false,
+  backupAlarmMinutes: (json['backupAlarmMinutes'] as num?)?.toInt() ?? 5,
+  backupNotificationState:
+      $enumDecodeNullable(
+        _$NotificationStateEnumMap,
+        json['backupNotificationState'],
+      ) ??
+      NotificationState.emergency,
 );
 
 Map<String, dynamic> _$TimerDisplaySettingsToJson(
@@ -55,6 +63,10 @@ Map<String, dynamic> _$TimerDisplaySettingsToJson(
   'notificationState': _$NotificationStateEnumMap[instance.notificationState]!,
   'allowRestart': instance.allowRestart,
   'allowStop': instance.allowStop,
+  'enableBackupAlarm': instance.enableBackupAlarm,
+  'backupAlarmMinutes': instance.backupAlarmMinutes,
+  'backupNotificationState':
+      _$NotificationStateEnumMap[instance.backupNotificationState]!,
 };
 
 const _$NotificationStateEnumMap = {

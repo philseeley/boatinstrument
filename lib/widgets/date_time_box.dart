@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as m;
 
 import 'package:flutter/material.dart';
 import 'package:boatinstrument/boatinstrument_controller.dart';
@@ -244,12 +245,18 @@ class _TimerDisplaySettings {
   NotificationState notificationState;
   bool allowRestart;
   bool allowStop;
+  bool enableBackupAlarm;
+  int backupAlarmMinutes;
+  NotificationState backupNotificationState;
 
   _TimerDisplaySettings({
     this.id = '',
     this.notificationState = NotificationState.warn,
     this.allowRestart = true,
-    this.allowStop = false
+    this.allowStop = false,
+    this.enableBackupAlarm = false,
+    this.backupAlarmMinutes = 5,
+    this.backupNotificationState = NotificationState.emergency
   });
 
   factory _TimerDisplaySettings.fromJson(SettingsData json) =>
@@ -259,15 +266,14 @@ class _TimerDisplaySettings {
 }
 
 class _Alarm {
-  DateTime expires;
-  NotificationState notificationState;
+  DateTime? expires;
+  final _TimerDisplaySettings settings;
 
-  _Alarm(this.expires, this.notificationState);
+  _Alarm(this.settings);
 }
 
 class TimerBackgroundTask extends BackgroundTask {
   final BoatInstrumentController _controller;
-  final Map<String, NotificationState> _notificationStates = {};
   final Map<String, _Alarm> _alarms = {};
   late final Timer _alarmTimer;
 
@@ -275,9 +281,17 @@ class TimerBackgroundTask extends BackgroundTask {
     Set<String> paths = {};
 
     for(var sd in settings) {
-      var s = _TimerDisplaySettings.fromJson(sd);
-      var path = _TimersSetupBoxState.timerPath(s.id);
-      _notificationStates[path] = s.notificationState;
+      final s = _TimerDisplaySettings.fromJson(sd);
+      final path = _TimersSetupBoxState.timerPath(s.id);
+      var alarm = _alarms[path];
+      if(alarm == null) {
+        _alarms[path] = _Alarm(s);
+      } else {
+        alarm.settings.notificationState = NotificationState.values[m.max(alarm.settings.notificationState.index, s.notificationState.index)];
+        alarm.settings.backupAlarmMinutes = m.min(alarm.settings.backupAlarmMinutes, s.backupAlarmMinutes);
+        alarm.settings.backupNotificationState = NotificationState.values[m.max(alarm.settings.enableBackupAlarm?alarm.settings.backupNotificationState.index:0, s.enableBackupAlarm?s.backupNotificationState.index:0)];
+        alarm.settings.enableBackupAlarm = alarm.settings.enableBackupAlarm || s.enableBackupAlarm;
+      }
       paths.add(path);
     }
 
@@ -294,25 +308,37 @@ class TimerBackgroundTask extends BackgroundTask {
 
    void _checkAlarms(_) {
     for(var a in _alarms.values) {
-      Duration d = a.expires.difference(_controller.timestamp());
+      if(a.expires != null) {
+        Duration d = a.expires!.difference(_controller.timestamp());
 
-      if(d.isNegative) _controller.playSoundFile(a.notificationState.soundFile);
+        if(d.isNegative) {
+          if(a.settings.enableBackupAlarm && d.inMinutes <= -a.settings.backupAlarmMinutes) {
+            _controller.playSoundFile(a.settings.backupNotificationState.soundFile);
+          } else {
+            _controller.playSoundFile(a.settings.notificationState.soundFile);
+          }
+        }
+      }
     }
   }
 
-  void _processData(List<Update> updates) {//print(updates);
+  void _processData(List<Update> updates) {
     for(var u in updates) {
-      if(u.value == null) {
-        _alarms.remove(u.path);
-      } else {
-        var expires = DateTime.tryParse(u.value['expires']??'');
-        if(expires == null) {
-          _alarms.remove(u.path);
+      final a = _alarms[u.path];
+
+      if(a != null) {
+        if(u.value == null) {
+          a.expires = null;
         } else {
-          _alarms[u.path] = _Alarm(expires, _notificationStates[u.path]!);
+          var expires = DateTime.tryParse(u.value['expires']??'');
+          if(expires == null) {
+            a.expires = null;
+          } else {
+            a.expires = expires;
+          }
         }
       }
-  }
+    }
   }
 }
 
@@ -475,18 +501,20 @@ class _TimerDisplaySettingsState extends State<_TimerDisplaySettingsWidget> {
           widget._controller,
           s.id,
           '$bi.timers',
-          (value) => s.id = value)
+          (value) => s.id = value
+        )
       ),
       ListTile(
-          leading: const Text("Alert Level:"),
-          title: EnumDropdownMenu(
-            NotificationState.values,
-            s.notificationState,
-            (v) {
-              setState(() {
-                s.notificationState = v!;
-              });
-            })
+        leading: const Text("Alert Level:"),
+        title: EnumDropdownMenu(
+          NotificationState.values,
+          s.notificationState,
+          (v) {
+            setState(() {
+              s.notificationState = v!;
+            });
+          }
+        )
       ),
       SwitchListTile(title: const Text("Allow Restart:"),
         value: s.allowRestart,
@@ -503,7 +531,45 @@ class _TimerDisplaySettingsState extends State<_TimerDisplaySettingsWidget> {
             s.allowStop = value;
           });
         }
-      )
+      ),
+      SwitchListTile(title: const Text("Backup Alarm:"),
+        value: s.enableBackupAlarm,
+        onChanged: (bool value) {
+          setState(() {
+            s.enableBackupAlarm = value;
+          });
+        }
+      ),
+      if(s.enableBackupAlarm) ...[
+        ListTile(
+          leading: const Text("Backup Alarm Delay:"),
+          title: Slider(
+            min: 1,
+            max: 30,
+            divisions: 29,
+            value: s.backupAlarmMinutes.toDouble(),
+            label: s.backupAlarmMinutes.toString(),
+            onChanged: (double value) {
+              setState(() {
+                s.backupAlarmMinutes = value.toInt();
+              });
+            }
+          ),
+          trailing: Text('${s.backupAlarmMinutes} mins'),
+        ),
+        ListTile(
+          leading: const Text("Alarm Level:"),
+          title: EnumDropdownMenu(
+            NotificationState.values,
+            s.backupNotificationState,
+            (v) {
+              setState(() {
+                s.backupNotificationState = v!;
+              });
+            }
+          )
+        ),
+      ]
     ]);
   }
 }

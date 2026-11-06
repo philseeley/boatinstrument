@@ -14,6 +14,8 @@
              Graphs - swap + and - actions to be consistent with expected behavior,
                i.e. + zooms in on data and - zooms out, like zooming a map.
              Battery State-of-Charge: now only shows whole values.
+             Timer Display now has a backup Alarm that sounds if the Timer is not
+               respond to.
   * 0.10.0 Swiping up, if "Quick Page Switch" enabled, shows a menu of pages.
            On Android the app keeps running when in the background or the
              phone is locked, provided it it given the required permissions.
