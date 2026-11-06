@@ -370,14 +370,8 @@ class TimerDisplayBox extends BoxWidget {
   }
 
   @override
-  Widget? getPerBoxSettingsHelp() => const HelpPage(text: '''Timers must first be defined and activated using the **Timers Setup** Box.
-
-The Restart and Stop buttons will only be displayed for Delta Timers.
-
-Setting the **Alert Level** to "Normal" or "Nominal" will disable the audio alarm.
-
-**Note:** audio will only sound when the **Timer Display** Box is visible on the current Page.''');
-  }
+  Widget? getPerBoxSettingsHelp() => const HelpPage(url: 'doc:timers.md');
+}
 
 class _TimerDisplayBoxState extends HeadedTextBoxState<TimerDisplayBox> {
   _Timer? _timer;
@@ -630,6 +624,9 @@ class TimersSetupBox extends BoxWidget {
   BoxSettingsWidget getSettingsWidget(Map<String, dynamic> json) {
     return _TimersSetupSettings(config.controller, _TimersSettings.fromJson(json));
   }
+
+  @override
+  Widget? getSettingsHelp() => const HelpPage(url: 'doc:timers.md');
 }
 
 class _TimersSetupBoxState extends HeadedBoxState<TimersSetupBox> {
