@@ -2,7 +2,7 @@
 
 A Boat Instrument for displaying data in fully configurable Boxes. The data is received via a subscription to a SignalK server.
 
-[<img src="media/youtube.png" width="200">](https://youtu.be/muNMslGeSYQ)
+[<img src="media/youtube.png" width="200">](https://youtu.be/iP5GLSs2QNo)
 
 For first-time users see the [installation](install.md) instructions and further [documentation](https://philseeley.github.io/docs/boatinstrument/main.html).
 
