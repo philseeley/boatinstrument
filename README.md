@@ -1,5 +1,7 @@
 # Boat Instrument
 
+[![boat tech directory](https://boat-tech-directory.rhizomatics.org.uk/images/badge.svg)](https://boat-tech-directory.rhizomatics.org.uk)
+
 A Boat Instrument for displaying data in fully configurable Boxes. The data is received via a subscription to a SignalK server.
 
 [<img src="media/youtube.png" width="200">](https://youtu.be/iP5GLSs2QNo)
