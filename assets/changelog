@@ -1,5 +1,5 @@
   * 0.11.0 On Linux and Windows, config files are now in the
-             $HOME/Documents/boatinstrument directory.
+             $HOME/Documents/boatinstrument sub-directory.
            The Quick Page Switch menu can now show Icons instead of
              the Page Name.
            Trusted CA Certificates can now be added if your SignalK server
@@ -10,7 +10,8 @@
              Device Battery level.
 
            Box updates:
-             Anchor Alarm allows you to set a Desired Location.
+             Anchor Alarm allows you to set a Desired Location and can show
+               your devices position.
              Graphs - swap + and - actions to be consistent with expected behavior,
                i.e. + zooms in on data and - zooms out, like zooming a map.
              Battery State-of-Charge: now only shows whole values.
