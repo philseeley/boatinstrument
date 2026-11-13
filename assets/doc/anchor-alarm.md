@@ -42,7 +42,9 @@ Once set, you can unlock and drag the anchor to move it and resize the alarm rad
 
 [Charts/Maps](doc:charts.md) can be display if configured in your SignalK server.
 
-When returning to your boat in a crowded anchorage, especially after dark, you can show your position and direction by toggling the ![device position](assets/icons/__THEME__/location.png) button. A circle indicating the reported location accuracy is shown and the heading accuracy is shown with two direction lines.
+On Android and iOS, when returning to your boat in a crowded anchorage, especially after dark, you can show your position and direction by toggling the ![device position](assets/icons/__THEME__/location.png) button. A circle indicating the reported location accuracy is shown and the heading accuracy is shown with two direction lines.
+
+**Note:** you must allow **Precise Location** permission to see your current location.
 
 ![device position](assets/icons/__THEME__/location.png) Show/Hide your device's location and direction.
 ![show/hide map](assets/icons/__THEME__/map.png) Show/Hide the Chart/Map

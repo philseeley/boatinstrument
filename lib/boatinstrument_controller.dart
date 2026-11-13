@@ -493,7 +493,26 @@ class BoatInstrumentController {
     if(soundFile != null) _audioPlayer?.play(AssetSource(soundFile));
   }
 
-  bool get deviceLocationAvailable => Platform.isAndroid || Platform.isIOS;
+  Future<bool> deviceLocationAvailable() async {
+    if(Platform.isAndroid || Platform.isIOS) {
+      var serviceEnabled = await _location.serviceEnabled();
+
+      if (!serviceEnabled) {
+        serviceEnabled = await _location.requestService();
+      }
+      if (!serviceEnabled) return false;
+
+      var permissionGranted = await _location.hasPermission();
+
+      if (permissionGranted != PermissionStatus.granted) {
+        permissionGranted = await _location.requestPermission();
+      }
+
+      return permissionGranted == PermissionStatus.granted;
+    } else {
+      return false;
+    }
+  }
 
   void listenToLocation(LocationCallback onLocation) {
     _locationCallbacks.add(onLocation);

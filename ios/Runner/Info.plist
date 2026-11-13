@@ -75,6 +75,6 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is only used locally on you phone</string>
+	<string>Your location is only used locally on your phone</string>
 </dict>
 </plist>

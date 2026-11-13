@@ -203,6 +203,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
   double? _currentRadius;
   double? _newCurrentRadius;
   static bool _getDevicePosition = false;
+  static bool? _deviceLocationAvailable;
   DeviceLocationData? _deviceLocationData;
   bool _unlocked = false;
   Timer? _lockTimer;
@@ -215,6 +216,9 @@ class _AnchorState extends State<AnchorAlarmBox> {
   @override
   void initState() {
     super.initState();
+    
+    _checkDeviceLocationAvailable();
+
     _lastPositionTime = widget.config.controller.timestamp();
 
     _settings = _AnchorAlarmSettings.fromJson(widget.config.controller.getBoxSettingsJson(widget.id));
@@ -231,6 +235,12 @@ class _AnchorState extends State<AnchorAlarmBox> {
     _toggleDevicePosition(on: _getDevicePosition);
   }
 
+  Future<void> _checkDeviceLocationAvailable() async {
+    _deviceLocationAvailable ??= await widget.config.controller.deviceLocationAvailable();
+    if(mounted) {
+      setState(() {});
+    }
+  }
   @override
   void dispose() {
     _toggleDevicePosition(on: false);
@@ -332,7 +342,7 @@ class _AnchorState extends State<AnchorAlarmBox> {
           ])
         ])),
         Positioned(bottom: pad, right: pad, child: Column(spacing: pad, children: [
-            if(widget.config.controller.deviceLocationAvailable) _button(_toggleDevicePosition, bg, iconData: _getDevicePosition?Icons.location_on:Icons.location_off),
+            if(_deviceLocationAvailable??false) _button(_toggleDevicePosition, bg, iconData: _getDevicePosition?Icons.location_on:Icons.location_off),
             if(_settings.signalkChart.defined) _button(_toggleMap, bg, iconStack: Stack(children: [Icon(Icons.map), if(!_showMap) Icon(Icons.close)])),
             _button(() {_changeZoom(1);}, bg, iconData: Icons.add),
             _button(_resetZoom, bg, iconData: Icons.all_out),
