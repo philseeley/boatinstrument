@@ -1198,22 +1198,24 @@ class BoatInstrumentController {
         l.i("Connecting to: $wsUri");
 
         _dataChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
-        _controlChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
 
         await _dataChannel?.ready;
-        await _controlChannel?.ready;
 
         _dataStreamSubscription = _dataChannel?.stream.listen(
             _processData,
             onError: (e) {
-              l.e('WebSocket stream error', error: e);
+              l.e('Data WebSocket stream error', error: e);
             },
             onDone: () {
-              l.w('WebSocket closed');
+              l.w('Data WebSocket closed');
             }
         );
 
         if(_signalk.allowRemoteControl) {
+          _controlChannel = IOWebSocketChannel.connect(wsUri.replace(query: 'subscribe=none'), headers: _httpHeaders(null));
+
+          await _controlChannel?.ready;
+
           _controlStreamSubscription = _controlChannel?.stream.listen(
               _processData,
               onError: (e) {
@@ -1307,7 +1309,7 @@ class BoatInstrumentController {
       );
     }
 
-    if(connecting) {
+    if(connecting && _controlChannel != null) {
       List<Map<String, dynamic>> subscribe = [];
 
       for(String path in _controlPaths) {
